@@ -1,0 +1,118 @@
+/* Contenedor Principal */
+.login-container {
+  width: 100vw; /* Usa el 100% del viewport */
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Evita el scroll horizontal */
+}
+
+/* Contenedor de Contenido */
+.login-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 1200px; /* Evita que el contenido se expanda demasiado */
+  margin: auto;
+}
+
+/* Sección del Logo */
+.login-logo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 50%; /* Se asegura de que ocupa la mitad de la pantalla */
+  padding: 20px;
+}
+
+/* Logo y Texto */
+.login-logo {
+  max-width: 50%;
+  margin-bottom: 10px;
+}
+
+.login-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #001f5b;
+  margin: 10px 0;
+}
+
+/* Sección del Formulario */
+.login-form-section {
+  display: flex;
+  justify-content: center;
+  width: 50%; /* Se asegura de que ocupa la otra mitad de la pantalla */
+  padding: 20px;
+}
+
+.login-form-container {
+  background: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.login-form-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #001f5b;
+  margin-bottom: 20px;
+}
+
+/* Campos del formulario */
+.login-field {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  margin-bottom: 15px;
+}
+
+.login-field label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.login-field input {
+  padding: 10px;
+  font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+  transition: border-color 0.3s ease;
+}
+
+.login-field input:focus {
+  border-color: #001f5b;
+  outline: none;
+}
+
+/* Botón */
+.login-button {
+  margin-top: 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 12px;
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: none;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  width: 100%;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background-color: #001F5B;
+  transform: scale(1.05);
+}

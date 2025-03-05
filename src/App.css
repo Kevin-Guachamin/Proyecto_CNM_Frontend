@@ -1,0 +1,6 @@
+html, body {
+  width: 100vw; /* Asegura que no haya desbordamiento horizontal */
+  overflow-x: hidden; /* Oculta cualquier posible scroll extra */
+  margin: 0;
+  padding: 0;
+}

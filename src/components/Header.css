@@ -1,0 +1,123 @@
+.header-container {
+  background-color: #00408a; /* Azul profundo */
+  width: 100vw; /* Ocupar todo el ancho de la ventana */
+  padding: 15px 0;
+  display: flex;
+  justify-content: center;
+  overflow-x: hidden; /* Evita que elementos internos causen scroll */
+  border-bottom: 5px solid #666666; /* Línea en el final del color azul */
+}
+
+.header-content {
+  width: 100%; /* Asegura que ocupe todo el ancho */
+  max-width: none; /* Quita la restricción de 1200px */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px; /* Margen interno para evitar que quede pegado */
+}
+
+/* Sección Izquierda */
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-logo {
+  width: 60px;
+  margin-right: 15px;
+}
+
+.header-title {
+  font-weight: bold;
+  color: white;
+  font-size: 22px;
+  margin: 0;
+}
+
+/* Sección Derecha */
+.header-right {
+  text-align: right;
+}
+
+.header-version,
+.header-date {
+  color: #E3F2FD;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Contenedor del menú */
+.menu-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Botón de menú (☰) */
+.menu-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+  padding: 5px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.menu-button:hover {
+  transform: scale(1.1);
+}
+
+/* Menú desplegable */
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 40px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  width: 200px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 100;
+}
+
+/* Nombre del usuario en el menú */
+.user-name {
+  font-weight: bold;
+  color: #00408a;
+  margin-bottom: 5px;
+}
+
+/* Rol del usuario */
+.user-role {
+  color: gray;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+/* Botón de cerrar sesión */
+.logout-button {
+  background: #d9534f;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.2s ease-in-out;
+}
+
+.logout-button:hover {
+  background: #c9302c;
+}
+
+/* Asegurar que el header no se vea afectado */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}

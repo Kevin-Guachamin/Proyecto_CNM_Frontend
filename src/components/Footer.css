@@ -1,0 +1,49 @@
+.footer-container {
+  background-color: #00408a !important; /* Azul profundo */
+  color: white;
+  text-align: center;
+  width: 100%;  /* Asegura que ocupe toda la pantalla */
+  height: auto;
+  margin: 0;
+  position: relative;
+  bottom: 0;
+  left: 0;
+  border-top: 5px solid #666666; /* Línea en el inicio del color azul */
+}
+
+.footer-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 5%;
+  margin: 0% 0% 0% 0%;
+  padding: 1%;
+}
+
+.footer-social {
+  margin-top: 0%;
+}
+
+.footer-icon {
+  color: white !important;
+  margin: 0 15px;
+}
+.footer-info {
+  display: flex;
+  justify-content: space-around; /* Distribuye los elementos equitativamente */
+  align-items: center; /* Centra los elementos en la línea */
+  flex-wrap: wrap; /* Permite que bajen si no hay espacio suficiente */
+  width: 100%;
+  padding: 10px 20px;
+  text-align: center;
+}
+
+.footer-item {
+  flex: 1; /* Hace que cada item ocupe el mismo espacio */
+  max-width: 300px; /* Controla el ancho máximo de cada ítem */
+  text-align: justify; /* Mantiene la justificación del texto */
+  display: flex;
+  flex-direction: column; /* Asegura que el texto respete el espacio disponible */
+  align-items: center; /* Centra los ítems en la línea */
+}
+
+
