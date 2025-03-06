@@ -1,0 +1,46 @@
+/* Contenedor principal con altura mínima y scroll vertical */
+.content-container {
+    min-height: 500px; /* Ajusta según necesidad */
+    max-height: 80vh; /* Permite que el contenido no se desborde demasiado */
+    overflow-y: auto; /* Habilita el scroll vertical solo si es necesario */
+    padding: 20px;
+}
+
+/* Contenedor para las tablas con scroll horizontal */
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* Habilita el desplazamiento horizontal */
+}
+
+/* Asegura que la tabla tenga espacio suficiente */
+.table-container table {
+    width: max-content; /* Mantiene el tamaño de la tabla si es muy ancha */
+    min-width: 100%; /* Evita que sea más pequeña de lo necesario */
+    border-collapse: collapse;
+}
+  
+  /* Encabezado */
+  .container-fluid {
+    background-color: #0d6efd; /* Color azul */
+    padding: 10px;
+  }
+  
+  /* Tabs */
+  #calificaciones-tabs .nav-link {
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  /* Contenido dentro de los Tabs */
+  .tab-content {
+    padding: 20px;
+    background-color: #f8f9fa; /* Fondo claro */
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+  }
+  
+  /* Estilos generales */
+  h2 {
+    color: #0d6efd;
+  }
+  
