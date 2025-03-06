@@ -1,60 +1,64 @@
 /* Sidebar */
 .sidebar {
-    height: 100vh;
-    background-color: #333;
-    color: white;
-    padding: 20px;
-    width: 250px;
-    transition: width 0.3s ease;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .sidebar.collapsed {
-    width: 64px;
-  }
-  
-  .sidebar.dark {
-    background-color: #333;
-    color: white;
-  }
-  
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .toggle-btn,
-  .theme-btn {
-    background: transparent;
-    border: none;
-    color: white;
-    cursor: pointer;
-  }
-  
-  .menu {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .menu-item {
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .menu-item.active {
-    background-color: #007bff;
-  }
-  
-  .menu-item:hover {
-    background-color: #555;
-  }
-  
-  .menu-item span {
-    margin-left: 10px;
-  }
+  height: 100vh;
+  background-color: #333;
+  color: white;
+  padding: 0px;
+  width: 200px;
+  transition: width 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar.collapsed {
+  width: 45px;
+}
+
+.sidebar.dark {
+  background-color: #333;
+  color: white;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.toggle-btn,
+.theme-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.menu {
+  list-style-type: none;
+  padding: 0px;
+  margin: 0; /* Evitar márgenes extras */
+}
+
+.menu-item {
+  padding: 10px 10px; /* Ajusta los valores del padding */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-sizing: border-box; /* Asegúrate de que el padding no cause espacio extra */
+  margin: 0px; /* Elimina cualquier margen adicional */
+}
+
+.menu-item.active {
+  background-color: #007bff;
+  border-radius: 0; /* Asegúrate de que no haya bordes redondeados */
+}
+
+.menu-item:hover {
+  background-color: #555;
+}
+
+.menu-item span {
+  margin-left: 10px;
+}
