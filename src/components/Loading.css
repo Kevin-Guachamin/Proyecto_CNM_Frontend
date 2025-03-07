@@ -1,0 +1,13 @@
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed; /* Para que se quede en el centro de la pantalla */
+    top: 0;
+    left: 0;
+    width: 100vw; /* Ancho total de la ventana */
+    height: 100vh; /* Altura total de la ventana */
+    background-color: rgba(255, 255, 255, 0.7); /* Fondo semitransparente si lo deseas */
+    z-index: 9999; /* Para asegurarse de que esté por encima de otros contenidos */
+  }
+  

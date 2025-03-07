@@ -2,11 +2,12 @@
 .header-container {
   background-color: #00408a; /* Azul profundo */
   width: 100vw; /* Ocupar todo el ancho de la ventana */
+  height: 45px;
   padding: 15px 0;
   display: flex;
   justify-content: center;
   overflow-x: hidden; /* Evita que elementos internos causen scroll */
-  border-bottom: 5px solid #666666; /* Línea en el final del color azul */
+  border-bottom: 0px /* Línea en el final del color azul */
 }
 
 /* Contenido del header */
