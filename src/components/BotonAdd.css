@@ -1,0 +1,21 @@
+.boton-add {
+    background-color: #28a745; /* Verde */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espacio entre el icono y el texto */
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .boton-add:hover {
+    background-color: #218838; /* Verde más oscuro en hover */
+  }
+  
+  .icono {
+    stroke-width: 5; /* Grosor del icono */
+  }
