@@ -1,11 +1,12 @@
 import { FaEdit, FaTrash } from 'react-icons/fa'; // Importar íconos
-import './Estilos.css'
+import "./Tabla.css"
+import "./common.css"
 
 function Tabla({filteredPeriodos,OnDelete, OnEdit}) {
   return (
     <div className="Contendor-tabla">
         {filteredPeriodos.length === 0 ? (
-          <p className="no-usuarios">No hay periodos registrados.</p>
+          <p className="no-periodos">No hay periodos registrados.</p>
         ) : (
           <table className="tabla_periodos">
             <thead>

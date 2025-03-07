@@ -43,7 +43,7 @@ function Index() {
     }, [API_URL]);
   
   return (
-    <div>
+    <div className="section-container">
        {/* Encabezado */}
        <div className="container-fluid p-0">
           {usuario && <Header isAuthenticated={true} usuario={usuario} />}

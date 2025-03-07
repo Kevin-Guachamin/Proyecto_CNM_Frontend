@@ -1,0 +1,20 @@
+/* Estilos para la tabla */
+.Contendor-tabla {
+    padding: 20px;
+  }
+  
+  .tabla_periodos {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .tabla_periodos th, .tabla_periodos td {
+    padding: 10px;
+    border: 1px solid #ddd;
+  }
+  
+  .no-periodos {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #888;
+  }

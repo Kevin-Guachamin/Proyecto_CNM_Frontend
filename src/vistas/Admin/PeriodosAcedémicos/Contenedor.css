@@ -1,0 +1,39 @@
+/* Estilos para el contenedor */
+.Contenedor-general {
+    padding: 20px;
+  }
+  
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal-content-periodos {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 60%;
+  }
+  
+  .no-periodos {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #888;
+  }
+  
+  .tabla_periodos {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .tabla_periodos th, .tabla_periodos td {
+    padding: 10px;
+    border: 1px solid #ddd;
+  }

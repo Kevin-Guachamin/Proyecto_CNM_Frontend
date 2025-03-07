@@ -1,7 +1,8 @@
 import React from 'react'
 import BotonAdd from '../../../components/BotonAdd'
 import Input from '../../../components/Input'
-import './Estilos.css'
+import "./Filtro.css"
+import "./common.css"
 
 function Filtro({search, setSearch, toggleModal}) {
   return (

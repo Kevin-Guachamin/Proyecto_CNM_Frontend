@@ -1,11 +1,12 @@
-import React,{useState} from 'react'
+import React,{useState, useEffect} from 'react'
 import Filtro from './Filtro';
 import CrearPeriodo from './CrearPeriodo';
 import Tabla from './Tabla';
 import axios from 'axios'
 import { ErrorMessage } from '../../../Utils/ErrorMesaje';
 import Swal from 'sweetalert2';
-import "./Estilos.css"
+import "./common.css"
+import "./Contenedor.css"
 
 function Contenedor({periodos,setPeriodos}) {
   const [search, setSearch] = useState('');
@@ -16,10 +17,11 @@ function Contenedor({periodos,setPeriodos}) {
   const filteredPeriodos = periodos.filter((periodo) =>
     periodo.descripcion.toLowerCase().includes(search.toLowerCase())
   );
+  
   const toggleModal = () => {
-    console.log("se abrió")
+    
     setIsModalOpen((prev) => !prev);
-    console.log("este es el estado",isModalOpen)
+    
     setPeriodoToUpdate(null); // Resetear usuario al abrir el modal
   };
   const handleSavePeriodo = (newPeriodo) => {

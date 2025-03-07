@@ -1,0 +1,36 @@
+/* Estilos comunes */
+.input-field {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .boton {
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .boton-crear {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .boton-cancelar {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .icon {
+    cursor: pointer;
+    margin: 0 5px;
+  }
+  
+  .edit-icon {
+    color: #007bff;
+  }
+  
+  .delete-icon {
+    color: #dc3545;
+  }
