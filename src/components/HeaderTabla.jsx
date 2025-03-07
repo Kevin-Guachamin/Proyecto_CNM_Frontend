@@ -9,9 +9,12 @@ const HeaderTabla = ({ datosEncabezado, imagenIzquierda, imagenDerecha }) => {
           <img src={imagenIzquierda} alt="Logo Izquierdo" style={{ height: "80px" }} />
         )}
 
-        {/* Título centrado */}
-        <h4 className="fw-bold flex-grow-1 text-center">{datosEncabezado.titulo}</h4>
-
+        {/* Contenedor para centrar título y subtítulo */}
+        <div className="text-center flex-grow-1">
+          <h4 className="fw-bold">{datosEncabezado.titulo}</h4>
+          <h5 className="fw-bold">{datosEncabezado.subtitulo}</h5>
+        </div>
+        
         {/* Imagen derecha (opcional) */}
         {imagenDerecha && (
           <img src={imagenDerecha} alt="Logo Derecho" style={{ height: "80px" }} />

@@ -33,13 +33,14 @@ function Calificaciones() {
       { name: "Configuración", icon: <Settings size={20} /> },
     ];
 
+    
     return (
       <>
         {/* Encabezado */}
         <div className="container-fluid p-0">
           {usuario && <Header isAuthenticated={true} usuario={usuario} />}
         </div>
-    
+  
         {/* Layout */}
         <Layout modules={modules}>
           {/* Contenido Principal */}
@@ -47,36 +48,37 @@ function Calificaciones() {
             <Container className="mt-4">
               <h2 className="text-center mb-4">Gestión de Calificaciones</h2>
               <Tabs defaultActiveKey="quimestre1" id="calificaciones-tabs" className="mb-3" fill>
+                
                 {/* 🔹 Quimestre 1 */}
                 <Tab eventKey="quimestre1" title="Quimestre 1">
                   <Tabs defaultActiveKey="parcial1-quim1" className="mb-3" fill>
                     <Tab eventKey="parcial1-quim1" title="Parcial 1 - Quim 1">
-                      <Parcial />
+                      <Parcial quimestreSeleccionado="1" parcialSeleccionado="1" />
                     </Tab>
                     <Tab eventKey="parcial2-quim1" title="Parcial 2 - Quim 1">
-                      <Parcial />
+                      <Parcial quimestreSeleccionado="1" parcialSeleccionado="2" />
                     </Tab>
                     <Tab eventKey="quimestre1" title="Quimestre 1">
-                      <Quimestral />
+                      <Quimestral quimestreSeleccionado="1" />
                     </Tab>
                   </Tabs>
                 </Tab>
-    
+  
                 {/* 🔹 Quimestre 2 */}
                 <Tab eventKey="quimestre2" title="Quimestre 2">
                   <Tabs defaultActiveKey="parcial1-quim2" className="mb-3" fill>
                     <Tab eventKey="parcial1-quim2" title="Parcial 1 - Quim 2">
-                      <Parcial />
+                      <Parcial quimestreSeleccionado="2" parcialSeleccionado="1" />
                     </Tab>
                     <Tab eventKey="parcial2-quim2" title="Parcial 2 - Quim 2">
-                      <Parcial />
+                      <Parcial quimestreSeleccionado="2" parcialSeleccionado="2" />
                     </Tab>
                     <Tab eventKey="quimestre2" title="Quimestre 2">
-                      <Quimestral />
+                      <Quimestral quimestreSeleccionado="2" />
                     </Tab>
                   </Tabs>
                 </Tab>
-    
+  
                 {/* 🔹 Nota Final */}
                 <Tab eventKey="notaFinal" title="Nota Final">
                   <Final />
@@ -88,5 +90,5 @@ function Calificaciones() {
       </>
     );
   }
-
+  
 export default Calificaciones;

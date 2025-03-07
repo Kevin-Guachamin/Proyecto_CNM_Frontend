@@ -2,9 +2,16 @@ import React from "react";
 import HeaderTabla from "../components/HeaderTabla";
 import Tabla from "../components/Tabla";
 
-function Parcial() {
+function Parcial({ quimestreSeleccionado, parcialSeleccionado }) {
+  console.log("quimestreSeleccionado:", quimestreSeleccionado); // Debugging
+  console.log("parcialSeleccionado:", parcialSeleccionado); // Debugging
+
+  // Generar el subtítulo dinámico correctamente
+  const subtitulo = `ACTA DE CALIFICACIONES ${parcialSeleccionado === "1" ? "PRIMER" : "SEGUNDO"} PARCIAL - ${quimestreSeleccionado === "1" ? "PRIMER" : "SEGUNDO"} QUIMESTRE`;
+
   const datosEncabezado = {
-    titulo: "ACTA DE CALIFICACIONES PRIMER PARCIAL - PRIMER QUIMESTRE",
+    titulo: "CONSERVATORIO NACIONAL DE MUSICA",  // Título fijo
+    subtitulo: subtitulo,  // Subtítulo dinámico corregido
     info: {
       "Profesor": "Guachis",
       "Asignatura": "Instrumento",
