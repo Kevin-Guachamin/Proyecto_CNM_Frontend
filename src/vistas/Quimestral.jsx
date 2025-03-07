@@ -2,9 +2,14 @@ import React from "react";
 import HeaderTabla from "../components/HeaderTabla";
 import Tabla from "../components/Tabla";
 
-const Quimestral = () => {
+const Quimestral = ({ quimestreSeleccionado }) => {
+  console.log("quimestreSeleccionado:", quimestreSeleccionado); // Debugging
+
+  const subtitulo = `ACTA DE RESUMEN DEL ${quimestreSeleccionado === "1" ? "PRIMER" : "SEGUNDO"} QUIMESTRE`;
+  
   const datosEncabezado = {
-    titulo: "ACTA DE RESUMEN DEL PRIMER QUIMESTRE",
+    titulo: "CONSERVATORIO NACIONAL DE MUSICA",  // Título fijo
+    subtitulo: subtitulo,  // Subtítulo dinámico corregido
     info: {
       "Profesor": "Guachis",
       "Asignatura": "Instrumento",

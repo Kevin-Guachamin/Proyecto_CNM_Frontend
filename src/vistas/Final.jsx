@@ -4,7 +4,8 @@ import Tabla from "../components/Tabla";
 
 const Final = () => {
   const datosEncabezado = {
-    titulo: "ACTA DE FINAL",
+    titulo: "CONSERVATORIO NACIONAL DE MUSICA",
+    subtitulo: "ACTA FINAL",
     info: {
       "Profesor": "Guachis",
       "Asignatura": "Instrumento",
