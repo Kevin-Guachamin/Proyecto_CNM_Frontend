@@ -5,7 +5,6 @@ import Tabla from './Tabla';
 import axios from 'axios'
 import { ErrorMessage } from '../../../Utils/ErrorMesaje';
 import Swal from 'sweetalert2';
-import "./common.css"
 import "./Contenedor.css"
 
 function Contenedor({periodos,setPeriodos}) {
@@ -17,7 +16,9 @@ function Contenedor({periodos,setPeriodos}) {
   const filteredPeriodos = periodos.filter((periodo) =>
     periodo.descripcion.toLowerCase().includes(search.toLowerCase())
   );
-  
+  useEffect(() => {
+    console.log("Modal abierto:", isModalOpen);
+  }, [isModalOpen]);
   const toggleModal = () => {
     
     setIsModalOpen((prev) => !prev);
@@ -25,18 +26,19 @@ function Contenedor({periodos,setPeriodos}) {
     setPeriodoToUpdate(null); // Resetear usuario al abrir el modal
   };
   const handleSavePeriodo = (newPeriodo) => {
-    
+    console.log("este es el periodo",newPeriodo)
     if (periodoToUpdate) {
       // Si estamos editando un usuario, lo actualizamos
       axios
-        .put(`${API_URL}/periodo_academico/editar/${periodoToUpdate.id}`, newPeriodo)
+        .put(`${API_URL}/periodo_academico/editar/${periodoToUpdate.ID}`, newPeriodo)
         .then((res) => {
           // Actualizamos el array de usuarios con la respuesta del servidor
           setPeriodos((prevPeriodos) =>
             prevPeriodos.map((periodo) =>
-              periodo.id === periodoToUpdate.id ? res.data : periodo
+              periodo.ID === periodoToUpdate.ID ? res.data : periodo
             )
           );
+          setIsModalOpen(false); // Cerrar el modal
         })
         .catch((error) => {
           ErrorMessage(error)
@@ -49,13 +51,15 @@ function Contenedor({periodos,setPeriodos}) {
         .post(`${API_URL}/periodo_academico/crear`, newPeriodo)
         .then((res) => {
           setPeriodos((prevPeriodos) => [...prevPeriodos, res.data]);
+          setIsModalOpen(false); // Cerrar el modal
         })
         .catch((error) => {
-          console.log("Respuesta fallida: " + error.message);
+          ErrorMessage(error)
+          console.log(error)
         });
      
   
-    setIsModalOpen(false); // Cerrar el modal
+    
 }
   }
   const handleEdit = (periodo) => {
@@ -77,13 +81,13 @@ function Contenedor({periodos,setPeriodos}) {
         if (result.isConfirmed) {
             // Eliminar usuario por ID
             axios
-                .delete(`${API_URL}/periodo_academico/eliminar/${periodo.id}`)
+                .delete(`${API_URL}/periodo_academico/eliminar/${periodo.ID}`)
                 .then((res) => {
                   
-                  setPeriodos((prevPeriodos) => prevPeriodos.filter((p) => p.id !== periodo.id));
+                  setPeriodos((prevPeriodos) => prevPeriodos.filter((p) => p.ID !== periodo.ID));
                     Swal.fire(
                         'Eliminado!',
-                        `El usuario ${res.data.descripcion} ha sido eliminado.`,
+                        `El periodo ${res.data.descripcion} ha sido eliminado.`,
                         'success'
                     );
                 })

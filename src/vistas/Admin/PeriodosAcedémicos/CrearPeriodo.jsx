@@ -2,36 +2,48 @@ import React, { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import Boton from '../../../components/Boton';
 import Input from '../../../components/Input';
+import "react-datepicker/dist/react-datepicker.css"; // Importa el CSS de react-datepicker
 import './CrearPeriodo.css';
-import "./common.css"
 
 function CrearPeriodo({ onCancel, periodoToUpdate, onSave }) {
     const [descripcion, setDescripcion] = useState("");
-    const [fecha_inicio, setFecha_inicio] = useState("");
-    const [fecha_fin, setFecha_fin] = useState("");
+    const [fecha_inicio, setFecha_inicio] = useState(null);
+    const [fecha_fin, setFecha_fin] = useState(null);
     const [estado, setEstado] = useState("");
 
-    useEffect(() => {
-        if (periodoToUpdate) {
-            setDescripcion(periodoToUpdate.descripcion || "");
-            setFecha_fin(periodoToUpdate.fecha_fin || "");
-            setFecha_inicio(periodoToUpdate.fecha_inicio || "");
-            setEstado(periodoToUpdate.estado || "");
-        }
-    }, [periodoToUpdate]);
+     // Función para convertir una fecha de formato dd/mm/yyyy a un objeto Date
+     const convertirFecha = (fecha) => {
+      if (!fecha) return null;
+      const [dia, mes, año] = fecha.split('/');
+      return new Date(`${año}-${mes}-${dia}`); // Convertir a formato ISO (yyyy-mm-dd)
+  };
+
+  useEffect(() => {
+      if (periodoToUpdate) {
+          setDescripcion(periodoToUpdate.descripcion || "");
+          // Convertir las fechas de dd/mm/yyyy a objetos Date
+          setFecha_fin(convertirFecha(periodoToUpdate.fecha_fin));
+          setFecha_inicio(convertirFecha(periodoToUpdate.fecha_inicio));
+          setEstado(periodoToUpdate.estado || "");
+      }
+  }, [periodoToUpdate]);
 
     const handleSubmit = () => {
-        const newPeriodo = { descripcion, fecha_inicio, fecha_fin, estado };
+        // Convertir las fechas a formato ISO (yyyy-MM-dd) antes de enviarlas
+        const formattedFechaInicio = fecha_inicio ? fecha_inicio.toISOString().split('T')[0] : null;
+        const formattedFechaFin = fecha_fin ? fecha_fin.toISOString().split('T')[0] : null;
+
+        const newPeriodo = { descripcion, fecha_inicio: formattedFechaInicio, fecha_fin: formattedFechaFin, estado };
         onSave(newPeriodo);
     };
 
     return (
         <div className="crear-periodo">
-            <h2>{periodoToUpdate ? 'Editar periodo' : 'Crear periodo'}</h2>
+            <h2>{periodoToUpdate ? 'Editar periodo' : 'Agregar periodo'}</h2>
             <div className="formulario">
                 <div className="form-row">
                     <div className="form-group">
-                        <label htmlFor="Descripcion">Descripción</label>
+                        <label htmlFor="descripcion">Descripción</label>
                         <Input
                             id="descripcion"
                             value={descripcion}
@@ -39,6 +51,7 @@ function CrearPeriodo({ onCancel, periodoToUpdate, onSave }) {
                             fondo="Ingrese la descripción"
                         />
                     </div>
+
                     <div className="form-group">
                         <label htmlFor="estado">Estado</label>
                         <select
@@ -52,29 +65,27 @@ function CrearPeriodo({ onCancel, periodoToUpdate, onSave }) {
                             <option value="Finalizado">Finalizado</option>
                         </select>
                     </div>
-                </div>
 
-                <div className="form-row">
                     <div className="form-group">
                         <label htmlFor="fecha_inicio">Fecha inicio</label>
                         <DatePicker
-                            selected={fecha_inicio}
-                            onChange={(date) => setFecha_inicio(date)}
-                            dateFormat="dd/MM/yyyy"
-                            className="input-field"
+                          selected={fecha_inicio}
+                          onChange={(date) => setFecha_inicio(date)} // Establecer directamente como Date
+                          dateFormat="dd/MM/yyyy"
+                          className="input-field"
                         />
                     </div>
+
                     <div className="form-group">
                         <label htmlFor="fecha_fin">Fecha fin</label>
                         <DatePicker
-                            selected={fecha_fin}
-                            onChange={(date) => setFecha_fin(date)}
-                            dateFormat="dd/MM/yyyy"
-                            className="input-field"
+                          selected={fecha_fin}
+                          onChange={(date) => setFecha_fin(date)} // Establecer directamente como Date
+                          dateFormat="dd/MM/yyyy"
+                          className="input-field"
                         />
                     </div>
                 </div>
-
             </div>
 
             <div className="botones">

@@ -1,27 +1,83 @@
-/* Estilos para la creación de periodo */
+/* Estilos generales para el formulario */
 .crear-periodo {
-    background-color: #f8f9fa;
-    padding: 20px;
-    border-radius: 5px;
-    width: 50%;
-    margin: 0 auto;
-  }
-  
-  .crear-periodo h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .formulario {
-    margin-bottom: 20px;
-  }
-  
-  .form-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-  }
-  
-  .form-group {
-    width: 48%;
-  }
+  background-color: #f8f9fa;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border-radius: 5px;
+  width: 90%; /* Ajusta el ancho según necesites */
+  margin: 0 auto;
+}
+.input-field {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+.crear-periodo h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  margin-left: 0px;
+  margin-right: 0px;
+  border:0;
+}
+
+/* Contenedor de formulario */
+.formulario {
+  margin-bottom: 20px;
+}
+
+/* Fila para los grupos de entrada */
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap; /* Esto permite que los elementos se ajusten si no hay suficiente espacio */
+}
+
+/* Cada grupo de entrada ocupará un porcentaje del ancho disponible */
+.form-group {
+  flex: 1 1 20%; /* Asegura que cada campo ocupe un 20% del contenedor */
+  margin-right: 10px; /* Espaciado entre los elementos */
+  box-sizing: border-box;
+}
+
+/* Ajustar el input de fecha del calendario */
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker__input-container input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+.botones {
+  display: flex;
+  justify-content: flex-start; /* Alinea los botones hacia la izquierda */
+  gap: 10px; /* Espacio entre los botones */
+  margin-top: 20px; /* Espacio entre el formulario y los botones */
+}
+/* Botón guardar */
+.boton-crear {
+  background-color: #007bff;
+  color: white;
+  width: auto; /* El ancho debe ser automático, no debe ocupar todo el espacio */
+  border-radius: 10%;
+}
+
+/* Botón cancelar */
+.boton-cancelar {
+  background-color: #dc3545;
+  color: white;
+  width: auto; /* El ancho debe ser automático, no debe ocupar todo el espacio */
+  border-radius: 10%;
+}
+.boton-crear:hover {
+  background-color: #0056b3; /* Azul más oscuro en hover */
+  color: white; /* Color del texto cuando se hace hover */
+}
+
+.boton-cancelar:hover {
+  background-color: #c82333; /* Rojo más oscuro en hover */
+  color: white; /* Color del texto cuando se hace hover */
+}

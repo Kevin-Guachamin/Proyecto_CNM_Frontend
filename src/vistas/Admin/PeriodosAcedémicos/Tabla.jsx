@@ -1,6 +1,6 @@
 import { FaEdit, FaTrash } from 'react-icons/fa'; // Importar íconos
 import "./Tabla.css"
-import "./common.css"
+
 
 function Tabla({filteredPeriodos,OnDelete, OnEdit}) {
   return (
@@ -14,6 +14,7 @@ function Tabla({filteredPeriodos,OnDelete, OnEdit}) {
                 <th>Descripción</th>
                 <th>Fecha inicio</th>
                 <th>Fecha fin</th>
+                <th>Estado</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -23,6 +24,7 @@ function Tabla({filteredPeriodos,OnDelete, OnEdit}) {
                   <td>{periodo.descripcion}</td>
                   <td>{periodo.fecha_inicio}</td>
                   <td>{periodo.fecha_fin}</td>
+                  <td>{periodo.estado}</td>
                   <td>
                     <FaEdit
                       className="icon edit-icon"
