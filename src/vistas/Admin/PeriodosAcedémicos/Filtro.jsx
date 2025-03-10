@@ -7,7 +7,6 @@ function Filtro({search, setSearch, toggleModal}) {
   return (
     <div className="filter-container">
         <input
-          fondo="periodo"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="search-input"

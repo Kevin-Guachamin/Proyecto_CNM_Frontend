@@ -2,10 +2,11 @@ import React,{useState, useEffect} from 'react'
 import Filtro from './Filtro';
 import CrearPeriodo from './CrearPeriodo';
 import Tabla from './Tabla';
-import axios from 'axios'
+import { Eliminar } from '../../../Utils/CRUD/Eliminar';
 import { ErrorMessage } from '../../../Utils/ErrorMesaje';
 import Swal from 'sweetalert2';
 import "./Contenedor.css"
+import { Editar } from '../../../Utils/CRUD/Editar';
 
 function Contenedor({periodos,setPeriodos}) {
   const [search, setSearch] = useState('');
@@ -26,78 +27,15 @@ function Contenedor({periodos,setPeriodos}) {
     setPeriodoToUpdate(null); // Resetear usuario al abrir el modal
   };
   const handleSavePeriodo = (newPeriodo) => {
-    console.log("este es el periodo",newPeriodo)
-    if (periodoToUpdate) {
-      // Si estamos editando un usuario, lo actualizamos
-      axios
-        .put(`${API_URL}/periodo_academico/editar/${periodoToUpdate.ID}`, newPeriodo)
-        .then((res) => {
-          // Actualizamos el array de usuarios con la respuesta del servidor
-          setPeriodos((prevPeriodos) =>
-            prevPeriodos.map((periodo) =>
-              periodo.ID === periodoToUpdate.ID ? res.data : periodo
-            )
-          );
-          setIsModalOpen(false); // Cerrar el modal
-        })
-        .catch((error) => {
-          ErrorMessage(error)
-          console.log(error)
-        });
-    } else {
-      // Si no estamos editando, agregamos uno nuevo
-      
-      axios
-        .post(`${API_URL}/periodo_academico/crear`, newPeriodo)
-        .then((res) => {
-          setPeriodos((prevPeriodos) => [...prevPeriodos, res.data]);
-          setIsModalOpen(false); // Cerrar el modal
-        })
-        .catch((error) => {
-          ErrorMessage(error)
-          console.log(error)
-        });
-     
-  
-    
-}
+    Editar(periodoToUpdate,newPeriodo,`${API_URL}/periodo_academico`,setPeriodos,setIsModalOpen)
   }
   const handleEdit = (periodo) => {
     setPeriodoToUpdate(periodo); // Asignar el usuario a editar
     setIsModalOpen(true); // Abrir modal
   };
   const handleDelete = (periodo) => {
-    
-    Swal.fire({
-        title: '¿Estás seguro?',
-        text: `¿Quieres eliminar a ${periodo.descripcion}?`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Eliminar usuario por ID
-            axios
-                .delete(`${API_URL}/periodo_academico/eliminar/${periodo.ID}`)
-                .then((res) => {
-                  
-                  setPeriodos((prevPeriodos) => prevPeriodos.filter((p) => p.ID !== periodo.ID));
-                    Swal.fire(
-                        'Eliminado!',
-                        `El periodo ${res.data.descripcion} ha sido eliminado.`,
-                        'success'
-                    );
-                })
-                .catch((error) => {
-                    ErrorMessage(error)
-                });
-        }
-    });
+    Eliminar(periodo, `${API_URL}/periodo_academico/eliminar`,periodo.descripcion,setPeriodos)
 };
-
   return (
     <div className='Contenedor-general'>
       <Filtro search={search} setSearch={setSearch} toggleModal={toggleModal}/>

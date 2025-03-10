@@ -1,23 +1,14 @@
 import React, { useState, useEffect } from "react";
 import Header from "../../../components/Header";
 import Layout from '../../../layout/containers/Layout'
-import { Users, Clipboard, GraduationCap, Book, UserRoundPen} from "lucide-react";
-import { FaBuilding } from 'react-icons/fa';
 import Loading from "../../../components/Loading";
 import Contenedor from "./Contenedor";
-import axios from "axios";
-import { ErrorMessage } from "../../../Utils/ErrorMesaje";
+import {modules} from "../Components/Modulos"
+import { ObtenerTodo } from "../../../Utils/CRUD/ObjetenerTodo";
+
 
 function Index() {
-  const modules = [
-    { name: "Periodos académicos", icon: <GraduationCap size={20} /> },
-    { name: "Asignaturas", icon: <Book size={20} /> },
-    { name: "Cursos", icon: <FaBuilding size={20} /> },
-    { name: "Docentes", icon: <UserRoundPen size={20}/>},
-    { name: "Estdudiantes", icon: <Users size={20} /> },
-    { name: "Califiaciones", icon:<Clipboard size={20}/> }
-    
-  ];
+  
   const [loading, setLoading] = useState(true); // Estado para mostrar la carga
   const [usuario, setUsuario] = useState(null);
   const [periodos, setPeriodos]=useState([])
@@ -25,18 +16,8 @@ function Index() {
   
   
   useEffect(() => {
-      // Aquí se realizará la petición al backend cuando esté disponible
-      axios.get(`${API_URL}/periodo_academico/obtener`)
-        .then(response => {
-          console.log(response)
-          setPeriodos(response.data); // Guardar la información del usuario en el estado
-          setLoading(false);
-        })
-        .catch(error => {
-          ErrorMessage(error)
-          setLoading(false);
-        });
-  
+      
+      ObtenerTodo(setPeriodos,`${API_URL}/periodo_academico/obtener`,setLoading)
       // Mientras no se conecte al backend, dejamos un usuario de prueba
       
       setUsuario({ nombre: "Juan Pérez", rol: "Estudiante" });
