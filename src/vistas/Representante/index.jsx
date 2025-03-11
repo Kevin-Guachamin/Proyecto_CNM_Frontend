@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Layout from '../../layout/containers/Layout';
-import Tabla from '../../components/Tabla';
+import Tabla from '../Representante/components/Tabla_Representante';
 import { Home, Users, Settings, Eye, ChevronLeft, ChevronRight, Sun, Moon } from "lucide-react";
 import { div } from 'framer-motion/client';
 import Header from "../../components/Header";
@@ -10,7 +10,8 @@ function Index() {
   // Estado para almacenar la información del usuario conectado
   const [usuario, setUsuario] = useState(null);
   const [datosEstudiante, setDatosEstudiante] = useState([]);
-  const columnas = ["Estudiante", "Curso", "Especialidad", "Acciones"];
+  const [isLoading, setIsLoading] = useState(true);
+  const datos = 2;
 
   const handleVerClick = (estudiante) => {
     console.log("ver detalles de: ", estudiante);
@@ -29,24 +30,38 @@ function Index() {
     //   });
 
     // Mientras no se conecte al backend, dejamos un usuario de prueba
-    setUsuario({ nombre: "Maria Pérez", rol: "Representante" });
-    setDatosEstudiante([
-      {
-        Estudiante: "Jose Andres Perez Jimenez", 
-        Curso: "el curso", 
-        Especialidad: "la especialidad",
-        Acciones: (
-          <button
-            className = "btn btn-primary btn-sm"
-            onClick = {() => handleVerClick("Jose Andres Perez Jimenez")}
-          >
-           <Eye size={16} className="me-1"/>
-           Ver calificaciones
-          </button>
-        )
-      },
-      {Estudiante: "Ana Maria Perez Jimenez", Curso: "el curso", Especialidad: "la especialidad"}
-    ]);
+    const cargarDatos = async () => {
+      try {
+        setIsLoading(true);
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        setUsuario({ nombre: "Maria Pérez", rol: "Representante" });
+        setDatosEstudiante([
+          {
+            Estudiante: "Jose Andres Perez Jimenez", 
+            Curso: "el curso", 
+            Especialidad: "la especialidad",
+            Acciones: (
+              <button
+                className = "btn btn-primary btn-sm"
+                onClick = {() => handleVerClick("Jose Andres Perez Jimenez")}
+              >
+              <Eye size={16} className="me-1"/>
+              Ver calificaciones
+              </button>
+            )
+          },
+          {Estudiante: "Ana Maria Perez Jimenez", Curso: "el curso", Especialidad: "la especialidad"}
+        ]);
+      } catch (error) {
+        console.error("Error al cargar datos: ", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  cargarDatos();  
+    
   }, []);
     
     const modules = [
@@ -58,14 +73,11 @@ function Index() {
         <div>
             {/* Encabezado */}
             <div className="container-fluid p-0">
-            {usuario && <Header isAuthenticated={true} usuario={usuario} />}
+              {usuario && <Header isAuthenticated={true} usuario={usuario} />}
             </div>
 
             <Layout modules = {modules}>
-              <Tabla
-                columnas={columnas}
-                datos={datosEstudiante} 
-              />
+              <Tabla datos={datosEstudiante} isLoading={isLoading}></Tabla>
             </Layout>
         </div>
     )
