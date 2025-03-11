@@ -17,9 +17,6 @@ function Contenedor({periodos,setPeriodos}) {
   const filteredPeriodos = periodos.filter((periodo) =>
     periodo.descripcion.toLowerCase().includes(search.toLowerCase())
   );
-  useEffect(() => {
-    console.log("Modal abierto:", isModalOpen);
-  }, [isModalOpen]);
   const toggleModal = () => {
     
     setIsModalOpen((prev) => !prev);

@@ -1,34 +1,26 @@
-import React,{useState, useRef} from 'react'
+import React,{useState} from 'react'
 import BotonAdd from '../../../components/BotonAdd'
 import { FaEdit, FaTrash } from 'react-icons/fa'; // Importar íconos
 import { Eliminar } from '../../../Utils/CRUD/Eliminar';
 import { Editar } from '../../../Utils/CRUD/Editar';
-import { FaLessThanEqual } from 'react-icons/fa6';
-
-
+import CrearAsignatura from './CrearAsignatura';
 
 function Contenedor({asignaturas, setAsginaturas}) {
-    const [nombre,setNombre]=useState("")
     const [asignaturaToUpdate,setAsginaturaToUpdate]=useState(null)
-    const [modal, setModal]=useState(FaLessThanEqual)
-    const inputRef= useRef(null)
+    const [modal, setModal]=useState(false)
+    
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
+    const toggleModal = () => {
+        setModal((prev) => !prev);
+        setAsginaturaToUpdate(null); // Resetear usuario al abrir el modal
+      };
     const OnEdit=(asignatura)=>{
-
-        setNombre(asignatura.nombre)
-        if(inputRef.current){
-            inputRef.current.focus()
-        }
+        
         setAsginaturaToUpdate(asignatura)
-        
+        setModal(true)
     }
-    const OnSave=()=>{
-        
-        const newAsignatura={nombre}
+    const handleSave=(newAsignatura)=>{
         Editar(asignaturaToUpdate,newAsignatura,`${API_URL}/materia`,setAsginaturas,setModal)
-        console.log(modal)
-        setNombre("")
-        setAsginaturaToUpdate(null)
         
     }
     const OnDelete= (asignatura)=>{
@@ -38,20 +30,21 @@ function Contenedor({asignaturas, setAsginaturas}) {
 
     return (
         <div>
-            <div>
-                <h1>Crear o editar nueva asignatura</h1>
-                <div>
-                    <label htmlFor="">Nombre</label>
-                    <input type="text" 
-                    ref={inputRef}
-                    value={nombre}
-                    onChange={(e) => setNombre(e.target.value)} 
-                    placeholder='Nombre de la asignatura'
-                    />
-                    <BotonAdd onClick={()=>OnSave()}/>
-                </div>
+           <div>
+                <BotonAdd onClick={()=>toggleModal()}/>
+            </div>
                 
-         </div>
+            {modal && (
+             <div className="modal">
+                <div className="modal-content-periodos">
+                 <CrearAsignatura
+                    onCancel={toggleModal}
+                    asignaturaToUpdate={asignaturaToUpdate}
+                    onSave={handleSave}
+                    />
+          </div>
+        </div>
+      )}
             {asignaturas.length === 0 ? (
                     <p className="no-periodos">No hay asignaturas registradas.</p>
                     ) : (
@@ -59,11 +52,14 @@ function Contenedor({asignaturas, setAsginaturas}) {
                         <thead>
                         <tr>
                          <th>ID</th>
+                         <th>Nombre</th>
+                         <th>Acciones</th>
                         </tr>
                      </thead>
                      <tbody>
                          {asignaturas.map((as, index) => (
                             <tr key={index}>
+                            <td>{as.ID}</td>
                               <td>{as.nombre}</td>
                              <td>
                                 <FaEdit
