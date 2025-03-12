@@ -1,5 +1,5 @@
 /* Estilos generales para el formulario */
-.crear-periodo {
+.crear-entidad {
   background-color: #f8f9fa;
   padding-top: 20px;
   padding-bottom: 20px;
@@ -13,7 +13,7 @@
   border: 1px solid #ddd;
   border-radius: 5px;
 }
-.crear-periodo h2 {
+.crear-entidad h2 {
   text-align: center;
   margin-bottom: 20px;
   margin-left: 0px;
@@ -42,42 +42,3 @@
 }
 
 /* Ajustar el input de fecha del calendario */
-.react-datepicker-wrapper {
-  width: 100%;
-}
-
-.react-datepicker__input-container input {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-}
-.botones {
-  display: flex;
-  justify-content: flex-start; /* Alinea los botones hacia la izquierda */
-  gap: 10px; /* Espacio entre los botones */
-  margin-top: 20px; /* Espacio entre el formulario y los botones */
-}
-/* Botón guardar */
-.boton-crear {
-  background-color: #007bff;
-  color: white;
-  width: auto; /* El ancho debe ser automático, no debe ocupar todo el espacio */
-  border-radius: 10%;
-}
-
-/* Botón cancelar */
-.boton-cancelar {
-  background-color: #dc3545;
-  color: white;
-  width: auto; /* El ancho debe ser automático, no debe ocupar todo el espacio */
-  border-radius: 10%;
-}
-.boton-crear:hover {
-  background-color: #0056b3; /* Azul más oscuro en hover */
-  color: white; /* Color del texto cuando se hace hover */
-}
-
-.boton-cancelar:hover {
-  background-color: #c82333; /* Rojo más oscuro en hover */
-  color: white; /* Color del texto cuando se hace hover */
-}

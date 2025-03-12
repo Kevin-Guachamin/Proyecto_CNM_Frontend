@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import DatePicker from 'react-datepicker';
 import Boton from '../../../components/Boton';
 import Input from '../../../components/Input';
 import "react-datepicker/dist/react-datepicker.css"; // Importa el CSS de react-datepicker
-import '../PeriodosAcedémicos/CrearPeriodo.css';
+import '../Styles/CrearEntidad.css';
 
-function CrearAsignatura({ onCancel, asignaturaToUpdate, onSave }) {
+function CrearAsignatura({ onCancel, entityToUpdate, onSave }) {
     const [nombre, setNombre] = useState("");
 
   useEffect(() => {
-      if (asignaturaToUpdate) {
-          setNombre(asignaturaToUpdate.nombre || "");
+      if (entityToUpdate) {
+          setNombre(entityToUpdate.nombre || "");
       }
-  }, [asignaturaToUpdate]);
+  }, [entityToUpdate]);
 
     const handleSubmit = () => {
         
@@ -21,8 +20,9 @@ function CrearAsignatura({ onCancel, asignaturaToUpdate, onSave }) {
     };
 
     return (
-        <div className="crear-periodo">
-            <h2>{asignaturaToUpdate ? 'Editar asignatura' : 'Agregar asignatura'}</h2>
+        <div className="modal-overlay">
+            <div className='modal-container'>
+            <h2>{entityToUpdate ? 'Editar asignatura' : 'Agregar asignatura'}</h2>
             <div className="formulario">
                 <div className="form-row">
                     <div className="form-group">
@@ -31,7 +31,7 @@ function CrearAsignatura({ onCancel, asignaturaToUpdate, onSave }) {
                             id="nombre"
                             value={nombre}
                             onChange={(e) => setNombre(e.target.value)}
-                            fondo="Ingrese la descripción"
+                            fondo="Ingrese una materia"
                         />
                     </div>
                 </div>
@@ -41,6 +41,8 @@ function CrearAsignatura({ onCancel, asignaturaToUpdate, onSave }) {
                 <Boton texto="Guardar" onClick={() => handleSubmit()} estilo="boton-crear" />
                 <Boton texto="Cancelar" onClick={onCancel} estilo="boton-cancelar" />
             </div>
+            </div>
+            
         </div>
     );
 }

@@ -3,9 +3,9 @@ import DatePicker from 'react-datepicker';
 import Boton from '../../../components/Boton';
 import Input from '../../../components/Input';
 import "react-datepicker/dist/react-datepicker.css"; // Importa el CSS de react-datepicker
-import './CrearPeriodo.css';
+import '../Styles/CrearEntidad.css';
 
-function CrearPeriodo({ onCancel, periodoToUpdate, onSave }) {
+function CrearPeriodo({ onCancel, entityToUpdate, onSave }) {
     const [descripcion, setDescripcion] = useState("");
     const [fecha_inicio, setFecha_inicio] = useState(null);
     const [fecha_fin, setFecha_fin] = useState(null);
@@ -19,14 +19,14 @@ function CrearPeriodo({ onCancel, periodoToUpdate, onSave }) {
   };
 
   useEffect(() => {
-      if (periodoToUpdate) {
-          setDescripcion(periodoToUpdate.descripcion || "");
+      if (entityToUpdate) {
+          setDescripcion(entityToUpdate.descripcion || "");
           // Convertir las fechas de dd/mm/yyyy a objetos Date
-          setFecha_fin(convertirFecha(periodoToUpdate.fecha_fin));
-          setFecha_inicio(convertirFecha(periodoToUpdate.fecha_inicio));
-          setEstado(periodoToUpdate.estado || "");
+          setFecha_fin(convertirFecha(entityToUpdate.fecha_fin));
+          setFecha_inicio(convertirFecha(entityToUpdate.fecha_inicio));
+          setEstado(entityToUpdate.estado || "");
       }
-  }, [periodoToUpdate]);
+  }, [entityToUpdate]);
 
     const handleSubmit = () => {
         // Convertir las fechas a formato ISO (yyyy-MM-dd) antes de enviarlas
@@ -38,10 +38,11 @@ function CrearPeriodo({ onCancel, periodoToUpdate, onSave }) {
     };
 
     return (
-        <div className="crear-periodo">
-            <h2>{periodoToUpdate ? 'Editar periodo' : 'Agregar periodo'}</h2>
-            <div className="formulario">
-                <div className="form-row">
+        <div className="modal-overlay">
+            <div className='modal-container'>
+            <h2 className='modal-title'>{entityToUpdate ? 'Editar periodo' : 'Agregar periodo'}</h2>
+            <div className="modal-form">
+                
                     <div className="form-group">
                         <label htmlFor="descripcion">Descripción</label>
                         <Input
@@ -85,13 +86,15 @@ function CrearPeriodo({ onCancel, periodoToUpdate, onSave }) {
                           className="input-field"
                         />
                     </div>
-                </div>
+                
             </div>
 
             <div className="botones">
                 <Boton texto="Guardar" onClick={() => handleSubmit()} estilo="boton-crear" />
                 <Boton texto="Cancelar" onClick={onCancel} estilo="boton-cancelar" />
             </div>
+            </div>
+            
         </div>
     );
 }

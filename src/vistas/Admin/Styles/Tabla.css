@@ -3,17 +3,17 @@
     padding: 20px;
   }
   
-  .tabla_periodos {
+  .tabla_registros {
     width: 100%;
     border-collapse: collapse;
   }
   
-  .tabla_periodos th, .tabla_periodos td {
+  .tabla_registros th, .tabla_registros td {
     padding: 10px;
     border: 1px solid #ddd;
   }
   
-  .no-periodos {
+  .no-registros {
     text-align: center;
     font-size: 1.2rem;
     color: #888;

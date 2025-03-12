@@ -13,7 +13,7 @@
     align-items: center;
   }
   
-  .modal-content-periodos {
+  .modal .modal-content {
     background: white;
     padding-left: 0px;
     border-radius: 5px;
@@ -21,18 +21,4 @@
     
   }
   
-  .no-periodos {
-    text-align: center;
-    font-size: 1.2rem;
-    color: #888;
-  }
-  
-  .tabla_periodos {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .tabla_periodos th, .tabla_periodos td {
-    padding: 10px;
-    border: 1px solid #ddd;
-  }
+ 
