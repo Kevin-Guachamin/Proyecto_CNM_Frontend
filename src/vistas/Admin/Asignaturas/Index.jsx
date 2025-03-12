@@ -5,22 +5,22 @@ import Loading from "../../../components/Loading";
 import Contenedor from "../Components/Contenedor";
 import {modules} from "../Components/Modulos"
 import { ObtenerTodo } from "../../../Utils/CRUD/ObjetenerTodo";
-import CrearPeriodo from "./CrearPeriodo";
+import CrearAsignatura from "./CrearAsignatura";
 
 
 function Index() {
   
   const [loading, setLoading] = useState(true); // Estado para mostrar la carga
   const [usuario, setUsuario] = useState(null);
-  const [periodos, setPeriodos]=useState([])
+  const [asignaturas, setAsginaturas]=useState([])
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
-  const headers = ["Descripción", "Fecha inicio", "Fecha fin", "Estado", "Acciones"];
-  const colums= ["descripcion","fecha_inicio","fecha_fin","estado"]
-  const filterKey="descripcion"
+  const headers = ["ID","Nombre","Acciones"];
+  const colums= ["ID","nombre"]
+  const filterKey="nombre"
   
   useEffect(() => {
       
-      ObtenerTodo(setPeriodos,`${API_URL}/periodo_academico/obtener`,setLoading)
+      ObtenerTodo(setAsginaturas,`${API_URL}/materia/obtener`,setLoading)
       // Mientras no se conecte al backend, dejamos un usuario de prueba
       
       setUsuario({ nombre: "Juan Pérez", rol: "Estudiante" });
@@ -33,7 +33,7 @@ function Index() {
           {usuario && <Header isAuthenticated={true} usuario={usuario} />}
         </div>
         <Layout modules={modules}>
-        {loading ? <Loading /> :<Contenedor data={periodos} setData={setPeriodos} headers={headers} columnsToShow={colums} filterKey={filterKey} apiEndpoint={"periodo_academico"} CrearEntidad={CrearPeriodo}/>}
+        {loading ? <Loading /> :<Contenedor data={asignaturas} setData={setAsginaturas} headers={headers} columnsToShow={colums} filterKey={filterKey} apiEndpoint={"materia"} CrearEntidad={CrearAsignatura}/>}
          
         </Layout>
     </div>

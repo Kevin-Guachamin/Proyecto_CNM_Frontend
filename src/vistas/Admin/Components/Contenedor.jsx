@@ -1,0 +1,57 @@
+import React, { useState } from 'react';
+import Filtro from './Filtro';
+import Tabla from './Tabla';
+import { Eliminar } from '../../../Utils/CRUD/Eliminar';
+import { Editar } from '../../../Utils/CRUD/Editar';
+import "../Styles/Contenedor.css"
+
+function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpoint,CrearEntidad}) {
+  const [search, setSearch] = useState('');
+  const [entityToUpdate, setEntityToUpdate] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
+
+  const filteredData = data.filter((item) =>
+    item[filterKey]?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const toggleModal = () => {
+    setIsModalOpen((prev) => !prev);
+    setEntityToUpdate(null);
+  };
+
+  const handleSaveEntity = (newEntity) => {
+    Editar(entityToUpdate, newEntity, `${API_URL}/${apiEndpoint}`, setData, setIsModalOpen);
+  };
+
+  const handleEdit = (entity) => {
+    setEntityToUpdate(entity);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (entity) => {
+    Eliminar(entity, `${API_URL}/${apiEndpoint}/eliminar`, entity[filterKey], setData);
+  };
+
+  return (
+    <div className='Contenedor-general'>
+      <Filtro search={search} setSearch={setSearch} toggleModal={toggleModal} filterKey={filterKey}/>
+      {isModalOpen && (
+            <CrearEntidad
+              onCancel={toggleModal}
+              entityToUpdate={entityToUpdate}
+              onSave={handleSaveEntity}
+            />
+      )}
+      <Tabla
+        filteredData={filteredData}
+        OnEdit={handleEdit}
+        OnDelete={handleDelete}
+        headers={headers}
+        columnsToShow={columnsToShow}
+      />
+    </div>
+  );
+}
+
+export default Contenedor;

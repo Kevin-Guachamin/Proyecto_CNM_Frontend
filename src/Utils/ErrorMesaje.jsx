@@ -8,7 +8,9 @@ export function ErrorMessage(error){
                   title: 'Error',
                   text: errorMessage,
                   icon: 'error',
+                  iconColor:"#dc3545",
                   confirmButtonText: 'Intentelo más tarde',
+                  confirmButtonColor: '#28a745'
                 });
               } else {
                 // En caso de que no haya respuesta del backend
@@ -16,7 +18,9 @@ export function ErrorMessage(error){
                   title: 'Error',
                   text: 'Hubo un problema al conectarse con el servidor.',
                   icon: 'error',
+                  iconColor:"#dc3545",
                   confirmButtonText: 'Intentelo más tarde',
+                  confirmButtonColor: '#28a745'
                 });
               }
 }

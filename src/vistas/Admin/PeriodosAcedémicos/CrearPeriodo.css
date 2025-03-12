@@ -1,27 +1,44 @@
-/* Estilos para la creación de periodo */
-.crear-periodo {
-    background-color: #f8f9fa;
-    padding: 20px;
-    border-radius: 5px;
-    width: 50%;
-    margin: 0 auto;
-  }
-  
-  .crear-periodo h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .formulario {
-    margin-bottom: 20px;
-  }
-  
-  .form-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-  }
-  
-  .form-group {
-    width: 48%;
-  }
+/* Estilos generales para el formulario */
+.crear-entidad {
+  background-color: #f8f9fa;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border-radius: 5px;
+  width: 90%; /* Ajusta el ancho según necesites */
+  margin: 0 auto;
+}
+.input-field {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+.crear-entidad h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  margin-left: 0px;
+  margin-right: 0px;
+  border:0;
+}
+
+/* Contenedor de formulario */
+.formulario {
+  margin-bottom: 20px;
+}
+
+/* Fila para los grupos de entrada */
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap; /* Esto permite que los elementos se ajusten si no hay suficiente espacio */
+}
+
+/* Cada grupo de entrada ocupará un porcentaje del ancho disponible */
+.form-group {
+  flex: 1 1 20%; /* Asegura que cada campo ocupe un 20% del contenedor */
+  margin-right: 10px; /* Espaciado entre los elementos */
+  box-sizing: border-box;
+}
+
+/* Ajustar el input de fecha del calendario */

@@ -1,0 +1,122 @@
+/* Fondo del modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+/* Contenedor del modal */
+.modal-container {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    width: 500px;
+    max-width: 90%;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Título */
+.modal-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Contenedor del formulario */
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Grupo de input */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+/* Etiquetas */
+.form-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+}
+
+/* Estilos de los inputs */
+.form-group input,
+.form-group select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Efecto al enfocar */
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+}
+
+/* Contenedor de botones */
+.react-datepicker-wrapper {
+    width: 100%;
+  }
+  
+  .react-datepicker__input-container input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  .botones {
+    display: flex;
+    justify-content: flex-end; /* Alinea los botones hacia la izquierda */
+    gap: 10px; /* Espacio entre los botones */
+    margin-top: 20px; /* Espacio entre el formulario y los botones */
+  }
+  /* Botón guardar */
+  .boton-crear {
+    background-color: #007bff;
+    color: white;
+    width: auto; /* El ancho debe ser automático, no debe ocupar todo el espacio */
+    border-radius: 10%;
+  }
+  
+  /* Botón cancelar */
+  .boton-cancelar {
+    background-color: #dc3545;
+    color: white;
+    width: auto; /* El ancho debe ser automático, no debe ocupar todo el espacio */
+    border-radius: 10%;
+  }
+  .boton-crear:hover {
+    background-color: #0056b3; /* Azul más oscuro en hover */
+    color: white; /* Color del texto cuando se hace hover */
+  }
+  
+  .boton-cancelar:hover {
+    background-color: #c82333; /* Rojo más oscuro en hover */
+    color: white; /* Color del texto cuando se hace hover */
+  }

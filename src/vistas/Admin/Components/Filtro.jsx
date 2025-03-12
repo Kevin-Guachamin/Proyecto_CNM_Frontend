@@ -1,17 +1,16 @@
 import React from 'react'
 import BotonAdd from '../../../components/BotonAdd'
-import Input from '../../../components/Input'
-import "./Filtro.css"
-import "./common.css"
+import "../Styles/Filtro.css"
 
-function Filtro({search, setSearch, toggleModal}) {
+
+function Filtro({search, setSearch, toggleModal,filterKey}) {
   return (
     <div className="filter-container">
-        <Input
-          fondo="periodo"
+        <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="search-input"
+          placeholder={`Filtrar por ${filterKey}`}
         />
         <BotonAdd  onClick={()=>toggleModal()} />
       </div>
