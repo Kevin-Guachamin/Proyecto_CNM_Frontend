@@ -60,15 +60,10 @@ function Index() {
         setIsLoading(false);
       }
     }
-  cargarDatos();  
+    cargarDatos();  
     
   }, []);
-    
-    const modules = [
-        { name: "Inicio", icon: <Home size={20} /> },
-        { name: "Usuarios", icon: <Users size={20} /> },
-        { name: "Configuración", icon: <Settings size={20} /> },
-    ];
+     
     return(
         <div>
             {/* Encabezado */}
@@ -76,7 +71,7 @@ function Index() {
               {usuario && <Header isAuthenticated={true} usuario={usuario} />}
             </div>
 
-            <Layout modules = {modules}>
+            <Layout showSidebar={false}>
               <Tabla datos={datosEstudiante} isLoading={isLoading}></Tabla>
             </Layout>
         </div>

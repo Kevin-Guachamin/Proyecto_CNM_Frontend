@@ -2,11 +2,11 @@ import React from 'react'
 import Sidebar from '../../components/Sidebar'
 import './Layout.css'
 
-function Layout({modules, children}) {
+function Layout({modules, children, showSidebar = true}) {
   return (
     <div className='app-layout'>
         <div className='main-content'>
-        <Sidebar modules={modules}/>
+        {showSidebar && <Sidebar modules={modules}/>}
         <div className='content'>
           {children}
         </div>
