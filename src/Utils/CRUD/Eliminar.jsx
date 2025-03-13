@@ -2,7 +2,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import { ErrorMessage } from '../ErrorMesaje';
 
-export function Eliminar (data, URL, descripcion, setData){
+export function Eliminar (data, URL, descripcion, setData, PK){
     Swal.fire({
         title: '¿Estás seguro?',
         text: `¿Quieres eliminar a ${descripcion}?`,
@@ -14,12 +14,12 @@ export function Eliminar (data, URL, descripcion, setData){
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Eliminar usuario por ID
+            // Eliminar usuario por PK
             axios
-                .delete(`${URL}/${data.ID}`)
+                .delete(`${URL}/${data[PK]}`)
                 .then(() => {
                   
-                  setData((prevData) => prevData.filter((d) => d.ID !== data.ID));
+                  setData((prevData) => prevData.filter((d) => d[PK] !== data[PK]));
                     Swal.fire(
                         'Eliminado!',
                         `El periodo ${descripcion} ha sido eliminado.`,

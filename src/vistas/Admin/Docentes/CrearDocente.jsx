@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import Boton from '../../../components/Boton';
-import Input from '../../../components/Input';
 import "react-datepicker/dist/react-datepicker.css"; // Importa el CSS de react-datepicker
 import '../Styles/CrearEntidad.css';
 
 function CrearDocente({ onCancel, entityToUpdate, onSave }) {
+   const [nroCedula, setNroCedula]=useState("")
    const [primer_nombre, setPrimerNombre] = useState("");
    const [primer_apellido,setPrimerApellido]=useState("");
    const [segundo_nombre,setSegundoNombre]=useState("");
@@ -13,9 +13,11 @@ function CrearDocente({ onCancel, entityToUpdate, onSave }) {
    const [celular, setCelular]=useState("");
    const [rol,setRol]=useState("");
 
+
   
     useEffect(() => {
         if (entityToUpdate) {
+            setNroCedula(entityToUpdate.nroCedula || "");
             setPrimerNombre(entityToUpdate.primer_nombre || "");
             setPrimerApellido(entityToUpdate.primer_apellido || "");
             setSegundoNombre(entityToUpdate.segundo_nombre || "");
@@ -28,7 +30,7 @@ function CrearDocente({ onCancel, entityToUpdate, onSave }) {
   
       const handleSubmit = () => {
           
-          const newAsignatura = {primer_nombre, primer_apellido, segundo_apellido, segundo_nombre, email, celular, rol};
+          const newAsignatura = {nroCedula,primer_nombre, primer_apellido, segundo_apellido, segundo_nombre, email, celular, rol};
           onSave(newAsignatura);
       };
   
@@ -38,6 +40,10 @@ function CrearDocente({ onCancel, entityToUpdate, onSave }) {
             <h2 className="modal-title">{entityToUpdate ? 'Editar docente' : 'Agregar docente'}</h2>
 
             <div className="modal-form">
+                <div className="form-group">
+                    <label htmlFor="nroCedula">Número de cédula:</label>
+                    <input id="nroCedula" value={nroCedula} onChange={(e) => setNroCedula(e.target.value)} placeholder="Ingrese un número de cédula" />
+                </div>
                 <div className="form-group">
                     <label htmlFor="primer_nombre">Primer nombre:</label>
                     <input id="primer_nombre" value={primer_nombre} onChange={(e) => setPrimerNombre(e.target.value)} placeholder="Ingrese un nombre" />

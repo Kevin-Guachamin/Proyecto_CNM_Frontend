@@ -17,6 +17,7 @@ function Index() {
   const headers = ["Descripción", "Fecha inicio", "Fecha fin", "Estado", "Acciones"];
   const colums= ["descripcion","fecha_inicio","fecha_fin","estado"]
   const filterKey="descripcion"
+  const PK="ID"
   
   useEffect(() => {
       
@@ -33,7 +34,7 @@ function Index() {
           {usuario && <Header isAuthenticated={true} usuario={usuario} />}
         </div>
         <Layout modules={modules}>
-        {loading ? <Loading /> :<Contenedor data={periodos} setData={setPeriodos} headers={headers} columnsToShow={colums} filterKey={filterKey} apiEndpoint={"periodo_academico"} CrearEntidad={CrearPeriodo}/>}
+        {loading ? <Loading /> :<Contenedor data={periodos} setData={setPeriodos} headers={headers} columnsToShow={colums} filterKey={filterKey} apiEndpoint={"periodo_academico"} CrearEntidad={CrearPeriodo} PK={PK}/>}
          
         </Layout>
     </div>

@@ -1,17 +1,17 @@
 import axios from 'axios'
 import { ErrorMessage } from '../ErrorMesaje';
 
-export function Editar (dataToUpdate,newData, URL, setData, setIsModalOpen){
+export function Editar (dataToUpdate,newData, URL, setData, setIsModalOpen, PK){
     
     if (dataToUpdate) {
         // Si estamos editando un usuario, lo actualizamos
         axios
-          .put(`${URL}/editar/${dataToUpdate.ID}`, newData)
+          .put(`${URL}/editar/${dataToUpdate[PK]}`, newData)
           .then((res) => {
             // Actualizamos el array de usuarios con la respuesta del servidor
             setData((prevData) =>
               prevData.map((data) =>
-                data.ID === dataToUpdate.ID ? res.data : data
+                data[PK] === dataToUpdate[PK] ? res.data : data
               )
             );
             setIsModalOpen(false); // Cerrar el modal

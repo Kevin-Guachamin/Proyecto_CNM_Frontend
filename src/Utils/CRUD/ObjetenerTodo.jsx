@@ -6,6 +6,7 @@ export function ObtenerTodo(setData,URL, setLoading){
     axios.get(`${URL}`)
         .then(response => {
           setData(response.data); // Guardar la información del usuario en el estado
+          console.log("estos son los registros", response.data)
           setLoading(false);
         })
         .catch(error => {

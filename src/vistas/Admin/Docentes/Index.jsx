@@ -14,9 +14,10 @@ function Index() {
   const [usuario, setUsuario] = useState(null);
   const [docentes, setDocentes]=useState([])
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
-  const headers = ["Primer nombre","Primer Apellido","Segundo Nombre","Segundo Apellido", "Email", "Celular","Rol", "Acciones"];
-  const colums= ["primer_nombre","primer_apellido","segundo_nombre","segundo_apellido","email","celular","rol"]
-  const filterKey="apellido"
+  const headers = ["Cédula","Primer nombre","Primer Apellido","Segundo Nombre","Segundo Apellido", "Email", "Celular","Rol", "Acciones"];
+  const colums= ["nroCedula","primer_nombre","primer_apellido","segundo_nombre","segundo_apellido","email","celular","rol"]
+  const filterKey="nroCedula"
+  const PK="nroCedula"
   
   useEffect(() => {
       
@@ -33,7 +34,7 @@ function Index() {
           {usuario && <Header isAuthenticated={true} usuario={usuario} />}
         </div>
         <Layout modules={modules}>
-        {loading ? <Loading /> :<Contenedor data={docentes} setData={setDocentes} headers={headers} columnsToShow={colums} filterKey={filterKey} apiEndpoint={"docente"} CrearEntidad={CrearDocente}/>}
+        {loading ? <Loading /> :<Contenedor data={docentes} setData={setDocentes} headers={headers} columnsToShow={colums} filterKey={filterKey} apiEndpoint={"docente"} CrearEntidad={CrearDocente} PK={PK}/>}
          
         </Layout>
     </div>

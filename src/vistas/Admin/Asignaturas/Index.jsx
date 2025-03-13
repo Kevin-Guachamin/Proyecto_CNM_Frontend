@@ -17,7 +17,8 @@ function Index() {
   const headers = ["ID","Nombre","Acciones"];
   const colums= ["ID","nombre"]
   const filterKey="nombre"
-  
+  const PK="ID"
+
   useEffect(() => {
       
       ObtenerTodo(setAsginaturas,`${API_URL}/materia/obtener`,setLoading)
@@ -33,7 +34,7 @@ function Index() {
           {usuario && <Header isAuthenticated={true} usuario={usuario} />}
         </div>
         <Layout modules={modules}>
-        {loading ? <Loading /> :<Contenedor data={asignaturas} setData={setAsginaturas} headers={headers} columnsToShow={colums} filterKey={filterKey} apiEndpoint={"materia"} CrearEntidad={CrearAsignatura}/>}
+        {loading ? <Loading /> :<Contenedor data={asignaturas} setData={setAsginaturas} headers={headers} columnsToShow={colums} filterKey={filterKey} apiEndpoint={"materia"} CrearEntidad={CrearAsignatura} PK={PK}/>}
          
         </Layout>
     </div>
