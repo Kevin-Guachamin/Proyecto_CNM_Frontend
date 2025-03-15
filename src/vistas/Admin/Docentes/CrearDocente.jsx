@@ -30,8 +30,8 @@ function CrearDocente({ onCancel, entityToUpdate, onSave }) {
   
       const handleSubmit = () => {
           
-          const newAsignatura = {nroCedula,primer_nombre, primer_apellido, segundo_apellido, segundo_nombre, email, celular, rol};
-          onSave(newAsignatura);
+          const newDocente = {nroCedula,primer_nombre, primer_apellido, segundo_apellido, segundo_nombre, email, celular, rol};
+          onSave(newDocente);
       };
   
       return (

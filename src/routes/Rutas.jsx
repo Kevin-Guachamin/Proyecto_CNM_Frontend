@@ -7,6 +7,7 @@ import Calificaciones from '../vistas/Calificaciones.jsx';
 import Asignaguras from "../vistas/Admin/Asignaturas/Index.jsx"
 import Docentes from "../vistas/Admin/Docentes/Index.jsx"
 import Representante from '../vistas/Representante/index.jsx'
+import Representantes from '../vistas/Admin/Representantes/Index.jsx'
 
 
 function Rutas() {
@@ -17,6 +18,7 @@ function Rutas() {
         <Route path="/admin/periodos" element= {<Periodos_Academicos/>}/>
         <Route path="/admin/asignaturas" element= {<Asignaguras/>}/>
         <Route path="/admin/docentes" element= {<Docentes/>}/>
+        <Route path="/admin/representantes" element= {<Representantes/>}/>
         <Route path="/calificaciones" element={<Calificaciones/>} />
         <Route path="/representante" element={<Representante/>} />
     </Routes>

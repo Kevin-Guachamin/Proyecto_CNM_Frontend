@@ -5,7 +5,7 @@ import { Eliminar } from '../../../Utils/CRUD/Eliminar';
 import { Editar } from '../../../Utils/CRUD/Editar';
 import "../Styles/Contenedor.css"
 
-function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpoint,CrearEntidad, PK}) {
+function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpoint,CrearEntidad, PK,extraIcon}) {
   const [search, setSearch] = useState('');
   const [entityToUpdate, setEntityToUpdate] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,6 +49,7 @@ function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpo
         OnDelete={handleDelete}
         headers={headers}
         columnsToShow={columnsToShow}
+        extraIcon={extraIcon}
       />
     </div>
   );

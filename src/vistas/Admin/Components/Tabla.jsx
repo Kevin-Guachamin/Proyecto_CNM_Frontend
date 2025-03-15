@@ -1,7 +1,7 @@
 import { FaEdit, FaTrash } from 'react-icons/fa'; // Importar íconos
 import "../Styles/Tabla.css";
 
-function Tabla({ filteredData, OnDelete, OnEdit, headers, columnsToShow }) {
+function Tabla({ filteredData, OnDelete, OnEdit, headers, columnsToShow,extraIcon }) {
   return (
     <div className="Contendor-tabla">
       {filteredData.length === 0 ? (
@@ -30,6 +30,7 @@ function Tabla({ filteredData, OnDelete, OnEdit, headers, columnsToShow }) {
                     className="icon delete-icon"
                     onClick={() => OnDelete(item)}
                   />
+                  {extraIcon && extraIcon(item)}
                 </td>
               </tr>
             ))}
