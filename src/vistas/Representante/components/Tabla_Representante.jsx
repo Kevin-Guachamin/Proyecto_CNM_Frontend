@@ -1,7 +1,8 @@
 // Tabla para REPRESENTANTE
 import "bootstrap/dist/css/bootstrap.min.css";
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
-const Tabla = ({datos, isLoading}) => {
+const Tabla = ({datos, isLoading, handleVerCalificaciones}) => {
     // Comprueba que los props sean arrays
     if(!Array.isArray(datos)) {
         return <div className="alert alert-danger"> Error: Los datos deben ser un array </div>
@@ -36,10 +37,23 @@ const Tabla = ({datos, isLoading}) => {
                     (
                         datos.map((estudiante, i)=> (
                             <tr key={i}>
-                                <td className="text-center"> {estudiante.Estudiante} </td>
-                                <td className="text-center"> {estudiante.Curso} </td>
-                                <td className="text-center"> {estudiante.Especialidad} </td>
-                                <td className="text-center"> {estudiante.Acciones} </td>
+                                <td className="text-center"> 
+                                    {estudiante.primer_nombre ?? '-'}{' '}
+                                    {estudiante.segundo_nombre ?? '-'}{' '}
+                                    {estudiante.primer_apellido ?? '-'}{' '}
+                                    {estudiante.segundo_apellido ?? '-'}{' '}
+                                 </td>
+                                <td className="text-center"> {estudiante.curso} </td>
+                                <td className="text-center"> {estudiante.especialidad} </td>
+                                <td className="text-center">
+                                    <button
+                                        className="btn btn-primary btn-sm p-1"
+                                        onClick={() => handleVerCalificaciones(estudiante.nroCedula)}
+                                        title="Ver calificaciones"
+                                    >
+                                        <i className="bi bi-eye"> Ver calificaciones </i>
+                                    </button>
+                                </td>
                             </tr>           
                         ))
                     ):(
