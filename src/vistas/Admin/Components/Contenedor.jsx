@@ -5,7 +5,7 @@ import { Eliminar } from '../../../Utils/CRUD/Eliminar';
 import { Editar } from '../../../Utils/CRUD/Editar';
 import "../Styles/Contenedor.css"
 
-function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpoint,CrearEntidad, PK,extraIcon}) {
+function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpoint,CrearEntidad, PK,extraIcon,setPage,page,totalPages}) {
   const [search, setSearch] = useState('');
   const [entityToUpdate, setEntityToUpdate] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,8 +20,8 @@ function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpo
     setEntityToUpdate(null);
   };
 
-  const handleSaveEntity = (newEntity) => {
-    Editar(entityToUpdate, newEntity, `${API_URL}/${apiEndpoint}`, setData, setIsModalOpen,PK);
+  const handleSaveEntity = (newEntity,headers) => {
+    Editar(entityToUpdate, newEntity, `${API_URL}/${apiEndpoint}`, setData, setIsModalOpen,PK,headers);
   };
 
   const handleEdit = (entity) => {
@@ -50,6 +50,9 @@ function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpo
         headers={headers}
         columnsToShow={columnsToShow}
         extraIcon={extraIcon}
+        setPage={setPage}
+        totalPages={totalPages}
+        page={page}
       />
     </div>
   );

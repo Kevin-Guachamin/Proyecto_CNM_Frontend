@@ -10,11 +10,8 @@ function CrearRepresentante({ onCancel, entityToUpdate, onSave }) {
   const [segundo_apellido, setSegundoApellido] = useState("");
   const [email, setEmail] = useState("");
   const [celular, setCelular] = useState("");
-  const [cedula_PDF, setCedulaPDF] = useState("");
-  const [croquis_PDF, setCroquisPDF] = useState("");
   const [convencional, setConvencional] = useState("");
   const [emergencia, setEmergencia] = useState("");
-
 
 
   useEffect(() => {
@@ -26,17 +23,37 @@ function CrearRepresentante({ onCancel, entityToUpdate, onSave }) {
       setSegundoApellido(entityToUpdate.segundo_apellido || "");
       setCelular(entityToUpdate.celular || "");
       setEmail(entityToUpdate.email || "");
-      setCedulaPDF(entityToUpdate.cedula_PDF || "")
-      setCroquisPDF(entityToUpdate.croquis_PDF || "")
       setConvencional(entityToUpdate.convencional || "")
       setEmergencia(entityToUpdate.emergencia || "")
     }
   }, [entityToUpdate]);
 
+    const [files, setFiles] = useState({
+      copiaCedula: null,
+      croquis: null,
+    });
+  const handleFileChange = (event) => {
+    const { name, files } = event.target;
+    setFiles((prevState) => ({
+      ...prevState,
+      [name]: files[0], // Solo se selecciona un archivo por input
+    }));
+  };
   const handleSubmit = () => {
-
-    const newRepresentante = { nroCedula, primer_nombre, primer_apellido, segundo_apellido, segundo_nombre, email, celular, cedula_PDF, croquis_PDF, convencional, emergencia };
-    onSave(newRepresentante);
+    const formData = new FormData();
+    formData.append("copiaCedula", files.copiaCedula);
+    formData.append("croquis", files.croquis);
+    formData.append("nroCedula",nroCedula)
+    formData.append("primer_nombre",primer_nombre)
+    formData.append("primer_apellido",primer_apellido)
+    formData.append("segundo_nombre",segundo_nombre)
+    formData.append("segundo_apellido",segundo_apellido)
+    formData.append("email",email)
+    formData.append("celular",celular)
+    formData.append("convencional",convencional)
+    formData.append("emergencia",emergencia)
+    
+    onSave(formData,{ headers: { "Content-Type": "multipart/form-data" } });
   };
 
   return (
@@ -87,7 +104,7 @@ function CrearRepresentante({ onCancel, entityToUpdate, onSave }) {
             </div>
             <div className="form-group">
               <label htmlFor="convencional">#Emergencia :</label>
-              <input id="convencional" value={convencional} onChange={(e) => setEmergencia(e.target.value)} placeholder="Ingrese un celular" />
+              <input id="convencional" value={emergencia} onChange={(e) => setEmergencia(e.target.value)} placeholder="Ingrese un celular" />
             </div>
           </div>
           <div className="form-group">
@@ -101,7 +118,7 @@ function CrearRepresentante({ onCancel, entityToUpdate, onSave }) {
               <input
                 type="file"
                 name="copiaCedula"
-                // onChange={handleFileChange}
+                onChange={handleFileChange}
                 accept="application/pdf"
               />
             </label>
@@ -110,19 +127,12 @@ function CrearRepresentante({ onCancel, entityToUpdate, onSave }) {
               <input
                 type="file"
                 name="croquis"
-                // onChange={handleFileChange}
+                onChange={handleFileChange}
                 accept="application/pdf"
               />
             </label>
-            {/* <button onClick={handleUpload} disabled={uploading}>
-              {uploading ? "Subiendo..." : "Subir Archivos"}
-            </button>
-            {message && <p>{message}</p>} */}
+            
           </div>
-
-
-
-
         </div>
 
         <div className="botones">

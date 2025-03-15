@@ -1,7 +1,8 @@
 import { FaEdit, FaTrash } from 'react-icons/fa'; // Importar íconos
 import "../Styles/Tabla.css";
+import Paginación from './Paginación';
 
-function Tabla({ filteredData, OnDelete, OnEdit, headers, columnsToShow,extraIcon }) {
+function Tabla({ filteredData, OnDelete, OnEdit, headers, columnsToShow,extraIcon,setPage,page,totalPages }) {
   return (
     <div className="Contendor-tabla">
       {filteredData.length === 0 ? (
@@ -36,7 +37,9 @@ function Tabla({ filteredData, OnDelete, OnEdit, headers, columnsToShow,extraIco
             ))}
           </tbody>
         </table>
+        
       )}
+      <Paginación totalPages={totalPages} page={page} setPage={setPage}/>
     </div>
   );
 }
