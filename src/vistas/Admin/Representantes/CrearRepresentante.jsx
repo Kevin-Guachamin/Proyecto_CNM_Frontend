@@ -118,6 +118,7 @@ function CrearRepresentante({ onCancel, entityToUpdate, onSave }) {
               <input
                 type="file"
                 name="copiaCedula"
+                
                 onChange={handleFileChange}
                 accept="application/pdf"
               />

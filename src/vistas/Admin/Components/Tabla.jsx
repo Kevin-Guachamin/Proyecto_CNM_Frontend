@@ -3,6 +3,7 @@ import "../Styles/Tabla.css";
 import Paginación from './Paginación';
 
 function Tabla({ filteredData, OnDelete, OnEdit, headers, columnsToShow,extraIcon,setPage,page,totalPages }) {
+  console.log("Estos son los datos:", filteredData)
   return (
     <div className="Contendor-tabla">
       {filteredData.length === 0 ? (

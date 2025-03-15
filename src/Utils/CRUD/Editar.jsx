@@ -13,7 +13,9 @@ export function Editar (dataToUpdate,newData, URL, setData, setIsModalOpen, PK,h
               prevData.map((data) =>
                 data[PK] === dataToUpdate[PK] ? res.data : data
               )
+              
             );
+            
             setIsModalOpen(false); // Cerrar el modal
           })
           .catch((error) => {
