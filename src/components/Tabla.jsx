@@ -1,8 +1,8 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./Tabla.css"
+import "./Tabla.css";
 
-const Tabla = ({ columnas, columnasAgrupadas, datos }) => {
+const Tabla = ({ columnas, columnasAgrupadas, datos, onChange, columnasEditables = [] }) => {
   return (
     <div className="table-responsive mt-3">
       <table className="table table-bordered table-striped custom-table">
@@ -18,13 +18,7 @@ const Tabla = ({ columnas, columnasAgrupadas, datos }) => {
           )}
           <tr className="table-primary">
             {columnas.map((col, index) => (
-              <th
-                key={index}
-                className={`text-center 
-                  ${index === 0 ? "nro-columna" : ""} 
-                  ${index === 1 ? "nomina-columna" : ""} 
-                  ${index > 1 ? "vertical-text" : ""}`}
-              >
+              <th key={index} className={`text-center ${index > 1 ? "vertical-text" : ""}`}>
                 {col}
               </th>
             ))}
@@ -34,13 +28,26 @@ const Tabla = ({ columnas, columnasAgrupadas, datos }) => {
           {datos.length > 0 ? (
             datos.map((fila, i) => (
               <tr key={i}>
-                {columnas.map((col, j) => (
-                  <td key={j} className={`text-center 
-                    ${j === 0 ? "nro-columna" : ""} 
-                    ${j === 1 ? "nomina-columna" : ""}`}>
-                    {fila[col] || "-"}
-                  </td>
-                ))}
+                {columnas.map((col, j) => {
+                  const esEditable = columnasEditables.includes(col);
+
+                  return (
+                    <td key={j} className="text-center">
+                      {esEditable ? (
+                        <input
+                          type="text"
+                          value={fila[col] || ""}
+                          onChange={(e) => onChange(i, col, e.target.value)}
+                          className="form-control text-center"
+                          data-columna={col} /* Agrega este atributo para CSS */
+                        />
+                      ) : (
+                        fila[col] || "-"
+                      )}
+                    </td>
+
+                  );
+                })}
               </tr>
             ))
           ) : (

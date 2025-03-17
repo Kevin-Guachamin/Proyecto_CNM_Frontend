@@ -11,7 +11,7 @@
 
 .table th, .table td {
     border: 1px solid #ccc;
-    padding: 8px;
+    padding: 5px;
     text-align: center;
     vertical-align: middle;
 }
@@ -27,9 +27,30 @@
     transform: rotate(180deg);
     text-align: center;
     white-space: nowrap;
-    width: 30px;
-    padding: 5px;
+    width: 1%;
+    padding: 3px;
 }
+
+/* Overrides ESPECÍFICOS para Parciales */
+.tabla-parciales .vertical-text {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: center;
+    white-space: nowrap;
+    /* Ajusta ancho, padding, font-size, etc. */
+    font-size: 12px;
+    line-height: 1.2;
+    padding: 2px 4px;
+  }
+  
+  /* Si quieres controlar el ancho de las columnas verticales */
+  .tabla-parciales .vertical-col {
+    width: 35px;
+    min-width: 35px;
+    max-width: 35px;
+    padding: 0;
+    overflow: hidden;
+  }
 
 .grouped-header {
     background-color: #e0ebff;
@@ -54,8 +75,8 @@
 }
 /* Ajustar el ancho de la columna "Nro" */
 .nro-columna {
-    width: 50px; /* Ajusta según sea necesario */
-    max-width: 50px;
+    width: 25px; /* Ajusta según sea necesario */
+    max-width: 25px;
     text-align: center;
     white-space: nowrap;
 }
@@ -74,10 +95,70 @@
     overflow-x: auto;
 }
 
-/* Asegurar que los encabezados de columnas en vertical no se expandan demasiado */
-.vertical-text {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    white-space: nowrap;
-    width: 40px; /* Reduce el tamaño si es necesario */
+/* Aumentar solo el ancho de Insumo 1, Insumo 2 y Evaluación Sumativa */
+td input[data-columna="INSUMO 1"],
+td input[data-columna="INSUMO 2"],
+td input[data-columna="EVALUACIÓN SUMATIVA"]
+{
+  width: 45px;
+}
+
+.tabla-parciales .table th:nth-last-child(-n+3),
+.tabla-parciales .table td:nth-last-child(-n+3) {
+    width: 25px; /* Ajusta el ancho según sea necesario */
+}
+ 
+.tabla-quimestral .table tbody td {
+    font-size: 12px; /* Texto de la celda */
+}
+
+.tabla-quimestral .table tbody td input {
+    font-size: 12px; /* Texto del input */
+}
+/* Columna 6 de “Resumen de Aprendizajes” en tabla-quimestral */
+.tabla-quimestral .table th:nth-child(6),
+.tabla-quimestral .table td:nth-child(6) {
+    width: 60px; /* Ajusta el ancho según sea necesario */
+}
+
+.tabla-final .table th:nth-child(7)
+{
+    width: 60px; /* Ajusta el ancho según sea necesario */
+}
+.tabla-final .table tbody td {
+    font-size: 12px; /* Texto de la celda */
+}
+
+.tabla-final .table tbody td input {
+    font-size: 12px; /* Texto del input */
+}  
+
+
+/* OVERRIDES SOLO PARA PDF */
+.pdf-export .vertical-text,
+.pdf-export .tabla-parciales .vertical-text {
+  min-width: 60px !important; /* o 80px, 100px... */
+  width: auto !important;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+}
+
+/* Si usas .vertical-col para forzar ancho */
+.pdf-export .tabla-parciales .vertical-col {
+  min-width: 60px !important; /* o más grande */
+  width: 60px !important;
+  max-width: 60px !important;
+}
+
+/* Para que no se recorte con table-responsive */
+.pdf-export .table-responsive {
+  overflow-x: visible !important;
+}
+
+/* Si tienes reglas que ponen width: 25px en las últimas 3 columnas: */
+.pdf-export .tabla-parciales .table th:nth-last-child(-n+3),
+.pdf-export .tabla-parciales .table td:nth-last-child(-n+3) {
+  width: 60px !important; /* Sobrescribe la regla de 25px */
 }
