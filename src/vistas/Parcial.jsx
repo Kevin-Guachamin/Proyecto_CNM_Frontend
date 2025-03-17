@@ -1,17 +1,18 @@
-import React from "react";
+import React, { useState,useEffect } from "react";
 import HeaderTabla from "../components/HeaderTabla";
 import Tabla from "../components/Tabla";
+import "./Parcial.css";
 
-function Parcial({ quimestreSeleccionado, parcialSeleccionado }) {
-  console.log("quimestreSeleccionado:", quimestreSeleccionado); // Debugging
-  console.log("parcialSeleccionado:", parcialSeleccionado); // Debugging
+function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial }) {
+  
+  // ID dinámico: pdf-parcial1-quim1, pdf-parcial2-quim1, pdf-parcial1-quim2, etc.
+  const idContenedor = `pdf-parcial${parcialSeleccionado}-quim${quimestreSeleccionado}`;
 
-  // Generar el subtítulo dinámico correctamente
   const subtitulo = `ACTA DE CALIFICACIONES ${parcialSeleccionado === "1" ? "PRIMER" : "SEGUNDO"} PARCIAL - ${quimestreSeleccionado === "1" ? "PRIMER" : "SEGUNDO"} QUIMESTRE`;
 
   const datosEncabezado = {
-    titulo: "CONSERVATORIO NACIONAL DE MUSICA",  // Título fijo
-    subtitulo: subtitulo,  // Subtítulo dinámico corregido
+    titulo: "CONSERVATORIO NACIONAL DE MUSICA",
+    subtitulo: subtitulo,
     info: {
       "Profesor": "Guachis",
       "Asignatura": "Instrumento",
@@ -23,43 +24,131 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado }) {
   };
 
   const columnasAgrupadas = [
-    { titulo: "", colspan: 1 },
-    { titulo: "", colspan: 1 },
+    { titulo: "", colspan: 2 },
     { titulo: "Evaluación de Aprendizajes", colspan: 6 },
     { titulo: "Evaluación del Comportamiento", colspan: 13 },
   ];
 
   const columnas = [
-    "INSUMO 1", "INSUMO 2", "Ponderación 70%", "Evaluación Sumativa", "Ponderación 30%", "Promedio Parcial",
-    "RESPETO Y CONSIDERACION", "VALORACION DE LA DIVERSIDAD", "CUMPLIMIENTO DE LAS NORMA DE CONVIVENCIA",
-    "CUIDADO  DEL PATRIMONIO INSTITUCIONAL", "RESPETO A LA PROPIEDAD AJENA", "PUNTUALIDAD Y  ASISTENCIA", "HONESTIDAD",
-    "PRESENTACION PERSONAL  (LIMPIEZA Y UNIFORME)", "PARTICIPACION COMUNITARIA", "RESPONSABILIDAD", "PROMEDIO PARCIAL",
-    "NIVEL","VALORACION"
+    "INSUMO 1", "INSUMO 2", "PONDERACIÓN 70%", "EVALUACIÓN SUMATIVA", "PONDERACIÓN 30%", "PROMEDIO PARCIAL",
+    "RESPETO Y \n CONSIDERACION", "VALORACION DE \n LA DIVERSIDAD", "CUMPLIMIENTO DE LAS \n NORMA DE CONVIVENCIA",
+    "CUIDADO  DEL \n PATRIMONIO INSTITUCIONAL", "RESPETO A LA \n PROPIEDAD AJENA", "PUNTUALIDAD \n Y ASISTENCIA", "HONESTIDAD \n ",
+    "PRESENTACION PERSONAL \n (LIMPIEZA Y UNIFORME)", "PARTICIPACION \n COMUNITARIA", "RESPONSABILIDAD \n ", "PROMEDIO COMPORTAMIENTO",
+    "NIVEL", "VALORACION"
   ];
 
-  const datos = [
-    { "Nro": 1, "Nómina de Estudiantes": "Estudiante 1", "INSUMO 1": 7, "INSUMO 2": 7, 
-      "Evaluación Sumativa": 4.9, "Ponderación 70%": 7, "Evaluación": 7, 
-      "Ponderación 30%": 2.10, "Promedio Parcial": 7.00,
-      "Conservación Materiales": 1, "Cuidado Espacios": 1, "Uso Herramientas": 1,
-      "Comunicación": 1, "Organización": 1, "Trabajo Individual": 1, "Trabajo Cooperativo": 1,
-      "Iniciativa": 1, "Liderazgo": 1, "Puntualidad": 0, "Responsabilidad": 1,
-      "Respeto Normas": 1, "Promedio Parcial Comportamiento": 9, "Nivel": "2 BE", "Valoración": "B"
-    },
-    { "Nro": 2, "Nómina de Estudiantes": "Estudiante 2", "INSUMO 1": 8, "INSUMO 2": 8, 
-      "Evaluación Sumativa": 5.2, "Ponderación 70%": 8, "Evaluación": 8, 
-      "Ponderación 30%": 2.40, "Promedio Parcial": 8.00,
-      "Conservación Materiales": 1, "Cuidado Espacios": 1, "Uso Herramientas": 1,
-      "Comunicación": 1, "Organización": 1, "Trabajo Individual": 0, "Trabajo Cooperativo": 0,
-      "Iniciativa": 1, "Liderazgo": 1, "Puntualidad": 1, "Responsabilidad": 0,
-      "Respeto Normas": 0, "Promedio Parcial Comportamiento": 8, "Nivel": "C", "Valoración": "D"
+  const [datos, setDatos] = useState([
+    {
+      "Nro": 1, "Nómina de Estudiantes": "Estudiante 1", "INSUMO 1": "", "INSUMO 2": "", "PONDERACIÓN 70%": "", "EVALUACIÓN SUMATIVA": "", "PONDERACIÓN 30%": "", "PROMEDIO PARCIAL": "",
+    "RESPETO Y \n CONSIDERACION": "", "VALORACION DE \n LA DIVERSIDAD": "", "CUMPLIMIENTO DE LAS \n NORMA DE CONVIVENCIA": "",
+    "CUIDADO  DEL \n PATRIMONIO INSTITUCIONAL": "", "RESPETO A LA \n PROPIEDAD AJENA": "", "PUNTUALIDAD \n Y ASISTENCIA": "", "HONESTIDAD \n": "",
+    "PRESENTACION PERSONAL \n (LIMPIEZA Y UNIFORME)": "", "PARTICIPACION \n COMUNITARIA": "", "RESPONSABILIDAD \n ": "", "PROMEDIO COMPORTAMIENTO": "",
+    "NIVEL": "2BE", "VALORACION": ""
     }
+  ]);
+
+  // Definir qué columnas son editables en Parciales
+  const columnasEditables = [
+    "INSUMO 1", "INSUMO 2", "EVALUACIÓN SUMATIVA",
+    "RESPETO Y \n CONSIDERACION", "VALORACION DE \n LA DIVERSIDAD", "CUMPLIMIENTO DE LAS \n NORMA DE CONVIVENCIA",
+    "CUIDADO  DEL \n PATRIMONIO INSTITUCIONAL", "RESPETO A LA \n PROPIEDAD AJENA", "PUNTUALIDAD \n Y ASISTENCIA", "HONESTIDAD \n ",
+    "PRESENTACION PERSONAL \n (LIMPIEZA Y UNIFORME)", "PARTICIPACION \n COMUNITARIA", "RESPONSABILIDAD \n "
   ];
+  const columnasComportamiento = [
+    "RESPETO Y \n CONSIDERACION", "VALORACION DE \n LA DIVERSIDAD", "CUMPLIMIENTO DE LAS \n NORMA DE CONVIVENCIA",
+    "CUIDADO  DEL \n PATRIMONIO INSTITUCIONAL", "RESPETO A LA \n PROPIEDAD AJENA", "PUNTUALIDAD \n Y ASISTENCIA", "HONESTIDAD \n ",
+    "PRESENTACION PERSONAL \n (LIMPIEZA Y UNIFORME)", "PARTICIPACION \n COMUNITARIA", "RESPONSABILIDAD \n "
+  ];
+
+
+
+  // Función para calcular la valoración según la suma total de comportamiento
+  const calcularValoracion = (suma) => {
+    if (suma >= 10) return "A";
+    if (suma === 9) return "B";
+    if (suma >= 7) return "C";
+    if (suma >= 5) return "D";
+    return "E";
+  };
+
+  // ✅ Nuevo: Enviar los datos al padre cuando cambian
+  useEffect(() => {
+    if (actualizarDatosParcial) {
+      actualizarDatosParcial(datos);
+    }
+  }, [datos, actualizarDatosParcial]);
+
+  // Manejar cambios en los inputs de la tabla
+  const handleInputChange = (rowIndex, columnName, value) => {
+    const nuevosDatos = datos.map((fila, i) => {
+      if (i === rowIndex) {
+        let nuevaFila = { ...fila };
+
+        // Validar que Insumo 1, Insumo 2 y Evaluación Sumativa acepten solo valores entre 0.00 y 10.00
+        if (["INSUMO 1", "INSUMO 2", "EVALUACIÓN SUMATIVA"].includes(columnName)) {
+          if (value === "") {
+            nuevaFila[columnName] = ""; // Permitir borrar el dato
+          } else if (!/^\d{0,2}(\.\d{0,2})?$/.test(value) || value > 10 || value < 0) {
+            alert("Error: El valor debe estar entre 0.00 y 10.00 con máximo dos decimales.");
+            return fila; // No actualizar si el valor es inválido
+          } else {
+            nuevaFila[columnName] = value;
+          }
+        }
+
+        // Validar que las columnas de comportamiento solo acepten 0 o 1
+        else if (columnasComportamiento.includes(columnName)) {
+          if (value === "") {
+            nuevaFila[columnName] = ""; // Permitir borrar el dato
+          } else if (value !== "0" && value !== "1") {
+            alert("Error: Solo se permite ingresar 0 o 1 en este campo.");
+            return fila; // No actualizar si el valor no es 0 o 1
+          } else {
+            nuevaFila[columnName] = value;
+          }
+        }
+
+        // Cálculo de suma de comportamiento
+        const sumaComportamiento = columnasComportamiento.reduce(
+          (acc, col) => acc + (parseInt(nuevaFila[col]) || 0),
+          0
+        );
+
+        // Cálculo automático de los promedios académicos
+        const insumo1 = parseFloat(nuevaFila["INSUMO 1"]) || 0;
+        const insumo2 = parseFloat(nuevaFila["INSUMO 2"]) || 0;
+        const evaluacion = parseFloat(nuevaFila["EVALUACIÓN SUMATIVA"]) || 0;
+
+        const ponderacion70 = ((insumo1 + insumo2) / 2) * 0.7;
+        const ponderacion30 = evaluacion * 0.3;
+        const promedioParcial = ponderacion70 + ponderacion30;
+
+        // Actualizar los valores en la fila
+        return {
+          ...nuevaFila,
+          "PONDERACIÓN 70%": ponderacion70.toFixed(2),
+          "PONDERACIÓN 30%": ponderacion30.toFixed(2),
+          "PROMEDIO PARCIAL": promedioParcial.toFixed(2),
+          "PROMEDIO COMPORTAMIENTO": sumaComportamiento, // Para la sección de comportamiento
+          "VALORACION": calcularValoracion(sumaComportamiento),
+        };
+      }
+      return fila;
+    });
+
+    setDatos(nuevosDatos);
+  };
 
   return (
-    <div className="container">
+    <div id={idContenedor} className="container tabla-parciales">
       <HeaderTabla datosEncabezado={datosEncabezado} imagenIzquierda={"/ConservatorioNacional.png"} />
-      <Tabla columnasAgrupadas={columnasAgrupadas} columnas={["Nro", "Nómina de Estudiantes", ...columnas]} datos={datos} />
+      <Tabla
+        columnasAgrupadas={columnasAgrupadas}
+        columnas={["Nro", "Nómina de Estudiantes", ...columnas]}
+        datos={datos}
+        onChange={handleInputChange}
+        columnasEditables={columnasEditables}
+      />
     </div>
   );
 }
