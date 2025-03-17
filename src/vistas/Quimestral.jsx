@@ -54,9 +54,9 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data,  actual
             "Examen": notaExamen,
             "Ponderación 30%": ponderacion30.toFixed(2),
             "Promedio Final": promedioFinal.toFixed(2),
-            "Promedio \n Comportamiento": promedioComportamiento,
+            "Promedio Comportamiento": promedioComportamiento,
             "Nivel": "",
-            "Comportamiento \n Final": comportamientoFinal,
+            "Comportamiento Final": comportamientoFinal,
           };
         });
   
@@ -127,7 +127,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data,  actual
 
   const columnas = [
     "Primer Parcial", "Segundo Parcial", "Ponderación 70%",
-    "Examen", "Ponderación 30%", "Promedio Final", "Promedio \n Comportamiento", "Nivel", "Comportamiento \n Final"
+    "Examen", "Ponderación 30%", "Promedio Final", "Promedio Comportamiento", "Nivel", "Comportamiento Final"
   ];
 
   // Indicamos que la columna "Examen" es editable, similar a como se hace en el componente de Parcial
