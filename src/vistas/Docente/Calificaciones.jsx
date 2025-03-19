@@ -3,8 +3,8 @@ import { Tabs, Tab, Container } from "react-bootstrap";
 import Parcial from "./Parcial";
 import Quimestral from "./Quimestral";
 import Final from "./Final";
-import Header from "../components/Header";
-import Layout from "../layout/containers/Layout";
+import Header from "../../components/Header";
+import Layout from "../../layout/containers/Layout";
 import { Home, Users, Settings } from "lucide-react";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import * as XLSX from "xlsx";
@@ -68,50 +68,112 @@ function Calificaciones() {
   // ──────────────────────────────────────────
   // 2) Exportar a PDF (dinámico con ID)
   // ──────────────────────────────────────────
+  
   const handleExportPDF = async () => {
     try {
-      const activePane = document.querySelector(".tab-pane.active");
-      if (!activePane) return alert("No se encontró la pestaña activa.");
-  
-      const contentToPrint = activePane.querySelector("[id^='pdf-']");
-      if (!contentToPrint) return alert("No se encontró contenedor pdf-*.");
-  
-      // 1. Agregar la clase .pdf-export
-      contentToPrint.classList.add("pdf-export");
-  
-      // 2. Pequeña pausa para que el DOM re-renderice
-      await new Promise((resolve) => setTimeout(resolve, 100));
-  
-      // 3. Capturar
-      const canvas = await html2canvas(contentToPrint, {
-        scale: 2,
-        scrollX: -window.scrollX,
-        scrollY: -window.scrollY,
-        windowWidth: contentToPrint.scrollWidth,
-        windowHeight: contentToPrint.scrollHeight
+      // 1. Buscar el contenedor activo con id^="pdf-"
+      let contentToPrint = document.querySelector(
+        ".tab-pane.active .tab-pane.active div[id^='pdf-']"
+      );
+      // Si no hay un tab anidado, buscar en el tab principal
+      if (!contentToPrint) {
+        contentToPrint = document.querySelector(".tab-pane.active div[id^='pdf-']");
+      }
+      if (!contentToPrint) {
+        alert("No se encontró el contenido a exportar.");
+        return;
+      }
+      
+      // 2. Crear un clon del contenido para manipularlo sin afectar la vista original
+      const clonedContent = contentToPrint.cloneNode(true);
+      const tempContainer = document.createElement("div");
+      tempContainer.style.width = "1200px"; // Ancho fijo para asegurar espacio suficiente
+      tempContainer.appendChild(clonedContent);
+      tempContainer.style.position = "absolute";
+      tempContainer.style.left = "-9999px";
+      tempContainer.style.top = "-9999px";
+      document.body.appendChild(tempContainer);
+      
+      // 3. Agregar clase para estilos de impresión al clon
+      clonedContent.classList.add("pdf-export");
+      
+      // 4. Aumentar el tiempo de espera para que se apliquen completamente los estilos
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      
+      // 5. Capturar el contenido como Canvas con mejor calidad y márgenes
+      const canvas = await html2canvas(clonedContent, {
+        scale: 3, // Mayor nitidez
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        windowWidth: 1200, // Ancho fijo que coincide con el contenedor
+        height: clonedContent.scrollHeight + 100, // Altura con margen adicional
+        width: 1200, // Ancho fijo para consistencia
+        x: 0,
+        y: 0,
+        scrollY: 0,
+        scrollX: 0,
       });
-  
-      // 4. Quitar la clase para volver a la vista normal
-      contentToPrint.classList.remove("pdf-export");
-  
-      // 5. Crear PDF del tamaño del canvas
-      const imgData = canvas.toDataURL("image/png");
-      const { width: canvasWidth, height: canvasHeight } = canvas;
-      const orientation = canvasWidth > canvasHeight ? "l" : "p";
-  
+      
+      // 6. Eliminar el contenedor temporal
+      document.body.removeChild(tempContainer);
+      
+      // 7. Convertir Canvas a imagen
+      const imgData = canvas.toDataURL("image/png", 1.0); // Máxima calidad
+      
+      // 8. Crear el PDF en A4 horizontal (landscape)
       const pdf = new jsPDF({
-        orientation,
-        unit: "px",
-        format: [canvasWidth, canvasHeight],
+        orientation: "l", // "l" = landscape
+        unit: "pt",       // puntos
+        format: "a4",     // tamaño A4
       });
-  
-      pdf.addImage(imgData, "PNG", 0, 0, canvasWidth, canvasHeight);
-      pdf.save("Calificaciones.pdf");
+      
+      // 9. Calcular dimensiones para encajar la imagen en A4
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      let imgWidth = pageWidth - 40; // Margen de 20pt en cada lado
+      let imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      // 10. Ajustar si la imagen excede la altura de la página
+      if (imgHeight > pageHeight - 40) { // Margen de 20pt arriba y abajo
+        imgHeight = pageHeight - 40;
+        imgWidth = (canvas.width * imgHeight) / canvas.height;
+      }
+      
+      // 11. Agregar la imagen al PDF centrada
+      const xOffset = (pageWidth - imgWidth) / 2;
+      const yOffset = (pageHeight - imgHeight) / 2;
+      pdf.addImage(imgData, "PNG", xOffset, yOffset, imgWidth, imgHeight);
+      
+      // 12. Construir nombre de archivo dinámico
+      let fileName = "Calificaciones.pdf";
+      if (contentToPrint.id.startsWith("pdf-")) {
+        const partialName = contentToPrint.id.replace("pdf-", "");
+        const parts = partialName.split("-");
+        
+        if (parts.length >= 2) {
+          const parcialRaw = parts[0] || "";
+          const quimRaw = parts[1] || "";
+          
+          const parcialNumber = parcialRaw.replace("parcial", "");
+          const quimNumber = quimRaw.replace("quim", "");
+          
+          const parcialLabel = parcialNumber ? `Parcial ${parcialNumber}` : "";
+          const quimLabel = quimNumber ? `Quimestre ${quimNumber}` : "";
+          
+          if (parcialLabel && quimLabel) {
+            fileName = `Calificaciones - ${parcialLabel} - ${quimLabel}.pdf`;
+          }
+        }
+      }
+      
+      // 13. Guardar el PDF
+      pdf.save(fileName);
     } catch (error) {
       console.error("Error exportando a PDF:", error);
+      alert("Ocurrió un error al exportar a PDF. Por favor intente nuevamente.");
     }
   };
-  
 
   // ──────────────────────────────────────────
   // 3) Imprimir
@@ -183,7 +245,7 @@ function Calificaciones() {
                     />
                   </Tab>
 
-                  <Tab eventKey="quimestre1" title="Quimestre 1">
+                  <Tab eventKey="quimestral-quim1" title="Quimestre 1">
                     <Quimestral
                       quimestreSeleccionado="1"
                       parcial1Data={parcial1Quim1Data}
@@ -219,7 +281,7 @@ function Calificaciones() {
                     />
                   </Tab>
 
-                  <Tab eventKey="quimestre2" title="Quimestre 2">
+                  <Tab eventKey="quimestral-quim2" title="Quimestre 2">
                     <Quimestral
                       quimestreSeleccionado="2"
                       parcial1Data={parcial1Quim2Data}

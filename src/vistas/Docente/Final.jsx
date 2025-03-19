@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
-import HeaderTabla from "../components/HeaderTabla";
-import Tabla from "../components/Tabla";
+import HeaderTabla from "../../components/HeaderTabla";
+import Tabla from "../../components/Tabla";
 
 const Final = ({ quim1Data, quim2Data }) => {
   const [datos, setDatos] = useState([]);
