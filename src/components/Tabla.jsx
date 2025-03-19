@@ -30,22 +30,28 @@ const Tabla = ({ columnas, columnasAgrupadas, datos, onChange, columnasEditables
               <tr key={i}>
                 {columnas.map((col, j) => {
                   const esEditable = columnasEditables.includes(col);
-
                   return (
                     <td key={j} className="text-center">
+                      {/* Texto que solo se muestra en PDF */}
+                      <span className="pdf-only">
+                        {fila[col] !== undefined && fila[col] !== "" ? fila[col] : "-"}
+                      </span>
+
+                      {/* Vista normal (input si es editable, texto si no) */}
                       {esEditable ? (
                         <input
                           type="text"
                           value={fila[col] || ""}
                           onChange={(e) => onChange(i, col, e.target.value)}
-                          className="form-control text-center"
-                          data-columna={col} /* Agrega este atributo para CSS */
+                          className="form-control text-center screen-only"
+                          data-columna={col}
                         />
                       ) : (
-                        fila[col] || "-"
+                        <span className="screen-only">
+                          {fila[col] !== undefined && fila[col] !== "" ? fila[col] : "-"}
+                        </span>
                       )}
                     </td>
-
                   );
                 })}
               </tr>

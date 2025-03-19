@@ -3,7 +3,7 @@ import Login from '../components/Login.jsx';
 import { Routes, Route } from 'react-router-dom';
 import Inicio from '../vistas/Inicio.jsx';
 import Periodos_Academicos from '../vistas/Admin/PeriodosAcedémicos/Index.jsx'
-import Calificaciones from '../vistas/Calificaciones.jsx';
+import Calificaciones from '../vistas/Docente/Calificaciones.jsx';
 import Asignaguras from "../vistas/Admin/Asignaturas/Index.jsx"
 import Docentes from "../vistas/Admin/Docentes/Index.jsx"
 import Representante from '../vistas/Representante/index.jsx'

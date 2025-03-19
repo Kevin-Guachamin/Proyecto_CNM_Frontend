@@ -1,6 +1,6 @@
 import React, { useState,useEffect } from "react";
-import HeaderTabla from "../components/HeaderTabla";
-import Tabla from "../components/Tabla";
+import HeaderTabla from "../../components/HeaderTabla";
+import Tabla from "../../components/Tabla";
 import "./Parcial.css";
 
 function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial }) {

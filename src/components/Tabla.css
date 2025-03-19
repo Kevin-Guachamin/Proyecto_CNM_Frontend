@@ -1,3 +1,7 @@
+/* ======================================
+   1) ESTILOS BASE
+====================================== */
+
 .container {
     width: 100%;
     overflow-x: auto;
@@ -9,7 +13,8 @@
     text-align: center;
 }
 
-.table th, .table td {
+.table th,
+.table td {
     border: 1px solid #ccc;
     padding: 5px;
     text-align: center;
@@ -22,6 +27,7 @@
     white-space: nowrap;
 }
 
+/* Texto vertical */
 .vertical-text {
     writing-mode: vertical-rl;
     transform: rotate(180deg);
@@ -37,20 +43,18 @@
     transform: rotate(180deg);
     text-align: center;
     white-space: nowrap;
-    /* Ajusta ancho, padding, font-size, etc. */
     font-size: 12px;
     line-height: 1.2;
     padding: 2px 4px;
-  }
-  
-  /* Si quieres controlar el ancho de las columnas verticales */
-  .tabla-parciales .vertical-col {
+}
+
+.tabla-parciales .vertical-col {
     width: 35px;
     min-width: 35px;
     max-width: 35px;
     padding: 0;
     overflow: hidden;
-  }
+}
 
 .grouped-header {
     background-color: #e0ebff;
@@ -67,15 +71,18 @@
     background-color: #f9f9f9;
 }
 
+/* Responsive para pantallas pequeñas */
 @media screen and (max-width: 768px) {
-    .table th, .table td {
+    .table th,
+    .table td {
         padding: 5px;
         font-size: 12px;
     }
 }
+
 /* Ajustar el ancho de la columna "Nro" */
 .nro-columna {
-    width: 25px; /* Ajusta según sea necesario */
+    width: 25px;
     max-width: 25px;
     text-align: center;
     white-space: nowrap;
@@ -83,82 +90,128 @@
 
 /* Ajustar el ancho de la columna 'Nómina de Estudiantes' */
 .nomina-columna {
-    width: 200px; /* Ajusta el valor según el tamaño que prefieras */
+    width: 200px;
     max-width: 200px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* Ajustar la tabla para evitar desbordamientos */
 .table-responsive {
     overflow-x: auto;
 }
 
-/* Aumentar solo el ancho de Insumo 1, Insumo 2 y Evaluación Sumativa */
+/* Aumentar ancho de inputs específicos */
 td input[data-columna="INSUMO 1"],
 td input[data-columna="INSUMO 2"],
-td input[data-columna="EVALUACIÓN SUMATIVA"]
-{
-  width: 45px;
+td input[data-columna="EVALUACIÓN SUMATIVA"] {
+    width: 45px;
 }
 
+/* Últimas 3 columnas en tabla-parciales */
 .tabla-parciales .table th:nth-last-child(-n+3),
 .tabla-parciales .table td:nth-last-child(-n+3) {
-    width: 25px; /* Ajusta el ancho según sea necesario */
+    width: 25px;
 }
- 
+
+/* Quimestral */
 .tabla-quimestral .table tbody td {
-    font-size: 12px; /* Texto de la celda */
+    font-size: 12px;
 }
 
 .tabla-quimestral .table tbody td input {
-    font-size: 12px; /* Texto del input */
+    font-size: 12px;
 }
-/* Columna 6 de “Resumen de Aprendizajes” en tabla-quimestral */
+
+/* Ajustar ancho de la 6ta columna en quimestral */
 .tabla-quimestral .table th:nth-child(6),
 .tabla-quimestral .table td:nth-child(6) {
-    width: 60px; /* Ajusta el ancho según sea necesario */
+    width: 60px;
 }
 
-.tabla-final .table th:nth-child(7)
-{
-    width: 60px; /* Ajusta el ancho según sea necesario */
+/* Final */
+.tabla-final .table th:nth-child(7) {
+    width: 60px;
 }
 .tabla-final .table tbody td {
-    font-size: 12px; /* Texto de la celda */
+    font-size: 12px;
+}
+.tabla-final .table tbody td input {
+    font-size: 12px;
 }
 
-.tabla-final .table tbody td input {
-    font-size: 12px; /* Texto del input */
-}  
+/* ======================================
+   2) OVERRIDES SOLO PARA PDF
+   (SE APLICAN AL HACER .pdf-export)
+====================================== */
 
+/* Ajustar contenedor al capturar */
+.pdf-export {
+    /* Forzar un ancho mayor para que quepan más columnas sin recortar */
+    width: 1200px !important;
+    overflow-x: visible !important;
+    /* Puedes reducir la fuente general si deseas */
+    font-size: 12px;
+}
 
-/* OVERRIDES SOLO PARA PDF */
+/* Permitir que la tabla se expanda */
+.pdf-export .table {
+    width: 100% !important;
+    border-collapse: collapse;
+}
+
+/* Asegurar que no se corte nada */
+.pdf-export .table th,
+.pdf-export .table td {
+    overflow: visible !important;
+    white-space: nowrap; /* o normal, si prefieres que haga salto de línea */
+}
+
+/* Vertical text más ancho en PDF para no cortarse */
 .pdf-export .vertical-text,
 .pdf-export .tabla-parciales .vertical-text {
-  min-width: 60px !important; /* o 80px, 100px... */
-  width: auto !important;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  font-size: 12px !important;
-  line-height: 1.2 !important;
+    min-width: auto !important;
+    width: auto !important;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+    overflow: visible !important;
 }
 
-/* Si usas .vertical-col para forzar ancho */
+/* Forzar ancho más grande para las columnas verticales */
 .pdf-export .tabla-parciales .vertical-col {
-  min-width: 60px !important; /* o más grande */
-  width: 60px !important;
-  max-width: 60px !important;
+    min-width: 60px !important;
+    width: 60px !important;
+    max-width: 60px !important;
 }
 
-/* Para que no se recorte con table-responsive */
-.pdf-export .table-responsive {
-  overflow-x: visible !important;
-}
-
-/* Si tienes reglas que ponen width: 25px en las últimas 3 columnas: */
+/* Sobrescribir la regla de las últimas 3 columnas si se ve muy angosto */
 .pdf-export .tabla-parciales .table th:nth-last-child(-n+3),
 .pdf-export .tabla-parciales .table td:nth-last-child(-n+3) {
-  width: 60px !important; /* Sobrescribe la regla de 25px */
+    width: 60px !important;
 }
+
+/* Evitar recortes en .table-responsive */
+.pdf-export .table-responsive {
+    overflow-x: visible !important;
+}
+
+/* Por defecto, mostrar inputs en pantalla y ocultar el texto para PDF */
+.pdf-only {
+    display: none;
+  }
+  
+  .screen-only {
+    display: inline-block;
+  }
+  
+  /* Cuando se agrega .pdf-export (en tu handleExportPDF), 
+     se ocultan los inputs y se muestra el texto */
+  .pdf-export .pdf-only {
+    display: inline-block !important;
+  }
+  
+  .pdf-export .screen-only {
+    display: none !important;
+  } 
