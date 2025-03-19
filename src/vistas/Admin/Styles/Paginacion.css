@@ -1,0 +1,48 @@
+.Paginación {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    position: sticky;
+    bottom: 0;
+  
+    
+    z-index: 100;
+  }
+  
+  .pagination li {
+    display: inline-block;
+  }
+  
+  .pagination a {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 16px;
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #007bff;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+  }
+  
+  .pagination a:hover {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .pagination .selected a {
+    background-color: #0056b3;
+    color: white;
+    border-color: #0056b3;
+  }
+  
+  .pagination .disabled a {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .pagination .break a {
+    cursor: default;
+    border: none;
+  }
+  
