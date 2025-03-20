@@ -122,7 +122,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data,  actual
 
   const columnasAgrupadas = [
     { titulo: "", colspan: 2 },
-    { titulo: "RESUMEN DE APRENDIZAJES", colspan: 9 },
+    { titulo: "RESUMEN DE APRENDIZAJES Y COMPORTAMIENTO", colspan: 9 },
   ];
 
   const columnas = [
@@ -142,7 +142,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data,  actual
       />
       <Tabla
         columnasAgrupadas={columnasAgrupadas}
-        columnas={["Nro", "Nómina de Estudiantes", ...columnas]}
+        columnas={columnas}
         datos={datos}
         onChange={handleInputChange}
         columnasEditables={columnasEditables}

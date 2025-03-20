@@ -1,10 +1,11 @@
-
 import React, { useState, useEffect } from "react";
 import HeaderTabla from "../../components/HeaderTabla";
 import Tabla from "../../components/Tabla";
 
 const Final = ({ quim1Data, quim2Data }) => {
   const [datos, setDatos] = useState([]);
+
+  const idContenedor = `pdf-final`;
 
   // Función para convertir el promedio de comportamiento en letra
   const calcularValoracion = (valor) => {
@@ -198,7 +199,7 @@ const Final = ({ quim1Data, quim2Data }) => {
   });
 
   return (
-    <div id="pdf-final" className="container tabla-final">
+    <div id={idContenedor} className="container tabla-final">
       <HeaderTabla
         datosEncabezado={datosEncabezado}
         imagenIzquierda={"/ConservatorioNacional.png"}
@@ -206,7 +207,7 @@ const Final = ({ quim1Data, quim2Data }) => {
       />
       <Tabla
         columnasAgrupadas={columnasAgrupadas}
-        columnas={["Nro", "Nómina de Estudiantes", ...columnas]}
+        columnas={columnas}
         datos={datosConEstilos}
         onChange={handleInputChange}
         // Sólo la columna "Examen Supletorio" es editable

@@ -1,7 +1,7 @@
 import React, { useState,useEffect } from "react";
 import HeaderTabla from "../../components/HeaderTabla";
 import Tabla from "../../components/Tabla";
-import "./Parcial.css";
+//import "./Parcial.css";
 
 function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial }) {
   
@@ -39,7 +39,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
 
   const [datos, setDatos] = useState([
     {
-      "Nro": 1, "Nómina de Estudiantes": "Estudiante 1", "INSUMO 1": "", "INSUMO 2": "", "PONDERACIÓN 70%": "", "EVALUACIÓN SUMATIVA": "", "PONDERACIÓN 30%": "", "PROMEDIO PARCIAL": "",
+      "Nro": 1, "Nómina de Estudiantes": "Kevin Patricio Guachamin Santillán", "INSUMO 1": "", "INSUMO 2": "", "PONDERACIÓN 70%": "", "EVALUACIÓN SUMATIVA": "", "PONDERACIÓN 30%": "", "PROMEDIO PARCIAL": "",
     "RESPETO Y \n CONSIDERACION": "", "VALORACION DE \n LA DIVERSIDAD": "", "CUMPLIMIENTO DE LAS \n NORMA DE CONVIVENCIA": "",
     "CUIDADO  DEL \n PATRIMONIO INSTITUCIONAL": "", "RESPETO A LA \n PROPIEDAD AJENA": "", "PUNTUALIDAD \n Y ASISTENCIA": "", "HONESTIDAD \n": "",
     "PRESENTACION PERSONAL \n (LIMPIEZA Y UNIFORME)": "", "PARTICIPACION \n COMUNITARIA": "", "RESPONSABILIDAD \n ": "", "PROMEDIO COMPORTAMIENTO": "",
@@ -144,7 +144,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
       <HeaderTabla datosEncabezado={datosEncabezado} imagenIzquierda={"/ConservatorioNacional.png"} />
       <Tabla
         columnasAgrupadas={columnasAgrupadas}
-        columnas={["Nro", "Nómina de Estudiantes", ...columnas]}
+        columnas={columnas}
         datos={datos}
         onChange={handleInputChange}
         columnasEditables={columnasEditables}

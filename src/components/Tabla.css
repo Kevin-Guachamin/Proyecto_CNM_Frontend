@@ -1,145 +1,73 @@
-/* ======================================
-   1) ESTILOS BASE
-====================================== */
-
-.container {
-    width: 100%;
-    overflow-x: auto;
-}
-
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: center;
-}
-
-.table th,
-.table td {
-    border: 1px solid #ccc;
-    padding: 5px;
-    text-align: center;
-    vertical-align: middle;
-}
-
-.table th {
-    background-color: #e0ebff;
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-/* Texto vertical */
-.vertical-text {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    text-align: center;
-    white-space: nowrap;
-    width: 1%;
-    padding: 3px;
-}
-
-/* Overrides ESPECÍFICOS para Parciales */
-.tabla-parciales .vertical-text {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    text-align: center;
-    white-space: nowrap;
-    font-size: 12px;
-    line-height: 1.2;
-    padding: 2px 4px;
-}
-
-.tabla-parciales .vertical-col {
-    width: 35px;
-    min-width: 35px;
-    max-width: 35px;
-    padding: 0;
-    overflow: hidden;
-}
-
-.grouped-header {
-    background-color: #e0ebff;
-    font-weight: bold;
-    text-align: center;
-}
-
-.sub-header {
-    background-color: #ffcc00;
-    font-weight: bold;
-}
-
-.row-highlight {
-    background-color: #f9f9f9;
-}
-
-/* Responsive para pantallas pequeñas */
-@media screen and (max-width: 768px) {
-    .table th,
-    .table td {
-        padding: 5px;
-        font-size: 12px;
-    }
-}
-
-/* Ajustar el ancho de la columna "Nro" */
-.nro-columna {
-    width: 25px;
-    max-width: 25px;
-    text-align: center;
-    white-space: nowrap;
-}
-
-/* Ajustar el ancho de la columna 'Nómina de Estudiantes' */
-.nomina-columna {
-    width: 200px;
-    max-width: 200px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.table-responsive {
-    overflow-x: auto;
-}
-
-/* Aumentar ancho de inputs específicos */
-td input[data-columna="INSUMO 1"],
-td input[data-columna="INSUMO 2"],
-td input[data-columna="EVALUACIÓN SUMATIVA"] {
-    width: 45px;
-}
-
-/* Últimas 3 columnas en tabla-parciales */
-.tabla-parciales .table th:nth-last-child(-n+3),
-.tabla-parciales .table td:nth-last-child(-n+3) {
-    width: 25px;
-}
-
-/* Quimestral */
-.tabla-quimestral .table tbody td {
-    font-size: 12px;
-}
-
-.tabla-quimestral .table tbody td input {
-    font-size: 12px;
-}
-
-/* Ajustar ancho de la 6ta columna en quimestral */
-.tabla-quimestral .table th:nth-child(6),
-.tabla-quimestral .table td:nth-child(6) {
-    width: 60px;
-}
-
-/* Final */
-.tabla-final .table th:nth-child(7) {
-    width: 60px;
-}
-.tabla-final .table tbody td {
-    font-size: 12px;
-}
-.tabla-final .table tbody td input {
-    font-size: 12px;
-}
-
+/* =========================================
+   1) Ancho fijo para columnas "Nro" y "Nómina de Estudiantes"
+   ========================================= */
+   .custom-table th:nth-child(1),
+   .custom-table td:nth-child(1) {
+     width: 25px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+   }
+   
+   .custom-table th:nth-child(2),
+   .custom-table td:nth-child(2) {
+     width: 200px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+   }
+   
+   /* =========================================
+      2) Ajustar la altura y posición de todos los TH en el thead
+      ========================================= */
+   .table thead tr.table-primary th {
+     height: 200px;         /* Más alto para acomodar texto grande */
+     position: relative;     /* Para ubicar el texto rotado */
+     vertical-align: middle; /* Centrado vertical */
+     text-align: center;     /* Centrado horizontal */
+     overflow: visible;      /* Importante: que no corte el texto rotado */
+   }
+   
+   /* =========================================
+      3) Dar ancho a partir de la 3ª columna (n+3),
+         pues las dos primeras son "Nro" y "Nómina"
+      ========================================= */
+   .table thead tr.table-primary th:nth-child(n+3) {
+     width: 70px;     /* Ajusta a un valor mayor si el texto es muy largo */
+     min-width: 70px;
+     max-width: 70px;
+     overflow: visible;
+   }
+   
+   /* =========================================
+      4) Rotar el texto dentro de un <span class="vertical-text">
+         - Permitir quiebre de línea con white-space: normal
+         - Definir un ancho fijo (p.ej. 110px) donde se "ajustará" el texto
+      ========================================= */
+      .vertical-text {
+        /* Para el clamp en WebKit/Blink (Chrome, Edge, Safari...) */
+        display: -webkit-box;
+        -webkit-line-clamp: 2;          /* Máximo 2 líneas */
+        -webkit-box-orient: vertical;
+        
+        /* "Versión estándar" (todavía no implementada en la mayoría de navegadores) */
+        line-clamp: 2;
+        box-orient: vertical;
+      
+        /* Ancho disponible para el texto rotado (ajusta a tu gusto) */
+        width: 180px;  
+        font-size: 0.85rem; 
+        text-align: center;
+      
+        /* Posicionamiento absoluto dentro del <th> */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform-origin: center center;
+        /* Combinar translate y rotate en un solo transform */
+        transform: translate(-50%, -50%) rotate(-90deg);
+      }      
+   
 /* ======================================
    2) OVERRIDES SOLO PARA PDF
    (SE APLICAN AL HACER .pdf-export)
@@ -147,71 +75,90 @@ td input[data-columna="EVALUACIÓN SUMATIVA"] {
 
 /* Ajustar contenedor al capturar */
 .pdf-export {
-    /* Forzar un ancho mayor para que quepan más columnas sin recortar */
-    width: 1200px !important;
-    overflow-x: visible !important;
-    /* Puedes reducir la fuente general si deseas */
-    font-size: 12px;
+  width: 1800px !important; 
+  overflow-x: visible !important;
+  font-size: 12px;
 }
 
-/* Permitir que la tabla se expanda */
+/* Fuerza el contenedor del header a usar todo ese ancho */
+.pdf-export .container.tabla-parciales {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+/* Para el header */
+.pdf-export .cabecera-parciales {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.pdf-export .container.border.p-3.mt-3 {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.pdf-export .container {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.pdf-export .row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.pdf-export [class^="col-"] {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Si te está afectando el padding/margen de .p-3, .mt-3 */
+.pdf-export .p-3 {
+  padding: 0 !important;
+}
+.pdf-export .mt-3 {
+  margin-top: 0 !important;
+}
+.pdf-export .cabecera-parciales {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  /* si quieres mantener el borde y el padding, hazlo con box-sizing */
+  box-sizing: border-box;
+  border: 1px solid #ccc; /* si deseas un borde */
+  /* padding: 1rem; */     /* si deseas algo de padding */
+}
 .pdf-export .table {
-    width: 100% !important;
-    border-collapse: collapse;
+  width: 100% !important;
+  border-collapse: collapse;
 }
 
-/* Asegurar que no se corte nada */
 .pdf-export .table th,
 .pdf-export .table td {
-    overflow: visible !important;
-    white-space: nowrap; /* o normal, si prefieres que haga salto de línea */
+  overflow: visible !important;
 }
 
-/* Vertical text más ancho en PDF para no cortarse */
-.pdf-export .vertical-text,
-.pdf-export .tabla-parciales .vertical-text {
-    min-width: auto !important;
-    width: auto !important;
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    font-size: 12px !important;
-    line-height: 1.2 !important;
-    overflow: visible !important;
-}
-
-/* Forzar ancho más grande para las columnas verticales */
-.pdf-export .tabla-parciales .vertical-col {
-    min-width: 60px !important;
-    width: 60px !important;
-    max-width: 60px !important;
-}
-
-/* Sobrescribir la regla de las últimas 3 columnas si se ve muy angosto */
-.pdf-export .tabla-parciales .table th:nth-last-child(-n+3),
-.pdf-export .tabla-parciales .table td:nth-last-child(-n+3) {
-    width: 60px !important;
-}
-
-/* Evitar recortes en .table-responsive */
 .pdf-export .table-responsive {
-    overflow-x: visible !important;
+  overflow-x: visible !important;
 }
 
-/* Por defecto, mostrar inputs en pantalla y ocultar el texto para PDF */
+/* Manejo de inputs vs texto */
 .pdf-only {
-    display: none;
-  }
-  
-  .screen-only {
-    display: inline-block;
-  }
-  
-  /* Cuando se agrega .pdf-export (en tu handleExportPDF), 
-     se ocultan los inputs y se muestra el texto */
-  .pdf-export .pdf-only {
-    display: inline-block !important;
-  }
-  
-  .pdf-export .screen-only {
-    display: none !important;
-  } 
+  display: none;
+}
+.screen-only {
+  display: inline-block;
+}
+.pdf-export .pdf-only {
+  display: inline-block !important;
+}
+.pdf-export .screen-only {
+  display: none !important;
+}
