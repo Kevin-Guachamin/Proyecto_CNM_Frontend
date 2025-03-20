@@ -18,7 +18,7 @@ function Paginación({ totalPages, page, setPage }) {
         pageRangeDisplayed={3} // Cantidad de páginas visibles en el centro
         onPageChange={handlePageClick}
         containerClassName={"pagination"} // Clase para estilizar
-        activeClassName={"active"} // Clase para la página activa
+        activeClassName={"selected"} // Clase para la página activa
         forcePage={page - 1} // Para sincronizar con el estado
       />
     </div>

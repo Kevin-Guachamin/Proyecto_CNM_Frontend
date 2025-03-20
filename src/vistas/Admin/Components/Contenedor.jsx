@@ -11,6 +11,7 @@ function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpo
   const [entityToUpdate, setEntityToUpdate] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
+  console.log("este es el datamao de la data",data.length)
 
   console.log("esta es la data",data)
   const filteredData = data.filter((item) =>
@@ -54,7 +55,7 @@ function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpo
         columnsToShow={columnsToShow}
         extraIcon={extraIcon}
       />
-      {Paginación && <div className='Paginación'>{Paginación}</div> && data. length>0}
+      {Paginación && data.length > 0 && <div className='Paginación'>{Paginación}</div>}
     </div>
   );
 }
