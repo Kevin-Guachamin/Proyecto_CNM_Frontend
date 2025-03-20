@@ -3,9 +3,14 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./Tabla.css";
 
 const Tabla = ({ columnas, columnasAgrupadas, datos, onChange, columnasEditables = [] }) => {
+  // Columnas que se repiten en todas las tablas
+  const columnasRepetidas = ["Nro", "Nómina de Estudiantes"];
+  // Concatenamos las columnas fijas con las columnas específicas pasadas desde el padre
+  const columnasFinales = [...columnasRepetidas, ...columnas];
+
   return (
     <div className="table-responsive mt-3">
-      <table className="table table-bordered table-striped custom-table">
+      <table className="table table-bordered table-striped custom-table tabla-parciales">
         <thead>
           {columnasAgrupadas && (
             <tr>
@@ -17,9 +22,15 @@ const Tabla = ({ columnas, columnasAgrupadas, datos, onChange, columnasEditables
             </tr>
           )}
           <tr className="table-primary">
-            {columnas.map((col, index) => (
-              <th key={index} className={`text-center ${index > 1 ? "vertical-text" : ""}`}>
-                {col}
+            {columnasFinales.map((col, index) => (
+              <th key={index} className="text-center">
+                {/* Para las dos primeras columnas, texto normal;
+                    para las demás, texto en vertical */}
+                {index > 1 ? (
+                  <span className="vertical-text">{col}</span>
+                ) : (
+                  col
+                )}
               </th>
             ))}
           </tr>
@@ -28,7 +39,7 @@ const Tabla = ({ columnas, columnasAgrupadas, datos, onChange, columnasEditables
           {datos.length > 0 ? (
             datos.map((fila, i) => (
               <tr key={i}>
-                {columnas.map((col, j) => {
+                {columnasFinales.map((col, j) => {
                   const esEditable = columnasEditables.includes(col);
                   return (
                     <td key={j} className="text-center">
@@ -36,8 +47,7 @@ const Tabla = ({ columnas, columnasAgrupadas, datos, onChange, columnasEditables
                       <span className="pdf-only">
                         {fila[col] !== undefined && fila[col] !== "" ? fila[col] : "-"}
                       </span>
-
-                      {/* Vista normal (input si es editable, texto si no) */}
+                      {/* Vista normal: input si es editable, texto si no */}
                       {esEditable ? (
                         <input
                           type="text"
@@ -58,7 +68,7 @@ const Tabla = ({ columnas, columnasAgrupadas, datos, onChange, columnasEditables
             ))
           ) : (
             <tr>
-              <td colSpan={columnas.length} className="text-center">
+              <td colSpan={columnasFinales.length} className="text-center">
                 No hay datos disponibles
               </td>
             </tr>
