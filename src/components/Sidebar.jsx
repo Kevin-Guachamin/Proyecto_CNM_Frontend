@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import "./Sidebar.css"; // Asegúrate de importar el archivo CSS
+import "./Sidebar.css";
 
-function Sidebar({ modules }) {
+function Sidebar({ modules, onNavigate }) {
   const [collapsed, setCollapsed] = useState(false);
   const [activeModule, setActiveModule] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Al cargar el componente, verifica si hay un módulo activo guardado en localStorage
     const savedModule = localStorage.getItem("activeModule");
     if (savedModule) {
       setActiveModule(parseInt(savedModule));
@@ -18,8 +17,12 @@ function Sidebar({ modules }) {
 
   const handleNavigation = (index, path) => {
     setActiveModule(index);
-    localStorage.setItem("activeModule", index); // Guardar el módulo activo en localStorage
-    navigate(path);
+    localStorage.setItem("activeModule", index);
+    if (onNavigate) {
+      onNavigate(path);
+    } else {
+      navigate(path);
+    }
   };
 
   return (

@@ -1,14 +1,22 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "./Modulo.css"; // Asegúrate de que existe un archivo CSS para estilos
+import "./Modulo.css";
 
-const Modulo = ({ modulos }) => {
+const Modulo = ({ modulos, onModuloClick }) => {
   const navigate = useNavigate();
+
+  const handleClick = (link) => {
+    if (onModuloClick) {
+      onModuloClick(link);
+    } else {
+      navigate(link);
+    }
+  };
 
   return (
     <div className="contenedor-modulos">
       {modulos.map((modulo) => (
-        <div key={modulo.id} className="modulo-card" onClick={() => navigate(modulo.ruta)}>
+        <div key={modulo.id} className="modulo-card" onClick={() => handleClick(modulo)}>
           <div className="modulo-icono">{modulo.icono}</div>
           <div className="modulo-titulo">{modulo.titulo}</div>
         </div>

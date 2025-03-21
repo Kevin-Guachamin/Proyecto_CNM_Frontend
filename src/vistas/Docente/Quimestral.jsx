@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import HeaderTabla from "../../components/HeaderTabla";
 import Tabla from "../../components/Tabla";
 
-const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data,  actualizarDatosQuim  }) => {
+const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data,  actualizarDatosQuim, datosModulo   }) => {
   
   const idContenedor = `pdf-quimestral-quim${quimestreSeleccionado}`;
 
@@ -107,19 +107,25 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data,  actual
 
   const subtitulo = `ACTA DE RESUMEN DEL ${quimestreSeleccionado === "1" ? "PRIMER" : "SEGUNDO"} QUIMESTRE`;
 
+  const determinarJornada = (horario) => {
+    const horaInicio = horario.split("-")[0];
+    const horaNumerica = parseInt(horaInicio.split(":")[0], 10);
+    return horaNumerica < 12 ? "Matutina" : "Vespertina";
+  };
+
   const datosEncabezado = {
     titulo: "CONSERVATORIO NACIONAL DE MUSICA",
     subtitulo: subtitulo,
     info: {
-      "Profesor": "Guachis",
-      "Asignatura": "Instrumento",
-      "Curso": "0",
-      "Paralelo": "0",
-      "Año Lectivo": "2024 - 2025",
-      "Jornada": "Matutina"
+      "Profesor": datosModulo.docente,
+      "Asignatura": datosModulo.materia,
+      "Curso": datosModulo.año,
+      "Paralelo": datosModulo.paralelo,
+      "Año Lectivo": datosModulo.periodo,
+      "Jornada": determinarJornada(datosModulo.horario)
     }
   };
-
+  
   const columnasAgrupadas = [
     { titulo: "", colspan: 2 },
     { titulo: "RESUMEN DE APRENDIZAJES Y COMPORTAMIENTO", colspan: 9 },

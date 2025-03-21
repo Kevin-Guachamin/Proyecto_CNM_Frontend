@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import HeaderTabla from "../../components/HeaderTabla";
 import Tabla from "../../components/Tabla";
 
-const Final = ({ quim1Data, quim2Data }) => {
+const Final = ({ quim1Data, quim2Data, datosModulo }) => {
   const [datos, setDatos] = useState([]);
 
   const idContenedor = `pdf-final`;
@@ -131,16 +131,22 @@ const Final = ({ quim1Data, quim2Data }) => {
     );
   };
 
+  const determinarJornada = (horario) => {
+    const horaInicio = horario.split("-")[0];
+    const horaNumerica = parseInt(horaInicio.split(":")[0], 10);
+    return horaNumerica < 12 ? "Matutina" : "Vespertina";
+  };
+
   const datosEncabezado = {
     titulo: "CONSERVATORIO NACIONAL DE MUSICA",
-    subtitulo: "ACTA FINAL",
+    subtitulo: "ACTA DE RESUMEN FINAL",
     info: {
-      "Profesor": "Guachis",
-      "Asignatura": "Instrumento",
-      "Curso": "0",
-      "Paralelo": "0",
-      "Año Lectivo": "2024 - 2025",
-      "Jornada": "Matutina"
+      "Profesor": datosModulo.docente,
+      "Asignatura": datosModulo.materia,
+      "Curso": datosModulo.año,
+      "Paralelo": datosModulo.paralelo,
+      "Año Lectivo": datosModulo.periodo,
+      "Jornada": determinarJornada(datosModulo.horario)
     }
   };
 
