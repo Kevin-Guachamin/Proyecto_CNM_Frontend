@@ -23,7 +23,7 @@ function Index() {
       
       ObtenerTodo(setPeriodos,`${API_URL}/periodo_academico/obtener`,setLoading)
       // Mientras no se conecte al backend, dejamos un usuario de prueba
-      
+      console.log("EStos son los periosdos", periodos)
       setUsuario({ nombre: "Juan Pérez", rol: "Estudiante" });
     }, [API_URL]);
   

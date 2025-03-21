@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Boton from '../../../components/Boton';
 import '../Styles/CrearEntidad.css';
 
-function CrearRepresentante({ onCancel, entityToUpdate, onSave }) {
+function CrearRepresentante({onCancel, entityToUpdate, onSave }) {
   const [nroCedula, setNroCedula] = useState("")
   const [primer_nombre, setPrimerNombre] = useState("");
   const [primer_apellido, setPrimerApellido] = useState("");
@@ -104,7 +104,7 @@ function CrearRepresentante({ onCancel, entityToUpdate, onSave }) {
             </div>
             <div className="form-group">
               <label htmlFor="convencional">#Emergencia :</label>
-              <input id="convencional" value={emergencia} onChange={(e) => setEmergencia(e.target.value)} placeholder="Ingrese un celular" />
+              <input id="emergencia" value={emergencia} onChange={(e) => setEmergencia(e.target.value)} placeholder="Ingrese un celular" />
             </div>
           </div>
           <div className="form-group">
@@ -118,7 +118,7 @@ function CrearRepresentante({ onCancel, entityToUpdate, onSave }) {
               <input
                 type="file"
                 name="copiaCedula"
-                
+
                 onChange={handleFileChange}
                 accept="application/pdf"
               />

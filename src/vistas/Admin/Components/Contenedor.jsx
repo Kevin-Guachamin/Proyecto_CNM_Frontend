@@ -5,12 +5,15 @@ import { Eliminar } from '../../../Utils/CRUD/Eliminar';
 import { Editar } from '../../../Utils/CRUD/Editar';
 import "../Styles/Contenedor.css"
 
-function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpoint,CrearEntidad, PK,extraIcon,setPage,page,totalPages}) {
+
+function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpoint,CrearEntidad, PK,extraIcon, Paginación}) {
   const [search, setSearch] = useState('');
   const [entityToUpdate, setEntityToUpdate] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
+  console.log("este es el datamao de la data",data.length)
 
+  console.log("esta es la data",data)
   const filteredData = data.filter((item) =>
     item[filterKey]?.toLowerCase().includes(search.toLowerCase())
   );
@@ -35,6 +38,7 @@ function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpo
 
   return (
     <div className='Contenedor-general'>
+      
       <Filtro search={search} setSearch={setSearch} toggleModal={toggleModal} filterKey={filterKey}/>
       {isModalOpen && (
             <CrearEntidad
@@ -50,10 +54,8 @@ function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpo
         headers={headers}
         columnsToShow={columnsToShow}
         extraIcon={extraIcon}
-        setPage={setPage}
-        totalPages={totalPages}
-        page={page}
       />
+      {Paginación && data.length > 0 && <div className='Paginación'>{Paginación}</div>}
     </div>
   );
 }
