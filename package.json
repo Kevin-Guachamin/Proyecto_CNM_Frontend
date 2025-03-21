@@ -21,7 +21,11 @@
     "axios": "^1.8.1",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
+    "file-saver": "^2.0.5",
     "framer-motion": "^12.4.10",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.0",
+    "jspdf-autotable": "^5.0.2",
     "lucide-react": "^0.477.0",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
@@ -31,7 +35,8 @@
     "react-paginate": "^8.3.0",
     "react-router-dom": "^7.2.0",
     "react-spinners": "^0.15.0",
-    "sweetalert2": "^11.17.2"
+    "sweetalert2": "^11.17.2",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

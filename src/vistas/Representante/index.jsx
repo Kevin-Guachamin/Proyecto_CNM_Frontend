@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
+import axios from 'axios';
 import Layout from '../../layout/containers/Layout';
 import Tabla from '../Representante/components/Tabla_Representante';
-import { Home, Users, Settings, Eye, ChevronLeft, ChevronRight, Sun, Moon } from "lucide-react";
-import { div } from 'framer-motion/client';
 import Header from "../../components/Header";
 
 
@@ -11,13 +10,34 @@ function Index() {
   const [usuario, setUsuario] = useState(null);
   const [datosEstudiante, setDatosEstudiante] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const datos = 2;
 
-  const handleVerClick = (estudiante) => {
-    console.log("ver detalles de: ", estudiante);
+  const handleVerCalificaciones = (estudianteCedula) => {
+    console.log("ver detalles de: ", estudianteCedula);
     // logica
   }
 
+  // Mientras no se conecte al backend, dejamos un usuario de prueba
+  const cargarDatos = async () => {
+    try {
+      setIsLoading(true);
+
+      // Peticion para obtener datos del representante logeado
+      const representante = await axios.get('http://localhost:8000/representante/obtener/1715234567');
+
+      // Peticion para obtener los estudiantes a cargo del representante logeado
+      const respuesta = await axios.get('http://localhost:8000/api/representantes/1715234567/estudiantes');
+
+      setUsuario({ nombre: representante.data.primer_nombre, rol: "Representante" });
+      setDatosEstudiante(respuesta.data);
+      
+      
+    } catch (error) {
+      console.error("Error al cargar datos: ", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+  
   // Simulación de usuario ficticio mientras se conecta con el backend
   useEffect(() => {
     // Aquí se realizará la petición al backend cuando esté disponible
@@ -29,37 +49,8 @@ function Index() {
     //     console.error("Error al obtener los datos del usuario:", error);
     //   });
 
-    // Mientras no se conecte al backend, dejamos un usuario de prueba
-    const cargarDatos = async () => {
-      try {
-        setIsLoading(true);
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        setUsuario({ nombre: "Maria Pérez", rol: "Representante" });
-        setDatosEstudiante([
-          {
-            Estudiante: "Jose Andres Perez Jimenez", 
-            Curso: "el curso", 
-            Especialidad: "la especialidad",
-            Acciones: (
-              <button
-                className = "btn btn-primary btn-sm"
-                onClick = {() => handleVerClick("Jose Andres Perez Jimenez")}
-              >
-              <Eye size={16} className="me-1"/>
-              Ver calificaciones
-              </button>
-            )
-          },
-          {Estudiante: "Ana Maria Perez Jimenez", Curso: "el curso", Especialidad: "la especialidad"}
-        ]);
-      } catch (error) {
-        console.error("Error al cargar datos: ", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
+    
+    
     cargarDatos();  
     
   }, []);
@@ -72,7 +63,11 @@ function Index() {
             </div>
 
             <Layout showSidebar={false}>
-              <Tabla datos={datosEstudiante} isLoading={isLoading}></Tabla>
+              <Tabla 
+                datos={datosEstudiante} 
+                isLoading={isLoading}
+                handleVerCalificaciones={handleVerCalificaciones}
+              ></Tabla>
             </Layout>
         </div>
     )

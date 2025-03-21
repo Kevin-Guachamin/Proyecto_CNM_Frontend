@@ -2,7 +2,7 @@ import React from "react";
 
 const HeaderTabla = ({ datosEncabezado, imagenIzquierda, imagenDerecha }) => {
   return (
-    <div className="container border p-3 mt-3">
+    <div className="container border p-3 mt-3 cabecera-parciales">
       <div className="d-flex justify-content-between align-items-center">
         {/* Imagen izquierda (opcional) */}
         {imagenIzquierda && (

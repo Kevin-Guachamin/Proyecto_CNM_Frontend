@@ -1,0 +1,21 @@
+/* Solo se aplica dentro de la vista de parciales */
+.tabla-parciales .table th:nth-child(n+3),
+.tabla-parciales .table td:nth-child(n+3) {
+    white-space: pre-line !important; /* Reconoce \n como salto de línea */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.tabla-parciales .table tbody td {
+    font-size: 11px; /* Texto de la celda */
+}
+
+.tabla-parciales .table tbody td input {
+    font-size: 11px; /* Texto del input */
+}
+
+/* Aplica solo a los inputs que están en las columnas de la sección de comportamiento 
+   (del noveno al vigésimo primer td en cada fila) */
+   .tabla-parciales .table td:nth-child(n+9):nth-child(-n+21) input {
+    width: 30px;
+  }

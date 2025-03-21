@@ -1,83 +1,164 @@
-.container {
-    width: 100%;
-    overflow-x: auto;
+/* =========================================
+   1) Ancho fijo para columnas "Nro" y "Nómina de Estudiantes"
+   ========================================= */
+   .custom-table th:nth-child(1),
+   .custom-table td:nth-child(1) {
+     width: 25px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+   }
+   
+   .custom-table th:nth-child(2),
+   .custom-table td:nth-child(2) {
+     width: 200px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     white-space: nowrap;
+   }
+   
+   /* =========================================
+      2) Ajustar la altura y posición de todos los TH en el thead
+      ========================================= */
+   .table thead tr.table-primary th {
+     height: 200px;         /* Más alto para acomodar texto grande */
+     position: relative;     /* Para ubicar el texto rotado */
+     vertical-align: middle; /* Centrado vertical */
+     text-align: center;     /* Centrado horizontal */
+     overflow: visible;      /* Importante: que no corte el texto rotado */
+   }
+   
+   /* =========================================
+      3) Dar ancho a partir de la 3ª columna (n+3),
+         pues las dos primeras son "Nro" y "Nómina"
+      ========================================= */
+   .table thead tr.table-primary th:nth-child(n+3) {
+     width: 70px;     /* Ajusta a un valor mayor si el texto es muy largo */
+     min-width: 70px;
+     max-width: 70px;
+     overflow: visible;
+   }
+   
+   /* =========================================
+      4) Rotar el texto dentro de un <span class="vertical-text">
+         - Permitir quiebre de línea con white-space: normal
+         - Definir un ancho fijo (p.ej. 110px) donde se "ajustará" el texto
+      ========================================= */
+      .vertical-text {
+        /* Para el clamp en WebKit/Blink (Chrome, Edge, Safari...) */
+        display: -webkit-box;
+        -webkit-line-clamp: 2;          /* Máximo 2 líneas */
+        -webkit-box-orient: vertical;
+        
+        /* "Versión estándar" (todavía no implementada en la mayoría de navegadores) */
+        line-clamp: 2;
+        box-orient: vertical;
+      
+        /* Ancho disponible para el texto rotado (ajusta a tu gusto) */
+        width: 180px;  
+        font-size: 0.85rem; 
+        text-align: center;
+      
+        /* Posicionamiento absoluto dentro del <th> */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform-origin: center center;
+        /* Combinar translate y rotate en un solo transform */
+        transform: translate(-50%, -50%) rotate(-90deg);
+      }      
+   
+/* ======================================
+   2) OVERRIDES SOLO PARA PDF
+   (SE APLICAN AL HACER .pdf-export)
+====================================== */
+
+/* Ajustar contenedor al capturar */
+.pdf-export {
+  width: 1800px !important; 
+  overflow-x: visible !important;
+  font-size: 12px;
 }
 
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: center;
+/* Fuerza el contenedor del header a usar todo ese ancho */
+.pdf-export .container.tabla-parciales {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
 }
 
-.table th, .table td {
-    border: 1px solid #ccc;
-    padding: 8px;
-    text-align: center;
-    vertical-align: middle;
+/* Para el header */
+.pdf-export .cabecera-parciales {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-.table th {
-    background-color: #e0ebff;
-    font-weight: bold;
-    white-space: nowrap;
+.pdf-export .container.border.p-3.mt-3 {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.pdf-export .container {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-.vertical-text {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    text-align: center;
-    white-space: nowrap;
-    width: 30px;
-    padding: 5px;
+.pdf-export .row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }
 
-.grouped-header {
-    background-color: #e0ebff;
-    font-weight: bold;
-    text-align: center;
+.pdf-export [class^="col-"] {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
-.sub-header {
-    background-color: #ffcc00;
-    font-weight: bold;
+/* Si te está afectando el padding/margen de .p-3, .mt-3 */
+.pdf-export .p-3 {
+  padding: 0 !important;
+}
+.pdf-export .mt-3 {
+  margin-top: 0 !important;
+}
+.pdf-export .cabecera-parciales {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  /* si quieres mantener el borde y el padding, hazlo con box-sizing */
+  box-sizing: border-box;
+  border: 1px solid #ccc; /* si deseas un borde */
+  /* padding: 1rem; */     /* si deseas algo de padding */
+}
+.pdf-export .table {
+  width: 100% !important;
+  border-collapse: collapse;
 }
 
-.row-highlight {
-    background-color: #f9f9f9;
+.pdf-export .table th,
+.pdf-export .table td {
+  overflow: visible !important;
 }
 
-@media screen and (max-width: 768px) {
-    .table th, .table td {
-        padding: 5px;
-        font-size: 12px;
-    }
-}
-/* Ajustar el ancho de la columna "Nro" */
-.nro-columna {
-    width: 50px; /* Ajusta según sea necesario */
-    max-width: 50px;
-    text-align: center;
-    white-space: nowrap;
+.pdf-export .table-responsive {
+  overflow-x: visible !important;
 }
 
-/* Ajustar el ancho de la columna 'Nómina de Estudiantes' */
-.nomina-columna {
-    width: 200px; /* Ajusta el valor según el tamaño que prefieras */
-    max-width: 200px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+/* Manejo de inputs vs texto */
+.pdf-only {
+  display: none;
 }
-
-/* Ajustar la tabla para evitar desbordamientos */
-.table-responsive {
-    overflow-x: auto;
+.screen-only {
+  display: inline-block;
 }
-
-/* Asegurar que los encabezados de columnas en vertical no se expandan demasiado */
-.vertical-text {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    white-space: nowrap;
-    width: 40px; /* Reduce el tamaño si es necesario */
+.pdf-export .pdf-only {
+  display: inline-block !important;
+}
+.pdf-export .screen-only {
+  display: none !important;
 }
