@@ -33,13 +33,13 @@ const Inicio = () => {
     }
   }, [navigate]);
 
-  // Manejo del click en módulos con loader
-  const handleModuloClick = (link) => {
+  const handleModuloClick = (modulo) => {
     setLoading(true);
     setTimeout(() => {
-      navigate(link);
-    }, 800); // Ajusta el tiempo según prefieras
+      navigate(modulo.link); // accedes a la propiedad link del objeto
+    }, 800);
   };
+  
 
   if (loading) {
     return <Loading />;

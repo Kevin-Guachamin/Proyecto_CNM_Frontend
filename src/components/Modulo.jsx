@@ -5,13 +5,13 @@ import "./Modulo.css";
 const Modulo = ({ modulos, onModuloClick }) => {
   const navigate = useNavigate();
 
-  const handleClick = (link) => {
+  const handleClick = (modulo) => {
     if (onModuloClick) {
-      onModuloClick(link);
-    } else {
-      navigate(link);
+      onModuloClick(modulo); // ← envías el objeto entero
+    } else if (modulo.link) {
+      navigate(modulo.link); // ← fallback si no se pasa onModuloClick
     }
-  };
+  };  
 
   return (
     <div className="contenedor-modulos">
