@@ -11,16 +11,18 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-
+import {useNavigate,useLocation} from "react-router-dom";
+import Loading from "../../components/Loading";
 import "./Calificaciones.css";
 
 function Calificaciones() {
-  // Simulación de usuario ficticio
+  
+  const navigate = useNavigate();
   const [usuario, setUsuario] = useState(null);
-  useEffect(() => {
-    setUsuario({ nombre: "Juan Pérez", rol: "Estudiante" });
-  }, []);
-
+  const [loading, setLoading] = useState(false);
+  const location = useLocation();
+  const moduloSeleccionado = location.state;
+  
   // Estados para almacenar los datos de cada Parcial
   const [parcial1Quim1Data, setParcial1Quim1Data] = useState([]);
   const [parcial2Quim1Data, setParcial2Quim1Data] = useState([]);
@@ -31,11 +33,25 @@ function Calificaciones() {
   const [quim2Data, setQuim2Data] = useState([]);
 
   const modules = [
-    { name: "Inicio", icon: <Home size={20} /> },
+    { name: "Inicio", icon: <Home size={20} />, path:"/panelcursos" },
     { name: "Usuarios", icon: <Users size={20} /> },
     { name: "Configuración", icon: <Settings size={20} /> },
   ];
 
+  const [datosModulo, setDatosModulo] = useState(moduloSeleccionado || {});
+  
+  useEffect(() => {
+    const storedUser = localStorage.getItem("usuario");
+    const storedToken = localStorage.getItem("token");
+
+    if (storedUser && storedToken && moduloSeleccionado) {
+      setUsuario(JSON.parse(storedUser));
+      setDatosModulo(moduloSeleccionado);
+    } else {
+      navigate("/panelcursos"); // Si falta módulo seleccionado o usuario/token, regresamos.
+    }
+  }, [moduloSeleccionado, navigate]);
+  
   // ──────────────────────────────────────────
   // 1) Exportar a Excel
   // ──────────────────────────────────────────
@@ -242,13 +258,21 @@ function Calificaciones() {
     window.print();
   };
 
+  const handleSidebarNavigation = (path) => {
+    setLoading(true);
+    setTimeout(() => navigate(path), 800);
+  };
+  if (loading) {
+    return <Loading />;
+  }
+
   return (
     <>
       <div className="container-fluid p-0">
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
 
-      <Layout modules={modules}>
+      <Layout modules={modules} onNavigate={handleSidebarNavigation}> 
         <div className="content-container">
           <Container className="mt-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
@@ -281,9 +305,8 @@ function Calificaciones() {
                     <Parcial
                       quimestreSeleccionado="1"
                       parcialSeleccionado="1"
-                      actualizarDatosParcial={(datos) => {
-                        setParcial1Quim1Data(datos);
-                      }}
+                      actualizarDatosParcial={(datos) => setParcial1Quim1Data(datos)}
+                      datosModulo={datosModulo}
                     />
                   </Tab>
 
@@ -294,6 +317,7 @@ function Calificaciones() {
                       actualizarDatosParcial={(datos) => {
                         setParcial2Quim1Data(datos);
                       }}
+                      datosModulo={datosModulo}
                     />
                   </Tab>
 
@@ -305,6 +329,7 @@ function Calificaciones() {
                       actualizarDatosQuim={(datos) => {
                         setQuim1Data(datos);
                       }}
+                      datosModulo={datosModulo}
                     />
                   </Tab>
                 </Tabs>
@@ -320,6 +345,7 @@ function Calificaciones() {
                       actualizarDatosParcial={(datos) => {
                         setParcial1Quim2Data(datos);
                       }}
+                      datosModulo={datosModulo}
                     />
                   </Tab>
 
@@ -330,6 +356,7 @@ function Calificaciones() {
                       actualizarDatosParcial={(datos) => {
                         setParcial2Quim2Data(datos);
                       }}
+                      datosModulo={datosModulo}
                     />
                   </Tab>
 
@@ -341,6 +368,7 @@ function Calificaciones() {
                       actualizarDatosQuim={(datos) => {
                         setQuim2Data(datos);
                       }}
+                      datosModulo={datosModulo}
                     />
                   </Tab>
                 </Tabs>
@@ -349,7 +377,7 @@ function Calificaciones() {
               {/* NOTA FINAL */}
               <Tab eventKey="notaFinal" title="Nota Final">
                 <div className="tab-pane active">
-                  <Final quim1Data={quim1Data} quim2Data={quim2Data} />
+                  <Final quim1Data={quim1Data} quim2Data={quim2Data} datosModulo={datosModulo} />
                 </div>
               </Tab>
             </Tabs>

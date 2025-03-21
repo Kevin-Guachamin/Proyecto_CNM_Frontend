@@ -1,27 +1,35 @@
 import React, { useState,useEffect } from "react";
 import HeaderTabla from "../../components/HeaderTabla";
 import Tabla from "../../components/Tabla";
+import axios from "axios";
 //import "./Parcial.css";
 
-function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial }) {
+function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo }) {
   
   // ID dinámico: pdf-parcial1-quim1, pdf-parcial2-quim1, pdf-parcial1-quim2, etc.
   const idContenedor = `pdf-parcial${parcialSeleccionado}-quim${quimestreSeleccionado}`;
 
   const subtitulo = `ACTA DE CALIFICACIONES ${parcialSeleccionado === "1" ? "PRIMER" : "SEGUNDO"} PARCIAL - ${quimestreSeleccionado === "1" ? "PRIMER" : "SEGUNDO"} QUIMESTRE`;
 
-  const datosEncabezado = {
-    titulo: "CONSERVATORIO NACIONAL DE MUSICA",
-    subtitulo: subtitulo,
-    info: {
-      "Profesor": "Guachis",
-      "Asignatura": "Instrumento",
-      "Curso": "0",
-      "Paralelo": "0",
-      "Año Lectivo": "2024 - 2025",
-      "Jornada": "Matutina"
-    }
-  };
+ // ⬇️ Aquí implementamos la función para determinar la jornada
+ const determinarJornada = (horario) => {
+  const horaInicio = horario.split("-")[0];
+  const horaNumerica = parseInt(horaInicio.split(":")[0], 10);
+  return horaNumerica < 12 ? "Matutina" : "Vespertina";
+};
+
+const datosEncabezado = {
+  titulo: "CONSERVATORIO NACIONAL DE MUSICA",
+  subtitulo: subtitulo,
+  info: {
+    "Profesor": datosModulo.docente,
+    "Asignatura": datosModulo.materia,
+    "Curso": datosModulo.año,
+    "Paralelo": datosModulo.paralelo,
+    "Año Lectivo": datosModulo.periodo,
+    "Jornada": determinarJornada(datosModulo.horario)
+  }
+};
 
   const columnasAgrupadas = [
     { titulo: "", colspan: 2 },
@@ -31,18 +39,18 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
 
   const columnas = [
     "INSUMO 1", "INSUMO 2", "PONDERACIÓN 70%", "EVALUACIÓN SUMATIVA", "PONDERACIÓN 30%", "PROMEDIO PARCIAL",
-    "RESPETO Y \n CONSIDERACION", "VALORACION DE \n LA DIVERSIDAD", "CUMPLIMIENTO DE LAS \n NORMA DE CONVIVENCIA",
-    "CUIDADO  DEL \n PATRIMONIO INSTITUCIONAL", "RESPETO A LA \n PROPIEDAD AJENA", "PUNTUALIDAD \n Y ASISTENCIA", "HONESTIDAD \n ",
-    "PRESENTACION PERSONAL \n (LIMPIEZA Y UNIFORME)", "PARTICIPACION \n COMUNITARIA", "RESPONSABILIDAD \n ", "PROMEDIO COMPORTAMIENTO",
+    "RESPETO Y CONSIDERACION", "VALORACION DE LA DIVERSIDAD", "CUMPLIMIENTO DE LAS NORMA DE CONVIVENCIA",
+    "CUIDADO  DEL PATRIMONIO INSTITUCIONAL", "RESPETO A LA PROPIEDAD AJENA", "PUNTUALIDAD Y ASISTENCIA", "HONESTIDAD ",
+    "PRESENTACION PERSONAL (LIMPIEZA Y UNIFORME)", "PARTICIPACION COMUNITARIA", "RESPONSABILIDAD ", "PROMEDIO COMPORTAMIENTO",
     "NIVEL", "VALORACION"
   ];
 
   const [datos, setDatos] = useState([
     {
       "Nro": 1, "Nómina de Estudiantes": "Kevin Patricio Guachamin Santillán", "INSUMO 1": "", "INSUMO 2": "", "PONDERACIÓN 70%": "", "EVALUACIÓN SUMATIVA": "", "PONDERACIÓN 30%": "", "PROMEDIO PARCIAL": "",
-    "RESPETO Y \n CONSIDERACION": "", "VALORACION DE \n LA DIVERSIDAD": "", "CUMPLIMIENTO DE LAS \n NORMA DE CONVIVENCIA": "",
-    "CUIDADO  DEL \n PATRIMONIO INSTITUCIONAL": "", "RESPETO A LA \n PROPIEDAD AJENA": "", "PUNTUALIDAD \n Y ASISTENCIA": "", "HONESTIDAD \n": "",
-    "PRESENTACION PERSONAL \n (LIMPIEZA Y UNIFORME)": "", "PARTICIPACION \n COMUNITARIA": "", "RESPONSABILIDAD \n ": "", "PROMEDIO COMPORTAMIENTO": "",
+    "RESPETO Y CONSIDERACION": "", "VALORACION DE LA DIVERSIDAD": "", "CUMPLIMIENTO DE LAS NORMA DE CONVIVENCIA": "",
+    "CUIDADO  DEL PATRIMONIO INSTITUCIONAL": "", "RESPETO A LA PROPIEDAD AJENA": "", "PUNTUALIDAD Y ASISTENCIA": "", "HONESTIDAD \n": "",
+    "PRESENTACION PERSONAL (LIMPIEZA Y UNIFORME)": "", "PARTICIPACION COMUNITARIA": "", "RESPONSABILIDAD ": "", "PROMEDIO COMPORTAMIENTO": "",
     "NIVEL": "2BE", "VALORACION": ""
     }
   ]);
@@ -50,14 +58,14 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
   // Definir qué columnas son editables en Parciales
   const columnasEditables = [
     "INSUMO 1", "INSUMO 2", "EVALUACIÓN SUMATIVA",
-    "RESPETO Y \n CONSIDERACION", "VALORACION DE \n LA DIVERSIDAD", "CUMPLIMIENTO DE LAS \n NORMA DE CONVIVENCIA",
-    "CUIDADO  DEL \n PATRIMONIO INSTITUCIONAL", "RESPETO A LA \n PROPIEDAD AJENA", "PUNTUALIDAD \n Y ASISTENCIA", "HONESTIDAD \n ",
-    "PRESENTACION PERSONAL \n (LIMPIEZA Y UNIFORME)", "PARTICIPACION \n COMUNITARIA", "RESPONSABILIDAD \n "
+    "RESPETO Y CONSIDERACION", "VALORACION DE LA DIVERSIDAD", "CUMPLIMIENTO DE LAS NORMA DE CONVIVENCIA",
+    "CUIDADO  DEL PATRIMONIO INSTITUCIONAL", "RESPETO A LA PROPIEDAD AJENA", "PUNTUALIDAD Y ASISTENCIA", "HONESTIDAD ",
+    "PRESENTACION PERSONAL (LIMPIEZA Y UNIFORME)", "PARTICIPACION COMUNITARIA", "RESPONSABILIDAD "
   ];
   const columnasComportamiento = [
-    "RESPETO Y \n CONSIDERACION", "VALORACION DE \n LA DIVERSIDAD", "CUMPLIMIENTO DE LAS \n NORMA DE CONVIVENCIA",
-    "CUIDADO  DEL \n PATRIMONIO INSTITUCIONAL", "RESPETO A LA \n PROPIEDAD AJENA", "PUNTUALIDAD \n Y ASISTENCIA", "HONESTIDAD \n ",
-    "PRESENTACION PERSONAL \n (LIMPIEZA Y UNIFORME)", "PARTICIPACION \n COMUNITARIA", "RESPONSABILIDAD \n "
+    "RESPETO Y CONSIDERACION", "VALORACION DE LA DIVERSIDAD", "CUMPLIMIENTO DE LAS NORMA DE CONVIVENCIA",
+    "CUIDADO  DEL PATRIMONIO INSTITUCIONAL", "RESPETO A LA PROPIEDAD AJENA", "PUNTUALIDAD Y ASISTENCIA", "HONESTIDAD ",
+    "PRESENTACION PERSONAL (LIMPIEZA Y UNIFORME)", "PARTICIPACION COMUNITARIA", "RESPONSABILIDAD "
   ];
 
 

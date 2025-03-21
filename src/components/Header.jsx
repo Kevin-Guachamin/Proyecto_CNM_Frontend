@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 function Header({ isAuthenticated, usuario }) {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const navigate = useNavigate(); // Hook para navegar
+  const navigate = useNavigate();
 
   const toggleDropdown = () => {
     setDropdownOpen(!isDropdownOpen);
@@ -27,9 +27,10 @@ function Header({ isAuthenticated, usuario }) {
   }, [isDropdownOpen]);
 
   const handleLogout = () => {
-    // Lógica de cierre de sesión
+    // Al cerrar sesión se elimina tanto el usuario como el token
     console.log("Cerrando sesión...");
     localStorage.removeItem("usuario");
+    localStorage.removeItem("token");
     navigate("/");
   };
 
@@ -37,6 +38,25 @@ function Header({ isAuthenticated, usuario }) {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date().toLocaleDateString("es-ES", options);
   };
+
+  // Extraer el primer nombre y el primer apellido
+  let displayName = "";
+  let displayRole = "";
+  
+  if (usuario) {
+    // Combina los campos para formar el nombre completo
+    const primerNombre = usuario.primer_nombre || "";
+    const primerApellido = usuario.primer_apellido || "";
+    
+    // Por ejemplo, tomar el primerNombre + primerApellido
+    displayName = `${primerNombre} ${primerApellido}`;
+  
+    // Si el usuario es docente y tiene subRol, mostrarlo; de lo contrario, mostrar rol
+    displayRole = (usuario.rol === "docente" && usuario.subRol) 
+      ? usuario.subRol 
+      : usuario.rol;
+  }
+  
 
   if (!isAuthenticated) {
     return (
@@ -61,11 +81,9 @@ function Header({ isAuthenticated, usuario }) {
           <div className="header-left">
             <h1 className="header-title">SISTEMA DE GESTIÓN ESTUDIANTIL</h1>
           </div>
-
           <div className="header-right">
             <p className="header-version">SGE v. 1.0.0</p>
             <p className="header-date">{getCurrentDate()}</p>
-
             <div className="menu-container">
               <button className="menu-button" onClick={toggleDropdown}>
                 ☰
@@ -80,7 +98,7 @@ function Header({ isAuthenticated, usuario }) {
         <>
           <div className={`overlay ${isDropdownOpen ? "show" : ""}`}></div>
           <div className={`dropdown-menu ${isDropdownOpen ? "show" : ""}`}>
-            {/* Sección del usuario con icono o imagen */}
+            {/* Sección de información del usuario */}
             <div className="user-info">
               {usuario.foto ? (
                 <img src={usuario.foto} alt="Avatar" className="user-avatar" />
@@ -88,8 +106,10 @@ function Header({ isAuthenticated, usuario }) {
                 <AccountCircleIcon className="user-icon" style={{ fontSize: "80px" }} />
               )}
               <div className="user-details">
-                <p className="user-name">{usuario.nombre}</p>
-                <p className="user-role">{usuario.rol}</p>
+                {/* Mostrar el primer nombre y primer apellido */}
+                <p className="user-name">{displayName}</p>
+                {/* Mostrar el rol según el tipo de usuario */}
+                <p className="user-role">{displayRole}</p>
               </div>
             </div>
 
