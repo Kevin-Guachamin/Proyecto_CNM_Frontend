@@ -7,7 +7,7 @@ import Calificaciones from '../vistas/Docente/Calificaciones.jsx';
 import Asignaguras from "../vistas/Admin/Asignaturas/Index.jsx"
 import Docentes from "../vistas/Admin/Docentes/Index.jsx"
 import Representante from '../vistas/Representante/index.jsx'
-import Estudiantes from '../vistas/Admin/Estudiantes/Index.jsx
+import Estudiantes from '../vistas/Admin/Estudiantes/Index.jsx'
 import PanelCursos from '../vistas/Panelcursos.jsx';
 
 

@@ -27,11 +27,10 @@ function CrearAsignatura({ onCancel, entityToUpdate, onSave }) {
                 <div className="form-row">
                     <div className="form-group">
                         <label htmlFor="nombre">Nombre</label>
-                        <Input
+                        <input
                             id="nombre"
                             value={nombre}
                             onChange={(e) => setNombre(e.target.value)}
-                            fondo="Ingrese una materia"
                         />
                     </div>
                 </div>

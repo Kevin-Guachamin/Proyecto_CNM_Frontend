@@ -15,7 +15,7 @@ function Login() {
     e.preventDefault();
     try {
       // Realizar la solicitud POST usando cédula y contraseña (enviado como "contraseña")
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/login`, {
+      const response = await axios.post(`${import.meta.env.VITE_URL_DEL_BACKEND}/login`, {
         nroCedula,
         password,
       });

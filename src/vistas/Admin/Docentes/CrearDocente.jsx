@@ -42,36 +42,36 @@ function CrearDocente({ onCancel, entityToUpdate, onSave }) {
             <div className="modal-form">
                 <div className="form-group">
                     <label htmlFor="nroCedula">Número de cédula:</label>
-                    <input id="nroCedula" value={nroCedula} onChange={(e) => setNroCedula(e.target.value)} placeholder="Ingrese un número de cédula" />
+                    <input id="nroCedula" value={nroCedula} onChange={(e) => setNroCedula(e.target.value)} />
                 </div>
                 <div className="form-group">
                     <label htmlFor="primer_nombre">Primer nombre:</label>
-                    <input id="primer_nombre" value={primer_nombre} onChange={(e) => setPrimerNombre(e.target.value)} placeholder="Ingrese un nombre" />
+                    <input id="primer_nombre" value={primer_nombre} onChange={(e) => setPrimerNombre(e.target.value)} />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="primer_apellido">Primer apellido:</label>
-                    <input id="primer_apellido" value={primer_apellido} onChange={(e) => setPrimerApellido(e.target.value)} placeholder="Ingrese un apellido" />
+                    <input id="primer_apellido" value={primer_apellido} onChange={(e) => setPrimerApellido(e.target.value)}  />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="segundo_nombre">Segundo nombre:</label>
-                    <input id="segundo_nombre" value={segundo_nombre} onChange={(e) => setSegundoNombre(e.target.value)} placeholder="Ingrese un nombre" />
+                    <input id="segundo_nombre" value={segundo_nombre} onChange={(e) => setSegundoNombre(e.target.value)}  />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="segundo_apellido">Segundo apellido:</label>
-                    <input id="segundo_apellido" value={segundo_apellido} onChange={(e) => setSegundoApellido(e.target.value)} placeholder="Ingrese un apellido" />
+                    <input id="segundo_apellido" value={segundo_apellido} onChange={(e) => setSegundoApellido(e.target.value)}  />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="email">Email:</label>
-                    <input id="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Ingrese un correo electrónico" />
+                    <input id="email" value={email} onChange={(e) => setEmail(e.target.value)}  />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="celular">Celular:</label>
-                    <input id="celular" value={celular} onChange={(e) => setCelular(e.target.value)} placeholder="Ingrese un celular" />
+                    <input id="celular" value={celular} onChange={(e) => setCelular(e.target.value)} />
                 </div>
 
                 <div className="form-group">

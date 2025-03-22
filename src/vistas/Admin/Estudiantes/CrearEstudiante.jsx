@@ -20,7 +20,31 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
   const [grupo_etnico, setGrupoEtnico] = useState("")
   const [especialidad, setEspecialidad] = useState("")
   const [IER, setIER] = useState("")
-  const [direccion, setDireccion] = useState("")
+  const [sector, setSector] = useState("")
+  const [parroquia, setParroquia] = useState("")
+  const [canton, setCanton] = useState("")
+  const [edad, setEdad]=useState("")
+  const [nroMatricula,setNroMatricula]=useState("")
+
+  function calcularEdad(fechaNacimiento) {
+    console.log("esta fue la fecha", fechaNacimiento)
+    let fechaNac = fechaNacimiento; // Convertir la fecha a objeto Date
+    let hoy = new Date();
+
+    let edad = hoy.getFullYear() - fechaNac.getFullYear(); // Restar años
+
+    // Ajustar si aún no ha pasado el cumpleaños este año
+    let mesActual = hoy.getMonth();
+    let diaActual = hoy.getDate();
+    let mesNac = fechaNac.getMonth();
+    let diaNac = fechaNac.getDate();
+
+    if (mesActual < mesNac || (mesActual === mesNac && diaActual < diaNac)) {
+        edad--;
+    }
+
+    return edad;
+}
 
   const convertirFecha = (fecha) => {
     if (!fecha) return null;
@@ -40,10 +64,17 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
       setGrupoEtnico(entityToUpdate.grupo_etnico || "")
       setEspecialidad(entityToUpdate.especialidad || "")
       setIER(entityToUpdate.IER || "")
-      setDireccion(entityToUpdate.direccion || "")
+      const palabras = entityToUpdate.direccion.split(" ")
+      setSector(palabras[0] || "")
+      setParroquia(palabras[1] || "")
+      setCanton(palabras[2] || "")
+      setNroMatricula(entityToUpdate.nroMatricula || "")
+      
+      setEdad(calcularEdad(convertirFecha(entityToUpdate.fecha_nacimiento)) || "")
+
     }
   }, [entityToUpdate]);
-  const generarNumeroMatricula = (anio, idEstudiante) => {
+  const generarCodigoEstudiante = (anio, idEstudiante) => {
     const secuencial = String(idEstudiante).padStart(4, "0"); // Asegura 4 dígitos
     return `${anio}${secuencial}`;
   };
@@ -87,6 +118,7 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
     }
   }
   const handleSubmit = () => {
+    const direccion = [sector, parroquia, canton].join(" ")
     const formattedFechaNacimiento = fecha_nacimiento ? fecha_nacimiento.toISOString().split('T')[0] : null;
     const formData = new FormData();
     formData.append("copiaCedula", files.copiaCedula);
@@ -104,6 +136,7 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
     formData.append("IER", IER)
     formData.append("direccion", direccion)
 
+
     onSave(formData, { headers: { "Content-Type": "multipart/form-data" } });
   };
 
@@ -116,36 +149,47 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
           <div className='rows'>
             <div className="form-group">
               <label htmlFor="nroCedula">Número de cédula:</label>
-              <input id="nroCedula" value={nroCedula} onChange={(e) => setNroCedula(e.target.value)} placeholder="Ingrese un número de cédula" />
+              <input id="nroCedula" value={nroCedula} onChange={(e) => setNroCedula(e.target.value)} />
             </div>
             <div className="form-group">
-              <label htmlFor="nroMatricula">Nro. Matricula:</label>
-              <input id="nroMatricula" value={entityToUpdate ? generarNumeroMatricula(entityToUpdate.anioMatricula, entityToUpdate.ID) : ""} placeholder="Se genera automaticamente" readOnly />
+              <label htmlFor="nroMatricula">Código estudiante:</label>
+              <input id="nroMatricula" value={entityToUpdate ? generarCodigoEstudiante(entityToUpdate.anioMatricula, entityToUpdate.ID) : ""} readOnly />
             </div>
           </div>
           <div className='rows'>
             <div className="form-group">
               <label htmlFor="primer_nombre">Primer nombre:</label>
-              <input id="primer_nombre" value={primer_nombre} onChange={(e) => setPrimerNombre(e.target.value)} placeholder="Ingrese un nombre" />
+              <input id="primer_nombre" value={primer_nombre} onChange={(e) => setPrimerNombre(e.target.value)} />
             </div>
 
             <div className="form-group">
               <label htmlFor="primer_apellido">Primer apellido:</label>
-              <input id="primer_apellido" value={primer_apellido} onChange={(e) => setPrimerApellido(e.target.value)} placeholder="Ingrese un apellido" />
+              <input id="primer_apellido" value={primer_apellido} onChange={(e) => setPrimerApellido(e.target.value)} />
             </div>
           </div>
 
           <div className='rows'>
             <div className="form-group">
               <label htmlFor="segundo_nombre">Segundo nombre:</label>
-              <input id="segundo_nombre" value={segundo_nombre} onChange={(e) => setSegundoNombre(e.target.value)} placeholder="Ingrese un nombre" />
+              <input id="segundo_nombre" value={segundo_nombre} onChange={(e) => setSegundoNombre(e.target.value)} />
             </div>
 
             <div className="form-group">
               <label htmlFor="segundo_apellido">Segundo apellido:</label>
-              <input id="segundo_apellido" value={segundo_apellido} onChange={(e) => setSegundoApellido(e.target.value)} placeholder="Ingrese un apellido" />
+              <input id="segundo_apellido" value={segundo_apellido} onChange={(e) => setSegundoApellido(e.target.value)} />
             </div>
 
+          </div>
+          <div className='rows'>
+          <div className="form-group">
+              <label htmlFor="edad">Edad:</label>
+              <input id="edad" value={edad} readOnly />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="Nro matrícula">Nro. matrícula:</label>
+              <input id="nro matrícula" value={nroMatricula} readOnly />
+            </div>
           </div>
           <div className='rows'>
 
@@ -181,29 +225,42 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
               <select id="genero" value={grupo_etnico} onChange={(e) => setGrupoEtnico(e.target.value)}>
                 <option value="">Selecciona un grupo</option>
                 <option value="Indígena">Indígena</option>
-                <option value="Meztizo">Meztizo</option>
-                <option value="Afroecuatoriano">Afroecuatoriano</option>
+                <option value="Mestizo">Meztizo</option>
+                <option value="Afro-descendiente">Afro-descendiente</option>
+                <option value="Negro">Negro</option>
+                <option value="Blanco">Blanco</option>
               </select>
             </div>
           </div>
           <div className='rows'>
             <div className="form-group">
               <label htmlFor="especialidad">Especialidad:</label>
-              <input id="especialidad" value={especialidad} onChange={(e) => setEspecialidad(e.target.value)} placeholder="Ingrese la especialidad" />
+              <input id="especialidad" value={especialidad} onChange={(e) => setEspecialidad(e.target.value)} />
             </div>
             <div className="form-group">
               <label htmlFor="IER">Institución de eduación regular:</label>
-              <input id="IER" value={IER} onChange={(e) => setIER(e.target.value)} placeholder="Ingrese una institución de educación" />
+              <input id="IER" value={IER} onChange={(e) => setIER(e.target.value)} />
             </div>
           </div>
           <div className='rows'>
-            <div className="form-group-direccion">
-              <label htmlFor="direccion">Dirección:</label>
-              <input id="direccion" value={direccion} onChange={(e) => setDireccion(e.target.value)} placeholder="Ingrese la dirección del domicilio" />
-            </div>
-            <div className='form-group'></div>
+            <label htmlFor="direccion">Dirección:</label>
           </div>
+          <div className='rows'>
+            <div className='form-group-direccion'>
+              <label htmlFor="">Sector: </label>
+              <input type="text" value={sector}  onChange={(e)=> setSector(e.target.value)}/>
+            </div>
+            <div className='form-group-direccion'>
+              <label htmlFor="">Parroquia: </label>
+              <input  type="text" value={parroquia}  onChange={(e)=> setParroquia(e.target.value)}/>
+            </div>
+            <div className='form-group-direccion'>
+              <label htmlFor="">Canton: </label>
+              <input type="text" value={canton}  onChange={(e)=> setCanton(e.target.value)}/>
+            </div>
 
+
+          </div>
           <div className="file-upload-container">
             <div className="file-upload">
               <label htmlFor="copiaCedula" className="custom-file-label">

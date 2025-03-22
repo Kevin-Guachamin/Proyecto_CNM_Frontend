@@ -22,7 +22,7 @@ export function Eliminar (data, URL, descripcion, setData, PK){
                   setData((prevData) => prevData.filter((d) => d[PK] !== data[PK]));
                     Swal.fire(
                         'Eliminado!',
-                        `El periodo ${descripcion} ha sido eliminado.`,
+                        `${descripcion} ha sido eliminado.`,
                         'success'
                     );
                 })

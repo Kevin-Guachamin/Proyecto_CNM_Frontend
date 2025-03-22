@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import Boton from '../../../components/Boton';
-import Input from '../../../components/Input';
 import "react-datepicker/dist/react-datepicker.css"; // Importa el CSS de react-datepicker
 import '../Styles/CrearEntidad.css';
 
@@ -18,10 +17,10 @@ function CrearPeriodo({ onCancel, entityToUpdate, onSave }) {
         return new Date(`${año}-${mes}-${dia}`); // Convertir a formato ISO (yyyy-mm-dd)
     };
 
-    useEffect(() => {
-        console.log("esto es lo que entro",entityToUpdate.fecha_fin)
-        console.log("esto salió",fecha_fin);
-    }, [fecha_fin,entityToUpdate.fecha_fin]);  // Esto se activará cuando fecha_fin cambie
+    // useEffect(() => {
+    //     console.log("esto es lo que entro",entityToUpdate.fecha_fin)
+    //     console.log("esto salió",fecha_fin);
+    // }, [fecha_fin,entityToUpdate.fecha_fin]);  // Esto se activará cuando fecha_fin cambie
     useEffect(() => {
         if (entityToUpdate) {
             setDescripcion(entityToUpdate.descripcion || "");
@@ -50,11 +49,11 @@ function CrearPeriodo({ onCancel, entityToUpdate, onSave }) {
 
                     <div className="form-group">
                         <label htmlFor="descripcion">Descripción</label>
-                        <Input
+                        <input
                             id="descripcion"
                             value={descripcion}
                             onChange={(e) => setDescripcion(e.target.value)}
-                            fondo="Ingrese la descripción"
+                            
                         />
                     </div>
 
