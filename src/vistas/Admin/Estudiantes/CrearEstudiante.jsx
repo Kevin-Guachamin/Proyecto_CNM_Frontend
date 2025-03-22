@@ -23,8 +23,8 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
   const [sector, setSector] = useState("")
   const [parroquia, setParroquia] = useState("")
   const [canton, setCanton] = useState("")
-  const [edad, setEdad]=useState("")
-  const [nroMatricula,setNroMatricula]=useState("")
+  const [edad, setEdad] = useState("")
+  const [nroMatricula, setNroMatricula] = useState("")
 
   function calcularEdad(fechaNacimiento) {
     console.log("esta fue la fecha", fechaNacimiento)
@@ -40,11 +40,11 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
     let diaNac = fechaNac.getDate();
 
     if (mesActual < mesNac || (mesActual === mesNac && diaActual < diaNac)) {
-        edad--;
+      edad--;
     }
 
     return edad;
-}
+  }
 
   const convertirFecha = (fecha) => {
     if (!fecha) return null;
@@ -69,7 +69,7 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
       setParroquia(palabras[1] || "")
       setCanton(palabras[2] || "")
       setNroMatricula(entityToUpdate.nroMatricula || "")
-      
+
       setEdad(calcularEdad(convertirFecha(entityToUpdate.fecha_nacimiento)) || "")
 
     }
@@ -119,7 +119,8 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
   }
   const handleSubmit = () => {
     const direccion = [sector, parroquia, canton].join(" ")
-    const formattedFechaNacimiento = fecha_nacimiento ? fecha_nacimiento.toISOString().split('T')[0] : null;
+    
+    console.log("fecha de nacimiento enviada a la base", fecha_nacimiento)
     const formData = new FormData();
     formData.append("copiaCedula", files.copiaCedula);
     formData.append("matricula_IER", files.matricula_IER);
@@ -130,7 +131,7 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
     formData.append("segundo_apellido", segundo_apellido)
     formData.append("genero", genero)
     formData.append("jornada", jornada)
-    formData.append("fecha_nacimiento", formattedFechaNacimiento)
+    formData.append("fecha_nacimiento", fecha_nacimiento)
     formData.append("grupo_etnico", grupo_etnico)
     formData.append("especialidad", especialidad)
     formData.append("IER", IER)
@@ -181,7 +182,7 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
 
           </div>
           <div className='rows'>
-          <div className="form-group">
+            <div className="form-group">
               <label htmlFor="edad">Edad:</label>
               <input id="edad" value={edad} readOnly />
             </div>
@@ -215,9 +216,14 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
               <label htmlFor="fecha_nacimiento">Fecha de nacimiento:</label>
               <DatePicker
                 selected={fecha_nacimiento}
-                onChange={(date) => setFechaNacimiento(date)} // Establecer directamente como Date
+                onChange={(date) => setFechaNacimiento(date)}
                 dateFormat="dd/MM/yyyy"
                 className="input-field"
+                showYearDropdown
+                scrollableYearDropdown
+                yearDropdownItemNumber={100}
+                maxDate={new Date()}
+                openToDate={new Date(new Date().setFullYear(new Date().getFullYear() - 9))} 
               />
             </div>
             <div className="form-group">
@@ -225,7 +231,7 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
               <select id="genero" value={grupo_etnico} onChange={(e) => setGrupoEtnico(e.target.value)}>
                 <option value="">Selecciona un grupo</option>
                 <option value="Indígena">Indígena</option>
-                <option value="Mestizo">Meztizo</option>
+                <option value="Mestizo">Mestizo</option>
                 <option value="Afro-descendiente">Afro-descendiente</option>
                 <option value="Negro">Negro</option>
                 <option value="Blanco">Blanco</option>
@@ -248,15 +254,15 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
           <div className='rows'>
             <div className='form-group-direccion'>
               <label htmlFor="">Sector: </label>
-              <input type="text" value={sector}  onChange={(e)=> setSector(e.target.value)}/>
+              <input type="text" value={sector} onChange={(e) => setSector(e.target.value)} />
             </div>
             <div className='form-group-direccion'>
               <label htmlFor="">Parroquia: </label>
-              <input  type="text" value={parroquia}  onChange={(e)=> setParroquia(e.target.value)}/>
+              <input type="text" value={parroquia} onChange={(e) => setParroquia(e.target.value)} />
             </div>
             <div className='form-group-direccion'>
               <label htmlFor="">Canton: </label>
-              <input type="text" value={canton}  onChange={(e)=> setCanton(e.target.value)}/>
+              <input type="text" value={canton} onChange={(e) => setCanton(e.target.value)} />
             </div>
 
 
@@ -294,6 +300,7 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
                 onChange={handleFileChange}
                 accept="application/pdf"
                 className="custom-file-input"
+                required
               />
               {/* Botón de descarga condicional */}
               {entityToUpdate && (

@@ -6,8 +6,8 @@ import '../Styles/CrearEntidad.css';
 
 function CrearPeriodo({ onCancel, entityToUpdate, onSave }) {
     const [descripcion, setDescripcion] = useState("");
-    const [fecha_inicio, setFecha_inicio] = useState(null);
-    const [fecha_fin, setFecha_fin] = useState(null);
+    const [fecha_inicio, setFecha_inicio] = useState("");
+    const [fecha_fin, setFecha_fin] = useState("");
     const [estado, setEstado] = useState("");
 
     // Función para convertir una fecha de formato dd/mm/yyyy a un objeto Date
@@ -16,28 +16,25 @@ function CrearPeriodo({ onCancel, entityToUpdate, onSave }) {
         const [dia, mes, año] = fecha.split('/');
         return new Date(`${año}-${mes}-${dia}`); // Convertir a formato ISO (yyyy-mm-dd)
     };
-
-    // useEffect(() => {
-    //     console.log("esto es lo que entro",entityToUpdate.fecha_fin)
-    //     console.log("esto salió",fecha_fin);
-    // }, [fecha_fin,entityToUpdate.fecha_fin]);  // Esto se activará cuando fecha_fin cambie
+    
+    useEffect(() => {
+        //console.log("esto es lo que entro",entityToUpdate.fecha_fin)
+        console.log("esto se intenta crear",fecha_fin);
+    }, [fecha_fin]);  // Esto se activará cuando fecha_fin cambie
     useEffect(() => {
         if (entityToUpdate) {
             setDescripcion(entityToUpdate.descripcion || "");
             // Convertir las fechas de dd/mm/yyyy a objetos Date
-            setFecha_fin(convertirFecha(entityToUpdate.fecha_fin));
-            setFecha_inicio(convertirFecha(entityToUpdate.fecha_inicio));
+            setFecha_fin(convertirFecha(entityToUpdate.fecha_fin) || "");
+            setFecha_inicio(convertirFecha(entityToUpdate.fecha_inicio) ||"") ;
             setEstado(entityToUpdate.estado || "");
         }
     }, [entityToUpdate]);
 
     const handleSubmit = () => {
-        // Convertir las fechas a formato ISO (yyyy-MM-dd) antes de enviarlas
-        const formattedFechaInicio = fecha_inicio ? fecha_inicio.toISOString().split('T')[0] : null;
-        const formattedFechaFin = fecha_fin ? fecha_fin.toISOString().split('T')[0] : null;
-        console.log("estas se estan enciando", formattedFechaFin, formattedFechaInicio)
+        
 
-        const newPeriodo = { descripcion, fecha_inicio: formattedFechaInicio, fecha_fin: formattedFechaFin, estado };
+        const newPeriodo = { descripcion, fecha_inicio, fecha_fin, estado };
         onSave(newPeriodo);
     };
 
@@ -76,7 +73,7 @@ function CrearPeriodo({ onCancel, entityToUpdate, onSave }) {
                         <DatePicker
                             selected={fecha_inicio}
                             onChange={(date) => {
-                                console.log("este es el date", date)
+                                
                                 setFecha_inicio(date)}} // Establecer directamente como Date
                             dateFormat="dd/MM/yyyy"
                             className="input-field"

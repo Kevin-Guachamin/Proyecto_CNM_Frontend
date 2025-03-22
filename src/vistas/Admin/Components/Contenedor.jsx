@@ -11,9 +11,9 @@ function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpo
   const [entityToUpdate, setEntityToUpdate] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
-  console.log("este es el datamao de la data",data.length)
+ 
 
-  console.log("esta es la data",data)
+  
   const filteredData = data.filter((item) =>
     item[filterKey]?.toLowerCase().includes(search.toLowerCase())
   );
