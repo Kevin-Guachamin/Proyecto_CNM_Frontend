@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Header from "../../../components/Header";
-import Layout from '../../../layout/containers/Layout'
+import Layout from '../../../layout/Layout'
 import Loading from "../../../components/Loading";
 import Contenedor from "../Components/Contenedor";
 import { modules } from "../Components/Modulos"

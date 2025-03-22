@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
-import Layout from "../layout/containers/Layout";
+import Layout from "../layout/Layout";
 import Modulo from "../components/Modulo";
 import Loading from "../components/Loading";
 import { Home, Users, Settings, BookOpen } from "lucide-react";

@@ -4,7 +4,7 @@ import Parcial from "./Parcial";
 import Quimestral from "./Quimestral";
 import Final from "./Final";
 import Header from "../../components/Header";
-import Layout from "../../layout/containers/Layout";
+import Layout from "../../layout/Layout";
 import { Home, Users, Settings } from "lucide-react";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import * as XLSX from "xlsx";

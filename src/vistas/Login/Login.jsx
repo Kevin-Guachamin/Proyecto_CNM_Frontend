@@ -27,11 +27,15 @@ function Login() {
       // Redirección basada en el rol del usuario:
       if (user.rol === "representante") {
         navigate("/representante");
-      } else if (user.rol === "docente") {
+      } else if (user.subrol === "Profesor") {
         // Por el momento, para todos los rols de docentes se redirige a "/inicio"
         // Luego se puede afinar la lógica según rols específicos
         navigate("/inicio");
-      } else {
+      } 
+      else if(user.subrol==="Administrador"){
+        navigate("/admin")
+      }
+      else {
         // Aquí se puede agregar lógica para otros rols en el futuro
         alert("Rol desconocido");
       }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
-import Layout from '../../layout/containers/Layout';
+import Layout from '../../layout/Layout';
 import Tabla from '../Representante/components/Tabla_Representante';
 import Header from "../../components/Header";
 
