@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import Header from "./Header";
-import Footer from "./Footer";
-import Input from "./Input";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
+import Input from "../../components/Input";
 import "./Login.css";
 
 function Login() {
