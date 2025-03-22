@@ -1,5 +1,5 @@
 import React from 'react'
-import Login from '../components/Login.jsx';
+import Login from '../vistas/Login/Login.jsx';
 import { Routes, Route } from 'react-router-dom';
 import Inicio from '../vistas/Inicio.jsx';
 import Periodos_Academicos from '../vistas/Admin/PeriodosAcedémicos/Index.jsx'
