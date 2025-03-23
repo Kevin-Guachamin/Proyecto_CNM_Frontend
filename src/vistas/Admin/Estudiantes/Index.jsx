@@ -3,7 +3,7 @@ import Header from "../../../components/Header";
 import Layout from '../../../layout/Layout'
 import Loading from "../../../components/Loading";
 import Contenedor from "../Components/Contenedor";
-import { modules } from "../Components/Modulos"
+import { modulesSettings } from "../Components/Modulos"
 import axios from 'axios'
 import CrearEstudiante from "./CrearEstudiante";
 import { IoEyeOutline } from "react-icons/io5";
@@ -32,7 +32,7 @@ function Index() {
     setLoading(true)
     axios.get(`${API_URL}/estudiante/obtener?page=${page}`)
       .then(response => {
-        
+
         setEstudiantes(response.data.estudiantes); // Guardar la información del usuario en el estado
         setTotalPages(response.data.totalPages)
         setLoading(false);
@@ -53,7 +53,7 @@ function Index() {
       <div className="container-fluid p-0">
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
-      <Layout modules={modules}>
+      <Layout modules={modulesSettings}>
         {loading ? <Loading /> :
           <Contenedor
             data={estudiantes}

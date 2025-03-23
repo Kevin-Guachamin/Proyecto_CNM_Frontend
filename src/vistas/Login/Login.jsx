@@ -23,21 +23,21 @@ function Login() {
       const { token, ...user } = response.data;
       localStorage.setItem("usuario", JSON.stringify(user));
       localStorage.setItem("token", token);
-
+      console.log("este es el usuario", user)
       // Redirección basada en el rol del usuario:
       if (user.rol === "representante") {
         navigate("/representante");
-      } else if (user.subrol === "Profesor") {
+      } else if (user.subRol === "Profesor") {
         // Por el momento, para todos los rols de docentes se redirige a "/inicio"
         // Luego se puede afinar la lógica según rols específicos
         navigate("/inicio");
       } 
-      else if(user.subrol==="Administrador"){
+      else if(user.subRol==="Administrador"){
         navigate("/admin")
       }
       else {
         // Aquí se puede agregar lógica para otros rols en el futuro
-        alert("Rol desconocido");
+        alert("Acceso no permitido");
       }
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
