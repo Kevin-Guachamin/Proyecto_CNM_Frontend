@@ -1,6 +1,7 @@
 // Tabla para REPRESENTANTE
 import "bootstrap/dist/css/bootstrap.min.css";
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import './Tabla_Representante.css'
 
 const Tabla = ({datos, isLoading, handleVerCalificaciones}) => {
     // Comprueba que los props sean arrays
@@ -23,13 +24,13 @@ const Tabla = ({datos, isLoading, handleVerCalificaciones}) => {
     // Tabla de los estudiantes a cargo del REPRESENTANTE
    return(
     <div className="tableresponsive mt-3">
-        <table className="table table-bordered table-striped custom-table">
+        <table className="table table-bordered table-striped estudiante-table">
             <thead>
-                <tr className="table-primary">
-                    <th scope = "col" className="text-center grouped-header"> Estudiante </th> 
-                    <th scope = "col" className="text-center grouped-header"> Curso </th>
-                    <th scope = "col" className="text-center grouped-header"> Especialidad</th>
-                    <th scope = "col" className="text-center grouped-header"> Accion </th>
+                <tr className="bg-primary-subtle">
+                    <th scope = "col" className="text-center bg-primary-subtle"> Estudiante </th> 
+                    <th scope = "col" className="text-center bg-primary-subtle"> Curso </th>
+                    <th scope = "col" className="text-center bg-primary-subtle"> Especialidad</th>
+                    <th scope = "col" className="text-center bg-primary-subtle"> Accion </th>
                 </tr>
             </thead>
             <tbody>
