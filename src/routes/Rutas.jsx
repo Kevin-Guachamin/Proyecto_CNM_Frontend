@@ -9,6 +9,7 @@ import Docentes from "../vistas/Admin/Docentes/Index.jsx"
 import Representante from '../vistas/Representante/index.jsx'
 import Estudiantes from '../vistas/Admin/Estudiantes/Index.jsx'
 import PanelCursos from '../vistas/Panelcursos.jsx';
+import ListaEstudiantes from '../vistas/Representante/modulos/listaEstudiantes.jsx';
 
 
 
@@ -24,6 +25,7 @@ function Rutas() {
         <Route path="/calificaciones" element={<Calificaciones/>} />
         <Route path="/panelcursos" element={<PanelCursos/>} />
         <Route path="/representante" element={<Representante/>} />
+        <Route path="/representante/lista" element={<ListaEstudiantes/>} />
     </Routes>
   )
 }
