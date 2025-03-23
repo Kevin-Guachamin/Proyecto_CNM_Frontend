@@ -1,0 +1,65 @@
+/* Estilos básicos de la tabla */
+.estudiante-table {
+    width: 100%;
+    table-layout: fixed;  /* Importante para que respete los anchos */
+    margin-bottom: 1rem;
+    border-collapse: collapse;
+}
+
+/* Estilos para las celdas y cabeceras */
+.estudiante-table th,
+.estudiante-table td {
+    padding: 8px;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid var(--bs-border-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Anchos específicos para cada columna */
+.estudiante-table th:nth-child(1),
+.estudiante-table td:nth-child(1) {
+    width: 40%;  /* Columna de Estudiante */
+}
+
+.estudiante-table th:nth-child(2),
+.estudiante-table td:nth-child(2) {
+    width: 20%;  /* Columna de Curso */
+}
+
+.estudiante-table th:nth-child(3),
+.estudiante-table td:nth-child(3) {
+    width: 20%;  /* Columna de Especialidad */
+}
+
+.estudiante-table th:nth-child(4),
+.estudiante-table td:nth-child(4) {
+    width: 20%;  /* Columna de Acción */
+}
+
+/* Estilos para el thead */
+.estudiante-table thead th {
+    height: auto;
+    padding: 10px;
+    background-color: var(--bs-primary-bg-subtle);
+    font-weight: bold;
+    border: 1px solid var(--bs-border-color);
+}
+
+/* Estilos para las filas alternas */
+.estudiante-table tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Estilos para el botón */
+.estudiante-table .btn-primary {
+    padding: 4px 8px;
+    font-size: 0.875rem;
+}
+
+/* Estilos para el icono del botón */
+.estudiante-table .bi {
+    margin-right: 4px;
+} 
