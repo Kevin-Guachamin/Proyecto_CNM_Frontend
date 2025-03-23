@@ -1,76 +1,43 @@
+import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
-import axios from 'axios';
-import Layout from '../../layout/containers/Layout';
-import Tabla from '../Representante/components/Tabla_Representante';
 import Header from "../../components/Header";
+import Modulo from "../../components/Modulo";
+import Layout from "../../layout/containers/Layout";
 
-
-function Index() {
-  // Estado para almacenar la información del usuario conectado
+const Index = () => {
+  const  navigate = useNavigate();
   const [usuario, setUsuario] = useState(null);
-  const [datosEstudiante, setDatosEstudiante] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [modulos] = useState([
+    { id: 1, titulo: "Información representante", icono: "📄", link: "/informacion" },
+    { id: 2, titulo: "Informacion estudiantil", icono: "✏️", link: "/informacionE" },
+    { id: 3, titulo: "Estudiantes", icono: "📊", link: "/representante/lista"},
+  ]);
 
-  const handleVerCalificaciones = (estudianteCedula) => {
-    console.log("ver detalles de: ", estudianteCedula);
-    // logica
-  }
-
-  // Mientras no se conecte al backend, dejamos un usuario de prueba
-  const cargarDatos = async () => {
-    try {
-      setIsLoading(true);
-
-      // Peticion para obtener datos del representante logeado
-      const representante = await axios.get('http://localhost:8000/representante/obtener/1715234567');
-
-      // Peticion para obtener los estudiantes a cargo del representante logeado
-      const respuesta = await axios.get('http://localhost:8000/api/representantes/1715234567/estudiantes');
-
-      setUsuario({ nombre: representante.data.primer_nombre, rol: "Representante" });
-      setDatosEstudiante(respuesta.data);
-      
-      
-    } catch (error) {
-      console.error("Error al cargar datos: ", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }
-  
-  // Simulación de usuario ficticio mientras se conecta con el backend
   useEffect(() => {
-    // Aquí se realizará la petición al backend cuando esté disponible
-    // axios.get("URL_DEL_BACKEND/usuarioConectado", { headers: { Authorization: `Bearer ${TOKEN}` } })
-    //   .then(response => {
-    //     setUsuario(response.data); // Guardar la información del usuario en el estado
-    //   })
-    //   .catch(error => {
-    //     console.error("Error al obtener los datos del usuario:", error);
-    //   });
-
-    
-    
-    cargarDatos();  
-    
+    setUsuario({primer_nombre: "Maria", primer_apellido: "Rodriguez", rol: "Representante"});
   }, []);
-     
-    return(
-        <div>
-            {/* Encabezado */}
-            <div className="container-fluid p-0">
-              {usuario && <Header isAuthenticated={true} usuario={usuario} />}
-            </div>
+  
+  const handleModuloClick = (modulo) => {
+    setLoading(true);
+    setTimeout(() => {
+      navigate(modulo.link); // accedes a la propiedad link del objeto
+    }, 800);
+  };
 
-            <Layout showSidebar={false}>
-              <Tabla 
-                datos={datosEstudiante} 
-                isLoading={isLoading}
-                handleVerCalificaciones={handleVerCalificaciones}
-              ></Tabla>
-            </Layout>
-        </div>
-    )
-}
+  return(
+    <div>
+      {/* Encabezado */}
+      <div className="container-fluid p-0">
+        {usuario && <Header isAuthenticated={true} usuario={usuario} />}
+      </div>
 
-export default Index
+      <Layout showSidebar={false}> 
+        <Modulo modulos={modulos} onModuloClick={handleModuloClick} />
+      </Layout>
+    
+    </div> 
+  );
+};
+
+export default Index;
