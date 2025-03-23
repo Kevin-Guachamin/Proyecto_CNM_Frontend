@@ -9,7 +9,7 @@ const Index = () => {
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(false);
   const [modulos] = useState([
-    { id: 1, titulo: "Información representante", icono: "📄", link: "/informacion" },
+    { id: 1, titulo: "Información representante", icono: "📄", link: "/representante/data" },
     { id: 2, titulo: "Informacion estudiantil", icono: "✏️", link: "/informacionE" },
     { id: 3, titulo: "Estudiantes", icono: "📊", link: "/representante/lista"},
   ]);
@@ -21,7 +21,9 @@ const Index = () => {
   const handleModuloClick = (modulo) => {
     setLoading(true);
     setTimeout(() => {
-      navigate(modulo.link); // accedes a la propiedad link del objeto
+      navigate(modulo.link, {
+        state: { nroCedula: '1715234567'}
+      }); // accedes a la propiedad link del objeto
     }, 800);
   };
 
