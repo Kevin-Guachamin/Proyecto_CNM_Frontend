@@ -28,7 +28,7 @@ const Tabla = ({datos, isLoading, handleVerCalificaciones}) => {
             <thead>
                 <tr className="bg-primary-subtle">
                     <th scope = "col" className="text-center bg-primary-subtle"> Estudiante </th> 
-                    <th scope = "col" className="text-center bg-primary-subtle"> Curso </th>
+                    <th scope = "col" className="text-center bg-primary-subtle"> Jornada </th>
                     <th scope = "col" className="text-center bg-primary-subtle"> Especialidad</th>
                     <th scope = "col" className="text-center bg-primary-subtle"> Accion </th>
                 </tr>
@@ -44,7 +44,7 @@ const Tabla = ({datos, isLoading, handleVerCalificaciones}) => {
                                     {estudiante.primer_apellido ?? '-'}{' '}
                                     {estudiante.segundo_apellido ?? '-'}{' '}
                                  </td>
-                                <td className="text-center"> {estudiante.curso} </td>
+                                <td className="text-center"> {estudiante.jornada} </td>
                                 <td className="text-center"> {estudiante.especialidad} </td>
                                 <td className="text-center">
                                     <button
