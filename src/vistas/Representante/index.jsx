@@ -10,8 +10,7 @@ const Index = () => {
   const [loading, setLoading] = useState(false);
   const [modulos] = useState([
     { id: 1, titulo: "Información representante", icono: "📄", link: "/representante/data" },
-    { id: 2, titulo: "Informacion estudiantil", icono: "✏️", link: "/informacionE" },
-    { id: 3, titulo: "Estudiantes", icono: "📊", link: "/representante/lista"},
+    { id: 2, titulo: "Informacion estudiantil", icono: "✏️", link: "/representante/lista" },
   ]);
 
   useEffect(() => {
