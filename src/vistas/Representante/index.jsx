@@ -22,7 +22,7 @@ const Index = () => {
     setLoading(true);
     setTimeout(() => {
       navigate(modulo.link, {
-        state: { nroCedula: '1715234567'}
+        state: { nroCedula: '0102030405'}
       }); // accedes a la propiedad link del objeto
     }, 800);
   };
