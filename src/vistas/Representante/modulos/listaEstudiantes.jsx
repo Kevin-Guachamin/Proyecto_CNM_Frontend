@@ -20,10 +20,10 @@ function ListaEstudiantes() {
       setIsLoading(true);
 
       // Peticion para obtener datos del representante logeado
-      const representante = await axios.get('http://localhost:8000/representante/obtener/1715234567');
+      const representante = await axios.get('http://localhost:8000/representante/obtener/0102030405');
 
       // Peticion para obtener los estudiantes a cargo del representante logeado
-      const respuesta = await axios.get('http://localhost:8000/api/representantes/1715234567/estudiantes');
+      const respuesta = await axios.get('http://localhost:8000/api/representantes/0102030405/estudiantes');
 
       setUsuario({ primer_nombre: representante.data.primer_nombre,
                     primer_apellido: representante.data.primer_apellido, 
