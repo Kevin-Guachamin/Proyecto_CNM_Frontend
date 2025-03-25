@@ -47,13 +47,18 @@ const Tabla = ({datos, isLoading, handleVerCalificaciones}) => {
                                 <td className="text-center"> {estudiante.jornada} </td>
                                 <td className="text-center"> {estudiante.especialidad} </td>
                                 <td className="text-center">
-                                    <button
-                                        className="btn btn-primary btn-sm p-1"
+                                    <i 
+                                        className="bi bi-card-checklist text-primary mx-2 fs-3"
                                         onClick={() => handleVerCalificaciones(estudiante.nroCedula)}
                                         title="Ver calificaciones"
-                                    >
-                                        <i className="bi bi-eye"> Ver calificaciones </i>
-                                    </button>
+                                        style={{ cursor: 'pointer' }}
+                                    ></i>
+                                    <i 
+                                        className="bi bi-info-circle text-info mx-2 fs-3"
+                                        onClick={() => handleVerCalificaciones(estudiante.nroCedula)}
+                                        title="Ver información"
+                                        style={{ cursor: 'pointer' }}
+                                    ></i>
                                 </td>
                             </tr>           
                         ))
