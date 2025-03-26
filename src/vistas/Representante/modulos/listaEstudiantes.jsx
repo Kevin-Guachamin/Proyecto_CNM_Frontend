@@ -14,6 +14,10 @@ function ListaEstudiantes() {
     // logica
   }
 
+  const handleVerDatosEstudiante = (estudianteCedula) => {
+    console.log('ver datos de: ', estudianteCedula);
+  }
+
   // Mientras no se conecte al backend, dejamos un usuario de prueba
   const cargarDatos = async () => {
     try {
