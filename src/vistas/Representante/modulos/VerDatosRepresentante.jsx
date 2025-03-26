@@ -10,13 +10,16 @@ const VerDatosRepresentante = () => {
   const location = useLocation();
   const nroCedulaRepresentante = location.state?.nroCedula;
   const [mostrarModal, setMostrarModal] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const cargarDatosRepresentante = async () => {
     try {
+      setIsLoading(true);
       const respuesta = await axios.get(`http://localhost:8000/representante/obtener/${nroCedulaRepresentante}`)
       setRepresentante(respuesta.data);
     } catch (error) {
+      setIsLoading(false);
       console.error('Error al obtener datos de representante: ', error);
     }
   }
@@ -35,7 +38,7 @@ const VerDatosRepresentante = () => {
       <div className="container-fluid p-0">
         {representante && <Header isAuthenticated={true} usuario={representante} />}
       </div>
-      <ViewData entity={representante} onCancel={OnCancel}></ViewData>
+      <ViewData entity={representante} onCancel={OnCancel} isLoading={isLoading}></ViewData>
     </div>
   );
 }
