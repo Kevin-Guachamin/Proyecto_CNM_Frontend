@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useMemo } from "react";
 import HeaderTabla from "../../components/HeaderTabla";
 import Tabla from "../../components/Tabla";
+import Swal from 'sweetalert2';
 
 const Final = ({ quim1Data, quim2Data, datosModulo }) => {
   const [datos, setDatos] = useState([]);
@@ -20,22 +21,22 @@ const Final = ({ quim1Data, quim2Data, datosModulo }) => {
   useEffect(() => {
     if (quim1Data?.length > 0 && quim2Data?.length > 0) {
       setDatos((prevDatos) =>
-        quim1Data.map((estudiante, index) => {
-          const estudiante2 = quim2Data[index] || {};
+        quim1Data.map((est1) => {
+          const est2 = quim2Data.find((e) => e.Nro === est1.Nro) || {};
 
           // Nota final de cada quimestre (de la columna "Promedio Final" en Quimestral)
-          const quim1PF = parseFloat(estudiante["Promedio Final"]) || 0;
-          const quim2PF = parseFloat(estudiante2["Promedio Final"]) || 0;
+          const quim1PF = parseFloat(est1["Promedio Final"]) || 0;
+          const quim2PF = parseFloat(est2["Promedio Final"]) || 0;
           const promedioAnual = ((quim1PF + quim2PF) / 2).toFixed(2);
 
           // Promedio de comportamiento de cada quimestre
-          const quim1PC = parseFloat(estudiante["Promedio Comportamiento"]) || 0;
-          const quim2PC = parseFloat(estudiante2["Promedio Comportamiento"]) || 0;
+          const quim1PC = parseFloat(est1["Promedio Comportamiento"]) || 0;
+          const quim2PC = parseFloat(est2["Promedio Comportamiento"]) || 0;
           const promedioComportamientoAnual = (quim1PC + quim2PC) / 2;
           const comportamiento = calcularValoracion(promedioComportamientoAnual);
 
           // Conservar valor previo del examen supletorio si ya se ingresó
-          const existingRow = prevDatos.find((row) => row.Nro === estudiante.Nro) || {};
+          const existingRow = prevDatos.find((row) => row.Nro === est1.Nro) || {};
           const examenSupletorioPrev = existingRow["Examen Supletorio"] || "";
 
           // Cálculo del Promedio Final:
@@ -65,22 +66,22 @@ const Final = ({ quim1Data, quim2Data, datosModulo }) => {
           const estado = promedioFinal >= 7 ? "Aprobado" : "Reprobado";
 
           return {
-            ...estudiante,
-            "Nro": estudiante.Nro,
-            "Nómina de Estudiantes": estudiante["Nómina de Estudiantes"],
-            "Primer Quimestre": quim1PF.toFixed(2),
-            "Segundo Quimestre": quim2PF.toFixed(2),
-            "Promedio Anual": promedioAnual,
+            ...est1,
+            "Nro": est1.Nro,
+            "Nómina de est1s": est1["Nómina de est1s"],
+            "Primer Quimestre": quim1PF,
+            "Segundo Quimestre": quim2PF,
+            "Promedio Anual": pAnualNum,
             "Comportamiento": comportamiento,
-            "Examen Supletorio": examenSupletorioPrev, // editable si < 7
-            "Promedio Final": promedioFinal.toFixed(2),
-            "Nivel": "", // Ajustar si lo requieres
+            "Examen Supletorio": examenSupletorioPrev,
+            "Promedio Final": promedioFinal,
+            "Nivel": est1["Nivel"] || "",
             "Estado": estado,
-
-            // Flags para estilos condicionales
+          
+            // Flags
             promedioAnualRequeridoSupletorio: pAnualNum < 7,
             promedioFinalInsuficiente: promedioFinal < 7,
-          };
+          };          
         })
       );
     }
@@ -89,37 +90,59 @@ const Final = ({ quim1Data, quim2Data, datosModulo }) => {
   // Manejar cambios en la columna "Examen Supletorio"
   const handleInputChange = (rowIndex, columnName, value) => {
     if (columnName === "Examen Supletorio") {
-      // Validar que sea un número válido entre 0.00 y 10.00
-      if (
-        value !== "" &&
-        (!/^\d{0,2}(\.\d{0,2})?$/.test(value) || value > 10 || value < 0)
-      ) {
-        alert("Error: El valor debe estar entre 0.00 y 10.00 con máximo dos decimales.");
+      const pAnualStr = datos[rowIndex]["Promedio Anual"];
+      const pAnualNum = typeof pAnualStr === "string"
+        ? parseFloat(pAnualStr)
+        : parseFloat(pAnualStr?.props?.children) || 0;
+  
+      // Si el promedio anual es menor a 4, no se permite supletorio
+      if (pAnualNum < 4) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Supletorio no permitido',
+          text: 'El est1 tiene menos de 4.00 en el promedio anual y no puede rendir supletorio.',
+          confirmButtonColor: '#3085d6',
+        });
         return;
       }
+  
+      // Validar que sea un número válido entre 0.00 y 7.00 con hasta dos decimales
+      const regexDecimal = /^\d{1,2}(\.\d{0,2})?$/;
+      if (value !== "") {
+        const esNumeroValido = regexDecimal.test(value.trim());
+        const valorNumerico = parseFloat(value);
+  
+        if (!esNumeroValido || isNaN(valorNumerico) || valorNumerico < 0 || valorNumerico > 7) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error de Validación',
+            text: 'El valor debe estar entre 0.00 y 7.00 con máximo dos decimales.',
+            confirmButtonColor: '#3085d6',
+          });
+          return;
+        }
+      }
     }
-
+  
     setDatos((prevDatos) =>
       prevDatos.map((row, i) => {
         if (i === rowIndex) {
           let newRow = { ...row, [columnName]: value };
           if (columnName === "Examen Supletorio") {
-            const pAnualNum = parseFloat(newRow["Promedio Anual"]) || 0;
+            const pAnualStr = newRow["Promedio Anual"];
+            const pAnualNum = typeof pAnualStr === "string"
+              ? parseFloat(pAnualStr)
+              : parseFloat(pAnualStr?.props?.children) || 0;
+  
             let nuevoPromedioFinal;
-
+  
             if (pAnualNum >= 7) {
-              // No se requiere supletorio
               nuevoPromedioFinal = pAnualNum;
             } else {
               const examenVal = value !== "" ? parseFloat(value) : 0;
-              // Solo reemplaza si supletorio es mayor que promedio anual
-              if (examenVal > pAnualNum) {
-                nuevoPromedioFinal = examenVal;
-              } else {
-                nuevoPromedioFinal = pAnualNum;
-              }
+              nuevoPromedioFinal = examenVal > pAnualNum ? examenVal : pAnualNum;
             }
-
+  
             newRow["Promedio Final"] = nuevoPromedioFinal.toFixed(2);
             newRow["Estado"] = nuevoPromedioFinal >= 7 ? "Aprobado" : "Reprobado";
             newRow.promedioFinalInsuficiente = nuevoPromedioFinal < 7;
@@ -129,7 +152,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo }) => {
         return row;
       })
     );
-  };
+  };  
 
   const determinarJornada = (horario) => {
     const horaInicio = horario.split("-")[0];
@@ -169,40 +192,30 @@ const Final = ({ quim1Data, quim2Data, datosModulo }) => {
   ];
 
   // Aplicamos estilos condicionales en la data
-  const datosConEstilos = datos.map((row) => {
-    // Promedio Anual en rojo si < 7
-    let promedioAnualConEstilo = row.promedioAnualRequeridoSupletorio
-      ? <span style={{ color: "red" }}>{row["Promedio Anual"]}</span>
-      : row["Promedio Anual"];
-
-    // Promedio Final en rojo si < 7 (o si no se ha ingresado supletorio y sigue <7)
-    let promedioFinalConEstilo = row.promedioFinalInsuficiente
-      ? <span style={{ color: "red" }}>{row["Promedio Final"]}</span>
-      : row["Promedio Final"];
-
-    // Estado con fondo verde si Aprobado, rojo si Reprobado
-    let estadoConEstilo;
-    if (row["Estado"] === "Aprobado") {
-      estadoConEstilo = (
-        <span style={{ backgroundColor: "green", color: "#fff", padding: "2px 4px" }}>
-          Aprobado
-        </span>
-      );
-    } else {
-      estadoConEstilo = (
-        <span style={{ backgroundColor: "red", color: "#fff", padding: "2px 4px" }}>
-          Reprobado
-        </span>
-      );
-    }
-
-    return {
-      ...row,
-      "Promedio Anual": promedioAnualConEstilo,
-      "Promedio Final": promedioFinalConEstilo,
-      "Estado": estadoConEstilo,
-    };
-  });
+  const datosConEstilos = useMemo(() => {
+    return datos.map((row) => {
+      const promedioAnual = row["Promedio Anual"]?.toFixed(2) || "0.00";
+      const promedioFinal = row["Promedio Final"]?.toFixed(2) || "0.00";
+      const primerQuimestre = row["Primer Quimestre"]?.toFixed(2) || "0.00";
+      const segundoQuimestre = row["Segundo Quimestre"]?.toFixed(2) || "0.00";
+  
+      return {
+        ...row,
+        "Primer Quimestre": primerQuimestre,
+        "Segundo Quimestre": segundoQuimestre,
+        "Promedio Anual": row.promedioAnualRequeridoSupletorio
+          ? <span style={{ color: "red" }}>{promedioAnual}</span>
+          : promedioAnual,
+        "Promedio Final": row.promedioFinalInsuficiente
+          ? <span style={{ color: "red" }}>{promedioFinal}</span>
+          : promedioFinal,
+        "Estado":
+          row["Estado"] === "Aprobado"
+            ? <span style={{ backgroundColor: "green", color: "#fff", padding: "2px 4px" }}>Aprobado</span>
+            : <span style={{ backgroundColor: "red", color: "#fff", padding: "2px 4px" }}>Reprobado</span>
+      };
+    });
+  }, [datos]);  
 
   return (
     <div id={idContenedor} className="container tabla-final">
@@ -218,6 +231,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo }) => {
         onChange={handleInputChange}
         // Sólo la columna "Examen Supletorio" es editable
         columnasEditables={["Examen Supletorio"]}
+        mostrarEliminar={false}
       />
     </div>
   );
