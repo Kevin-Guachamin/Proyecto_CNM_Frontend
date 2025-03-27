@@ -11,18 +11,21 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import {useNavigate,useLocation} from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Loading from "../../components/Loading";
+import axios from "axios";
+import Swal from "sweetalert2";
 import "./Calificaciones.css";
+import { ErrorMessage } from "../../Utils/ErrorMesaje";
 
 function Calificaciones() {
-  
+
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(false);
   const location = useLocation();
   const moduloSeleccionado = location.state;
-  
+
   // Estados para almacenar los datos de cada Parcial
   const [parcial1Quim1Data, setParcial1Quim1Data] = useState([]);
   const [parcial2Quim1Data, setParcial2Quim1Data] = useState([]);
@@ -31,14 +34,79 @@ function Calificaciones() {
   // Estados para Quimestral
   const [quim1Data, setQuim1Data] = useState([]);
   const [quim2Data, setQuim2Data] = useState([]);
+  
+  const makeKey = ({ id_inscripcion, quimestre, parcial }) =>
+  `${id_inscripcion}-${quimestre}-${parcial}`;
+
+  const handleActualizarParcial1Quim1 = React.useCallback((datos) => {
+    setParcial1Quim1Data(datos);
+    setSavedKeys(prev => {
+      const copy = new Set(prev);
+      datos.forEach(row => copy.add(makeKey(row)));
+      return copy;
+    });
+  }, []);
+  
+
+  const handleActualizarParcial2Quim1 = React.useCallback((datos) => {
+    setParcial2Quim1Data(datos);
+    setSavedKeys(prev => {
+      const copy = new Set(prev);
+      datos.forEach(row => copy.add(makeKey(row)));
+      return copy;
+    });
+  }, []);
+
+  const handleActualizarParcial1Quim2 = React.useCallback((datos) => {
+    setParcial1Quim2Data(datos);
+    setSavedKeys(prev => {
+      const copy = new Set(prev);
+      datos.forEach(row => copy.add(makeKey(row)));
+      return copy;
+    });
+  }, []);
+
+  const handleActualizarParcial2Quim2 = React.useCallback((datos) => {
+    setParcial2Quim2Data(datos);
+    setSavedKeys(prev => {
+      const copy = new Set(prev);
+      datos.forEach(row => copy.add(makeKey(row)));
+      return copy;
+    });
+  }, []);
+
+  const handleActualizarQuim1 = React.useCallback((datos) => {
+    setQuim1Data(datos);
+    setSavedKeys(prev => {
+      const copy = new Set(prev);
+      datos.forEach(row => copy.add(makeKey(row)));
+      return copy;
+    });
+  }, []);
+
+  const handleActualizarQuim2 = React.useCallback((datos) => {
+    setQuim2Data(datos);
+    setSavedKeys(prev => {
+      const copy = new Set(prev);
+      datos.forEach(row => copy.add(makeKey(row)));
+      return copy;
+    });
+  }, []);
+
+  const [activeMainTab, setActiveMainTab] = useState("quimestre1");
+  const [activeSubTabQuim1, setActiveSubTabQuim1] = useState("parcial1-quim1");
+  const [activeSubTabQuim2, setActiveSubTabQuim2] = useState("parcial1-quim2");
 
   const modules = [
-    { name: "Inicio", icon: <Home size={20} />, path:"/panelcursos" },
+    { name: "Inicio", icon: <Home size={20} />, path: "/panelcursos" },
     { name: "Usuarios", icon: <Users size={20} /> },
     { name: "Configuración", icon: <Settings size={20} /> },
   ];
 
   const [datosModulo, setDatosModulo] = useState(moduloSeleccionado || {});
+
+  const [savedKeys, setSavedKeys] = useState(new Set());
+
   
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
@@ -51,7 +119,7 @@ function Calificaciones() {
       navigate("/panelcursos"); // Si falta módulo seleccionado o usuario/token, regresamos.
     }
   }, [moduloSeleccionado, navigate]);
-  
+
   // ──────────────────────────────────────────
   // 1) Exportar a Excel
   // ──────────────────────────────────────────
@@ -63,17 +131,17 @@ function Calificaciones() {
         alert("No se encontró la pestaña activa para exportar a Excel.");
         return;
       }
-  
+
       // 2) Buscar el header y la tabla dentro de la pestaña activa
       //    Asumiendo que el header tiene clase .cabecera-parciales
       const headerContainer = activeTab.querySelector(".cabecera-parciales");
       const table = activeTab.querySelector("table");
-  
+
       if (!table) {
         alert("No se encontró ninguna tabla en la pestaña activa.");
         return;
       }
-  
+
       // 3) Extraer datos del header
       //    (En este ejemplo tomamos el texto y lo ponemos en filas simples)
       let headerData = [];
@@ -84,7 +152,7 @@ function Calificaciones() {
         // Agregamos cada uno en una fila separada
         headerData.push([h4]);
         headerData.push([h5]);
-  
+
         // Luego, tomamos los "Profesor: X", "Año Lectivo: Y", etc.
         // asumiendo que están en divs .col-md-6.mb-1
         const infoDivs = headerContainer.querySelectorAll(".row .col-md-6.mb-1");
@@ -92,24 +160,24 @@ function Calificaciones() {
           // Ej: "Profesor: Guachis"
           headerData.push([div.innerText]);
         });
-  
+
         // Agregamos una fila vacía para separar
         headerData.push([]);
       }
-  
+
       // 4) Convertir la tabla HTML a un array de arrays (AOA)
       //    usando primero table_to_sheet y luego sheet_to_json con { header: 1 }
       const tempSheet = XLSX.utils.table_to_sheet(table);
       const tableAOA = XLSX.utils.sheet_to_json(tempSheet, { header: 1 });
-  
+
       // 5) Combinar el header AOA y la tabla AOA
       const finalAOA = [...headerData, ...tableAOA];
-  
+
       // 6) Generar el worksheet y el workbook
       const worksheet = XLSX.utils.aoa_to_sheet(finalAOA);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Calificaciones");
-  
+
       // 7) Exportar a .xlsx
       const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
       const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
@@ -136,30 +204,30 @@ function Calificaciones() {
         alert("No se encontró el contenido a exportar.");
         return;
       }
-  
+
       // 2. Crear un clon del contenido
       const clonedContent = contentToPrint.cloneNode(true);
       const tempContainer = document.createElement("div");
-  
+
       // Detectar si es "parcial"
       const isParcial = contentToPrint.id.includes("parcial");
-  
+
       // Ajustar ancho del contenedor temporal
       if (isParcial) {
         tempContainer.style.width = "1400px";
       } else {
         tempContainer.style.width = "1300px";
       }
-  
+
       tempContainer.style.position = "absolute";
       tempContainer.style.left = "-9999px";
       tempContainer.style.top = "-9999px";
       document.body.appendChild(tempContainer);
       tempContainer.appendChild(clonedContent);
-  
+
       // 3. Agregar clase para estilos de impresión al clon
       clonedContent.classList.add("pdf-export");
-  
+
       // 4. (Opcional) Escalar solo la tabla si es parcial
       if (isParcial) {
         const tablaParciales = clonedContent.querySelector(".tabla-parciales");
@@ -169,10 +237,10 @@ function Calificaciones() {
           tablaParciales.style.transformOrigin = "top left";
         }
       }
-  
+
       // 5. Esperar para que se apliquen estilos
       await new Promise((resolve) => setTimeout(resolve, 500));
-  
+
       // 6. Capturar con html2canvas
       const canvas = await html2canvas(clonedContent, {
         // Si es parcial, scale 2 para no generar un canvas enorme
@@ -189,42 +257,42 @@ function Calificaciones() {
         scrollY: 0,
         scrollX: 0,
       });
-  
+
       // 7. Remover el contenedor temporal
       document.body.removeChild(tempContainer);
-  
+
       // 8. Convertir Canvas a imagen
       const imgData = canvas.toDataURL("image/png", 1.0);
-  
+
       // 9. Crear PDF (landscape)
       const pdf = new jsPDF({
         orientation: "l",
         unit: "pt",
         format: "a4",
       });
-  
+
       // 10. Calcular dimensiones para que quepa en A4
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-  
+
       // Define margen menor si es parcial
       const margin = isParcial ? 30 : 40;
       let imgWidth = pageWidth - margin * 2;
       let imgHeight = (canvas.height * imgWidth) / canvas.width;
-  
+
       // Ajustar si excede la altura
       if (imgHeight > pageHeight - margin * 2) {
         imgHeight = pageHeight - margin * 2;
         imgWidth = (canvas.width * imgHeight) / canvas.height;
       }
-  
+
       // Calcular offsets para centrar
       const xOffset = (pageWidth - imgWidth) / 2;
       const yOffset = margin;
-  
+
       // 11. Añadir imagen al PDF
       pdf.addImage(imgData, "PNG", xOffset, yOffset, imgWidth, imgHeight);
-  
+
       // 12. Nombre de archivo dinámico
       let fileName = "Calificaciones.pdf";
       if (contentToPrint.id.startsWith("pdf-")) {
@@ -242,7 +310,7 @@ function Calificaciones() {
           }
         }
       }
-  
+
       // 13. Guardar el PDF
       pdf.save(fileName);
     } catch (error) {
@@ -250,63 +318,118 @@ function Calificaciones() {
       alert("Ocurrió un error al exportar a PDF. Por favor intente nuevamente.");
     }
   };
+
+  // ──────────────────────────────────────────
+  // 3) Función para guardar datos del tab activo
+  // ──────────────────────────────────────────
+  const handleSave = () => {
+    let activeData = [];
+    if (activeMainTab === "quimestre1") {
+      if (activeSubTabQuim1 === "parcial1-quim1") activeData = parcial1Quim1Data;
+      else if (activeSubTabQuim1 === "parcial2-quim1") activeData = parcial2Quim1Data;
+      else activeData = quim1Data;
+    } else {
+      if (activeSubTabQuim2 === "parcial1-quim2") activeData = parcial1Quim2Data;
+      else if (activeSubTabQuim2 === "parcial2-quim2") activeData = parcial2Quim2Data;
+      else activeData = quim2Data;
+    }
   
-  // ──────────────────────────────────────────
-  // 3) Imprimir
-  // ──────────────────────────────────────────
-  const handlePrint = () => {
-    window.print();
-  };
+    if (activeData.length === 0) {
+      return Swal.fire({ icon:"warning", title:"Sin datos", text:"No hay calificaciones para guardar." });
+    }
+  
+    const newRows = activeData.filter(row => !savedKeys.has(makeKey(row)));
+  
+    if (newRows.length === 0) {
+      return Swal.fire({
+        icon: "info",
+        title: "Sin cambios",
+        text: "Para modificar una calificación ya guardada usa el botón ✏️ en Acciones."
+      });
+    }
+  
+    axios.post(`${import.meta.env.VITE_URL_DEL_BACKEND}/parciales/bulk`, newRows)
+      .then(() => {
+        Swal.fire({ icon:"success", title:"Guardado", text:"Calificaciones guardadas correctamente." });
+        setSavedKeys(prev => {
+          const copy = new Set(prev);
+          newRows.forEach(r => copy.add(makeKey(r)));
+          return copy;
+        });
+      })
+      .catch(error => {
+        Swal.fire({ icon:"error", title:"Error", text:"No se pudieron guardar las calificaciones." });
+        ErrorMessage(error);
+      });
+  };  
 
   const handleSidebarNavigation = (path) => {
     setLoading(true);
     setTimeout(() => navigate(path), 800);
   };
+
   if (loading) {
     return <Loading />;
   }
-
+  
   return (
     <>
       <div className="container-fluid p-0">
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
 
-      <Layout modules={modules} onNavigate={handleSidebarNavigation}> 
+      <Layout modules={modules} onNavigate={handleSidebarNavigation}>
         <div className="content-container">
           <Container className="mt-4">
-            <div className="d-flex justify-content-between align-items-center mb-4">
+            <div className="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
               <h2 className="mb-0">Gestión de Calificaciones</h2>
-              <div>
-                <button
-                  className="btn btn-success me-2"
-                  onClick={handleExportExcel}
-                  title="Exportar a Excel"
-                >
-                  <i className="bi bi-file-earmark-excel-fill"></i>
-                </button>
 
-                <button
-                  className="btn btn-danger me-2"
-                  onClick={handleExportPDF}
-                  title="Exportar a PDF"
-                >
-                  <i className="bi bi-file-earmark-pdf-fill"></i>
-                </button>
+              <div className="d-flex flex-column align-items-end gap-2">
+                {/* Línea de Exportaciones */}
+                <div className="d-flex align-items-center gap-2">
+                  <span className="label-text">Exportaciones:</span>
+                  <button
+                    className="btn btn-success btn-sm"
+                    onClick={handleExportExcel}
+                    title="Exportar a Excel"
+                  >
+                    <i className="bi bi-file-earmark-excel-fill"></i>
+                  </button>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={handleExportPDF}
+                    title="Exportar a PDF"
+                  >
+                    <i className="bi bi-file-earmark-pdf-fill"></i>
+                  </button>
+                </div>
+
+                {/* Línea de Acciones */}
+                <div className="d-flex align-items-center gap-2">
+                  <span className="label-text">Acciones:</span>
+                  <button className="btn btn-secondary btn-sm" title="Guardar"  onClick={handleSave}>
+                    <i className="bi bi-save"></i>
+                  </button>
+                  <button className="btn btn-primary btn-sm text-white" title="Editar">
+                    <i className="bi bi-pencil-fill"></i>
+                  </button>
+                </div>
               </div>
             </div>
 
+
             {/* TABS PRINCIPALES */}
-            <Tabs defaultActiveKey="quimestre1" id="calificaciones-tabs" className="mb-3" fill>
+            <Tabs defaultActiveKey="quimestre1" id="calificaciones-tabs" className="mb-3" fill onSelect={(k) => setActiveMainTab(k)}>
               {/* QUIMESTRE 1 */}
               <Tab eventKey="quimestre1" title="Quimestre 1">
-                <Tabs defaultActiveKey="parcial1-quim1" className="mb-3" fill>
+                <Tabs defaultActiveKey="parcial1-quim1" className="mb-3" fill onSelect={(k) => setActiveSubTabQuim1(k)}>
                   <Tab eventKey="parcial1-quim1" title="Parcial 1 - Quim 1">
                     <Parcial
                       quimestreSeleccionado="1"
                       parcialSeleccionado="1"
-                      actualizarDatosParcial={(datos) => setParcial1Quim1Data(datos)}
+                      actualizarDatosParcial={handleActualizarParcial1Quim1}
                       datosModulo={datosModulo}
+                      activo={activeMainTab === "quimestre1" && activeSubTabQuim1 === "parcial1-quim1"}
                     />
                   </Tab>
 
@@ -314,38 +437,34 @@ function Calificaciones() {
                     <Parcial
                       quimestreSeleccionado="1"
                       parcialSeleccionado="2"
-                      actualizarDatosParcial={(datos) => {
-                        setParcial2Quim1Data(datos);
-                      }}
+                      actualizarDatosParcial={handleActualizarParcial2Quim1}
                       datosModulo={datosModulo}
+                      activo={activeMainTab === "quimestre1" && activeSubTabQuim1 === "parcial2-quim1"}
                     />
                   </Tab>
 
                   <Tab eventKey="quimestral-quim1" title="Quimestre 1">
-                    <Quimestral
-                      quimestreSeleccionado="1"
-                      parcial1Data={parcial1Quim1Data}
-                      parcial2Data={parcial2Quim1Data}
-                      actualizarDatosQuim={(datos) => {
-                        setQuim1Data(datos);
-                      }}
-                      datosModulo={datosModulo}
-                    />
+                      <Quimestral
+                        quimestreSeleccionado="1"
+                        parcial1Data={parcial1Quim1Data}
+                        parcial2Data={parcial2Quim1Data}
+                        actualizarDatosQuim={handleActualizarQuim1}
+                        datosModulo={datosModulo}
+                      />
                   </Tab>
                 </Tabs>
               </Tab>
 
               {/* QUIMESTRE 2 */}
               <Tab eventKey="quimestre2" title="Quimestre 2">
-                <Tabs defaultActiveKey="parcial1-quim2" className="mb-3" fill>
+                <Tabs defaultActiveKey="parcial1-quim2" className="mb-3" fill onSelect={(k) => setActiveSubTabQuim2(k)}>
                   <Tab eventKey="parcial1-quim2" title="Parcial 1 - Quim 2">
                     <Parcial
                       quimestreSeleccionado="2"
                       parcialSeleccionado="1"
-                      actualizarDatosParcial={(datos) => {
-                        setParcial1Quim2Data(datos);
-                      }}
+                      actualizarDatosParcial={handleActualizarParcial1Quim2}
                       datosModulo={datosModulo}
+                      activo={activeMainTab === "quimestre2" && activeSubTabQuim2 === "parcial1-quim2"}
                     />
                   </Tab>
 
@@ -353,10 +472,9 @@ function Calificaciones() {
                     <Parcial
                       quimestreSeleccionado="2"
                       parcialSeleccionado="2"
-                      actualizarDatosParcial={(datos) => {
-                        setParcial2Quim2Data(datos);
-                      }}
+                      actualizarDatosParcial={handleActualizarParcial2Quim2}
                       datosModulo={datosModulo}
+                      activo={activeMainTab === "quimestre2" && activeSubTabQuim2 === "parcial2-quim2"}
                     />
                   </Tab>
 
@@ -365,9 +483,7 @@ function Calificaciones() {
                       quimestreSeleccionado="2"
                       parcial1Data={parcial1Quim2Data}
                       parcial2Data={parcial2Quim2Data}
-                      actualizarDatosQuim={(datos) => {
-                        setQuim2Data(datos);
-                      }}
+                      actualizarDatosQuim={handleActualizarQuim2}
                       datosModulo={datosModulo}
                     />
                   </Tab>
