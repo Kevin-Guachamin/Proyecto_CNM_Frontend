@@ -18,13 +18,13 @@ function Index() {
   const colums = ["nroCedula", "primer_nombre", "primer_apellido", "segundo_nombre", "segundo_apellido", "email", "celular", "rol"]
   const filterKey = "nroCedula"
   const PK = "nroCedula"
+  
 
   useEffect(() => {
-
+    const storedUser = localStorage.getItem("usuario");
+    const parsedUser = JSON.parse(storedUser);
     ObtenerTodo(setDocentes, `${API_URL}/docente/obtener`, setLoading)
-    // Mientras no se conecte al backend, dejamos un usuario de prueba
-
-    setUsuario({ nombre: "Juan Pérez", rol: "Estudiante" });
+    setUsuario(parsedUser);
   }, [API_URL]);
 
   return (

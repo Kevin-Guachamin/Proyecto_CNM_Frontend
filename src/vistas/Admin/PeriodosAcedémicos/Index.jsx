@@ -6,6 +6,7 @@ import Contenedor from "../Components/Contenedor";
 import { modulesSettings } from "../Components/Modulos"
 import { ObtenerTodo } from "../../../Utils/CRUD/ObjetenerTodo";
 import CrearPeriodo from "./CrearPeriodo";
+import { Password } from "@mui/icons-material";
 
 
 function Index() {
@@ -18,12 +19,15 @@ function Index() {
   const colums = ["descripcion", "fecha_inicio", "fecha_fin", "estado"]
   const filterKey = "descripcion"
   const PK = "ID"
+  
 
   useEffect(() => {
-
+    const storedUser = localStorage.getItem("usuario");
+    const parsedUser = JSON.parse(storedUser);
     ObtenerTodo(setPeriodos, `${API_URL}/periodo_academico/obtener`, setLoading)
     // Mientras no se conecte al backend, dejamos un usuario de prueba
-    setUsuario({ nombre: "Juan Pérez", rol: "Estudiante" });
+    setUsuario(parsedUser);
+    
   }, [API_URL]);
 
   return (
