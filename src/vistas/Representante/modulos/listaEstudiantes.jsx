@@ -2,24 +2,34 @@ import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import Tabla from '../../Representante/components/Tabla_Representante';
 import Header from "../../../components/Header";
+import VerDatosEstudiante from '../../Representante/modulos/VerDatosEstudiante';
 import { useNavigate } from "react-router-dom";
 
 function ListaEstudiantes() {
   // Estado para almacenar la información del usuario conectado
   const [usuario, setUsuario] = useState(null);
   const [datosEstudiante, setDatosEstudiante] = useState([]);
+  const [estudianteSeleccionado, setEstudianteSeleccionado] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  navigate = useNavigate();
 
   const handleVerCalificaciones = (estudianteCedula) => {
     console.log("ver detalles de: ", estudianteCedula);
     // logica
   }
 
-  const handleVerDatosEstudiante = (estudianteCedula) => {
-   console.log('ver datos de: ', estudianteCedula);
-   navigate();
-  
+  const handleVerDatosEstudiante = async (estudianteCedula) => {
+   try {
+    const respuesta = await axios.get(`http://localhost:8000/estudiante/obtener/${estudianteCedula}`);
+    setEstudianteSeleccionado(respuesta.data);
+    setIsModalOpen(true);
+
+   } catch (error) { 
+    console.log('Error al obtener los datos del estudiante para el modal', error);
+   } finally {
+    setIsLoading(false);
+   }
+ 
   }
 
   // Mientras no se conecte al backend, dejamos un usuario de prueba
@@ -63,6 +73,11 @@ function ListaEstudiantes() {
     cargarDatos();  
     
   }, []);
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEstudianteSeleccionado(null);
+  }
      
     return(
       <div> 
@@ -75,6 +90,16 @@ function ListaEstudiantes() {
           handleVerCalificaciones={handleVerCalificaciones}
           handleVerDatosEstudiante={handleVerDatosEstudiante}
         ></Tabla> 
+
+        {/* Modal de datos del estudiante */}
+        {isModalOpen && (
+          <VerDatosEstudiante
+            onCancel={handleCloseModal}
+            isLoading={isLoading}
+            entity={estudianteSeleccionado}
+          />
+        )}
+
       </div>
     )
 }
