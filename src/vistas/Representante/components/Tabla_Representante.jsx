@@ -57,13 +57,13 @@ const Tabla = ({datos, isLoading, handleVerCalificaciones, handleVerDatosEstudia
                                     <td className="text-center">
                                         <i
                                             className="bi bi-card-checklist text-primary mx-2 fs-3"
-                                            onClick={() => handleVerCalificaciones(estudiante.nroCedula)}
+                                            onClick={() => handleVerCalificaciones(estudiante.id)}
                                             title="Ver calificaciones"
                                             style={{ cursor: 'pointer' }}
                                         ></i>
                                         <i
                                             className="bi bi-info-circle text-info mx-2 fs-3"
-                                            onClick={() => handleVerDatosEstudiante(estudiante.nroCedula)}
+                                            onClick={() => handleVerDatosEstudiante(estudiante.id)}
                                             title="Ver información"
                                             style={{ cursor: 'pointer' }}
                                         ></i>
