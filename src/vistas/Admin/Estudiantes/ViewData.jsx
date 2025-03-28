@@ -18,8 +18,8 @@ function ViewData({onCancel, isLoading, entity }) {
     OJO FALTA COMPROBAR EL FUNCIONAMIENTO CON LOS ARCHIVOS PDFS SUBIDOS
   */
 
-  if (isLoading) {
-    <isLoading></isLoading> 
+  if (isLoading) { 
+    <Loading></Loading>
   }
 
   useEffect(() => {
