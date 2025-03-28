@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import Tabla from '../../Representante/components/Tabla_Representante';
 import Header from "../../../components/Header";
+import { useNavigate } from "react-router-dom";
 
 function ListaEstudiantes() {
   // Estado para almacenar la información del usuario conectado
   const [usuario, setUsuario] = useState(null);
   const [datosEstudiante, setDatosEstudiante] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  navigate = useNavigate();
 
   const handleVerCalificaciones = (estudianteCedula) => {
     console.log("ver detalles de: ", estudianteCedula);
@@ -15,7 +17,9 @@ function ListaEstudiantes() {
   }
 
   const handleVerDatosEstudiante = (estudianteCedula) => {
-    console.log('ver datos de: ', estudianteCedula);
+   console.log('ver datos de: ', estudianteCedula);
+   navigate();
+  
   }
 
   // Mientras no se conecte al backend, dejamos un usuario de prueba
@@ -69,6 +73,7 @@ function ListaEstudiantes() {
           datos={datosEstudiante} 
           isLoading={isLoading}
           handleVerCalificaciones={handleVerCalificaciones}
+          handleVerDatosEstudiante={handleVerDatosEstudiante}
         ></Tabla> 
       </div>
     )
