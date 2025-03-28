@@ -11,6 +11,7 @@ import Estudiantes from '../vistas/Admin/Estudiantes/Index.jsx'
 import PanelCursos from '../vistas/Panelcursos.jsx';
 import ListaEstudiantes from '../vistas/Representante/modulos/listaEstudiantes.jsx';
 import VerDatosRepresentante from '../vistas/Representante/modulos/VerDatosRepresentante.jsx';
+import VerDatosEstudiante from '../vistas/Representante/modulos/VerDatosEstudiante.jsx';
 
 
 
@@ -26,8 +27,10 @@ function Rutas() {
         <Route path="/calificaciones" element={<Calificaciones/>} />
         <Route path="/panelcursos" element={<PanelCursos/>} />
         <Route path="/representante" element={<Representante/>} />
-        <Route path="/representante/lista" element={<ListaEstudiantes/>} />
-        <Route path="/representante/data" element={<VerDatosRepresentante/>} />
+        <Route path="/representante/estudiantes" element={<ListaEstudiantes/>} />
+        <Route path="/representante/perfil" element={<VerDatosRepresentante/>} />
+        <Route path="/estudiante/perfil" element={<VerDatosEstudiante/>} />
+
     </Routes>
   )
 }
