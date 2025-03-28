@@ -9,8 +9,8 @@ const Index = () => {
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(false);
   const [modulos] = useState([
-    { id: 1, titulo: "Información representante", icono: "📄", link: "/representante/data" },
-    { id: 2, titulo: "Información estudiantil", icono: "✏️", link: "/representante/lista" },
+    { id: 1, titulo: "Información representante", icono: "📄", link: "/representante/perfil" },
+    { id: 2, titulo: "Información estudiantil", icono: "✏️", link: "/representante/estudiantes" },
   ]);
 
   useEffect(() => {
