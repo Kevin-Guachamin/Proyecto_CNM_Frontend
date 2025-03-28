@@ -66,11 +66,10 @@ function ViewDataEstudiante({onCancel, isLoading, entity }) {
               <div className="form-group">
                 <label htmlFor="nroCedula">Número de cédula:</label>
                 <input id="nroCedula" value={nroCedula} onChange={(e) => setNroCedula(e.target.value)} placeholder="Ingrese un número de cédula" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="celular">#Celular:</label>
-                <input id="celular" value={celular} onChange={(e) => setCelular(e.target.value)} placeholder="Ingrese un celular" />
               </div>  
+              <div className="form-group">
+                <label></label>
+              </div>
             </div>
             
             <div className='rows'>
@@ -150,11 +149,7 @@ function ViewDataEstudiante({onCancel, isLoading, entity }) {
                 <input id="nroCedula_representante" value={nroCedula_representante} onChange={(e) => setNroCedulaRepresentante(e.target.value)} placeholder="Ingrese el nro de cédula del representante" />
               </div>
             </div>
-
-            <div className="form-group">
-              <label htmlFor="email">Email:</label>
-              <input id="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Ingrese un correo electrónico" />
-            </div>
+ 
             <div className='rows'>
               
               <label>
