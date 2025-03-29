@@ -19,6 +19,7 @@ const Modulo = ({ modulos, onModuloClick }) => {
         <div key={modulo.id} className="modulo-card" onClick={() => handleClick(modulo)}>
           <div className="modulo-icono">{modulo.icono}</div>
           <div className="modulo-titulo">{modulo.titulo}</div>
+          <div className="modulo-descripcion">{modulo.descripcion}</div>
         </div>
       ))}
     </div>

@@ -20,6 +20,11 @@ function PanelCursos() {
     { name: "Configuración", icon: <Settings size={20} />, path: "/configuracion" },
   ];
 
+  function formatearHorario(horario) {
+    // Reemplaza cualquier ocurrencia de "HH:MM:SS" por "HH:MM"
+    return horario.replace(/(\d{2}:\d{2}):\d{2}/g, "$1");
+  }
+  
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const storedToken = localStorage.getItem("token");
@@ -35,8 +40,8 @@ function PanelCursos() {
           if (Array.isArray(data) && data.length > 0) {
             const cursosData = data.map((curso) => ({
               id: curso.ID,
-              titulo: `Curso de ${curso.materia}`,
-              descripcion: `Paralelo: ${curso.paralelo}, Horario: ${curso.horario}`,
+              titulo: `Curso: ${curso.materia}`,
+              descripcion: `Paralelo: ${curso.paralelo}\n Horario: ${formatearHorario(curso.horario)}`,
               link: "/calificaciones"
             }));
             setCursos(cursosData);
