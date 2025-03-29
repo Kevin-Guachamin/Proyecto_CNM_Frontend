@@ -4,9 +4,9 @@ import Tabla from "../../components/Tabla";
 import Swal from 'sweetalert2';
 import axios from "axios";
 import { ErrorMessage } from "../../Utils/ErrorMesaje";
+import "./Parcial.css";
 
-
-const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actualizarDatosQuim, datosModulo }) => {
+const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actualizarDatosQuim, datosModulo,inputsDisabled }) => {
 
   const idContenedor = `pdf-quimestral-quim${quimestreSeleccionado}`;
 
@@ -15,12 +15,17 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
 
   // Función para calcular la valoración (para comportamiento) según la suma total
   const calcularValoracion = (valor) => {
-    if (valor >= 10) return "A";
-    if (valor === 9) return "B";
-    if (valor >= 7) return "C";
-    if (valor >= 5) return "D";
-    return "E";
+    // 1) Truncar el valor (9.4 => 9)
+    const truncado = Math.floor(valor);
+  
+    // 2) Asignar la letra en función del entero
+    if (truncado === 10) return "A";
+    if (truncado === 9)  return "B";
+    if (truncado >= 7)  return "C"; // Esto abarca 7 y 8
+    if (truncado >= 5)  return "D"; // Esto abarca 5 y 6
+    return "E";                     // Menos de 5
   };
+  
   const abreviarNivel = (nivel) => {
     if (!nivel || typeof nivel !== "string") return "";
 
@@ -37,36 +42,63 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
     return ""; // Por defecto si no matchea nada
   };
   
+  const obtenerEtiquetaQuimestre = () => {
+    return quimestreSeleccionado === "1" ? "Q1" : "Q2";
+  };
+
+  function parseCampoNumerico(valor) {
+    if (typeof valor === "string" && valor.trim() === "") {
+      return null; // vacío
+    }
+    const parsed = parseFloat(valor);
+    return isNaN(parsed) ? null : parsed;
+  }
+  
+  const transformarDatosQuimestralParaGuardar = (datos) => {
+    return datos.map((fila) => {
+      return {
+        id_inscripcion: fila.idInscripcion, // 👈 ojo con la nomenclatura
+      examen: parseCampoNumerico(fila["Examen"]),
+      quimestre: obtenerEtiquetaQuimestre(),
+      "Promedio Completo": parseCampoNumerico(fila["Promedio Final"]),
+      "Promedio Comportamiento Completo": parseCampoNumerico(fila["Promedio Comportamiento"])
+      };
+    });
+  };
+
   // Cada vez que lleguen datos de ambos parciales, se combinan
   useEffect(() => {
-    console.log("💡 parcial1Data:", parcial1Data);
-    if (!datosModulo || !datosModulo.ID) return;
+    if (!datosModulo?.ID) return;
   
     const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${datosModulo.ID}`;
+    const urlQuimestrales = `${import.meta.env.VITE_URL_DEL_BACKEND}/quimestrales/asignacion/${datosModulo.ID}`;
   
-    axios.get(urlInscripciones)
-      .then((resp) => {
-        const estudiantes = resp.data;
+    Promise.all([axios.get(urlInscripciones), axios.get(urlQuimestrales)])
+      .then(([respEstudiantes, respQuimestrales]) => {
+        const estudiantes = respEstudiantes.data;
+        const quimestrales = respQuimestrales.data;
   
-        const nuevosDatos = estudiantes.map((est) => {
-          const p1 = parcial1Data.find(p => p.id_inscripcion === est.idInscripcion);
-          const p2 = parcial2Data.find(p => p.id_inscripcion === est.idInscripcion);
+        const nuevosDatos = estudiantes.map(est => {
+          const p1 = parcial1Data.find(p => p.id_inscripcion === est.idInscripcion) || {};
+          const p2 = parcial2Data.find(p => p.id_inscripcion === est.idInscripcion) || {};
+          const saved = quimestrales.find(q =>
+            q.idInscripcion === est.idInscripcion &&
+            q.quimestre === obtenerEtiquetaQuimestre()
+          ) || {};          
   
-          const parcial1 = p1?.["Promedio Final"] !== undefined
-            ? parseFloat(p1["Promedio Final"]) || 0
-            : 0;
-  
-          const parcial2 = p2?.["Promedio Final"] !== undefined
-            ? parseFloat(p2["Promedio Final"]) || 0
-            : 0;
-  
+          const parcial1 = parseFloat(p1["Promedio Final"] || 0);
+          const parcial2 = parseFloat(p2["Promedio Final"] || 0);
           const promedioAcademico = (parcial1 + parcial2) / 2;
           const ponderacion70 = promedioAcademico * 0.7;
-  
-          const comportamiento1 = p1?.comportamiento?.reduce((acc, val) => acc + (parseInt(val) || 0), 0) || 0;
-          const comportamiento2 = p2?.comportamiento?.reduce((acc, val) => acc + (parseInt(val) || 0), 0) || 0;
-          const promedioComportamiento = Math.ceil((comportamiento1 + comportamiento2) / 2);
-          const comportamientoFinal = calcularValoracion(promedioComportamiento);
+          const notaExamen = saved.examen ?? "";
+          const ponderacion30 = parseFloat(notaExamen || 0) * 0.3;
+          const promedioFinal = ponderacion70 + ponderacion30;
+          
+          const comportamientoP1 = parseFloat(p1["Promedio Comportamiento"] || 0);
+          const comportamientoP2 = parseFloat(p2["Promedio Comportamiento"] || 0);
+
+          const comportamientoTotal = (comportamientoP1 + comportamientoP2) / 2;
+          const comportamientoFinal = calcularValoracion(comportamientoTotal);
   
           return {
             idInscripcion: est.idInscripcion,
@@ -75,36 +107,40 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
             "Primer Parcial": parcial1.toFixed(2),
             "Segundo Parcial": parcial2.toFixed(2),
             "Ponderación 70%": ponderacion70.toFixed(2),
-            "Examen": "",
-            "Ponderación 30%": "0.00",
-            "Promedio Final": ponderacion70.toFixed(2),
-            "Promedio Comportamiento": promedioComportamiento,
+            "Examen": notaExamen,
+            "Ponderación 30%": ponderacion30.toFixed(2),
+            "Promedio Final": promedioFinal.toFixed(2),
+            "Promedio Comportamiento": comportamientoTotal,
             "Nivel": abreviarNivel(est.nivel),
             "Comportamiento Final": comportamientoFinal,
           };
         });
   
         setDatos(nuevosDatos);
-        if (typeof actualizarDatosQuim === "function") {
-          actualizarDatosQuim(nuevosDatos);
-        }
-  
-        // 👇 Para depurar si llega la nota bien
-        console.log("✅ Datos combinados Quimestral:", nuevosDatos);
+        actualizarDatosQuim(nuevosDatos);
+        console.log("✅ Datos Quimestral cargados:", nuevosDatos);
       })
-      .catch((err) => {
-        console.error("❌ Error al cargar estudiantes:", err);
+      .catch(err => {
+        console.error("❌ Error cargando Quimestrales:", err);
         ErrorMessage(err);
       });
-  }, [datosModulo, parcial1Data, parcial2Data]);
-       
+  }, [datosModulo, parcial1Data, parcial2Data, quimestreSeleccionado]);  
 
   useEffect(() => {
-    if (typeof actualizarDatosQuim === "function") {
-      actualizarDatosQuim(datos);
+    // Sólo disparar cuando ya tengamos filas con cálculo listo
+    if (!datos || datos.length === 0) return;
+  
+    // Filtra filas válidas (aquí todas tienen “Promedio Final” calculado)
+    const datosCompletos = datos.filter(fila => fila["Promedio Final"]  !== undefined && fila["Comportamiento Final"] !== undefined);
+    
+  
+    if (typeof actualizarDatosQuim === "function" && datosCompletos.length > 0) {
+      const datosTransformados = transformarDatosQuimestralParaGuardar(datosCompletos);
+      actualizarDatosQuim(datosTransformados);
+      console.log(`🚀 Datos enviados desde Quimestral Quimestre ${quimestreSeleccionado}:`, datosTransformados);
     }
-  }, [datos, actualizarDatosQuim]);
-
+  }, [datos, actualizarDatosQuim, quimestreSeleccionado]);
+  
   // Función para manejar cambios en los inputs de la tabla (en este caso, solo para la columna "Examen")
   const handleInputChange = (rowIndex, columnName, value) => {
     const nuevosDatos = datos.map((fila, i) => {
@@ -190,7 +226,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
         datos={datos}
         onChange={handleInputChange}
         columnasEditables={columnasEditables}
-        mostrarEliminar={false}
+        inputsDisabled={inputsDisabled}
       />
     </div>
   );

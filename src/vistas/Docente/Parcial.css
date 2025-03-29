@@ -1,21 +1,9 @@
-/* Solo se aplica dentro de la vista de parciales */
-.tabla-parciales .table th:nth-child(n+3),
-.tabla-parciales .table td:nth-child(n+3) {
-    white-space: pre-line !important; /* Reconoce \n como salto de línea */
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+.tabla-quimestral, .tabla-parciales, .tabla-final {
+    font-size: 15px; /* Texto de la tabla */
 }
 
-.tabla-parciales .table tbody td {
-    font-size: 11px; /* Texto de la celda */
+/* Override: SOLO para .tabla-quimestral y .tabla-final */
+.tabla-quimestral .vertical-text,
+.tabla-final .vertical-text {
+  font-size: 1.05rem !important; /* o el valor que desees */
 }
-
-.tabla-parciales .table tbody td input {
-    font-size: 11px; /* Texto del input */
-}
-
-/* Aplica solo a los inputs que están en las columnas de la sección de comportamiento 
-   (del noveno al vigésimo primer td en cada fila) */
-   .tabla-parciales .table td:nth-child(n+9):nth-child(-n+21) input {
-    width: 30px;
-  }
