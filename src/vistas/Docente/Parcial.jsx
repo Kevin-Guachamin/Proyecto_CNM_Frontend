@@ -4,9 +4,9 @@ import Tabla from "../../components/Tabla";
 import axios from "axios";
 import { ErrorMessage } from "../../Utils/ErrorMesaje";
 import Swal from 'sweetalert2';
-//import "./Parcial.css";
+import "./Parcial.css";
 
-function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, activo }) {
+function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled }) {
 
   // ID dinámico: pdf-parcial1-quim1, pdf-parcial2-quim1, pdf-parcial1-quim2, etc.
   const idContenedor = `pdf-parcial${parcialSeleccionado}-quim${quimestreSeleccionado}`;
@@ -87,30 +87,48 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
   };
 
   // Función para calcular la valoración según la suma total de comportamiento
-  const calcularValoracion = (suma) => {
-    if (suma >= 10) return "A";
-    if (suma === 9) return "B";
-    if (suma >= 7) return "C";
-    if (suma >= 5) return "D";
-    return "E";
+  const calcularValoracion = (valor) => {
+    // 1) Truncar el valor (9.4 => 9)
+    const truncado = Math.floor(valor);
+  
+    // 2) Asignar la letra en función del entero
+    if (truncado === 10) return "A";
+    if (truncado === 9)  return "B";
+    if (truncado >= 7)  return "C"; // Esto abarca 7 y 8
+    if (truncado >= 5)  return "D"; // Esto abarca 5 y 6
+    return "E";                     // Menos de 5
   };
-
+  
+  function parseCampoNumerico(valor) {
+    if (typeof valor === "string" && valor.trim() === "") {
+      return null; // vacío
+    }
+    const parsed = parseFloat(valor);
+    return isNaN(parsed) ? null : parsed;
+  }
+  
   // 🔁 Transformador que ajusta la estructura a lo que necesita el backend
   const transformarDatosParaGuardar = (datos) => {
     return datos.map((fila) => {
-      const comportamiento = columnasComportamiento.map((col) => parseInt(fila[col]) || 0);
+      const comportamiento = columnasComportamiento.map((col) => {
+        const parsed = parseInt(fila[col]);
+        return isNaN(parsed) ? null : parsed;
+      });
+  
       return {
-        id_inscripcion: fila.idInscripcion, // 👈 cambia la clave a minúscula y con guión bajo      
-        insumo1: parseFloat(fila["INSUMO 1"]) || 0,
-        insumo2: parseFloat(fila["INSUMO 2"]) || 0,
-        evaluacion: parseFloat(fila["EVALUACIÓN SUMATIVA"]) || 0,
-        comportamiento: comportamiento,
+        id_inscripcion: fila.idInscripcion,
+        insumo1: parseCampoNumerico(fila["INSUMO 1"]),
+        insumo2: parseCampoNumerico(fila["INSUMO 2"]),
+        evaluacion: parseCampoNumerico(fila["EVALUACIÓN SUMATIVA"]),
+        comportamiento, // array con valores numéricos o null
         quimestre: obtenerEtiquetaQuimestre(),
         parcial: obtenerEtiquetaParcial(),
-        "Promedio Final": parseFloat(fila["PROMEDIO PARCIAL"]) || 0
+        "Promedio Final": parseCampoNumerico(fila["PROMEDIO PARCIAL"]),
+        "Promedio Comportamiento": parseCampoNumerico(fila["PROMEDIO COMPORTAMIENTO"])
       };
     });
   };
+  
 
   // ✅ Nuevo useEffect que envía datos transformados al padre
   useEffect(() => {
@@ -287,6 +305,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
         datos={datos}
         onChange={handleInputChange}
         columnasEditables={columnasEditables}
+        inputsDisabled={inputsDisabled}
       />
     </div>
   );

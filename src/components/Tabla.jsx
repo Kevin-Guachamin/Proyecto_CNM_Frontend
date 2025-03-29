@@ -10,9 +10,10 @@ const Tabla = ({
   onChange,
   columnasEditables = [],
   mostrarEditar = true,
-  mostrarEliminar = true,
+  mostrarGuardar = true,
   onEditar,
-  onEliminar
+  onGuardar,
+  inputsDisabled
 }) => {
   const columnasRepetidas = ["Nro", "Nómina de Estudiantes"];
   const columnaFinal = "Acciones";
@@ -73,14 +74,14 @@ const Tabla = ({
                               <i className="bi bi-pencil-fill" ></i>
                             </button>
                           )}
-                          {mostrarEliminar && (
+                          {mostrarGuardar && (
                             <button
-                              className="btn btn-sm btn-danger"
+                              className="btn btn-success-light btn-sm text-white"
                               onClick={() =>
-                                onEliminar ? onEliminar(i, fila) : console.log("Eliminar clicked", i)
+                                onGuardar ? onGuardar(i, fila) : console.log("Eliminar clicked", i)
                               }
                             >
-                              <i className="bi bi-trash-fill" ></i>
+                              <i className="bi bi-floppy2-fill" ></i>
                             </button>
                           )}
                         </div>
@@ -90,39 +91,85 @@ const Tabla = ({
                     // Renderizamos las celdas normales
                     const esEditable = columnasEditables.includes(col);
                     return (
-                      <td key={j} className="text-center">
+                      <td key={j} className={`text-center ${col === "PROMEDIO PARCIAL" &&
+                          !isNaN(parseFloat(fila[col])) &&
+                          parseFloat(fila[col]) < 7
+                          ? "text-danger-strong"
+                          : col === "Promedio Final" &&
+                            !isNaN(parseFloat(fila[col])) &&
+                            parseFloat(fila[col]) < 7
+                            ? "text-danger-strong"
+                            : ""
+                        }`}>
                         {/* Texto que solo se muestra en PDF */}
                         <span className="pdf-only">
                           {fila[col] !== undefined && fila[col] !== "" ? fila[col] : "-"}
                         </span>
                         {/* Vista normal: input si es editable, texto si no */}
                         {esEditable ? (
-                          <input
-                            type="text"
-                            value={fila[col] || ""}
-                            onChange={(e) => onChange(i, col, e.target.value)}
-                            onBlur={(e) => {
-                              const val = e.target.value;
-                              if (columnasFormateables.includes(col)) {
-                                const numero = parseFloat(val);
-                                if (!isNaN(numero)) {
-                                  onChange(i, col, numero.toFixed(2));
-                                }
-                              }
-                            }}
-                            className="form-control text-center screen-only"
-                            data-columna={col}
-                            disabled={
-                              col === "Examen Supletorio" &&
-                              (() => {
-                                const valor = fila["Promedio Anual"];
-                                const promedio = typeof valor === "string"
+                          col === "Examen Supletorio" ? (
+                            (() => {
+                              // Calculamos el promedio anual para decidir si mostrar input o no
+                              const valor = fila["Promedio Anual"];
+                              const promedio =
+                                typeof valor === "string"
                                   ? parseFloat(valor)
-                                  : parseFloat(valor?.props?.children);
-                                return promedio < 4;
-                              })()
-                            }
-                          />
+                                  : parseFloat(valor?.props?.children) || 0;
+                              // Si el promedio anual es mayor o igual a 7, mostramos solo "-" y no input
+                              if (promedio >= 7) {
+                                return <span className="screen-only">-</span>;
+                              } else {
+                                return (
+                                  <input
+                                    type="text"
+                                    value={fila[col] || ""}
+                                    onChange={(e) => onChange(i, col, e.target.value)}
+                                    onBlur={(e) => {
+                                      const val = e.target.value;
+                                      if (columnasFormateables.includes(col)) {
+                                        const numero = parseFloat(val);
+                                        if (!isNaN(numero)) {
+                                          onChange(i, col, numero.toFixed(2));
+                                        }
+                                      }
+                                    }}
+                                    className="form-control text-center screen-only"
+                                    data-columna={col}
+                                    disabled={
+                                      inputsDisabled || (
+                                        (() => {
+                                          const valor = fila["Promedio Anual"];
+                                          const promedio =
+                                            typeof valor === "string"
+                                              ? parseFloat(valor)
+                                              : parseFloat(valor?.props?.children) || 0;
+                                          return promedio < 4;
+                                        })()
+                                      )
+                                    }
+                                  />
+                                );
+                              }
+                            })()
+                          ) : (
+                            <input
+                              type="text"
+                              value={fila[col] || ""}
+                              onChange={(e) => onChange(i, col, e.target.value)}
+                              onBlur={(e) => {
+                                const val = e.target.value;
+                                if (columnasFormateables.includes(col)) {
+                                  const numero = parseFloat(val);
+                                  if (!isNaN(numero)) {
+                                    onChange(i, col, numero.toFixed(2));
+                                  }
+                                }
+                              }}
+                              className="form-control text-center screen-only"
+                              data-columna={col}
+                              disabled={inputsDisabled}
+                            />
+                          )
                         ) : (
                           <span className="screen-only">
                             {fila[col] !== undefined && fila[col] !== "" ? fila[col] : "-"}
