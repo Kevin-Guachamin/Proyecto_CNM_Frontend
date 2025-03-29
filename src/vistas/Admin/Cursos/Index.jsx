@@ -5,13 +5,14 @@ import Loading from "../../../components/Loading";
 import Contenedor from "./ContenedorCursos";
 import { modulesSettings } from "../Components/Modulos"
 
-import CrearCurso from "./CrearCurso";
+
 
 
 function Index() {
   const [usuario, setUsuario] = useState(null);
-  const headers = ["Paralelo", "Docente", "Materia", "Horario","Acciones"];
-  const filterKey = "nombre"
+  const headers = ["Nivel","Paralelo", "Docente", "Materia", "Días","Horario","Cupos","Acciones"];
+  const Columns= ["nivel","paralelo","Docente.nombre","dias","horario","cupos"]
+  const filterKey = "materia.nombre"
   const PK = "ID"
   
   useEffect(() => {
@@ -27,7 +28,7 @@ function Index() {
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
       <Layout modules={modulesSettings}>
-         <Contenedor  headers={headers}  filterKey={filterKey} apiEndpoint={"asignacion"} CrearEntidad={CrearCurso} PK={PK} />
+         <Contenedor  headers={headers}  filterKey={filterKey} apiEndpoint={"asignacion"}  PK={PK} />
 
       </Layout>
     </div>

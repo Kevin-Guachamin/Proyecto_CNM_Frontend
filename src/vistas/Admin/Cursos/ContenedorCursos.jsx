@@ -7,17 +7,30 @@ import axios from 'axios';
 import { ErrorMessage } from '../../../Utils/ErrorMesaje';
 import "../Styles/Contenedor.css"
 import Loading from "../../../components/Loading";
+import CrearCurso from "./CrearCurso";
+import { useEffect } from 'react';
 
 
-function Contenedor({ headers, columnsToShow, filterKey, apiEndpoint, CrearEntidad, PK, extraIcon, Paginación }) {
+function Contenedor({ headers, columnsToShow, filterKey, apiEndpoint, PK, extraIcon, Paginación }) {
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
     const [data, setData] = useState([])
     const [entityToUpdate, setEntityToUpdate] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [periodo, setPeriodo] = useState("")
+    const [periodos, setPeriodos] = useState([])
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
-    
 
+    useEffect(() => {
+        axios.get(`${API_URL}/periodo_academico/obtener`)
+            .then(response => {
+                setPeriodos(response.data);
+
+            })
+            .catch(error => {
+                ErrorMessage(error);
+            })
+    }, [API_URL])
     const obtenerAsignaciones = async (tipo) => {
         try {
             const response = await axios.get(`${API_URL}/${apiEndpoint}/nivel/${tipo}`);
@@ -64,22 +77,22 @@ function Contenedor({ headers, columnsToShow, filterKey, apiEndpoint, CrearEntid
         const agr = [BM, BS, BCH_BS, BCH]
         setData(agr)
     }
-    const HandleTable = (valor)=>{
-       if(valor ==="BE"){
-        AgruparBE()
-       }
-       if(valor === "BM"){
-        AgruparBM()
-       }
-       if(valor ==="BS"){
-        AgruparBS()
-       }
-       if(valor==="BCH"){
-        AgruparBCH()
-       }
-       if(valor ==="Agr"){
-        Agrupaciones()
-       }
+    const HandleTable = (valor) => {
+        if (valor === "BE") {
+            AgruparBE()
+        }
+        if (valor === "BM") {
+            AgruparBM()
+        }
+        if (valor === "BS") {
+            AgruparBS()
+        }
+        if (valor === "BCH") {
+            AgruparBCH()
+        }
+        if (valor === "Agr") {
+            Agrupaciones()
+        }
     }
 
     const filteredData = data.filter((item) => {
@@ -112,7 +125,7 @@ function Contenedor({ headers, columnsToShow, filterKey, apiEndpoint, CrearEntid
             <div>
                 <label >Seleccionar Grupo </label>
                 <select
-                    onChange={(e)=>HandleTable(e.target.value)}
+                    onChange={(e) => HandleTable(e.target.value)}
                     className="input-field"
                 >
                     <option value="">Selecciona un grupo </option>
@@ -123,11 +136,26 @@ function Contenedor({ headers, columnsToShow, filterKey, apiEndpoint, CrearEntid
                     <option value="Agr">Agrupaciones</option>
                 </select>
             </div>
+            <div>
+                <label >Seleccionar Año Lectivo </label>
+                <select
+                    onChange={(e) => setPeriodo(e.target.value)}
+                    className="input-field"
+                >
+                    <option value="">Seleccione un periodo</option>
+                    {periodos.map((periodo) => (
+                        <option key={periodo.ID} value={periodo.descripcion}>
+                            {periodo.descripcion}
+                        </option>
+                    ))}
+                </select>
+            </div>
             {isModalOpen && (
-                <CrearEntidad
+                <CrearCurso
                     onCancel={toggleModal}
                     entityToUpdate={entityToUpdate}
                     onSave={handleSaveEntity}
+                    periodo={periodo}
                 />
             )}
             {loading ? <Loading /> : <Tabla
