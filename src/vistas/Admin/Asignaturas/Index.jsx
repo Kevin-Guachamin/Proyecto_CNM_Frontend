@@ -14,18 +14,18 @@ function Index() {
   const [usuario, setUsuario] = useState(null);
   const [asignaturas, setAsginaturas] = useState([])
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
-  const headers = ["ID", "Nombre", "Acciones"];
-  const colums = ["ID", "nombre"]
+  const headers = ["ID", "Nombre", "Nivel","Edad mínima","Acciones"];
+  const colums = ["ID", "nombre","nivel","edadMin"]
   const filterKey = "nombre"
   const PK = "ID"
-
+  const storedUser = localStorage.getItem("usuario");
   useEffect(() => {
 
     ObtenerTodo(setAsginaturas, `${API_URL}/materia/obtener`, setLoading)
     // Mientras no se conecte al backend, dejamos un usuario de prueba
 
-    setUsuario({ nombre: "Juan Pérez", rol: "Estudiante" });
-  }, [API_URL]);
+    setUsuario({ nombre:storedUser.primer_nombre, rol: storedUser.subRol });
+  }, [API_URL,storedUser]);
 
   return (
     <div className="section-container">

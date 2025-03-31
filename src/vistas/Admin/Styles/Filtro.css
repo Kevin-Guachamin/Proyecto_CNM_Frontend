@@ -1,8 +1,18 @@
 /* Estilos para el filtro */
+.filtros {
+    display: flex;
+    flex-direction: row;
+    gap: 20px; /* Espacio entre los elementos */
+    justify-content: start;
+  }
+
+  .input-field {
+    width: 200px; /* Ajusta el tamaño de los select, puedes cambiarlo si lo deseas */
+  }
 .filter-container {
     display: flex;
     align-items: center; /* Alinea los elementos verticalmente */
-    margin-bottom: 20px;
+    margin-bottom: 0px;
 }
 
 .search-input {

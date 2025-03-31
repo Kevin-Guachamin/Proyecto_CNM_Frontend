@@ -2,32 +2,24 @@ import React, { useState, useEffect } from "react";
 import Header from "../../../components/Header";
 import Layout from '../../../layout/Layout'
 import Loading from "../../../components/Loading";
-import Contenedor from "../Components/Contenedor";
+import Contenedor from "./ContenedorCursos";
 import { modulesSettings } from "../Components/Modulos"
 import { ObtenerTodo } from "../../../Utils/CRUD/ObjetenerTodo";
-import CrearPeriodo from "./CrearPeriodo";
-import { Password } from "@mui/icons-material";
+
 
 
 function Index() {
-
-  const [loading, setLoading] = useState(true); // Estado para mostrar la carga
   const [usuario, setUsuario] = useState(null);
-  const [periodos, setPeriodos] = useState([])
+  const [asignaciones, setAsignaciones] = useState([])
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
-  const headers = ["Descripción", "Fecha inicio", "Fecha fin", "Estado", "Acciones"];
-  const colums = ["descripcion", "fecha_inicio", "fecha_fin", "estado"]
-  const filterKey = "descripcion"
+  const [loading, setLoading] = useState(false);
   const PK = "ID"
   
-
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = JSON.parse(storedUser);
-    ObtenerTodo(setPeriodos, `${API_URL}/periodo_academico/obtener`, setLoading)
-    // Mientras no se conecte al backend, dejamos un usuario de prueba
+    ObtenerTodo(setAsignaciones, `${API_URL}/asignacion/obtener`, setLoading)
     setUsuario(parsedUser);
-    
   }, [API_URL]);
 
   return (
@@ -37,7 +29,7 @@ function Index() {
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
       <Layout modules={modulesSettings}>
-        {loading ? <Loading /> : <Contenedor data={periodos} setData={setPeriodos} headers={headers} columnsToShow={colums} filterKey={filterKey} apiEndpoint={"periodo_academico"} CrearEntidad={CrearPeriodo} PK={PK} />}
+      {loading ? <Loading /> :<Contenedor data={asignaciones}  setData={setAsignaciones} setLoading={setLoading} apiEndpoint={"asignacion"}  PK={PK} />}
 
       </Layout>
     </div>
