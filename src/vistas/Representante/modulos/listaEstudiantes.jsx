@@ -4,6 +4,7 @@ import Tabla from '../../Representante/components/Tabla_Representante';
 import Header from "../../../components/Header";
 import VerDatosEstudiante from '../../Representante/modulos/VerDatosEstudiante';
 import { useNavigate } from "react-router-dom";
+import VerCalificacionesEstudiante from "./VerCalificacionesEstudiante";
 
 function ListaEstudiantes() {
   // Estado para almacenar la información del usuario conectado
@@ -11,11 +12,21 @@ function ListaEstudiantes() {
   const [datosEstudiante, setDatosEstudiante] = useState([]);
   const [estudianteSeleccionado, setEstudianteSeleccionado] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCalificacionesOpen, setIsCalificacionesOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const handleVerCalificaciones = (estudianteCedula) => {
-    console.log("ver detalles de: ", estudianteCedula);
-    // logica
+    console.log("ver calificaciones de: ", estudianteCedula);
+    try {
+      /* const respuesta = await axios.get(`http://localhost:8000/estudiante/obtener/${estudianteCedula}`);
+      setEstudianteSeleccionado(respuesta.data); */
+      setIsCalificacionesOpen(true);
+
+    } catch (error) {
+      console.log('Error al obtener las calificaciones del estudiante para el modal', error);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   const handleVerDatosEstudiante = async (estudianteCedula) => {
@@ -76,6 +87,7 @@ function ListaEstudiantes() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setIsCalificacionesOpen(false);
     setEstudianteSeleccionado(null);
   }
      
@@ -97,6 +109,13 @@ function ListaEstudiantes() {
             onCancel={handleCloseModal}
             isLoading={isLoading}
             entity={estudianteSeleccionado}
+          />
+        )}
+        
+        {/* Modal de calificaciones */}
+        {isCalificacionesOpen && (
+          <VerCalificacionesEstudiante
+            onCancel={handleCloseModal} 
           />
         )}
 
