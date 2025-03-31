@@ -10,12 +10,14 @@ export function Editar (dataToUpdate,newData, URL, setData, setIsModalOpen, PK,h
           .then((res) => {
             // Actualizamos el array de usuarios con la respuesta del servidor
             console.log("esto llego de la base después de editar", res.data)
-            setData((prevData) =>
-              prevData.map((data) =>
-                data[PK] === dataToUpdate[PK] ? res.data : data
-              )
+            setData((prevData) => {
+              // Comprobar el valor de prevData dentro de la actualización
+              console.log("prevData dentro de setData:", prevData);
               
-            );
+              return prevData.map((data) =>
+                data[PK] === dataToUpdate[PK] ? res.data : data
+              );
+            });
             
             setIsModalOpen(false); // Cerrar el modal
           })

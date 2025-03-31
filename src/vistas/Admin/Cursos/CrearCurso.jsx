@@ -17,11 +17,12 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
   const [cupos, setCupos] = useState("")
   const [docentes, setDocentes] = useState([])
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
+
   useEffect(() => {
     axios.get(`${API_URL}/docente/obtener`)
       .then(response => {
         setDocentes(response.data);
-        console.log("estos son los docentes:", docentes)
+        
       })
       .catch(error => {
         ErrorMessage(error);
@@ -41,12 +42,12 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
   }, [API_URL, setDocentes])
   useEffect(() => {
     if (entityToUpdate) {
-
+      
       setParalelo(entityToUpdate.paralelo || "");
       setDocente(entityToUpdate.Docente || "");
-      setAsignatura(entityToUpdate.Materia.nombre || "");
-      setDia1(entityToUpdate.dias[1] || "")
-      setDia2(entityToUpdate.dias[2] || "")
+      setAsignatura(entityToUpdate.Materia || "");
+      setDia1(entityToUpdate.dias[0] || "")
+      setDia2(entityToUpdate.dias[1] || "")
       setHoraInicio(entityToUpdate.horaInicio || "")
       setHoraFin(entityToUpdate.horaFin || "")
       setCupos(entityToUpdate.cupos || "")
@@ -54,10 +55,29 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
   }, [entityToUpdate]);
 
   const handleSubmit = () => {
+    
+    try {
+      if (!periodo) {
+        throw new Error("No se ha seleccionado un periodo");
+      }
+      let dias
+      if (dia1 === "") {
+        dias = [dia2]
+      }
+      else if (dia2 === "") {
+        dias = [dia1]
+      }
+      else {
+        dias = [dia1, dia2]
+      }
 
-    const dias = [dia1, dia2]
-    const newAsignacion = { paralelo, horaInicio, horaFin, dias, cupos, id_periodo_academico: periodo.id, nroCedula_docente: docente.nroCedula, id_materia: asignatura.ID };
-    onSave(newAsignacion);
+
+      const newAsignacion = { paralelo, horaInicio, horaFin, dias, cupos: Number(cupos), id_periodo_academico: Number(periodo), nroCedula_docente: docente.nroCedula, id_materia: Number(asignatura.ID) };
+      onSave(newAsignacion);
+    } catch (error) {
+      ErrorMessage(error)
+    }
+
   };
 
   return (
@@ -105,22 +125,25 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
             <input
               type="time"
               value={horaInicio}
-              onChange={(e) => setHoraInicio(e.target.value)}
-              // Intervalos de 15 minutos (900 segundos)
+              onChange={(e) => {setHoraInicio(e.target.value); // Guardar solo la hora y los minutos
+              }}
               min="07:00" // Inicio a las 7:00 AM
               max="19:00" // Fin a las 19:00 PM
             />
+
           </div>
           <div className='form-group'>
             <label htmlFor="">Horar fin</label>
             <input
               type="time"
               value={horaFin}
-              onChange={(e) => setHoraFin(e.target.value)}
-              // Intervalos de 15 minutos (900 segundos)
+              onChange={(e) => {
+                setHoraFin(e.target.value); // Guardar solo la hora y los minutos
+              }}
               min="07:00" // Inicio a las 7:00 AM
               max="19:00" // Fin a las 19:00 PM
             />
+
           </div>
           <div className="form-group">
             <label htmlFor="cupos">Cupos</label>

@@ -4,22 +4,23 @@ import Layout from '../../../layout/Layout'
 import Loading from "../../../components/Loading";
 import Contenedor from "./ContenedorCursos";
 import { modulesSettings } from "../Components/Modulos"
-
+import { ObtenerTodo } from "../../../Utils/CRUD/ObjetenerTodo";
 
 
 
 function Index() {
   const [usuario, setUsuario] = useState(null);
-  const headers = ["Nivel","Paralelo", "Docente", "Materia", "Días","Horario","Cupos","Acciones"];
-  const Columns= ["nivel","paralelo","Docente.nombre","dias","horario","cupos"]
-  const filterKey = "materia.nombre"
+  const [asignaciones, setAsignaciones] = useState([])
+  const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
+  const [loading, setLoading] = useState(false);
   const PK = "ID"
   
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = JSON.parse(storedUser);
+    ObtenerTodo(setAsignaciones, `${API_URL}/asignacion/obtener`, setLoading)
     setUsuario(parsedUser);
-  }, []);
+  }, [API_URL]);
 
   return (
     <div className="section-container">
@@ -28,7 +29,7 @@ function Index() {
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
       <Layout modules={modulesSettings}>
-         <Contenedor  headers={headers}  filterKey={filterKey} apiEndpoint={"asignacion"}  PK={PK} />
+      {loading ? <Loading /> :<Contenedor data={asignaciones}  setData={setAsignaciones} setLoading={setLoading} apiEndpoint={"asignacion"}  PK={PK} />}
 
       </Layout>
     </div>

@@ -3,11 +3,14 @@ import '../Styles/AutoCompleteInput.css'
 const AutoCompleteInput = ({ opciones, inputValue, setInputValue, key1, key2 }) => {
   const [filteredOptions, setFilteredOptions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-
+  const [input,setInput]=useState(`${inputValue[key1]} ${inputValue[key2]}`)
+  useEffect(() => {
+    setInput(`${inputValue[key1]} ${inputValue[key2]}`);
+  }, [inputValue,key1,key2]);
   // Función que maneja el cambio en el input
   const handleInputChange = (e) => {
     const value = e.target.value;
-    setInputValue(value);
+    setInput(value);
 
     if (value.trim() === "") {
       setFilteredOptions([]);
@@ -26,7 +29,9 @@ const AutoCompleteInput = ({ opciones, inputValue, setInputValue, key1, key2 }) 
 
   // Función que maneja el clic en una opción
   const handleOptionClick = (opcion) => {
-    setInputValue(`${opcion[key1]} ${opcion[key2]}`);
+    setInput(`${opcion[key1]} ${opcion[key2]}`);
+    setInputValue(opcion)
+
     setFilteredOptions([]);
     setShowSuggestions(false);
   };
@@ -50,7 +55,7 @@ const AutoCompleteInput = ({ opciones, inputValue, setInputValue, key1, key2 }) 
     <div className="autocomplete-container">
       <input
         type="text"
-        value={inputValue}
+        value={input}
         onChange={handleInputChange}
         placeholder="Escribe algo..."
         className="autocomplete-input"
