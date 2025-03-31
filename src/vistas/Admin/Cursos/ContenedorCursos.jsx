@@ -8,12 +8,13 @@ import { ErrorMessage } from '../../../Utils/ErrorMesaje';
 import "../Styles/Contenedor.css"
 import CrearCurso from "./CrearCurso";
 import { useEffect } from 'react';
+import Loading from '../../../components/Loading';
 
 
-function Contenedor({ data, setData, apiEndpoint, PK, extraIcon, Paginación, setLoading }) {
-
-    const [search, setSearch] = useState('');
-
+function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
+    const [data, setData] = useState([])
+    const [loading, setLoading] = useState(false);
+    const [search, setSearch] = useState('')
     const [entityToUpdate, setEntityToUpdate] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [periodo, setPeriodo] = useState("")
@@ -34,6 +35,21 @@ function Contenedor({ data, setData, apiEndpoint, PK, extraIcon, Paginación, se
                 ErrorMessage(error);
             })
     }, [API_URL])
+    const handlePeriodoChange = (e) => {
+        const selectedPeriodo = e.target.value;
+        setPeriodo(selectedPeriodo);
+
+        if (!selectedPeriodo) return; // Evitar peticiones innecesarias
+
+        axios.get(`${API_URL}/asignacion/obtener/periodo/${selectedPeriodo}`)
+            .then(response => {
+                setData(response.data);
+            })
+            .catch(error => {
+                ErrorMessage(error);
+            });
+    };
+
     const obtenerAsignaciones = async (tipo) => {
         try {
             if (!periodo) {
@@ -62,6 +78,9 @@ function Contenedor({ data, setData, apiEndpoint, PK, extraIcon, Paginación, se
     };
 
     const HandleTable = (valor) => {
+        if (!periodo) {
+            return false
+        }
         const grupos = {
             "BE": ["1ro BE", "2do BE"],
             "BM": ["1ro BM", "2do BM", "3ro BM"],
@@ -72,6 +91,16 @@ function Contenedor({ data, setData, apiEndpoint, PK, extraIcon, Paginación, se
 
         if (grupos[valor]) {
             agruparAsignaciones(grupos[valor]);
+        }
+        else{
+            console.log("este es el periodo ID",periodo)
+            axios.get(`${API_URL}/asignacion/obtener/periodo/${periodo}`)
+            .then(response => {
+                setData(response.data);
+            })
+            .catch(error => {
+                ErrorMessage(error);
+            });
         }
         console.log("Esta es la data", data);
     };
@@ -105,35 +134,43 @@ function Contenedor({ data, setData, apiEndpoint, PK, extraIcon, Paginación, se
 
     return (
         <div className='Contenedor-general'>
-            <div className='filtros'> 
-            <div className='form-group'>
-                
-                <select
-                    onChange={(e) => setPeriodo(e.target.value)}
-                    className="input-field"
-                >
-                    <option value="">Seleccione un periodo</option>
-                    {periodos.map((periodo) => (
-                        <option key={periodo.ID} value={periodo.ID}>
-                            {periodo.descripcion}
-                        </option>
-                    ))}
-                </select>
-            </div>
-            <div className='form-group'>
-                <select
-                    onChange={(e) => HandleTable(e.target.value)}
-                    className="input-field"
-                >
-                    <option value="">Selecciona un grupo </option>
-                    <option value="BE">Básico Elemental</option>
-                    <option value="BM">Básico Medio</option>
-                    <option value="BS">Básico Superior</option>
-                    <option value="BCH">Bachillerato</option>
-                    <option value="Agr">Agrupaciones</option>
-                </select>
-            </div>
-            <Filtro search={search} setSearch={setSearch} toggleModal={toggleModal} filterKey={key1} />
+            {!periodo && (
+                <label className="label-error">
+                    *Se requiere un periodo
+                </label>
+            )}
+            <div className='filtros'>
+
+                <div className='form-group'>
+
+                    <select
+                        onChange={handlePeriodoChange}
+                        className="input-field"
+                    >
+                        <option value="">Seleccione un periodo</option>
+                        {periodos.map((periodo) => (
+                            <option key={periodo.ID} value={periodo.ID}>
+                                {periodo.descripcion}
+                            </option>
+                        ))}
+                    </select>
+
+
+                </div>
+                <div className='form-group'>
+                    <select
+                        onChange={(e) => HandleTable(e.target.value)}
+                        className="input-field"
+                    >
+                        <option value="">Selecciona un grupo </option>
+                        <option value="BE">Básico Elemental</option>
+                        <option value="BM">Básico Medio</option>
+                        <option value="BS">Básico Superior</option>
+                        <option value="BCH">Bachillerato</option>
+                        <option value="Agr">Agrupaciones</option>
+                    </select>
+                </div>
+                <Filtro search={search} setSearch={setSearch} toggleModal={toggleModal} filterKey={key1} />
             </div>
             {isModalOpen && (
                 <CrearCurso
@@ -143,7 +180,7 @@ function Contenedor({ data, setData, apiEndpoint, PK, extraIcon, Paginación, se
                     periodo={periodo}
                 />
             )}
-            <Tabla
+            {loading ? <Loading /> : <Tabla
                 filteredData={filteredData}
                 OnEdit={handleEdit}
                 OnDelete={handleDelete}
@@ -151,6 +188,7 @@ function Contenedor({ data, setData, apiEndpoint, PK, extraIcon, Paginación, se
                 columnsToShow={Columns}
                 extraIcon={extraIcon}
             />
+            }
             {Paginación && data.length > 0 && <div className='Paginación'>{Paginación}</div>}
         </div>
     );

@@ -111,6 +111,11 @@
     transition: all 0.2s ease-in-out;
     
 }
+.selected{
+  display: flex;
+  flex-direction: column;
+  
+}
 .react-datepicker__input-container{
  
   display: flex;
