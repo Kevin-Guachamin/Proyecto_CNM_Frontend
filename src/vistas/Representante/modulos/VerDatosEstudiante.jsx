@@ -9,6 +9,7 @@ function ViewDataEstudiante({onCancel, isLoading, entity }) {
   const [primer_apellido, setPrimerApellido] = useState("");
   const [segundo_nombre, setSegundoNombre] =  useState("");
   const [segundo_apellido, setSegundoApellido] = useState("");
+  const [nivel, setNivel] = useState("");
   const [genero, setGenero] = useState("");
   const [anioMatricula, setAnioMatricula] = useState("");
   const [jornada, setJornada] = useState("");
@@ -36,6 +37,7 @@ function ViewDataEstudiante({onCancel, isLoading, entity }) {
       setPrimerApellido(entity.primer_apellido || "");
       setSegundoNombre(entity.segundo_nombre || "");
       setSegundoApellido(entity.segundo_apellido || "");
+      setNivel(entity.nivel || "");
       setGenero(entity.genero || "");
       setAnioMatricula(entity.anioMatricula || "");
       setJornada(entity.jornada || "");
@@ -68,7 +70,8 @@ function ViewDataEstudiante({onCancel, isLoading, entity }) {
                 <input id="nroCedula" value={nroCedula} onChange={(e) => setNroCedula(e.target.value)} placeholder="Ingrese un número de cédula" />
               </div>  
               <div className="form-group">
-                <label></label>
+                <label htmlFor="nivel">Nivel:</label>
+                <input id="nivel" value={nivel} onChange={(e) => setNroCedula(e.target.value)} placeholder="Ingrese el nivel" />
               </div>
             </div>
             
