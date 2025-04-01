@@ -30,6 +30,8 @@ function Index() {
 
   useEffect(() => {
     setLoading(true)
+    const storedUser = localStorage.getItem("usuario");
+    const parsedUser = JSON.parse(storedUser);
     axios.get(`${API_URL}/estudiante/obtener?page=${page}`)
       .then(response => {
 
@@ -44,7 +46,7 @@ function Index() {
 
     // Mientras no se conecte al backend, dejamos un usuario de prueba
 
-    setUsuario({ nombre: "Juan Pérez", rol: "Estudiante" });
+    setUsuario(parsedUser);
   }, [API_URL, page]);
 
   return (
