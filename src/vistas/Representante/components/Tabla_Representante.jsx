@@ -27,6 +27,7 @@ const Tabla = ({datos, isLoading, handleVerCalificaciones, handleVerDatosEstudia
     const handleOnClick = () => {
         navigate('/representante'); // Usa el navigate ya definido
     }
+    
 
     // Tabla de los estudiantes a cargo del REPRESENTANTE
    return(
@@ -36,7 +37,7 @@ const Tabla = ({datos, isLoading, handleVerCalificaciones, handleVerDatosEstudia
                 <thead>
                     <tr className="bg-primary-subtle">
                         <th scope="col" className="text-center bg-primary-subtle"> Estudiante </th>
-                        <th scope="col" className="text-center bg-primary-subtle"> Jornada </th>
+                        <th scope="col" className="text-center bg-primary-subtle"> Nivel </th>
                         <th scope="col" className="text-center bg-primary-subtle"> Especialidad</th>
                         <th scope="col" className="text-center bg-primary-subtle"> Accion </th>
                     </tr>
@@ -52,18 +53,18 @@ const Tabla = ({datos, isLoading, handleVerCalificaciones, handleVerDatosEstudia
                                         {estudiante.primer_apellido ?? '-'}{' '}
                                         {estudiante.segundo_apellido ?? '-'}{' '}
                                     </td>
-                                    <td className="text-center"> {estudiante.jornada} </td>
+                                    <td className="text-center"> {estudiante.nivel} </td>
                                     <td className="text-center"> {estudiante.especialidad} </td>
                                     <td className="text-center">
                                         <i
                                             className="bi bi-card-checklist text-primary mx-2 fs-3"
-                                            onClick={() => handleVerCalificaciones(estudiante.id)}
+                                            onClick={() => handleVerCalificaciones(estudiante.nroCedula)}
                                             title="Ver calificaciones"
                                             style={{ cursor: 'pointer' }}
                                         ></i>
                                         <i
                                             className="bi bi-info-circle text-info mx-2 fs-3"
-                                            onClick={() => handleVerDatosEstudiante(estudiante.id)}
+                                            onClick={() => handleVerDatosEstudiante(estudiante.nroCedula)}
                                             title="Ver información"
                                             style={{ cursor: 'pointer' }}
                                         ></i>
