@@ -1,20 +1,16 @@
 import React from "react";
+import { useState } from "react";
+import Swal from "sweetalert2";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./Tabla.css";
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import "./Tabla.css";
 
 const Tabla = ({
-  columnas,
-  columnasAgrupadas,
-  datos,
-  onChange,
-  columnasEditables = [],
-  mostrarEditar = true,
-  mostrarGuardar = true,
-  onEditar,
-  onGuardar,
-  inputsDisabled
-}) => {
+  columnas, columnasAgrupadas, datos, onChange, columnasEditables = [],
+  mostrarEditar = true, mostrarGuardar = true, onEditar, onGuardar, inputsDisabled, 
+  isWithinRange,rangoTexto }) => {
+  
+  const [editingRow, setEditingRow] = useState(null);
   const columnasRepetidas = ["Nro", "Nómina de Estudiantes"];
   const columnaFinal = "Acciones";
   const columnasFinales = [...columnasRepetidas, ...columnas, columnaFinal];
@@ -67,20 +63,31 @@ const Tabla = ({
                           {mostrarEditar && (
                             <button
                               className="btn btn-sm btn-primary text-white"
-                              onClick={() =>
-                                onEditar ? onEditar(i, fila) : console.log("Editar clicked", i)
-                              }
-                            >
+                              onClick={() => {
+                                if (!isWithinRange) {
+                                  Swal.fire({
+                                    icon: rangoTexto ? "warning" : "info",
+                                    title: rangoTexto ? "Fuera de fecha" : "Fechas no definidas",
+                                    text: rangoTexto 
+                                      ? "No se puede editar fuera del rango de fechas establecido." 
+                                      : "Aún no se han definido fechas para esta sección.",
+                                  });
+                                  return;
+                                }                            
+                                console.log("Pencil clicked: setEditingRow =>", i);
+                                setEditingRow(i); // Habilita la edición para esta fila.
+                                if (onEditar) onEditar(i, fila);
+                              }}>
                               <i className="bi bi-pencil-fill" ></i>
                             </button>
                           )}
                           {mostrarGuardar && (
                             <button
                               className="btn btn-success-light btn-sm text-white"
-                              onClick={() =>
-                                onGuardar ? onGuardar(i, fila) : console.log("Eliminar clicked", i)
-                              }
-                            >
+                              onClick={() => {
+                                if (onGuardar) onGuardar(i, fila);
+                                setEditingRow(null); // Sale del modo edición.
+                              }}>
                               <i className="bi bi-floppy2-fill" ></i>
                             </button>
                           )}
@@ -135,18 +142,7 @@ const Tabla = ({
                                     }}
                                     className="form-control text-center screen-only"
                                     data-columna={col}
-                                    disabled={
-                                      inputsDisabled || (
-                                        (() => {
-                                          const valor = fila["Promedio Anual"];
-                                          const promedio =
-                                            typeof valor === "string"
-                                              ? parseFloat(valor)
-                                              : parseFloat(valor?.props?.children) || 0;
-                                          return promedio < 4;
-                                        })()
-                                      )
-                                    }
+                                    disabled={inputsDisabled || editingRow !== i || (promedio < 4)}
                                   />
                                 );
                               }
@@ -167,7 +163,7 @@ const Tabla = ({
                               }}
                               className="form-control text-center screen-only"
                               data-columna={col}
-                              disabled={inputsDisabled}
+                              disabled={inputsDisabled || editingRow !== i}
                             />
                           )
                         ) : (

@@ -1,19 +1,16 @@
+// Inicio.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Modulo from "../components/Modulo";
 import Header from "../components/Header";
 import Loading from "../components/Loading";
+import Modulo from "../components/Modulo"; // O el componente que uses para mostrar los módulos
+import { getModulos } from "./getModulos";
 
 const Inicio = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [usuario, setUsuario] = useState(null);
-
-  const [modulos] = useState([
-    { id: 1, titulo: "Información Estudiantil", icono: "📄", link: "/informacion" },
-    { id: 2, titulo: "Matriculación", icono: "✏️", link: "/matriculacion" },
-    { id: 3, titulo: "Calificaciones", icono: "📊", link: "/panelcursos"},
-  ]);
+  const [modulos, setModulos] = useState([]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
@@ -21,25 +18,22 @@ const Inicio = () => {
 
     if (storedUser && storedToken) {
       const parsedUser = JSON.parse(storedUser);
-
-      if (parsedUser.rol !== "docente") {
+      if (!["Profesor", "Vicerrector", "Secretaria"].includes(parsedUser.subRol)) {
         navigate("/");
         return;
       }
-
       setUsuario(parsedUser);
+      // No incluimos "Inicio" porque ya estamos en la vista Inicio
+      setModulos(getModulos(parsedUser.subRol, false));
     } else {
       navigate("/");
     }
   }, [navigate]);
 
   const handleModuloClick = (modulo) => {
-    setLoading(true);
-    setTimeout(() => {
-      navigate(modulo.link); // accedes a la propiedad link del objeto
-    }, 800);
+    // Ejemplo de navegación
+    navigate(modulo.link);
   };
-  
 
   if (loading) {
     return <Loading />;

@@ -615,6 +615,93 @@ function Calificaciones() {
     return <Loading />;
   }
 
+  const handleEditar = (rowIndex, rowData) => {
+    console.log("Editar fila:", rowIndex, rowData);
+    // Limpiar el flag en localStorage y desbloquear la edición
+    localStorage.removeItem("inputsLocked");
+    setInputsDisabled(false);
+  };
+  
+  const [estadoFechas, setEstadoFechas] = useState({});
+  const [textoRangoFechas, setTextoRangoFechas] = useState({});
+
+  // ✅ Función para convertir "D/M/YYYY" a objeto Date válido
+  const parseFecha = (strFecha) => {
+    const [dia, mes, anio] = strFecha.split("/");
+    return new Date(`${anio}-${mes}-${dia}`);
+  };
+
+  useEffect(() => {
+    const verificarFechas = async () => {
+      const mapping = {
+        "parcial1-quim1": "parcial1_quim1",
+        "parcial2-quim1": "parcial2_quim1",
+        "quimestral-quim1": "quimestre1",
+        "parcial1-quim2": "parcial1_quim2",
+        "parcial2-quim2": "parcial2_quim2",
+        "quimestral-quim2": "quimestre2",
+        "notaFinal": "nota_final"
+      };
+  
+      let activeSubTab = null;
+      if (activeMainTab === "quimestre1") {
+        activeSubTab = activeSubTabQuim1;
+      } else if (activeMainTab === "quimestre2") {
+        activeSubTab = activeSubTabQuim2;
+      } else if (activeMainTab === "notaFinal") {
+        activeSubTab = "notaFinal";
+      }
+  
+      const claveDescripcion = mapping[activeSubTab];
+      if (!claveDescripcion) return;
+  
+      try {
+        const resp = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/fechas_notas/obtener`);
+        const data = resp.data;
+        const registro = data.find(item => item.descripcion === claveDescripcion);
+  
+        if (!registro) {
+          Swal.fire({
+            icon: "warning",
+            title: "Fecha por definirse",
+            text: "Aún no se han definido las fechas para esta sección.",
+          });
+  
+          setEstadoFechas(prev => ({ ...prev, [activeSubTab]: false }));
+          setTextoRangoFechas(prev => ({ ...prev, [activeSubTab]: "" }));
+          return;
+        }
+        
+        const fechaResp = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/fechas_notas/fecha_actual`);
+        const hoy = parseFecha(fechaResp.data.fechaActual);
+        const fechaInicio = parseFecha(registro.fecha_inicio);
+        const fechaFin = parseFecha(registro.fecha_fin);
+  
+        const estaDentro = hoy >= fechaInicio && hoy <= fechaFin;
+  
+        const formatearFecha = (fechaStr) => {
+          const [dia, mes, anio] = fechaStr.split("/");
+          const diaF = dia.padStart(2, "0");
+          const mesF = mes.padStart(2, "0");
+          return `${diaF}/${mesF}/${anio}`;
+        };
+        
+        const rangoTexto = `Disponible del ${formatearFecha(registro.fecha_inicio)} al ${formatearFecha(registro.fecha_fin)}`;
+        
+        setEstadoFechas(prev => ({ ...prev, [activeSubTab]: estaDentro }));
+        setTextoRangoFechas(prev => ({ ...prev, [activeSubTab]: rangoTexto }));
+  
+      } catch (error) {
+        console.error("Error al verificar fechas:", error);
+        ErrorMessage(error);
+        setEstadoFechas(prev => ({ ...prev, [activeSubTab]: false }));
+        setTextoRangoFechas(prev => ({ ...prev, [activeSubTab]: "Error al obtener fechas" }));
+      }
+    };
+  
+    verificarFechas();
+  }, [activeMainTab, activeSubTabQuim1, activeSubTabQuim2]);
+
   return (
     <>
       <div className="container-fluid p-0">
@@ -674,6 +761,9 @@ function Calificaciones() {
                       datosModulo={datosModulo}
                       activo={activeMainTab === "quimestre1" && activeSubTabQuim1 === "parcial1-quim1"}
                       inputsDisabled={inputsDisabled}
+                      onEditar={handleEditar}
+                      isWithinRange={estadoFechas["parcial1-quim1"] ?? false}
+                      rangoTexto={textoRangoFechas["parcial1-quim1"]}
                     />
                   </Tab>
 
@@ -685,6 +775,9 @@ function Calificaciones() {
                       datosModulo={datosModulo}
                       activo={activeMainTab === "quimestre1" && activeSubTabQuim1 === "parcial2-quim1"}
                       inputsDisabled={inputsDisabled}
+                      onEditar={handleEditar}
+                      isWithinRange={estadoFechas["parcial2-quim1"] ?? false}
+                      rangoTexto={textoRangoFechas["parcial2-quim1"]}
                     />
                   </Tab>
 
@@ -696,6 +789,9 @@ function Calificaciones() {
                       actualizarDatosQuim={handleActualizarQuim1}
                       datosModulo={datosModulo}
                       inputsDisabled={inputsDisabled}
+                      onEditar={handleEditar}
+                      isWithinRange={estadoFechas["quimestral-quim1"] ?? false}
+                      rangoTexto={textoRangoFechas["quimestral-quim1"]}
                     />
                   </Tab>
                 </Tabs>
@@ -712,6 +808,9 @@ function Calificaciones() {
                       datosModulo={datosModulo}
                       activo={activeMainTab === "quimestre2" && activeSubTabQuim2 === "parcial1-quim2"}
                       inputsDisabled={inputsDisabled}
+                      onEditar={handleEditar}
+                      isWithinRange={estadoFechas["parcial1-quim2"] ?? false}
+                      rangoTexto={textoRangoFechas["parcial1-quim2"]}
                     />
                   </Tab>
 
@@ -723,6 +822,9 @@ function Calificaciones() {
                       datosModulo={datosModulo}
                       activo={activeMainTab === "quimestre2" && activeSubTabQuim2 === "parcial2-quim2"}
                       inputsDisabled={inputsDisabled}
+                      onEditar={handleEditar}
+                      isWithinRange={estadoFechas["parcial2-quim2"] ?? false}
+                      rangoTexto={textoRangoFechas["parcial2-quim2"]}
                     />
                   </Tab>
 
@@ -734,6 +836,9 @@ function Calificaciones() {
                       actualizarDatosQuim={handleActualizarQuim2}
                       datosModulo={datosModulo}
                       inputsDisabled={inputsDisabled}
+                      onEditar={handleEditar}
+                      isWithinRange={estadoFechas["quimestral-quim2"] ?? false}
+                      rangoTexto={textoRangoFechas["quimestral-quim2"]}
                     />
                   </Tab>
                 </Tabs>
@@ -748,6 +853,9 @@ function Calificaciones() {
                     datosModulo={datosModulo}
                     actualizarDatosFinal={handleActualizarFinal}
                     inputsDisabled={inputsDisabled}
+                    onEditar={handleEditar}
+                    isWithinRange={estadoFechas["notaFinal"] ?? false}
+                    rangoTexto={textoRangoFechas["notaFinal"]}
                   />
                 </div>
               </Tab>

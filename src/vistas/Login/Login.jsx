@@ -4,15 +4,18 @@ import axios from "axios";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import Input from "../../components/Input";
+import Loading from "../../components/Loading";
 import "./Login.css";
 
 function Login() {
   const navigate = useNavigate();
   const [nroCedula, setnroCedula] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true); // Activa el loading justo después de enviar el formulario
     try {
       // Realizar la solicitud POST usando cédula y contraseña (enviado como "contraseña")
       const response = await axios.post(`${import.meta.env.VITE_URL_DEL_BACKEND}/login`, {
@@ -34,6 +37,9 @@ function Login() {
       } 
       else if(user.subRol==="Administrador"){
         navigate("/admin")
+      }
+      else if(user.subRol==="Vicerrector"){
+        navigate("/inicio")
       }
       else {
         // Aquí se puede agregar lógica para otros rols en el futuro
@@ -58,6 +64,10 @@ function Login() {
       setnroCedula(onlyNumbers);
     }
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <>
