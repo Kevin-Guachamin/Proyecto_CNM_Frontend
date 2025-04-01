@@ -12,7 +12,7 @@ const Inicio = () => {
 
   const [modulos] = useState([
     { id: 1, titulo: "Configuración", icono: <Settings size={32} className="text-gray-700" />, link: "/admin/periodos" },
-    { id: 2, titulo: "Matriculación", icono: "✏️", link: "/matriculacion" },
+    { id: 2, titulo: "Matriculación", icono: "✏️", link: "/admin/matriculacion" },
     { id: 3, titulo: "Calificaciones", icono: <Clipboard size={20}/>, path:"/admin/calificaciones", link: "/panelcursos"},
   ]);
 

@@ -86,7 +86,8 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
             "BM": ["1ro BM", "2do BM", "3ro BM"],
             "BS": ["1ro BS", "2do BS", "3ro BS"],
             "BCH": ["1ro BCH", "2do BCH", "3ro BCH"],
-            "Agr": ["BM", "BS", "BCH", "BS BCH"]
+            "Agr": ["BM", "BS", "BCH", "BS BCH"],
+            
         };
 
         if (grupos[valor]) {
@@ -168,6 +169,7 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
                         <option value="BS">Básico Superior</option>
                         <option value="BCH">Bachillerato</option>
                         <option value="Agr">Agrupaciones</option>
+                        
                     </select>
                 </div>
                 <Filtro search={search} setSearch={setSearch} toggleModal={toggleModal} filterKey={key1} />

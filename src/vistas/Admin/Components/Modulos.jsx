@@ -1,4 +1,4 @@
-import { GraduationCap, Book, Home} from "lucide-react";
+import { GraduationCap, Book, Home,NotebookPen} from "lucide-react";
 import { FaBuilding } from "react-icons/fa";
 import { BiMaleFemale } from "react-icons/bi";
 import { ImUserTie } from "react-icons/im";
@@ -12,7 +12,8 @@ export const modulesSettings = [
 ];
 
 export const modulesMatricula = [
-  { name: "Cursos"}
+  {name: "Inicio",icon: <Home size={20}/>, path: "/admin"},
+  { name: "Inscripción",icon: <NotebookPen size={20}/>, path: "/admin/matriculacion"}
 ]
 
 export const modulesEstudiates=[

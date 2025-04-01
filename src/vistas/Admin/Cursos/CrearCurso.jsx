@@ -72,7 +72,7 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
       }
 
 
-      const newAsignacion = { paralelo, horaInicio, horaFin, dias, cupos: Number(cupos), id_periodo_academico: Number(periodo), nroCedula_docente: docente.nroCedula, id_materia: Number(asignatura.ID) };
+      const newAsignacion = { paralelo, horaInicio, horaFin, dias, cupos: Number(cupos), id_periodo_academico: Number(periodo), nroCedula_docente: docente.nroCedula, id_materia: Number(asignatura.ID) ,cuposDisponibles: Number(cupos)};
       onSave(newAsignacion);
     } catch (error) {
       ErrorMessage(error)
