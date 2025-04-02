@@ -7,7 +7,6 @@ import Swal from 'sweetalert2';
 import "./Parcial.css";
 
 function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto }) {
-
   // ID dinámico: pdf-parcial1-quim1, pdf-parcial2-quim1, pdf-parcial1-quim2, etc.
   const idContenedor = `pdf-parcial${parcialSeleccionado}-quim${quimestreSeleccionado}`;
 
@@ -145,7 +144,6 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
     if (actualizarDatosParcial && datosCompletos.length > 0) {
       const datosTransformados = transformarDatosParaGuardar(datos);
       actualizarDatosParcial(datosTransformados);
-      console.log(`🚀 Datos enviados desde Parcial ${parcialSeleccionado} - Quimestre ${quimestreSeleccionado}:`, datosTransformados);
     }
   }, [datos, actualizarDatosParcial, quimestreSeleccionado, parcialSeleccionado]);
 
@@ -312,7 +310,6 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
         setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
       })
       .catch((error) => {
-        console.error("❌ Error al cargar datos combinados:", error);
         ErrorMessage(error);
       });
   }, [datosModulo, quimestreSeleccionado, parcialSeleccionado]);
@@ -366,7 +363,6 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
         setDatosOriginales(nuevaCopia);
       })
       .catch((error) => {
-        console.error("❌ Error actualizando:", error);
         Swal.fire({
           icon: "error",
           title: "Error al actualizar ❌.",
@@ -394,6 +390,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
         onEditar={onEditar}
         onGuardar={handleGuardar}
         rangoTexto={rangoTexto}
+        isWithinRange={isWithinRange}
       />
     </div>
   );
