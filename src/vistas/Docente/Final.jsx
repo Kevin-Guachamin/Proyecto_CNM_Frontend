@@ -23,7 +23,6 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
     if (truncado >= 5)  return "D"; // Esto abarca 5 y 6
     return "E";                     // Menos de 5
   };
-  
 
   const abreviarNivel = (nivel) => {
     if (!nivel || typeof nivel !== "string") return "";
@@ -83,7 +82,6 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
           const q1PF = parseFloat(quim1["Promedio Completo"]) || 0;
           const q2PF = parseFloat(quim2["Promedio Completo"]) || 0;
           const promedioAnual = (q1PF + q2PF) / 2;
-          console.log(quim1, quim2)
           // Tomar los promedios de comportamiento (numéricos)
           const q1PC = parseFloat(quim1["Promedio Comportamiento Completo"]) || 0;
           const q2PC = parseFloat(quim2["Promedio Comportamiento Completo"]) || 0;
@@ -135,7 +133,6 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
         setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
       })
       .catch((err) => {
-        console.error("❌ Error cargando datos finales:", err);
         ErrorMessage(err);
       });
   }, [datosModulo, quim1Data, quim2Data]);
@@ -150,8 +147,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
     if (typeof actualizarDatosFinal === "function") {
       const datosTransformados = transformarDatosFinalParaGuardar(datos);
       actualizarDatosFinal(datosTransformados);
-      console.log("🚀 Datos finales preparados:", datosTransformados);
-    }
+      }
   }, [datos, actualizarDatosFinal]);
 
   // Manejar cambios en la columna "Examen Supletorio"
@@ -160,8 +156,6 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
     if (columnName === "Examen Supletorio") {
       // A) Tomamos la versión numérica pura
       const pAnualNum = datos[rowIndex]._promedioAnual || 0;
-      console.log("pAnualNum =>", pAnualNum);
-  
       // B) Validamos
       if (pAnualNum < 4) {
         Swal.fire({
@@ -328,7 +322,6 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
         setDatos(nuevaCopia);
       })
       .catch((error) => {
-        console.error("❌ Error actualizando examen supletorio:", error);
         Swal.fire({
           icon: "error",
           title: "Error al actualizar ❌",
@@ -361,6 +354,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
         onEditar={onEditar}
         onGuardar={handleGuardar}
         rangoTexto={rangoTexto}
+        isWithinRange={isWithinRange}
       />
     </div>
   );

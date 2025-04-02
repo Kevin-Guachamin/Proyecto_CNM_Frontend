@@ -9,7 +9,6 @@ const Tabla = ({
   columnas, columnasAgrupadas, datos, onChange, columnasEditables = [],
   mostrarEditar = true, mostrarGuardar = true, onEditar, onGuardar, inputsDisabled, 
   isWithinRange,rangoTexto }) => {
-  
   const [editingRow, setEditingRow] = useState(null);
   const columnasRepetidas = ["Nro", "Nómina de Estudiantes"];
   const columnaFinal = "Acciones";
@@ -74,7 +73,6 @@ const Tabla = ({
                                   });
                                   return;
                                 }                            
-                                console.log("Pencil clicked: setEditingRow =>", i);
                                 setEditingRow(i); // Habilita la edición para esta fila.
                                 if (onEditar) onEditar(i, fila);
                               }}>

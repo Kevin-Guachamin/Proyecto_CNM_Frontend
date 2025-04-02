@@ -121,10 +121,8 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
         setDatos(nuevosDatos);
         setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
         actualizarDatosQuim(nuevosDatos);        
-        console.log("✅ Datos Quimestral cargados:", nuevosDatos);
       })
       .catch(err => {
-        console.error("❌ Error cargando Quimestrales:", err);
         ErrorMessage(err);
       });
   }, [datosModulo, parcial1Data, parcial2Data, quimestreSeleccionado]);
@@ -140,7 +138,6 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
     if (typeof actualizarDatosQuim === "function" && datosCompletos.length > 0) {
       const datosTransformados = transformarDatosQuimestralParaGuardar(datosCompletos);
       actualizarDatosQuim(datosTransformados);
-      console.log(`🚀 Datos enviados desde Quimestral Quimestre ${quimestreSeleccionado}:`, datosTransformados);
     }
   }, [datos, actualizarDatosQuim, quimestreSeleccionado]);
 
@@ -287,7 +284,6 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
         setDatosOriginales(copia);
       })
       .catch((error) => {
-        console.error("❌ Error actualizando quimestral:", error);
         Swal.fire({
           icon: "error",
           title: "Error al actualizar ❌.",
@@ -319,6 +315,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
         onEditar={onEditar}
         onGuardar={handleGuardar}
         rangoTexto={rangoTexto}
+        isWithinRange={isWithinRange}
       />
     </div>
   );

@@ -627,10 +627,14 @@ function Calificaciones() {
 
   // ✅ Función para convertir "D/M/YYYY" a objeto Date válido
   const parseFecha = (strFecha) => {
+    if (!strFecha) return null;
+    // Si ya viene en formato ISO ("YYYY-MM-DD"), lo usamos directamente
+    if (strFecha.includes("-")) return new Date(strFecha);
+    // Si viene en formato "DD/MM/YYYY", lo convertimos a "YYYY-MM-DD"
     const [dia, mes, anio] = strFecha.split("/");
-    return new Date(`${anio}-${mes}-${dia}`);
+    return new Date(`${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`);
   };
-
+  
   useEffect(() => {
     const verificarFechas = async () => {
       const mapping = {
@@ -656,9 +660,13 @@ function Calificaciones() {
       if (!claveDescripcion) return;
   
       try {
-        const resp = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/fechas_notas/obtener`);
+        // Obtener las fechas definidas en el backend
+        const resp = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/fechas_notas/obtener_todo`);
         const data = resp.data;
         const registro = data.find(item => item.descripcion === claveDescripcion);
+  
+        // Imprime el registro para ver los valores de fecha_inicio y fecha_fin
+        console.log("Registro para", claveDescripcion, ":", registro);
   
         if (!registro) {
           Swal.fire({
@@ -671,23 +679,34 @@ function Calificaciones() {
           setTextoRangoFechas(prev => ({ ...prev, [activeSubTab]: "" }));
           return;
         }
-        
+  
+        // Obtener la fecha actual del backend
         const fechaResp = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/fechas_notas/fecha_actual`);
+  
+        // Imprime la fecha actual recibida
+        console.log("Fecha actual recibida:", fechaResp.data.fechaActual);
+  
         const hoy = parseFecha(fechaResp.data.fechaActual);
         const fechaInicio = parseFecha(registro.fecha_inicio);
         const fechaFin = parseFecha(registro.fecha_fin);
   
+        // Imprime las fechas parseadas para verificar sus valores
+        console.log("Fecha actual (parseada):", hoy);
+        console.log("Fecha inicio (parseada):", fechaInicio);
+        console.log("Fecha fin (parseada):", fechaFin);
+  
         const estaDentro = hoy >= fechaInicio && hoy <= fechaFin;
+        console.log("¿Está dentro del rango?", estaDentro);
   
         const formatearFecha = (fechaStr) => {
-          const [dia, mes, anio] = fechaStr.split("/");
+          const [anio, mes, dia] = fechaStr.split("-");
           const diaF = dia.padStart(2, "0");
           const mesF = mes.padStart(2, "0");
           return `${diaF}/${mesF}/${anio}`;
         };
-        
+  
         const rangoTexto = `Disponible del ${formatearFecha(registro.fecha_inicio)} al ${formatearFecha(registro.fecha_fin)}`;
-        
+  
         setEstadoFechas(prev => ({ ...prev, [activeSubTab]: estaDentro }));
         setTextoRangoFechas(prev => ({ ...prev, [activeSubTab]: rangoTexto }));
   
@@ -700,7 +719,7 @@ function Calificaciones() {
     };
   
     verificarFechas();
-  }, [activeMainTab, activeSubTabQuim1, activeSubTabQuim2]);
+  }, [activeMainTab, activeSubTabQuim1, activeSubTabQuim2]);  
 
   return (
     <>

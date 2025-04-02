@@ -10,10 +10,13 @@ function CrearFechas({ onCancel, entityToUpdate, onSave }) {
 
   const parseToYYYYMMDD = (strFecha) => {
     if (!strFecha) return "";
-    if (strFecha.includes("-")) return strFecha; // Ya está en formato ISO
+    // Si ya es "YYYY-MM-DD", se regresa tal cual
+    if (strFecha.includes("-") && strFecha.length === 10) return strFecha;
+    
+    // Si es "DD/MM/YYYY"
     const [dia, mes, anio] = strFecha.split("/");
     return `${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
-  };  
+  };      
 
   useEffect(() => {
     if (entityToUpdate) {

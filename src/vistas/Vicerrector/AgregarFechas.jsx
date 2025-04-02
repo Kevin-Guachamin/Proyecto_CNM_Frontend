@@ -10,6 +10,7 @@ import Filtro from "../Admin/components/Filtro";
 import Tabla from "../Admin/components/Tabla";
 import Swal from "sweetalert2";
 import { getModulos, transformModulesForLayout } from "../getModulos";
+import { Eliminar } from '../../Utils/CRUD/Eliminar';
 
 function AgregarFechas() {
   const navigate = useNavigate();
@@ -41,35 +42,32 @@ function AgregarFechas() {
     }
   }, [navigate]);
 
-  const normalizarFechas = (fechas) => {
-    return fechas.map((f) => ({
-      ...f,
-      fecha_inicio: convertirAISO(f.fecha_inicio),
-      fecha_fin: convertirAISO(f.fecha_fin),
-    }));
-  };
-
-  const convertirAISO = (fechaStr) => {
-    if (!fechaStr.includes("/")) return fechaStr; // Ya está en ISO
-    const [dia, mes, anio] = fechaStr.split("/");
-    return `${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
-  };
+  const parseFecha = (strFecha) => {
+    if (!strFecha) return "";
+    // Suponiendo que strFecha viene como "YYYY-MM-DD"
+    const [year, month, day] = strFecha.split("-");
+    return `${day}/${month}/${year}`;
+  };  
 
   const fetchFechas = async () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_URL_DEL_BACKEND}/fechas_notas/obtener`
+        `${import.meta.env.VITE_URL_DEL_BACKEND}/fechas_notas/obtener_todo`
       );
-      const fechasNormalizadas = normalizarFechas(response.data);
-      console.log("✅ Datos normalizados:", fechasNormalizadas);
-      setFechas([...fechasNormalizadas]);
+      // Transformar los datos para que las fechas se muestren en formato DD/MM/YYYY
+      const transformedData = response.data.map(item => ({
+        ...item,
+        fecha_inicio: parseFecha(item.fecha_inicio),
+        fecha_fin: parseFecha(item.fecha_fin)
+      }));
+      setFechas(transformedData);
     } catch (error) {
       ErrorMessage(error);
     } finally {
       setLoading(false);
     }
-  };
+  };      
 
   const handleAddFecha = () => {
     setFechaToUpdate(null);
@@ -81,33 +79,13 @@ function AgregarFechas() {
     setShowModal(true);
   };
 
-  const handleDeleteFecha = async (ID) => {
-    Swal.fire({
-      title: "¿Está seguro de eliminar esta fecha?",
-      text: "Esta acción no se puede deshacer.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Sí, eliminar",
-      cancelButtonText: "Cancelar",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          setLoading(true);
-          await axios.delete(
-            `${import.meta.env.VITE_URL_DEL_BACKEND}/fechas_notas/eliminar/${ID}`
-          );
-          await fetchFechas();
-          Swal.fire("Eliminado", "La fecha ha sido eliminada.", "success");
-        } catch (error) {
-          ErrorMessage(error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    });
-  };
+  // En este caso, usamos "ID" como la clave primaria (PK)
+  const PK = "ID";
+  const URL = `${import.meta.env.VITE_URL_DEL_BACKEND}/fechas_notas/eliminar`;
+
+  const handleDeleteFecha = (fecha) => {
+    Eliminar(fecha, URL, fecha.descripcion, setFechas, PK);
+  };  
 
   const handleSaveFecha = async (data) => {
     try {
@@ -144,14 +122,14 @@ function AgregarFechas() {
     setShowModal(false);
   };
 
-  const filteredFechas = [...fechas].filter((fecha) =>
+  const filteredFechas = fechas.filter(fecha =>
     fecha.descripcion.toLowerCase().includes(search.toLowerCase())
   );
-
+  
   if (loading) {
     return <Loading />;
   }
-
+  
   return (
     <>
       <div className="container-fluid p-0">
