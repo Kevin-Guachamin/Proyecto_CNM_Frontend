@@ -85,14 +85,17 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
       <div className='modal-container'>
         <h2 className='modal-title'>{entityToUpdate ? 'Editar curso' : 'Agregar curso'}</h2>
         <div className="modal-form">
+          <div className='rows'>
 
           <div className="form-group">
             <label htmlFor="asignaturas">Asignaturas</label>
             <AutoCompleteInput inputValue={asignatura} setInputValue={setAsignatura} opciones={asignaturas} key1="nombre" key2="nivel" />
           </div>
+          
           <div className="form-group">
             <label htmlFor="docentes">Docentes</label>
             <AutoCompleteInput inputValue={docente} setInputValue={setDocente} opciones={docentes} key1="primer_nombre" key2="primer_apellido" />
+          </div>
           </div>
           <div className='form-group'>
             <label htmlFor="">Paralelo</label>

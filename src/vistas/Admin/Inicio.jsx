@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Modulo from "../../components/Modulo";
 import Header from "../../components/Header";
 import Loading from "../../components/Loading";
-import { Settings, Clipboard } from "lucide-react";
+import { Settings,  } from "lucide-react";
+import { BiMaleFemale } from "react-icons/bi";
 
 const Inicio = () => {
   const navigate = useNavigate();
@@ -11,9 +12,9 @@ const Inicio = () => {
   const [usuario, setUsuario] = useState(null);
 
   const [modulos] = useState([
-    { id: 1, titulo: "Configuración", icono: <Settings size={32} className="text-gray-700" />, link: "/admin/periodos" },
+    { id: 1, titulo: "Configuración", icono: <Settings size={40} className="text-gray-700" />, link: "/admin/periodos" },
     { id: 2, titulo: "Matriculación", icono: "✏️", link: "/admin/matriculacion" },
-    { id: 3, titulo: "Calificaciones", icono: <Clipboard size={20}/>, path:"/admin/calificaciones", link: "/panelcursos"},
+    { id: 3, titulo: "Estudiantes", icono: <BiMaleFemale size={40}/>, link: "/admin/estudiantes"},
   ]);
 
   useEffect(() => {

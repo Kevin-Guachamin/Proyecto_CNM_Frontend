@@ -3,7 +3,7 @@ import Header from "../../../components/Header";
 import Layout from '../../../layout/Layout'
 import Loading from "../../../components/Loading";
 import Contenedor from "../Components/Contenedor";
-import { modulesSettings } from "../Components/Modulos"
+import { modulesEstudiates } from "../Components/Modulos"
 import axios from 'axios'
 import CrearEstudiante from "./CrearEstudiante";
 import { IoEyeOutline } from "react-icons/io5";
@@ -55,7 +55,7 @@ function Index() {
       <div className="container-fluid p-0">
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
-      <Layout modules={modulesSettings}>
+      <Layout modules={modulesEstudiates}>
         {loading ? <Loading /> :
           <Contenedor
             data={estudiantes}

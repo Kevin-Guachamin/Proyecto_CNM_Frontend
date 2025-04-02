@@ -22,9 +22,7 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
     const key1 = "Materia"
     const key2 = "nombre"
-    const Columns = ["Meria.nivel", "paralelo", "Docente.nombre", "Materia.nombre", "dias", "horaInicio", "cupos"]
-    const Headers = ["Nivel", "Paralelo", "Docente", "Materia", "Días", "Hora inicio", "Cupos", "Acciones"];
-
+    
     useEffect(() => {
         axios.get(`${API_URL}/periodo_academico/obtener`)
             .then(response => {
@@ -40,9 +38,10 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
         setPeriodo(selectedPeriodo);
 
         if (!selectedPeriodo) return; // Evitar peticiones innecesarias
-
+        console.log("yo me ejecute")
         axios.get(`${API_URL}/asignacion/obtener/periodo/${selectedPeriodo}`)
             .then(response => {
+                console.log(response.data)
                 setData(response.data);
             })
             .catch(error => {
@@ -108,9 +107,9 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
 
     const filteredData = data.filter((item) => {
 
-
+        console.log("este es el item",item)
         const value = item?.[key1]?.[key2]; // Usamos el encadenamiento opcional para evitar errores si alguna propiedad no existe
-
+        console.log("este es el value",value)
         return value ? value.toLowerCase() : false;
     });
 
@@ -187,7 +186,6 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
                 OnEdit={handleEdit}
                 OnDelete={handleDelete}
                 headers={Headers}
-                columnsToShow={Columns}
                 extraIcon={extraIcon}
             />
             }
