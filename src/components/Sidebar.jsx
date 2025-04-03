@@ -1,28 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./Sidebar.css";
 
-function Sidebar({ modules, onNavigate }) {
+function Sidebar({ modules }) {
   const [collapsed, setCollapsed] = useState(false);
   const [activeModule, setActiveModule] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation(); // 📌 Para obtener la URL actual
 
+  // 📌 Actualiza el módulo activo basado en la URL actual
   useEffect(() => {
-    const savedModule = localStorage.getItem("activeModule");
-    if (savedModule) {
-      setActiveModule(parseInt(savedModule));
-    }
-  }, []);
+    const currentIndex = modules.findIndex((mod) => mod.path === location.pathname);
+    setActiveModule(currentIndex);
+  }, [location.pathname, modules]); // Se ejecuta cuando cambia la URL
 
   const handleNavigation = (index, path) => {
     setActiveModule(index);
-    localStorage.setItem("activeModule", index);
-    if (onNavigate) {
-      onNavigate(path);
-    } else {
-      navigate(path);
-    }
+    navigate(path);
   };
 
   return (
@@ -48,5 +43,4 @@ function Sidebar({ modules, onNavigate }) {
     </div>
   );
 }
-
-export default Sidebar;
+export default Sidebar

@@ -1,16 +1,21 @@
-// Inicio.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../components/Header";
-import Loading from "../components/Loading";
-import Modulo from "../components/Modulo"; // O el componente que uses para mostrar los módulos
-import { getModulos } from "./getModulos";
+import Modulo from "../../components/Modulo";
+import Header from "../../components/Header";
+import Loading from "../../components/Loading";
+import { Settings,  } from "lucide-react";
+import { BiMaleFemale } from "react-icons/bi";
 
 const Inicio = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [usuario, setUsuario] = useState(null);
-  const [modulos, setModulos] = useState([]);
+
+  const [modulos] = useState([
+    { id: 1, titulo: "Configuración", icono: <Settings size={40} className="text-gray-700" />, link: "/admin/periodos" },
+    { id: 2, titulo: "Matriculación", icono: "✏️", link: "/admin/matriculacion" },
+    { id: 3, titulo: "Estudiantes", icono: <BiMaleFemale size={40}/>, link: "/admin/estudiantes"},
+  ]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
@@ -18,22 +23,25 @@ const Inicio = () => {
 
     if (storedUser && storedToken) {
       const parsedUser = JSON.parse(storedUser);
-      if (!["Profesor", "Vicerrector", "Secretaria"].includes(parsedUser.subRol)) {
+
+      if (parsedUser.subRol !== "Administrador") {
         navigate("/");
         return;
       }
+
       setUsuario(parsedUser);
-      // No incluimos "Inicio" porque ya estamos en la vista Inicio
-      setModulos(getModulos(parsedUser.subRol, false));
     } else {
       navigate("/");
     }
   }, [navigate]);
 
   const handleModuloClick = (modulo) => {
-    // Ejemplo de navegación
-    navigate(modulo.link);
+    setLoading(true);
+    setTimeout(() => {
+      navigate(modulo.link); // accedes a la propiedad link del objeto
+    }, 800);
   };
+  
 
   if (loading) {
     return <Loading />;

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import Header from "../components/Header";
-import Layout from "../layout/containers/Layout";
+import Layout from "../layout/Layout";
 import Modulo from "../components/Modulo";
 import Loading from "../components/Loading";
 import { Home, Users, Settings, BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ErrorMessage } from "../Utils/ErrorMesaje";
 
 function PanelCursos() {
   const navigate = useNavigate();
@@ -19,6 +20,11 @@ function PanelCursos() {
     { name: "Configuración", icon: <Settings size={20} />, path: "/configuracion" },
   ];
 
+  function formatearHorario(horario) {
+    // Reemplaza cualquier ocurrencia de "HH:MM:SS" por "HH:MM"
+    return horario.replace(/(\d{2}:\d{2}):\d{2}/g, "$1");
+  }
+  
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const storedToken = localStorage.getItem("token");
@@ -27,15 +33,15 @@ function PanelCursos() {
       const parsedUser = JSON.parse(storedUser);
       setUsuario(parsedUser);
   
-      axios.get(`${import.meta.env.VITE_API_URL}/asignacion/docente/${parsedUser.nroCedula}`)
+      axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/asignacion/docente/${parsedUser.nroCedula}`)
         .then((response) => {
           const data = response.data;
   
           if (Array.isArray(data) && data.length > 0) {
             const cursosData = data.map((curso) => ({
               id: curso.ID,
-              titulo: `Curso de ${curso.materia}`,
-              descripcion: `Paralelo: ${curso.paralelo}, Horario: ${curso.horario}`,
+              titulo: `Curso: ${curso.materia}`,
+              descripcion: `Paralelo: ${curso.paralelo}\n Horario: ${formatearHorario(curso.horario)}`,
               link: "/calificaciones"
             }));
             setCursos(cursosData);
@@ -44,7 +50,7 @@ function PanelCursos() {
           }
         })
         .catch((error) => {
-          console.error("Error al obtener asignaciones:", error);
+          ErrorMessage(error);
           setCursos([]);
         });
     } else {
@@ -56,13 +62,13 @@ function PanelCursos() {
     console.log("Modulo seleccionado:", modulo);  // <-- Añade este log
     setLoading(true);
     
-    axios.get(`${import.meta.env.VITE_API_URL}/asignacion/obtener/${modulo.id}`)
+    axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/asignacion/obtener/${modulo.id}`)
       .then((response) => {
         const moduloCompleto = response.data;
         navigate("/calificaciones", { state: moduloCompleto });
       })
       .catch((error) => {
-        console.error("Error al obtener datos completos:", error);
+        ErrorMessage(error);
         setLoading(false); 
         alert("Ocurrió un error al cargar los datos del módulo.");
       });

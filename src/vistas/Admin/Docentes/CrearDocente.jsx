@@ -78,8 +78,8 @@ function CrearDocente({ onCancel, entityToUpdate, onSave }) {
                     <label htmlFor="rol">Rol:</label>
                     <select id="rol" value={rol} onChange={(e) => setRol(e.target.value)}>
                         <option value="">Selecciona un rol</option>
+                        <option value="Administrador">Administrador</option>
                         <option value="Profesor">Profesor</option>
-                        <option value="Rector">Rector</option>
                         <option value="Vicerector">Vicerector</option>
                         <option value="Secretaria">Secretaria</option>
                     </select>

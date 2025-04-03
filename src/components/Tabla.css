@@ -38,7 +38,17 @@
      max-width: 70px;
      overflow: visible;
    }
-   
+   /*boton Guardar*/
+   .btn-success-light {
+    background-color: #0dcf2d !important; /* Verde más claro */
+    border-color: #A1D99B !important;
+  }
+  
+  /*columnas con colo*/
+  .text-danger-strong {
+    color: #ff0303 !important;
+  }
+
    /* =========================================
       4) Rotar el texto dentro de un <span class="vertical-text">
          - Permitir quiebre de línea con white-space: normal
@@ -56,7 +66,7 @@
       
         /* Ancho disponible para el texto rotado (ajusta a tu gusto) */
         width: 180px;  
-        font-size: 0.85rem; 
+        font-size: 0.9rem; 
         text-align: center;
       
         /* Posicionamiento absoluto dentro del <th> */
@@ -68,6 +78,7 @@
         transform: translate(-50%, -50%) rotate(-90deg);
       }      
    
+      
 /* ======================================
    2) OVERRIDES SOLO PARA PDF
    (SE APLICAN AL HACER .pdf-export)
@@ -160,5 +171,9 @@
   display: inline-block !important;
 }
 .pdf-export .screen-only {
+  display: none !important;
+}
+
+.pdf-export .columna-final {
   display: none !important;
 }

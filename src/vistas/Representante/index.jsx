@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
+import axios from 'axios';
+import Tabla from '../Representante/components/Tabla_Representante';
 import Header from "../../components/Header";
 import Modulo from "../../components/Modulo";
 import Layout from "../../layout/containers/Layout";

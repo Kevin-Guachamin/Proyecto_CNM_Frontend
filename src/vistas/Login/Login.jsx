@@ -1,18 +1,21 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import Header from "./Header";
-import Footer from "./Footer";
-import Input from "./Input";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
+import Input from "../../components/Input";
+import Loading from "../../components/Loading";
 import "./Login.css";
 
 function Login() {
   const navigate = useNavigate();
   const [nroCedula, setnroCedula] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true); // Activa el loading justo después de enviar el formulario
     try {
       // Realizar la solicitud POST usando cédula y contraseña (enviado como "contraseña")
       const response = await axios.post(`${import.meta.env.VITE_URL_DEL_BACKEND}/login`, {
@@ -23,17 +26,24 @@ function Login() {
       const { token, ...user } = response.data;
       localStorage.setItem("usuario", JSON.stringify(user));
       localStorage.setItem("token", token);
-
+      console.log("este es el usuario", user)
       // Redirección basada en el rol del usuario:
       if (user.rol === "representante") {
         navigate("/representante");
-      } else if (user.rol === "docente") {
+      } else if (user.subRol === "Profesor") {
         // Por el momento, para todos los rols de docentes se redirige a "/inicio"
         // Luego se puede afinar la lógica según rols específicos
         navigate("/inicio");
-      } else {
+      } 
+      else if(user.subRol==="Administrador"){
+        navigate("/admin")
+      }
+      else if(user.subRol==="Vicerrector"){
+        navigate("/inicio")
+      }
+      else {
         // Aquí se puede agregar lógica para otros rols en el futuro
-        alert("Rol desconocido");
+        alert("Acceso no permitido");
       }
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
@@ -54,6 +64,10 @@ function Login() {
       setnroCedula(onlyNumbers);
     }
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <>
