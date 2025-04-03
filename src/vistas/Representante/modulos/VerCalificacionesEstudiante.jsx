@@ -3,7 +3,7 @@ import TablaEstudianteCalificaciones from "../components/Tabla_EstudianteCalific
 import Boton from "../../../components/Boton";
 import { useState } from "react";
 
-const VerCalificacionesEstudiante = ({onCancel, calificaciones}) => {
+const VerCalificacionesEstudiante = ({onCancel, estudianteId}) => {
     const [estudiante, setEstudiante] =  useState({
             primer_nombre: "Nombre",
             primer_apellido: "Apellido"
@@ -12,7 +12,7 @@ const VerCalificacionesEstudiante = ({onCancel, calificaciones}) => {
     return (
       <div className="modal-overlay">
         <div className="modal-container">
-          <h2 className="modal-title">Información completa de {`${estudiante.primer_nombre} ${estudiante.primer_apellido}`}</h2>
+          <h2 className="modal-title"> Reporte de calificaciones de {`${estudiante.primer_nombre} ${estudiante.primer_apellido}`}</h2>
   
           <div className="modal-form">
             <TablaEstudianteCalificaciones></TablaEstudianteCalificaciones>
