@@ -6,7 +6,7 @@ import axios from "axios";
 import { ErrorMessage } from "../../Utils/ErrorMesaje";
 import "./Parcial.css";
 
-const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputsDisabled }) => {
+const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputsDisabled, onEditar, isWithinRange, rangoTexto  }) => {
   const [datos, setDatos] = useState([]);
 
   const idContenedor = `pdf-final`;
@@ -23,7 +23,6 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
     if (truncado >= 5)  return "D"; // Esto abarca 5 y 6
     return "E";                     // Menos de 5
   };
-  
 
   const abreviarNivel = (nivel) => {
     if (!nivel || typeof nivel !== "string") return "";
@@ -51,6 +50,8 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
     });
   };
 
+  const [datosOriginales, setDatosOriginales] = useState([]);
+  
   // Combinar los datos de Quimestre 1 y 2
   useEffect(() => {
     if (!datosModulo?.ID) return;
@@ -81,7 +82,6 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
           const q1PF = parseFloat(quim1["Promedio Completo"]) || 0;
           const q2PF = parseFloat(quim2["Promedio Completo"]) || 0;
           const promedioAnual = (q1PF + q2PF) / 2;
-          console.log(quim1, quim2)
           // Tomar los promedios de comportamiento (numéricos)
           const q1PC = parseFloat(quim1["Promedio Comportamiento Completo"]) || 0;
           const q2PC = parseFloat(quim2["Promedio Comportamiento Completo"]) || 0;
@@ -104,7 +104,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
           return {
             // Identificador
             idInscripcion: est.idInscripcion, // o est.idInscripcion, según tu BD
-
+            idFinal: finalGuardado.id,
             // Props numéricas internas
             _primerQuimestre: q1PF,
             _segundoQuimestre: q2PF,
@@ -130,9 +130,9 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
         });
 
         setDatos(nuevosDatos);
+        setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
       })
       .catch((err) => {
-        console.error("❌ Error cargando datos finales:", err);
         ErrorMessage(err);
       });
   }, [datosModulo, quim1Data, quim2Data]);
@@ -147,8 +147,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
     if (typeof actualizarDatosFinal === "function") {
       const datosTransformados = transformarDatosFinalParaGuardar(datos);
       actualizarDatosFinal(datosTransformados);
-      console.log("🚀 Datos finales preparados:", datosTransformados);
-    }
+      }
   }, [datos, actualizarDatosFinal]);
 
   // Manejar cambios en la columna "Examen Supletorio"
@@ -157,8 +156,6 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
     if (columnName === "Examen Supletorio") {
       // A) Tomamos la versión numérica pura
       const pAnualNum = datos[rowIndex]._promedioAnual || 0;
-      console.log("pAnualNum =>", pAnualNum);
-  
       // B) Validamos
       if (pAnualNum < 4) {
         Swal.fire({
@@ -281,6 +278,58 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
     });
   }, [datos]);  
 
+  const realmenteDeshabilitado = inputsDisabled || !isWithinRange;
+
+  const handleGuardar = (rowIndex, rowData) => {
+    // Aquí asumimos que ya existe el registro (como en los otros componentes)
+    const original = datos[rowIndex];
+    const haCambiado = JSON.stringify(rowData) !== JSON.stringify(original);
+  
+    if (!haCambiado) {
+      Swal.fire({
+        icon: "info",
+        title: "Sin cambios",
+        text: "No has realizado ningún cambio en esta fila.",
+      });
+      return;
+    }
+  
+    const examen = parseFloat(rowData["Examen Supletorio"]);
+    if (isNaN(examen) || examen < 0 || examen > 7) {
+      Swal.fire({
+        icon: "error",
+        title: "Valor inválido",
+        text: "La nota del examen supletorio debe estar entre 0.00 y 7.00.",
+      });
+      return;
+    }
+  
+    const body = {
+      id_inscripcion: rowData.idInscripcion,
+      examen_recuperacion: examen,
+    };
+  
+    axios
+      .put(`${import.meta.env.VITE_URL_DEL_BACKEND}/finales/${rowData.idInscripcion}`, body)
+      .then(() => {
+        Swal.fire({
+          icon: "success",
+          title: "Actualizado",
+          text: "La nota del examen supletorio se actualizó correctamente.",
+        });
+        const nuevaCopia = [...datos];
+        nuevaCopia[rowIndex] = JSON.parse(JSON.stringify(rowData));
+        setDatos(nuevaCopia);
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: "Error al actualizar ❌",
+          text: "No se pudo actualizar el examen supletorio.",
+        });
+        ErrorMessage(error);
+      });
+  };
   
   return (
     <div id={idContenedor} className="container tabla-final">
@@ -289,6 +338,11 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
         imagenIzquierda={"/ConservatorioNacional.png"}
         imagenDerecha={"/Ministerio.png"}
       />
+      {!isWithinRange && (
+        <div className="alert alert-warning text-center">
+          🕒 {rangoTexto || "Este parcial aún no está disponible para edición."}
+        </div>
+      )}
       <Tabla
         columnasAgrupadas={columnasAgrupadas}
         columnas={columnas}
@@ -296,7 +350,11 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
         onChange={handleInputChange}
         // Sólo la columna "Examen Supletorio" es editable
         columnasEditables={["Examen Supletorio"]}
-        inputsDisabled={inputsDisabled}
+        inputsDisabled={realmenteDeshabilitado}
+        onEditar={onEditar}
+        onGuardar={handleGuardar}
+        rangoTexto={rangoTexto}
+        isWithinRange={isWithinRange}
       />
     </div>
   );

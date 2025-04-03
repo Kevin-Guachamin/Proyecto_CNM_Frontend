@@ -615,6 +615,112 @@ function Calificaciones() {
     return <Loading />;
   }
 
+  const handleEditar = (rowIndex, rowData) => {
+    console.log("Editar fila:", rowIndex, rowData);
+    // Limpiar el flag en localStorage y desbloquear la edición
+    localStorage.removeItem("inputsLocked");
+    setInputsDisabled(false);
+  };
+  
+  const [estadoFechas, setEstadoFechas] = useState({});
+  const [textoRangoFechas, setTextoRangoFechas] = useState({});
+
+  // ✅ Función para convertir "D/M/YYYY" a objeto Date válido
+  const parseFecha = (strFecha) => {
+    if (!strFecha) return null;
+    // Si ya viene en formato ISO ("YYYY-MM-DD"), lo usamos directamente
+    if (strFecha.includes("-")) return new Date(strFecha);
+    // Si viene en formato "DD/MM/YYYY", lo convertimos a "YYYY-MM-DD"
+    const [dia, mes, anio] = strFecha.split("/");
+    return new Date(`${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`);
+  };
+  
+  useEffect(() => {
+    const verificarFechas = async () => {
+      const mapping = {
+        "parcial1-quim1": "parcial1_quim1",
+        "parcial2-quim1": "parcial2_quim1",
+        "quimestral-quim1": "quimestre1",
+        "parcial1-quim2": "parcial1_quim2",
+        "parcial2-quim2": "parcial2_quim2",
+        "quimestral-quim2": "quimestre2",
+        "notaFinal": "nota_final"
+      };
+  
+      let activeSubTab = null;
+      if (activeMainTab === "quimestre1") {
+        activeSubTab = activeSubTabQuim1;
+      } else if (activeMainTab === "quimestre2") {
+        activeSubTab = activeSubTabQuim2;
+      } else if (activeMainTab === "notaFinal") {
+        activeSubTab = "notaFinal";
+      }
+  
+      const claveDescripcion = mapping[activeSubTab];
+      if (!claveDescripcion) return;
+  
+      try {
+        // Obtener las fechas definidas en el backend
+        const resp = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/fechas_notas/obtener_todo`);
+        const data = resp.data;
+        const registro = data.find(item => item.descripcion === claveDescripcion);
+  
+        // Imprime el registro para ver los valores de fecha_inicio y fecha_fin
+        console.log("Registro para", claveDescripcion, ":", registro);
+  
+        if (!registro) {
+          Swal.fire({
+            icon: "warning",
+            title: "Fecha por definirse",
+            text: "Aún no se han definido las fechas para esta sección.",
+          });
+  
+          setEstadoFechas(prev => ({ ...prev, [activeSubTab]: false }));
+          setTextoRangoFechas(prev => ({ ...prev, [activeSubTab]: "" }));
+          return;
+        }
+  
+        // Obtener la fecha actual del backend
+        const fechaResp = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/fechas_notas/fecha_actual`);
+  
+        // Imprime la fecha actual recibida
+        console.log("Fecha actual recibida:", fechaResp.data.fechaActual);
+  
+        const hoy = parseFecha(fechaResp.data.fechaActual);
+        const fechaInicio = parseFecha(registro.fecha_inicio);
+        const fechaFin = parseFecha(registro.fecha_fin);
+  
+        // Imprime las fechas parseadas para verificar sus valores
+        console.log("Fecha actual (parseada):", hoy);
+        console.log("Fecha inicio (parseada):", fechaInicio);
+        console.log("Fecha fin (parseada):", fechaFin);
+  
+        const estaDentro = hoy >= fechaInicio && hoy <= fechaFin;
+        console.log("¿Está dentro del rango?", estaDentro);
+  
+        const formatearFecha = (fechaStr) => {
+          const [anio, mes, dia] = fechaStr.split("-");
+          const diaF = dia.padStart(2, "0");
+          const mesF = mes.padStart(2, "0");
+          return `${diaF}/${mesF}/${anio}`;
+        };
+  
+        const rangoTexto = `Disponible del ${formatearFecha(registro.fecha_inicio)} al ${formatearFecha(registro.fecha_fin)}`;
+  
+        setEstadoFechas(prev => ({ ...prev, [activeSubTab]: estaDentro }));
+        setTextoRangoFechas(prev => ({ ...prev, [activeSubTab]: rangoTexto }));
+  
+      } catch (error) {
+        console.error("Error al verificar fechas:", error);
+        ErrorMessage(error);
+        setEstadoFechas(prev => ({ ...prev, [activeSubTab]: false }));
+        setTextoRangoFechas(prev => ({ ...prev, [activeSubTab]: "Error al obtener fechas" }));
+      }
+    };
+  
+    verificarFechas();
+  }, [activeMainTab, activeSubTabQuim1, activeSubTabQuim2]);  
+
   return (
     <>
       <div className="container-fluid p-0">
@@ -674,6 +780,9 @@ function Calificaciones() {
                       datosModulo={datosModulo}
                       activo={activeMainTab === "quimestre1" && activeSubTabQuim1 === "parcial1-quim1"}
                       inputsDisabled={inputsDisabled}
+                      onEditar={handleEditar}
+                      isWithinRange={estadoFechas["parcial1-quim1"] ?? false}
+                      rangoTexto={textoRangoFechas["parcial1-quim1"]}
                     />
                   </Tab>
 
@@ -685,6 +794,9 @@ function Calificaciones() {
                       datosModulo={datosModulo}
                       activo={activeMainTab === "quimestre1" && activeSubTabQuim1 === "parcial2-quim1"}
                       inputsDisabled={inputsDisabled}
+                      onEditar={handleEditar}
+                      isWithinRange={estadoFechas["parcial2-quim1"] ?? false}
+                      rangoTexto={textoRangoFechas["parcial2-quim1"]}
                     />
                   </Tab>
 
@@ -696,6 +808,9 @@ function Calificaciones() {
                       actualizarDatosQuim={handleActualizarQuim1}
                       datosModulo={datosModulo}
                       inputsDisabled={inputsDisabled}
+                      onEditar={handleEditar}
+                      isWithinRange={estadoFechas["quimestral-quim1"] ?? false}
+                      rangoTexto={textoRangoFechas["quimestral-quim1"]}
                     />
                   </Tab>
                 </Tabs>
@@ -712,6 +827,9 @@ function Calificaciones() {
                       datosModulo={datosModulo}
                       activo={activeMainTab === "quimestre2" && activeSubTabQuim2 === "parcial1-quim2"}
                       inputsDisabled={inputsDisabled}
+                      onEditar={handleEditar}
+                      isWithinRange={estadoFechas["parcial1-quim2"] ?? false}
+                      rangoTexto={textoRangoFechas["parcial1-quim2"]}
                     />
                   </Tab>
 
@@ -723,6 +841,9 @@ function Calificaciones() {
                       datosModulo={datosModulo}
                       activo={activeMainTab === "quimestre2" && activeSubTabQuim2 === "parcial2-quim2"}
                       inputsDisabled={inputsDisabled}
+                      onEditar={handleEditar}
+                      isWithinRange={estadoFechas["parcial2-quim2"] ?? false}
+                      rangoTexto={textoRangoFechas["parcial2-quim2"]}
                     />
                   </Tab>
 
@@ -734,6 +855,9 @@ function Calificaciones() {
                       actualizarDatosQuim={handleActualizarQuim2}
                       datosModulo={datosModulo}
                       inputsDisabled={inputsDisabled}
+                      onEditar={handleEditar}
+                      isWithinRange={estadoFechas["quimestral-quim2"] ?? false}
+                      rangoTexto={textoRangoFechas["quimestral-quim2"]}
                     />
                   </Tab>
                 </Tabs>
@@ -748,6 +872,9 @@ function Calificaciones() {
                     datosModulo={datosModulo}
                     actualizarDatosFinal={handleActualizarFinal}
                     inputsDisabled={inputsDisabled}
+                    onEditar={handleEditar}
+                    isWithinRange={estadoFechas["notaFinal"] ?? false}
+                    rangoTexto={textoRangoFechas["notaFinal"]}
                   />
                 </div>
               </Tab>

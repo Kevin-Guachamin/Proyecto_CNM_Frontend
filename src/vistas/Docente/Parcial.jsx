@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import HeaderTabla from "../../components/HeaderTabla";
 import Tabla from "../../components/Tabla";
 import axios from "axios";
@@ -6,8 +6,7 @@ import { ErrorMessage } from "../../Utils/ErrorMesaje";
 import Swal from 'sweetalert2';
 import "./Parcial.css";
 
-function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled }) {
-
+function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto }) {
   // ID dinámico: pdf-parcial1-quim1, pdf-parcial2-quim1, pdf-parcial1-quim2, etc.
   const idContenedor = `pdf-parcial${parcialSeleccionado}-quim${quimestreSeleccionado}`;
 
@@ -19,6 +18,9 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
     const horaNumerica = parseInt(horaInicio.split(":")[0], 10);
     return horaNumerica < 12 ? "Matutina" : "Vespertina";
   };
+
+  const [datosOriginales, setDatosOriginales] = useState([]);
+
   const obtenerEtiquetaQuimestre = () => {
     return quimestreSeleccionado === "1" ? "Q1" : "Q2";
   };
@@ -90,15 +92,15 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
   const calcularValoracion = (valor) => {
     // 1) Truncar el valor (9.4 => 9)
     const truncado = Math.floor(valor);
-  
+
     // 2) Asignar la letra en función del entero
     if (truncado === 10) return "A";
-    if (truncado === 9)  return "B";
-    if (truncado >= 7)  return "C"; // Esto abarca 7 y 8
-    if (truncado >= 5)  return "D"; // Esto abarca 5 y 6
+    if (truncado === 9) return "B";
+    if (truncado >= 7) return "C"; // Esto abarca 7 y 8
+    if (truncado >= 5) return "D"; // Esto abarca 5 y 6
     return "E";                     // Menos de 5
   };
-  
+
   function parseCampoNumerico(valor) {
     if (typeof valor === "string" && valor.trim() === "") {
       return null; // vacío
@@ -106,7 +108,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
     const parsed = parseFloat(valor);
     return isNaN(parsed) ? null : parsed;
   }
-  
+
   // 🔁 Transformador que ajusta la estructura a lo que necesita el backend
   const transformarDatosParaGuardar = (datos) => {
     return datos.map((fila) => {
@@ -114,7 +116,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
         const parsed = parseInt(fila[col]);
         return isNaN(parsed) ? null : parsed;
       });
-  
+
       return {
         id_inscripcion: fila.idInscripcion,
         insumo1: parseCampoNumerico(fila["INSUMO 1"]),
@@ -128,25 +130,42 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
       };
     });
   };
-  
+
+  // Combina la lógica de "deshabilitado por fuera de fecha" y "deshabilitado por prop"
+  const realmenteDeshabilitado = inputsDisabled || !isWithinRange;
 
   // ✅ Nuevo useEffect que envía datos transformados al padre
   useEffect(() => {
     // ✅ Nos aseguramos de que ya haya datos con cálculos listos
     if (!datos || datos.length === 0) return;
-  
+
     const datosCompletos = datos.filter(fila => fila["PROMEDIO PARCIAL"] !== undefined);
-  
+
     if (actualizarDatosParcial && datosCompletos.length > 0) {
       const datosTransformados = transformarDatosParaGuardar(datos);
       actualizarDatosParcial(datosTransformados);
-      console.log(`🚀 Datos enviados desde Parcial ${parcialSeleccionado} - Quimestre ${quimestreSeleccionado}:`, datosTransformados);
     }
   }, [datos, actualizarDatosParcial, quimestreSeleccionado, parcialSeleccionado]);
-  
 
   // Manejar cambios en los inputs de la tabla
   const handleInputChange = (rowIndex, columnName, value) => {
+    // Chequeamos si ya está bloqueado por prop o por fecha
+    if (!isWithinRange) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Fuera de fecha',
+        text: 'No se pueden editar notas fuera del rango de fechas establecido.',
+      });
+      return;
+    }
+    if (inputsDisabled) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Edición bloqueada',
+        text: 'Este parcial ya se bloqueó o se guardó definitivamente.',
+      });
+      return;
+    }
     const nuevosDatos = datos.map((fila, i) => {
       if (i === rowIndex) {
         let nuevaFila = { ...fila };
@@ -222,16 +241,16 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
     const insumo1 = parseFloat(fila["INSUMO 1"]) || 0;
     const insumo2 = parseFloat(fila["INSUMO 2"]) || 0;
     const evaluacion = parseFloat(fila["EVALUACIÓN SUMATIVA"]) || 0;
-  
+
     const ponderacion70 = ((insumo1 + insumo2) / 2) * 0.7;
     const ponderacion30 = evaluacion * 0.3;
     const promedioParcial = ponderacion70 + ponderacion30;
-  
+
     const sumaComportamiento = columnasComportamiento.reduce(
       (acc, col) => acc + (parseInt(fila[col]) || 0),
       0
     );
-  
+
     return {
       ...fila,
       "PONDERACIÓN 70%": ponderacion70.toFixed(2),
@@ -241,27 +260,28 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
       "VALORACION": calcularValoracion(sumaComportamiento),
     };
   };
-  
+
   useEffect(() => {
     if (!datosModulo?.ID) return;
 
     const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${datosModulo.ID}`;
     const urlParciales = `${import.meta.env.VITE_URL_DEL_BACKEND}/parciales/asignacion/${datosModulo.ID}`;
-  
+
     Promise.all([axios.get(urlInscripciones), axios.get(urlParciales)])
       .then(([respEstudiantes, respParciales]) => {
         const estudiantes = respEstudiantes.data;
         const parciales = respParciales.data;
-  
+
         const nuevosDatos = estudiantes.map(est => {
-        const parcialGuardado = parciales.find(p =>
-          p.idInscripcion === est.idInscripcion &&
-          p.parcial === obtenerEtiquetaParcial() &&
-          p.quimestre === obtenerEtiquetaQuimestre()
-        ) || {};
-  
+          const parcialGuardado = parciales.find(p =>
+            p.idInscripcion === est.idInscripcion &&
+            p.parcial === obtenerEtiquetaParcial() &&
+            p.quimestre === obtenerEtiquetaQuimestre()
+          ) || {};
+
           const fila = {
             idInscripcion: est.idInscripcion,
+            idParcial: parcialGuardado?.idParcial,
             "Nro": est.nro,
             "Nómina de Estudiantes": est.nombre,
             "INSUMO 1": safe(parcialGuardado?.insumo1),
@@ -284,28 +304,93 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
             "NIVEL": abreviarNivel(est.nivel),
             "VALORACION": ""
           };
-  
           return calcularDatosFila(fila);
         });
-  
         setDatos(nuevosDatos);
+        setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
       })
       .catch((error) => {
-        console.error("❌ Error al cargar datos combinados:", error);
         ErrorMessage(error);
       });
-    }, [datosModulo, quimestreSeleccionado, parcialSeleccionado]);  
+  }, [datosModulo, quimestreSeleccionado, parcialSeleccionado]);
+
+  const handleGuardar = (rowIndex, rowData) => {
+    if (!rowData.idParcial) {
+      Swal.fire({
+        icon: "error",
+        title: "Registro no encontrado",
+        text: "No se puede actualizar porque aún no existe un registro para esta fila.",
+      });
+      return;
+    }
+
+    const original = datosOriginales[rowIndex];
+    const haCambiado = JSON.stringify(rowData) !== JSON.stringify(original);
+
+    if (!haCambiado) {
+      Swal.fire({
+        icon: "info",
+        title: "Sin cambios",
+        text: "No has realizado ningún cambio en esta fila.",
+      });
+      return;
+    }
+
+    const comportamiento = columnasComportamiento.map((col) =>
+      parseInt(rowData[col]) || 0
+    );
+
+    const body = {
+      id_inscripcion: rowData.idInscripcion,
+      insumo1: parseFloat(rowData["INSUMO 1"]),
+      insumo2: parseFloat(rowData["INSUMO 2"]),
+      evaluacion: parseFloat(rowData["EVALUACIÓN SUMATIVA"]),
+      comportamiento,
+      quimestre: obtenerEtiquetaQuimestre(),
+      parcial: obtenerEtiquetaParcial(),
+    };
+
+    axios
+      .put(`${import.meta.env.VITE_URL_DEL_BACKEND}/parciales/${rowData.idParcial}`, body)
+      .then(() => {
+        Swal.fire({
+          icon: "success",
+          title: "Actualizado",
+          text: "Las calificaciones se actualizaron correctamente.",
+        });
+        const nuevaCopia = [...datosOriginales];
+        nuevaCopia[rowIndex] = JSON.parse(JSON.stringify(rowData));
+        setDatosOriginales(nuevaCopia);
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: "Error al actualizar ❌.",
+          text: "No se pudo actualizar la calificación.",
+        });
+        ErrorMessage(error);
+      });
+  };
 
   return (
     <div id={idContenedor} className="container tabla-parciales">
       <HeaderTabla datosEncabezado={datosEncabezado} imagenIzquierda={"/ConservatorioNacional.png"} />
+      {!isWithinRange && (
+        <div className="alert alert-warning text-center">
+          🕒 {rangoTexto || "Este parcial aún no está disponible para edición."}
+        </div>
+      )}
       <Tabla
         columnasAgrupadas={columnasAgrupadas}
         columnas={columnas}
         datos={datos}
         onChange={handleInputChange}
         columnasEditables={columnasEditables}
-        inputsDisabled={inputsDisabled}
+        inputsDisabled={realmenteDeshabilitado}
+        onEditar={onEditar}
+        onGuardar={handleGuardar}
+        rangoTexto={rangoTexto}
+        isWithinRange={isWithinRange}
       />
     </div>
   );
