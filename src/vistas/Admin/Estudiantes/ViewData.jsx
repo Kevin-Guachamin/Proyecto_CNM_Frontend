@@ -1,12 +1,51 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Boton from '../../../components/Boton';
+import Loading from '../../../components/Loading';
+import { useState } from 'react';
 
-function ViewData({onCancel, entity }) {
+function ViewData({onCancel, isLoading, entity }) {
+  const [nroCedula,setNroCedula] = useState(""); // Inicializar con cadena vacia si es que hay valores undefined en entity
+  const [primer_nombre, setPrimerNombre] = useState("");
+  const [celular, setCelular] = useState("");
+  const [primer_apellido, setPrimerApellido] = useState("");
+  const [segundo_nombre, setSegundoNombre] =  useState("");
+  const [segundo_apellido, setSegundoApellido] = useState("");
+  const [convencional, setConvencional] = useState("");
+  const [emergencia, setEmergencia] = useState(""); 
+  const [email, setEmail] = useState("");
+
+  /* 
+    OJO FALTA COMPROBAR EL FUNCIONAMIENTO CON LOS ARCHIVOS PDFS SUBIDOS
+  */
+
+  if (isLoading) { 
+    <Loading></Loading>
+  }
+
+  useEffect(() => {
+   if (entity) {
+      setNroCedula(entity.nroCedula || ""); // Set cadena vacia en caso de que haya un dato undefined
+      setPrimerNombre(entity.primer_nombre || "");
+      setCelular(entity.celular || "");
+      setPrimerApellido(entity.primer_apellido || "");
+      setSegundoNombre(entity.segundo_nombre || "");
+      setSegundoApellido(entity.segundo_apellido || "");
+      setConvencional(entity.convencional || "");
+      setEmergencia(entity.emergencia || "");
+      setEmail(entity.email || "");
+    } 
+  }, [entity]);
+
+  const handleSubmit = () => {
+    // Comprobar que el formualrio es valido
+
+    // Comprobar que la actualizacion de datos este habilitada en la fecha establecida
+  }
 
     return (
       <div className="modal-overlay">
         <div className="modal-container">
-          <h2 className="modal-title">Información completa de {`${entity.primer_nombre} ${entity.primer_apellido}`}</h2>
+          <h2 className="modal-title">Información completa de {`${primer_nombre} ${primer_apellido}`}</h2>
   
           <div className="modal-form">
             <div className='rows'>
@@ -66,7 +105,7 @@ function ViewData({onCancel, entity }) {
                   type="file"
                   name="copiaCedula"
                   
-                  onChange={handleFileChange}
+                  //onChange={handleFileChange}
                   accept="application/pdf"
                 />
               </label>
@@ -75,7 +114,7 @@ function ViewData({onCancel, entity }) {
                 <input
                   type="file"
                   name="croquis"
-                  onChange={handleFileChange}
+                  //onChange={handleFileChange}
                   accept="application/pdf"
                 />
               </label>
