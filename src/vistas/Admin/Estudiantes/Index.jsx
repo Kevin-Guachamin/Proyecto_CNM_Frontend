@@ -3,7 +3,7 @@ import Header from "../../../components/Header";
 import Layout from '../../../layout/Layout'
 import Loading from "../../../components/Loading";
 import Contenedor from "../Components/Contenedor";
-import { modulesSettings } from "../Components/Modulos"
+import { modulesEstudiates } from "../Components/Modulos"
 import axios from 'axios'
 import CrearEstudiante from "./CrearEstudiante";
 import { IoEyeOutline } from "react-icons/io5";
@@ -30,6 +30,8 @@ function Index() {
 
   useEffect(() => {
     setLoading(true)
+    const storedUser = localStorage.getItem("usuario");
+    const parsedUser = JSON.parse(storedUser);
     axios.get(`${API_URL}/estudiante/obtener?page=${page}`)
       .then(response => {
 
@@ -44,7 +46,7 @@ function Index() {
 
     // Mientras no se conecte al backend, dejamos un usuario de prueba
 
-    setUsuario({ nombre: "Juan Pérez", rol: "Estudiante" });
+    setUsuario(parsedUser);
   }, [API_URL, page]);
 
   return (
@@ -53,7 +55,7 @@ function Index() {
       <div className="container-fluid p-0">
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
-      <Layout modules={modulesSettings}>
+      <Layout modules={modulesEstudiates}>
         {loading ? <Loading /> :
           <Contenedor
             data={estudiantes}

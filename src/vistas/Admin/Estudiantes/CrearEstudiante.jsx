@@ -4,11 +4,11 @@ import DatePicker from 'react-datepicker';
 import '../Styles/CrearEntidad.css';
 import "react-datepicker/dist/react-datepicker.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDownload } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';
+//import { faDownload } from '@fortawesome/free-solid-svg-icons';
+//import axios from 'axios';
 import { ErrorMessage } from '../../../Utils/ErrorMesaje';
 
-function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
+function CrearEstudiante({ onCancel, entityToUpdate, onSave,representante }) {
   const [nroCedula, setNroCedula] = useState("")
   const [primer_nombre, setPrimerNombre] = useState("");
   const [primer_apellido, setPrimerApellido] = useState("");
@@ -80,8 +80,8 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
   };
 
   const [files, setFiles] = useState({
-    copiaCedula: null,
-    matricula_IER: null,
+    matricula_IER: entityToUpdate ? entityToUpdate.matricula_IER : null,
+    copiaCedula: entityToUpdate ? entityToUpdate.copiaCedula : null
   });
   const handleFileChange = (event) => {
     const { name, files } = event.target;
@@ -90,33 +90,33 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
       [name]: files[0], // Solo se selecciona un archivo por input
     }));
   };
+//Funcion para descargar archivos NO BORRAR AÚN se la ba a usar en otro lado
+  // const handleDownload = async (filePath) => {
+  //   const parts = filePath.split("\\");
+  //   const folder = parts[1]; // Subcarpeta (ej: "Estudiantes")
+  //   const filename = parts[2]; // Nombre del archivo (ej: "ProyectoCNM.pdf")
 
-  const handleDownload = async (filePath) => {
-    const parts = filePath.split("\\");
-    const folder = parts[1]; // Subcarpeta (ej: "Estudiantes")
-    const filename = parts[2]; // Nombre del archivo (ej: "ProyectoCNM.pdf")
+  //   try {
+  //     const response = await axios.get(
+  //       `http://localhost:8000/estudiante/download/${folder}/${filename}`,
+  //       {
+  //         responseType: 'blob',
+  //       }
+  //     );
 
-    try {
-      const response = await axios.get(
-        `http://localhost:8000/estudiante/download/${folder}/${filename}`,
-        {
-          responseType: 'blob',
-        }
-      );
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', filename);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error al descargar el archivo:', error);
-      ErrorMessage(error)
-    }
-  }
+  //     const url = window.URL.createObjectURL(new Blob([response.data]));
+  //     const link = document.createElement('a');
+  //     link.href = url;
+  //     link.setAttribute('download', filename);
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     document.body.removeChild(link);
+  //     window.URL.revokeObjectURL(url);
+  //   } catch (error) {
+  //     console.error('Error al descargar el archivo:', error);
+  //     ErrorMessage(error)
+  //   }
+  // }
   const handleSubmit = () => {
     const direccion = [sector, parroquia, canton].join(" ")
     
@@ -136,9 +136,10 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
     formData.append("especialidad", especialidad)
     formData.append("IER", IER)
     formData.append("direccion", direccion)
+    formData.append("nroCedula_representante",representante)
 
 
-    onSave(formData, { headers: { "Content-Type": "multipart/form-data" } });
+    onSave(formData);
   };
 
   return (
@@ -146,38 +147,38 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
       <div className="modal-container">
         <h2 className="modal-title">{entityToUpdate ? 'Editar estudiante' : 'Agregar estudiante'}</h2>
 
-        <div className="modal-form">
+        <form onSubmit={(e) => handleSubmit(e)} className="modal-form">
           <div className='rows'>
             <div className="form-group">
               <label htmlFor="nroCedula">Número de cédula:</label>
-              <input id="nroCedula" value={nroCedula} onChange={(e) => setNroCedula(e.target.value)} />
+              <input  required id="nroCedula" value={nroCedula} onChange={(e) => setNroCedula(e.target.value)} />
             </div>
             <div className="form-group">
               <label htmlFor="nroMatricula">Código estudiante:</label>
-              <input id="nroMatricula" value={entityToUpdate ? generarCodigoEstudiante(entityToUpdate.anioMatricula, entityToUpdate.ID) : ""} readOnly />
+              <input  id="nroMatricula" value={entityToUpdate ? generarCodigoEstudiante(entityToUpdate.anioMatricula, entityToUpdate.ID) : ""} readOnly />
             </div>
           </div>
           <div className='rows'>
             <div className="form-group">
               <label htmlFor="primer_nombre">Primer nombre:</label>
-              <input id="primer_nombre" value={primer_nombre} onChange={(e) => setPrimerNombre(e.target.value)} />
+              <input required id="primer_nombre" value={primer_nombre} onChange={(e) => setPrimerNombre(e.target.value)} />
             </div>
 
             <div className="form-group">
               <label htmlFor="primer_apellido">Primer apellido:</label>
-              <input id="primer_apellido" value={primer_apellido} onChange={(e) => setPrimerApellido(e.target.value)} />
+              <input required id="primer_apellido" value={primer_apellido} onChange={(e) => setPrimerApellido(e.target.value)} />
             </div>
           </div>
 
           <div className='rows'>
             <div className="form-group">
               <label htmlFor="segundo_nombre">Segundo nombre:</label>
-              <input id="segundo_nombre" value={segundo_nombre} onChange={(e) => setSegundoNombre(e.target.value)} />
+              <input required id="segundo_nombre" value={segundo_nombre} onChange={(e) => setSegundoNombre(e.target.value)} />
             </div>
 
             <div className="form-group">
               <label htmlFor="segundo_apellido">Segundo apellido:</label>
-              <input id="segundo_apellido" value={segundo_apellido} onChange={(e) => setSegundoApellido(e.target.value)} />
+              <input required id="segundo_apellido" value={segundo_apellido} onChange={(e) => setSegundoApellido(e.target.value)} />
             </div>
 
           </div>
@@ -196,16 +197,16 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
 
             <div className="form-group">
               <label htmlFor="jornada">Jornada :</label>
-              <select id="jornada" value={jornada} onChange={(e) => setJornada(e.target.value)}>
-                <option value="">Selecciona una jornada</option>
+              <select required id="jornada" value={jornada} onChange={(e) => setJornada(e.target.value)}>
+                <option value="" disabled selected>Selecciona una jornada</option>
                 <option value="Matutina">Matutina</option>
                 <option value="Vespertina">Vespertina</option>
               </select>
             </div>
             <div className="form-group">
               <label htmlFor="genero">Genero:</label>
-              <select id="genero" value={genero} onChange={(e) => setGenero(e.target.value)}>
-                <option value="">Selecciona un genero</option>
+              <select required id="genero" value={genero} onChange={(e) => setGenero(e.target.value)}>
+                <option value="" disabled selected>Selecciona un genero</option>
                 <option value="Masculino">Masculino</option>
                 <option value="Femenino">Femenino</option>
               </select>
@@ -228,8 +229,8 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
             </div>
             <div className="form-group">
               <label htmlFor="grupo_etnico">Grupo Etnico:</label>
-              <select id="genero" value={grupo_etnico} onChange={(e) => setGrupoEtnico(e.target.value)}>
-                <option value="">Selecciona un grupo</option>
+              <select required id="genero" value={grupo_etnico} onChange={(e) => setGrupoEtnico(e.target.value)}>
+                <option value="" disabled selected>Selecciona un grupo</option>
                 <option value="Indígena">Indígena</option>
                 <option value="Mestizo">Mestizo</option>
                 <option value="Afro-descendiente">Afro-descendiente</option>
@@ -241,11 +242,11 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
           <div className='rows'>
             <div className="form-group">
               <label htmlFor="especialidad">Especialidad:</label>
-              <input id="especialidad" value={especialidad} onChange={(e) => setEspecialidad(e.target.value)} />
+              <input required id="especialidad" value={especialidad} onChange={(e) => setEspecialidad(e.target.value)} />
             </div>
             <div className="form-group">
               <label htmlFor="IER">Institución de eduación regular:</label>
-              <input id="IER" value={IER} onChange={(e) => setIER(e.target.value)} />
+              <input required id="IER" value={IER} onChange={(e) => setIER(e.target.value)} />
             </div>
           </div>
           <div className='rows'>
@@ -254,15 +255,15 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
           <div className='rows'>
             <div className='form-group-direccion'>
               <label htmlFor="">Sector: </label>
-              <input type="text" value={sector} onChange={(e) => setSector(e.target.value)} />
+              <input required type="text" value={sector} onChange={(e) => setSector(e.target.value)} />
             </div>
             <div className='form-group-direccion'>
               <label htmlFor="">Parroquia: </label>
-              <input type="text" value={parroquia} onChange={(e) => setParroquia(e.target.value)} />
+              <input required type="text" value={parroquia} onChange={(e) => setParroquia(e.target.value)} />
             </div>
             <div className='form-group-direccion'>
               <label htmlFor="">Canton: </label>
-              <input type="text" value={canton} onChange={(e) => setCanton(e.target.value)} />
+              <input required type="text" value={canton} onChange={(e) => setCanton(e.target.value)} />
             </div>
 
 
@@ -281,12 +282,12 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
                 className="custom-file-input"
               />
               {/* Botón de descarga condicional */}
-              {entityToUpdate && (
+              {/*entityToUpdate && (
                 <button className="download-button" onClick={() => handleDownload(entityToUpdate.cedula_PDF)}>
                   <FontAwesomeIcon icon={faDownload} className="icon" />
                   Descargar documento
                 </button>
-              )}
+              )*/}
             </div>
 
             <div className="file-upload">
@@ -300,25 +301,25 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave }) {
                 onChange={handleFileChange}
                 accept="application/pdf"
                 className="custom-file-input"
-                required
+               
               />
               {/* Botón de descarga condicional */}
-              {entityToUpdate && (
+              {/*entityToUpdate && (
                 <button className="download-button" onClick={() => handleDownload(entityToUpdate.matricula_IER_PDF)}>
                   <FontAwesomeIcon icon={faDownload} className="icon" />
                   Descargar documento
                 </button>
-              )}
+              )*/}
+            </div>
+          </div>
+          <div className='rows-botones'>
+            <div className="botones">
+              <button type='submit' className='boton-crear' >Guardar</button>
+              <Boton texto="Cancelar" onClick={onCancel} estilo="boton-cancelar" />
             </div>
           </div>
 
-
-        </div>
-
-        <div className="botones">
-          <Boton texto="Guardar" onClick={() => handleSubmit()} estilo="boton-crear" />
-          <Boton texto="Cancelar" onClick={onCancel} estilo="boton-cancelar" />
-        </div>
+        </form>
       </div>
     </div>
   )

@@ -1,7 +1,9 @@
-import { GraduationCap, Book, Home} from "lucide-react";
+import { GraduationCap, Book, Home,NotebookPen} from "lucide-react";
 import { FaBuilding } from "react-icons/fa";
-import { BiMaleFemale } from "react-icons/bi";
+import { LuUsers } from "react-icons/lu";
 import { ImUserTie } from "react-icons/im";
+import { FaUsersLine } from "react-icons/fa6";
+import { FaUserEdit } from "react-icons/fa";
 
 export const modulesSettings = [
   {name: "Inicio",icon: <Home size={20}/>, path: "/admin"},
@@ -12,9 +14,14 @@ export const modulesSettings = [
 ];
 
 export const modulesMatricula = [
-  { name: "Cursos"}
+  {name: "Inicio",icon: <Home size={20}/>, path: "/admin"},
+  { name: "Matriculación",icon: <NotebookPen size={20}/>, path: "/admin/matriculacion"}
 ]
 
 export const modulesEstudiates=[
-  { name: "Estudiantes", icon: <BiMaleFemale size={24} />, path: "/admin/estudiantes" },
+  {name: "Inicio",icon: <Home size={20}/>, path: "/admin"},
+  {name: "Registro",icon: <NotebookPen size={20}/>, path: "/admin/inscripcion"},
+  {name: "Actualizar Registro",icon: <FaUserEdit size={20}/>, path: "/admin/inscripcion"},
+  {name: "Estudiantes", icon: <LuUsers size={20}/>, path: "/admin/estudiantes"},
+  {name: "Representantes", icon: <FaUsersLine size={25}/>, path: "/admin/representantes"},
 ]

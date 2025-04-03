@@ -11,7 +11,12 @@ import Estudiantes from '../vistas/Admin/Estudiantes/Index.jsx'
 import PanelCursos from '../vistas/PanelCursos.jsx';
 import Admin from '../vistas/Admin/inicio.jsx'
 import Cursos from '../vistas/Admin/Cursos/Index.jsx'
+import Busqueda from '../vistas/Admin/Matriculación/Index.jsx';
+import Horarios from '../vistas/Admin/Matriculación/Horarios.jsx'
+import Inscripcion from '../vistas/Admin/Inscripcion/Index.jsx'
+import Representantes from '../vistas/Admin/Representantes/Index.jsx'
 import AgregarFechas from '../vistas/Vicerrector/AgregarFechas.jsx';
+
 
 
 function Rutas() {
@@ -25,6 +30,10 @@ function Rutas() {
         <Route path="/admin/docentes" element= {<Docentes/>}/>
         <Route path="/admin/estudiantes" element= {<Estudiantes/>}/>
         <Route path='/admin/cursos' element= {<Cursos/>} />
+        <Route path='/admin/matriculacion' element= {<Busqueda/>} />
+        <Route path='/admin/horarios' element= {<Horarios/>} />
+        <Route path='/admin/inscripcion' element= {<Inscripcion/>} />
+        <Route path='/admin/representantes' element= {<Representantes/>} />
         <Route path="/calificaciones" element={<Calificaciones/>} />
         <Route path="/panelcursos" element={<PanelCursos/>} />
         <Route path="/representante" element={<Representante/>} />

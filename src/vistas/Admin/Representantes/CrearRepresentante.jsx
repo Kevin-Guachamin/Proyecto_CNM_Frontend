@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Boton from '../../../components/Boton';
 import '../Styles/CrearEntidad.css';
 
-function CrearRepresentante({onCancel, entityToUpdate, onSave }) {
+function CrearRepresentante({ onCancel, entityToUpdate, onSave }) {
   const [nroCedula, setNroCedula] = useState("")
   const [primer_nombre, setPrimerNombre] = useState("");
   const [primer_apellido, setPrimerApellido] = useState("");
@@ -28,10 +28,11 @@ function CrearRepresentante({onCancel, entityToUpdate, onSave }) {
     }
   }, [entityToUpdate]);
 
-    const [files, setFiles] = useState({
-      copiaCedula: null,
-      croquis: null,
-    });
+  const [files, setFiles] = useState(() => ({
+    croquis: entityToUpdate ? entityToUpdate.croquis : null,
+    copiaCedula: entityToUpdate ? entityToUpdate.copiaCedula : null
+  }));
+  
   const handleFileChange = (event) => {
     const { name, files } = event.target;
     setFiles((prevState) => ({
@@ -39,21 +40,23 @@ function CrearRepresentante({onCancel, entityToUpdate, onSave }) {
       [name]: files[0], // Solo se selecciona un archivo por input
     }));
   };
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     const formData = new FormData();
     formData.append("copiaCedula", files.copiaCedula);
     formData.append("croquis", files.croquis);
-    formData.append("nroCedula",nroCedula)
-    formData.append("primer_nombre",primer_nombre)
-    formData.append("primer_apellido",primer_apellido)
-    formData.append("segundo_nombre",segundo_nombre)
-    formData.append("segundo_apellido",segundo_apellido)
-    formData.append("email",email)
-    formData.append("celular",celular)
-    formData.append("convencional",convencional)
-    formData.append("emergencia",emergencia)
-    
-    onSave(formData,{ headers: { "Content-Type": "multipart/form-data" } });
+    formData.append("nroCedula", nroCedula)
+    console.log("esta era la cédula", nroCedula)
+    formData.append("primer_nombre", primer_nombre)
+    formData.append("primer_apellido", primer_apellido)
+    formData.append("segundo_nombre", segundo_nombre)
+    formData.append("segundo_apellido", segundo_apellido)
+    formData.append("email", email)
+    formData.append("celular", celular)
+    formData.append("convencional", convencional)
+    formData.append("emergencia", emergencia)
+
+    onSave(formData);
   };
 
   return (
@@ -61,64 +64,70 @@ function CrearRepresentante({onCancel, entityToUpdate, onSave }) {
       <div className="modal-container">
         <h2 className="modal-title">{entityToUpdate ? 'Editar representante' : 'Agregar representante'}</h2>
 
-        <div className="modal-form">
+        <form onSubmit={(e) => handleSubmit(e)} className="modal-form">
           <div className='rows'>
             <div className="form-group">
               <label htmlFor="nroCedula">Número de cédula:</label>
-              <input id="nroCedula" value={nroCedula} onChange={(e) => setNroCedula(e.target.value)} />
+              <input required id="nroCedula" value={nroCedula} onChange={(e) => setNroCedula(e.target.value)} />
             </div>
             <div className="form-group">
               <label htmlFor="celular">#Celular:</label>
-              <input id="celular" value={celular} onChange={(e) => setCelular(e.target.value)} />
+              <input required id="celular" value={celular} onChange={(e) => setCelular(e.target.value)} />
             </div>
 
           </div>
           <div className='rows'>
             <div className="form-group">
               <label htmlFor="primer_nombre">Primer nombre:</label>
-              <input id="primer_nombre" value={primer_nombre} onChange={(e) => setPrimerNombre(e.target.value)}/>
+              <input required id="primer_nombre" value={primer_nombre} onChange={(e) => setPrimerNombre(e.target.value)} />
             </div>
 
             <div className="form-group">
               <label htmlFor="primer_apellido">Primer apellido:</label>
-              <input id="primer_apellido" value={primer_apellido} onChange={(e) => setPrimerApellido(e.target.value)} />
+              <input required id="primer_apellido" value={primer_apellido} onChange={(e) => setPrimerApellido(e.target.value)} />
             </div>
           </div>
 
           <div className='rows'>
             <div className="form-group">
               <label htmlFor="segundo_nombre">Segundo nombre:</label>
-              <input id="segundo_nombre" value={segundo_nombre} onChange={(e) => setSegundoNombre(e.target.value)} />
+              <input required id="segundo_nombre" value={segundo_nombre} onChange={(e) => setSegundoNombre(e.target.value)} />
             </div>
 
             <div className="form-group">
               <label htmlFor="segundo_apellido">Segundo apellido:</label>
-              <input id="segundo_apellido" value={segundo_apellido} onChange={(e) => setSegundoApellido(e.target.value)} />
+              <input required id="segundo_apellido" value={segundo_apellido} onChange={(e) => setSegundoApellido(e.target.value)} />
             </div>
 
           </div>
           <div className='rows'>
             <div className="form-group">
               <label htmlFor="convencional">#Convencional :</label>
-              <input id="convencional" value={convencional} onChange={(e) => setConvencional(e.target.value)} />
+              <input required id="convencional" value={convencional} onChange={(e) => setConvencional(e.target.value)} />
             </div>
             <div className="form-group">
               <label htmlFor="convencional">#Emergencia :</label>
-              <input id="emergencia" value={emergencia} onChange={(e) => setEmergencia(e.target.value)} />
+              <input required id="emergencia" value={emergencia} onChange={(e) => setEmergencia(e.target.value)} />
             </div>
           </div>
-          <div className="form-group">
-            <label htmlFor="email">Email:</label>
-            <input id="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <div className='rows'>
+
+            <div className="form-group">
+              <label htmlFor="email">Email:</label>
+              <input required id="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            </div>
+            <div className='form-group'>
+
+            </div>
           </div>
           <div className='rows'>
-            
+
             <label>
               Copia de Cédula:
               <input
                 type="file"
                 name="copiaCedula"
-
+                
                 onChange={handleFileChange}
                 accept="application/pdf"
               />
@@ -126,20 +135,25 @@ function CrearRepresentante({onCancel, entityToUpdate, onSave }) {
             <label>
               Croquis:
               <input
+                
                 type="file"
                 name="croquis"
                 onChange={handleFileChange}
                 accept="application/pdf"
               />
             </label>
-            
-          </div>
-        </div>
 
-        <div className="botones">
-          <Boton texto="Guardar" onClick={() => handleSubmit()} estilo="boton-crear" />
-          <Boton texto="Cancelar" onClick={onCancel} estilo="boton-cancelar" />
-        </div>
+          </div>
+          <div className='rows-botones'>
+            <div className="botones">
+              <button type='submit' className='boton-crear' >Guardar</button>
+              <Boton texto="Cancelar" onClick={onCancel} estilo="boton-cancelar" />
+            </div>
+          </div>
+
+        </form>
+
+
       </div>
     </div>
   )
