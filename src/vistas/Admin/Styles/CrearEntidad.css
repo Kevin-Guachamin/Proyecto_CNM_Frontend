@@ -152,7 +152,14 @@
     border: 1px solid #ddd;
     border-radius: 5px;
   }
-  .botones {
+  .rows-botones{
+    display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 15px;
+  width: 700px;
+  }
+   .botones {
     display: flex;
     justify-content: flex-end; /* Alinea los botones hacia la izquierda */
     gap: 10px; /* Espacio entre los botones */

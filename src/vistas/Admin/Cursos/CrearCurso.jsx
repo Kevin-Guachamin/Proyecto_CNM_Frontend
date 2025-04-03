@@ -22,7 +22,7 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
     axios.get(`${API_URL}/docente/obtener`)
       .then(response => {
         setDocentes(response.data);
-        
+
       })
       .catch(error => {
         ErrorMessage(error);
@@ -42,7 +42,7 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
   }, [API_URL, setDocentes])
   useEffect(() => {
     if (entityToUpdate) {
-      
+
       setParalelo(entityToUpdate.paralelo || "");
       setDocente(entityToUpdate.Docente || "");
       setAsignatura(entityToUpdate.Materia || "");
@@ -55,7 +55,7 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
   }, [entityToUpdate]);
 
   const handleSubmit = () => {
-    
+
     try {
       if (!periodo) {
         throw new Error("No se ha seleccionado un periodo");
@@ -72,7 +72,7 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
       }
 
 
-      const newAsignacion = { paralelo, horaInicio, horaFin, dias, cupos: Number(cupos), id_periodo_academico: Number(periodo), nroCedula_docente: docente.nroCedula, id_materia: Number(asignatura.ID) ,cuposDisponibles: Number(cupos)};
+      const newAsignacion = { paralelo, horaInicio, horaFin, dias, cupos: Number(cupos), id_periodo_academico: Number(periodo), nroCedula_docente: docente.nroCedula, id_materia: Number(asignatura.ID), cuposDisponibles: Number(cupos) };
       onSave(newAsignacion);
     } catch (error) {
       ErrorMessage(error)
@@ -87,78 +87,85 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
         <div className="modal-form">
           <div className='rows'>
 
-          <div className="form-group">
-            <label htmlFor="asignaturas">Asignaturas</label>
-            <AutoCompleteInput inputValue={asignatura} setInputValue={setAsignatura} opciones={asignaturas} key1="nombre" key2="nivel" />
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="docentes">Docentes</label>
-            <AutoCompleteInput inputValue={docente} setInputValue={setDocente} opciones={docentes} key1="primer_nombre" key2="primer_apellido" />
-          </div>
-          </div>
-          <div className='form-group'>
-            <label htmlFor="">Paralelo</label>
-            <input type="text" value={paralelo} onChange={(e) => setParalelo(e.target.value)} />
-          </div>
-          <div className="form-group">
-            <label htmlFor="Dia1">Día 1</label>
-            <select id="Dia1" value={dia1} onChange={(e) => setDia1(e.target.value)}>
-              <option value="">Selecciona un día</option>
-              <option value="Lunes">Lunes</option>
-              <option value="Martes">Martes</option>
-              <option value="Miércoles">Miercóles</option>
-              <option value="Jueves">Jueves</option>
-              <option value="Viernes">Viernes</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <label htmlFor="Dia2">Día 2</label>
-            <select id="Dia2" value={dia2} onChange={(e) => setDia2(e.target.value)}>
-              <option value="">Selecciona un día</option>
-              <option value="Lunes">Lunes</option>
-              <option value="Martes">Martes</option>
-              <option value="Miércoles">Miercóles</option>
-              <option value="Jueves">Jueves</option>
-              <option value="Viernes">Viernes</option>
-            </select>
-          </div>
-          <div className='form-group'>
-            <label htmlFor="">Horar inicio</label>
-            <input
-              type="time"
-              value={horaInicio}
-              onChange={(e) => {setHoraInicio(e.target.value); // Guardar solo la hora y los minutos
-              }}
-              min="07:00" // Inicio a las 7:00 AM
-              max="19:00" // Fin a las 19:00 PM
-            />
+            <div className="form-group">
+              <label htmlFor="asignaturas">Asignatura:</label>
+              <AutoCompleteInput inputValue={asignatura} setInputValue={setAsignatura} opciones={asignaturas} key1="nombre" key2="nivel" />
+            </div>
 
+            <div className="form-group">
+              <label htmlFor="docentes">Docente:</label>
+              <AutoCompleteInput inputValue={docente} setInputValue={setDocente} opciones={docentes} key1="primer_nombre" key2="primer_apellido" />
+            </div>
           </div>
-          <div className='form-group'>
-            <label htmlFor="">Horar fin</label>
-            <input
-              type="time"
-              value={horaFin}
-              onChange={(e) => {
-                setHoraFin(e.target.value); // Guardar solo la hora y los minutos
-              }}
-              min="07:00" // Inicio a las 7:00 AM
-              max="19:00" // Fin a las 19:00 PM
-            />
+          <div className='rows'>
 
+            <div className='form-group'>
+              <label htmlFor="">Paralelo:</label>
+              <input type="text" value={paralelo} onChange={(e) => setParalelo(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label htmlFor="Dia1">Día 1:</label>
+              <select id="Dia1" value={dia1} onChange={(e) => setDia1(e.target.value)}>
+                <option value="">Selecciona un día</option>
+                <option value="Lunes">Lunes</option>
+                <option value="Martes">Martes</option>
+                <option value="Miércoles">Miercóles</option>
+                <option value="Jueves">Jueves</option>
+                <option value="Viernes">Viernes</option>
+              </select>
+            </div>
+            <div className='form-group'>
+              <label htmlFor="">Horar inicio:</label>
+              <input
+                type="time"
+                value={horaInicio}
+                onChange={(e) => {
+                  setHoraInicio(e.target.value); // Guardar solo la hora y los minutos
+                }}
+                min="07:00" // Inicio a las 7:00 AM
+                max="19:00" // Fin a las 19:00 PM
+              />
+
+            </div>
           </div>
-          <div className="form-group">
-            <label htmlFor="cupos">Cupos</label>
-            <input
-              id="cupos"
-              type="number"
-              min="0"
-              max="120"
-              value={cupos}
-              onChange={(e) => setCupos(e.target.value)}
-              className="form-control"
-            />
+          <div className='rows'>
+            <div className="form-group">
+              <label htmlFor="cupos">Cupos:</label>
+              <input
+                id="cupos"
+                type="number"
+                min="0"
+                max="120"
+                value={cupos}
+                onChange={(e) => setCupos(e.target.value)}
+                className="form-control"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="Dia2">Día 2:</label>
+              <select id="Dia2" value={dia2} onChange={(e) => setDia2(e.target.value)}>
+                <option value="">Selecciona un día</option>
+                <option value="Lunes">Lunes</option>
+                <option value="Martes">Martes</option>
+                <option value="Miércoles">Miercóles</option>
+                <option value="Jueves">Jueves</option>
+                <option value="Viernes">Viernes</option>
+              </select>
+            </div>
+            <div className='form-group'>
+              <label htmlFor="">Horar fin:</label>
+              <input
+                type="time"
+                value={horaFin}
+                onChange={(e) => {
+                  setHoraFin(e.target.value); // Guardar solo la hora y los minutos
+                }}
+                min="07:00" // Inicio a las 7:00 AM
+                max="19:00" // Fin a las 19:00 PM
+              />
+
+            </div>
+
           </div>
         </div>
 

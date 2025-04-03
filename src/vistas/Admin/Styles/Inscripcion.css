@@ -1,0 +1,113 @@
+.buscar-representante {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    max-width: 550px;
+}
+
+.buscar-representante label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    white-space: nowrap;
+}
+
+.buscar-representante input {
+    padding: 7px;
+    border: 1px solid #aaa;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.buscar-representante input:focus {
+    border-color: #666;
+}
+
+.buscar-representante button {
+    
+    background-color: #6c757d; /* Gris elegante */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.buscar-representante button:hover {
+    background-color: #5a6268;
+}
+.contenedor-agregar, .contenedor-buscar {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    margin-top: 10px;
+}
+.agregar-representante {
+    padding: 8px 12px;
+    background-color: #28a745; /* Verde elegante */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 10px;
+    width: 200px;
+}
+
+.agregar-representante:hover {
+    background-color: #218838; /* Verde más oscuro */
+   
+}
+.contenedor-botonesFinales {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.botones-finales {
+    display: flex;
+    gap: 15px; /* Espacio entre botones */
+}
+
+.botones-finales button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    width: 150px; /* Ajusta según sea necesario */
+    height: 50px; /* Ajusta según sea necesario */
+    text-align: center;
+}
+
+.botones-finales button:first-child {
+    background-color: #28a745; /* Verde para Confirmar */
+    color: white;
+    
+}
+
+.botones-finales button:first-child:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+}
+
+.botones-finales button:last-child {
+    background-color: #dc3545; /* Rojo para Cancelar */
+    color: white;
+}
+
+.botones-finales button:last-child:hover {
+    background-color: #c82333;
+    transform: scale(1.05);
+}

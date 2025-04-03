@@ -1,103 +1,212 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { ErrorMessage } from '../../../Utils/ErrorMesaje';
 import axios from 'axios';
 import CrearRepresentante from '../Representantes/CrearRepresentante';
+import { FaEdit, FaTrash } from 'react-icons/fa';
+import Swal from 'sweetalert2';
+import CrearEstudiante from '../Estudiantes/CrearEstudiante';
+import '../Styles/Inscripcion.css';
 
 function BuscarTutor() {
-    const [cedula, setCedula] = useState("")
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [buscado, setBuscado] = useState(false); // Estado para saber si ya se buscó
+    const [cedula, setCedula] = useState("");
+    const [entityToUpdate, setEntityToUpdate] = useState(null);
+    const [modalRepresentante, setModalRepresentante] = useState(false);
+    const [modalEstudiante, setModalEstudiante] = useState(false);
+    const [buscado, setBuscado] = useState(false);
+    const [representante, setRepresentante] = useState(null);
+    const [estudiante, setEstudiante] = useState(null);
+    const [exist, setExist] = useState(false);
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
-    const [representante, setRepresentante] = useState("")
-
-    const handlenroCedulaChange = (e) => {
-        // Remover caracteres no numéricos
-        const onlyNumbers = e.target.value.replace(/[^0-9]/g, "");
-        // Permitir solo hasta 10 dígitos
-        if (onlyNumbers.length <= 10) {
-            setCedula(onlyNumbers);
+    function formatDate(date) {
+        // Si el valor es una cadena, lo convertimos a un objeto Date
+        if (typeof date === "string") {
+            date = new Date(date);
         }
-    };
-    const handleSaveEntity = (newDocente,headers) => {
-        axios
-          .post(`${API_URL}/representante/crear`, newDocente,headers)
-          .then((res) => {
-            console.log("este llego de la base despues de crear",res.data)
-            setRepresentante(res.data);
-            setIsModalOpen(false); // Cerrar el modal
-          })
-          .catch((error) => {
-            ErrorMessage(error)
-            console.log(error)
-          });
-      };
-    const HandleBuscarRepresentante = async () => {
-        setBuscado(true)
+
+        // Verificamos que sea un objeto Date válido
+        if (!(date instanceof Date) || isNaN(date)) {
+            throw new Error("Invalid date");
+        }
+
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0"); // Los meses son 0-indexed
+        const year = date.getFullYear();
+
+        return `${day}/${month}/${year}`;
+    }
+    const handleBuscarRepresentante = async () => {
+        setBuscado(true);
         try {
             if (!cedula) {
-                return
+                setRepresentante(null);
+                return;
             }
             const response = await axios.get(`${API_URL}/representante/obtener/${cedula}`);
-            setRepresentante(response)
+            setRepresentante(response.data);
+            setExist(true);
+        } catch (error) {
+            if (error.response?.status === 404) {
+                setRepresentante(null);
+                return;
+            }
+            ErrorMessage(error);
+        }
+    };
 
+    const handleSaveRepresentante = (formData) => {
+        const formObject = Object.fromEntries(formData.entries());
+        setRepresentante(formObject);
+        setModalRepresentante(false);
+    };
+
+    const handleSaveEstudiante = (formData) => {
+        const formObject = Object.fromEntries(formData.entries());
+        setEstudiante(formObject);
+        setModalEstudiante(false);
+    };
+    const handleEditEstudiante = (entity) => {
+        setEntityToUpdate(entity);
+        setModalEstudiante(true);
+    };
+    const handleEditRepresentante = (entity) => {
+        setEntityToUpdate(entity);
+        setModalRepresentante(true);
+    };
+    const toggleModalEstudiante = () => {
+        setModalEstudiante((prev) => !prev);
+        setEntityToUpdate(null);
+    };
+    const toggleModalRepresentante = () => {
+        setModalRepresentante((prev) => !prev);
+        setEntityToUpdate(null);
+    };
+
+
+    const handleDelete = (type) => {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: `¿Quieres eliminar este ${type}?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                if (type === 'representante') setRepresentante(null);
+                if (type === 'estudiante') setEstudiante(null);
+            }
+        });
+    };
+
+    const handleRegistrar = async () => {
+        try {
+            if (!exist) {
+                await axios.post(`${API_URL}/representante/crear`, representante, { headers: { "Content-Type": "multipart/form-data" } });
+            }
+            console.log("este es el estudiante antes de guardar",estudiante)
+            await axios.post(`${API_URL}/estudiante/crear`, estudiante, { headers: { "Content-Type": "multipart/form-data" } });
+            Swal.fire("Registro exitoso!", `Estudiante ${estudiante.primer_nombre} ${estudiante.primer_apellido} con su representante ${representante.primer_nombre} ${representante.primer_apellido}`, "success");
+            setEstudiante(null);
+            setRepresentante(null);
+            setBuscado(false);
         } catch (error) {
             ErrorMessage(error);
-
         }
-    }
-    const toggleModal = () => {
-        setIsModalOpen((prev) => !prev);
-        
-      };
+    };
+
     return (
         <div>
-            <div>
-                <label htmlFor="">Buscar representante por cédula</label>
-                <input type="text" value={cedula} onChange={handlenroCedulaChange} />
-                <button onClick={HandleBuscarRepresentante}>Buscar</button>
-
+            <div className='contenedor-buscar'>
+                <div className="buscar-representante">
+                    <label htmlFor="cedula">Buscar representante por cédula:</label>
+                    <input type="text" id="cedula" value={cedula} onChange={(e) => setCedula(e.target.value.replace(/\D/g, '').slice(0, 10))} />
+                    <button onClick={handleBuscarRepresentante}>Buscar</button>
+                </div>
             </div>
-            {isModalOpen && (
-            <CrearRepresentante
-              onCancel={toggleModal}
-              onSave={handleSaveEntity}
-            />
-      )}
-            <div className="Contendor-tabla">
-                {buscado && !representante && (
+            {modalRepresentante && <CrearRepresentante onCancel={toggleModalRepresentante} onSave={handleSaveRepresentante} entityToUpdate={entityToUpdate}/>}
+            {!representante && (
+                <div className="contenedor-agregar">
+                    <button className="agregar-representante" onClick={toggleModalRepresentante}>Agregar representante</button>
+                </div>
+            )}
+            {buscado && !representante && (
                     <div>
                         <p className="no-registros">No se encontró el representante.</p>
-                        <button onClick={toggleModal}> Agrear representante</button>
+
                     </div>
                 )}
-
-                {representante && (
-                    <table className="tabla_registros">
-                        <thead>
-                            <tr>
-                                <th>Cédula</th>
-                                <th>Primer nombre</th>
-                                <th>Primer apellido</th>
-                                <th>Email</th>
-                                <th>Celular</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{representante.nroCedula}</td>
-                                <td>{representante.primer_nombre}</td>
-                                <td>{representante.primer_apellido}</td>
-                                <td>{representante.email}</td>
-                                <td>{representante.celular}</td>
-
-                            </tr>
-                        </tbody>
-                    </table>
-                )}
-            </div>
-
+            {representante && (
+                <div>
+                    <div className='Contendor-tabla'>
+                        <table className="tabla_registros">
+                            <thead>
+                                <tr>
+                                    <th>Cédula</th><th>Nombre</th><th>Apellido</th><th>Email</th><th>Celular</th><th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{representante.nroCedula}</td>
+                                    <td>{representante.primer_nombre}</td>
+                                    <td>{representante.primer_apellido}</td>
+                                    <td>{representante.email}</td>
+                                    <td>{representante.celular}</td>
+                                    <td>
+                                        {!exist &&(<FaEdit className="icon edit-icon" onClick={() => handleEditRepresentante(representante)} />)}
+                                        
+                                        <FaTrash className="icon delete-icon" onClick={() => handleDelete('representante')} />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    {!estudiante && (
+                        <div className="contenedor-agregar">
+                            <button className="agregar-representante" onClick={toggleModalEstudiante}>Agregar estudiante</button>
+                        </div>
+                    )}
+                    {modalEstudiante && <CrearEstudiante onCancel={toggleModalEstudiante} onSave={handleSaveEstudiante} representante={representante.nroCedula} entityToUpdate={entityToUpdate} />}
+                    {estudiante && (
+                        <div>
+                            <div className='Contendor-tabla'>
+                                <table className="tabla_registros">
+                                    <thead>
+                                        <tr>
+                                            <th>Cédula</th><th>Nombre</th><th>Apellido</th><th>Fecha Nacimiento</th><th>Género</th><th>Jornada</th><th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>{estudiante.nroCedula}</td>
+                                            <td>{estudiante.primer_nombre}</td>
+                                            <td>{estudiante.primer_apellido}</td>
+                                            <td>{formatDate(estudiante.fecha_nacimiento)}</td>
+                                            <td>{estudiante.genero}</td>
+                                            <td>{estudiante.jornada}</td>
+                                            <td>
+                                                <FaEdit className="icon edit-icon" onClick={() => handleEditEstudiante(estudiante)} />
+                                                <FaTrash className="icon delete-icon" onClick={() => handleDelete('estudiante')} />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className='contenedor-botonesFinales'> 
+                                
+                            <div className="botones-finales">
+                                <button onClick={handleRegistrar}>Guardar</button>
+                                <button onClick={() => { setEstudiante(null); setRepresentante(null); setBuscado(false) }}>Cancelar</button>
+                            </div>
+                            </div>
+                            
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
-    )
+    );
 }
 
-export default BuscarTutor
+export default BuscarTutor;
