@@ -15,11 +15,15 @@ function ListaEstudiantes() {
   const [isCalificacionesOpen, setIsCalificacionesOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const handleVerCalificaciones = (estudianteCedula) => {
-    console.log("ver calificaciones de: ", estudianteCedula);
+  const handleVerCalificaciones = async (estudianteId) => {
+    console.log("ver calificaciones de: ", estudianteId);
     try {
-      /* const respuesta = await axios.get(`http://localhost:8000/estudiante/obtener/${estudianteCedula}`);
-      setEstudianteSeleccionado(respuesta.data); */
+      const respuesta = await axios.get(`http://localhost:8000/estudiante/obtener/${estudianteId}`);
+      setEstudianteSeleccionado(respuesta.data);
+      
+
+      // Obtener las notas del estudiante 
+      
       setIsCalificacionesOpen(true);
 
     } catch (error) {
@@ -116,6 +120,7 @@ function ListaEstudiantes() {
         {isCalificacionesOpen && (
           <VerCalificacionesEstudiante
             onCancel={handleCloseModal} 
+            // notas
           />
         )}
 
