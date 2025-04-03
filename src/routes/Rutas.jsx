@@ -8,7 +8,7 @@ import Asignaguras from "../vistas/Admin/Asignaturas/Index.jsx"
 import Docentes from "../vistas/Admin/Docentes/Index.jsx"
 import Representante from '../vistas/Representante/index.jsx'
 import Estudiantes from '../vistas/Admin/Estudiantes/Index.jsx'
-import PanelCursos from '../vistas/Panelcursos.jsx';
+import PanelCursos from '../vistas/PanelCursos.jsx';
 import ListaEstudiantes from '../vistas/Representante/modulos/listaEstudiantes.jsx';
 import VerDatosRepresentante from '../vistas/Representante/modulos/VerDatosRepresentante.jsx';
 import VerDatosEstudiante from '../vistas/Representante/modulos/VerDatosEstudiante.jsx';
