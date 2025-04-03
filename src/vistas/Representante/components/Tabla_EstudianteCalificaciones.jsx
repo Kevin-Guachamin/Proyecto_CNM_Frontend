@@ -10,14 +10,6 @@ const TablaEstudianteCalificaciones = () => {
                    <h2 className="mb-0">Gestión de Calificaciones</h2>
                    <div>
                        <button
-                           className="btn btn-success me-2"
-                           //onClick={handleExportExcel}
-                           title="Exportar a Excel"
-                       >
-                           <i className="bi bi-file-earmark-excel-fill"></i>
-                       </button>
-
-                       <button
                            className="btn btn-danger me-2"
                            //onClick={handleExportPDF}
                            title="Exportar a PDF"
