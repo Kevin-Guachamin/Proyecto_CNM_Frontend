@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import '../Styles/AutoCompleteInput.css'
+import '../../../Styles/AutoCompleteInput.css'
 const AutoCompleteInput = ({ opciones, inputValue, setInputValue, key1, key2 }) => {
   const [filteredOptions, setFilteredOptions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);

@@ -1,12 +1,11 @@
 import React, { useState } from 'react'
 import axios from "axios";
-import { ErrorMessage } from '../../../../Utils/ErrorMesaje';
 import { useNavigate } from 'react-router-dom';
-import Input from '../../../../components/Input';
+import Input from '../../components/Input';
 import "./ChangePassword.css";
 
 
-function ChangePassword() {
+function ChangePassword({type,redireccion}) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const navigate = useNavigate()
@@ -24,7 +23,7 @@ function ChangePassword() {
         {
           currentPassword,
           newPassword,
-          type: "Representante",
+          type: type,
         },
         {
           headers: {
@@ -34,17 +33,17 @@ function ChangePassword() {
       );
 
       setMsg(response.data.message);
-      console.log("este es el response",response)
+      console.log("este es el response", response)
       setCurrentPassword("");
       setNewPassword("");
     } catch (err) {
-      console.log("este es el error",err.response.data);
+      console.log("este es el error", err.response.data);
       setError(err.response.data.message)
-      
+
     }
   };
   const OnCancel = () => {
-    navigate("/representante")
+    navigate(`${redireccion}`)
   }
 
   return (

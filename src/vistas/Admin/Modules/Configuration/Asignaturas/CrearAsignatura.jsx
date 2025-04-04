@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import Boton from '../../../components/Boton';
-import Input from '../../../components/Input';
+import Boton from '../../../../../components/Boton';
+import Input from '../../../../../components/Input';
 import "react-datepicker/dist/react-datepicker.css"; // Importa el CSS de react-datepicker
-import '../Styles/CrearEntidad.css';
+import '../../../Styles/CrearEntidad.css';
 
 function CrearAsignatura({ onCancel, entityToUpdate, onSave }) {
     const [nombre, setNombre] = useState("");

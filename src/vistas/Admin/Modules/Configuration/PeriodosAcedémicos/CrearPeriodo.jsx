@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
-import Boton from '../../../components/Boton';
+import Boton from '../../../../../components/Boton';
 import "react-datepicker/dist/react-datepicker.css"; // Importa el CSS de react-datepicker
-import '../Styles/CrearEntidad.css';
+import '../../../Styles/CrearEntidad.css';
 
 function CrearPeriodo({ onCancel, entityToUpdate, onSave }) {
     const [descripcion, setDescripcion] = useState("");
@@ -16,23 +16,23 @@ function CrearPeriodo({ onCancel, entityToUpdate, onSave }) {
         const [dia, mes, año] = fecha.split('/');
         return new Date(`${año}-${mes}-${dia}`); // Convertir a formato ISO (yyyy-mm-dd)
     };
-    
+
     useEffect(() => {
         //console.log("esto es lo que entro",entityToUpdate.fecha_fin)
-        console.log("esto se intenta crear",fecha_fin);
+        console.log("esto se intenta crear", fecha_fin);
     }, [fecha_fin]);  // Esto se activará cuando fecha_fin cambie
     useEffect(() => {
         if (entityToUpdate) {
             setDescripcion(entityToUpdate.descripcion || "");
             // Convertir las fechas de dd/mm/yyyy a objetos Date
             setFecha_fin(convertirFecha(entityToUpdate.fecha_fin) || "");
-            setFecha_inicio(convertirFecha(entityToUpdate.fecha_inicio) ||"") ;
+            setFecha_inicio(convertirFecha(entityToUpdate.fecha_inicio) || "");
             setEstado(entityToUpdate.estado || "");
         }
     }, [entityToUpdate]);
 
     const handleSubmit = () => {
-        
+
 
         const newPeriodo = { descripcion, fecha_inicio, fecha_fin, estado };
         onSave(newPeriodo);
@@ -50,7 +50,7 @@ function CrearPeriodo({ onCancel, entityToUpdate, onSave }) {
                             id="descripcion"
                             value={descripcion}
                             onChange={(e) => setDescripcion(e.target.value)}
-                            
+
                         />
                     </div>
 
@@ -73,8 +73,9 @@ function CrearPeriodo({ onCancel, entityToUpdate, onSave }) {
                         <DatePicker
                             selected={fecha_inicio}
                             onChange={(date) => {
-                                
-                                setFecha_inicio(date)}} // Establecer directamente como Date
+
+                                setFecha_inicio(date)
+                            }} // Establecer directamente como Date
                             dateFormat="dd/MM/yyyy"
                             className="input-field"
                         />

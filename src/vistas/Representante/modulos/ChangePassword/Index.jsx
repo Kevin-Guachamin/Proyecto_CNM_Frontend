@@ -1,22 +1,22 @@
-import React,{useState,useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import Header from "../../../../components/Header";
-import ChangePassword from './ChangePassword';
+import ChangePassword from '../../../components/ChangePassword';
 import { useNavigate } from 'react-router-dom';
 
 function Index() {
-    
-    const [usuario,setUsuario]=useState("")
-    const navigate=useNavigate()
-    
+
+    const [usuario, setUsuario] = useState("")
+    const navigate = useNavigate()
+
     useEffect(() => {
         const storedUser = localStorage.getItem("usuario");
         const parsedUser = JSON.parse(storedUser);
-        console.log("este es el usuario",parsedUser)
+        console.log("este es el usuario", parsedUser)
         if (!parsedUser || parsedUser.rol !== "representante") {
             navigate("/")
-            
+
         }
-        
+
 
         setUsuario(parsedUser);
     }, [navigate]);
@@ -27,7 +27,7 @@ function Index() {
                 {usuario && <Header isAuthenticated={true} usuario={usuario} />}
             </div>
 
-             <ChangePassword />
+            <ChangePassword type={"representante"} redireccion={"/representante"}/>
 
 
         </div>

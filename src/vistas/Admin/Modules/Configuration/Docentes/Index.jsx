@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import Header from "../../../components/Header";
-import Layout from '../../../layout/Layout'
-import Loading from "../../../components/Loading";
-import Contenedor from "../Components/Contenedor";
-import { modulesSettings } from "../Components/Modulos"
-import { ObtenerTodo } from "../../../Utils/CRUD/ObjetenerTodo";
+import Header from "../../../../../components/Header";
+import Layout from '../../../../../layout/Layout'
+import Loading from "../../../../../components/Loading";
+import Contenedor from "../../../Components/Contenedor";
+import { modulesSettings } from "../../../Components/Modulos"
+import { ObtenerTodo } from "../../../../../Utils/CRUD/ObjetenerTodo";
 import CrearDocente from "./CrearDocente";
 import { useNavigate } from "react-router-dom";
 
@@ -19,18 +19,18 @@ function Index() {
   const colums = ["nroCedula", "primer_nombre", "primer_apellido", "segundo_nombre", "segundo_apellido", "email", "celular", "rol"]
   const filterKey = "nroCedula"
   const PK = "nroCedula"
-  const navigate=useNavigate()
-  
+  const navigate = useNavigate()
+
 
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = JSON.parse(storedUser);
-    if(!parsedUser || parsedUser.subRol!=="Administrador"){
+    if (!parsedUser || parsedUser.subRol !== "Administrador") {
       navigate("/")
     }
     ObtenerTodo(setDocentes, `${API_URL}/docente/obtener`, setLoading)
     setUsuario(parsedUser);
-  }, [API_URL,navigate]);
+  }, [API_URL, navigate]);
 
   return (
     <div className="section-container">

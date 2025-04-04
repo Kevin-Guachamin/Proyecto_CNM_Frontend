@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { ErrorMessage } from '../../../Utils/ErrorMesaje';
+import { ErrorMessage } from '../../../../../Utils/ErrorMesaje';
 import axios from 'axios';
 import CrearRepresentante from '../Representantes/CrearRepresentante';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import CrearEstudiante from '../Estudiantes/CrearEstudiante';
-import '../Styles/Inscripcion.css';
+import '../../../Styles/Inscripcion.css';
 
 function BuscarTutor() {
     const [cedula, setCedula] = useState("");
@@ -105,7 +105,7 @@ function BuscarTutor() {
             if (!exist) {
                 await axios.post(`${API_URL}/representante/crear`, representante, { headers: { "Content-Type": "multipart/form-data" } });
             }
-            console.log("este es el estudiante antes de guardar",estudiante)
+            console.log("este es el estudiante antes de guardar", estudiante)
             await axios.post(`${API_URL}/estudiante/crear`, estudiante, { headers: { "Content-Type": "multipart/form-data" } });
             Swal.fire("Registro exitoso!", `Estudiante ${estudiante.primer_nombre} ${estudiante.primer_apellido} con su representante ${representante.primer_nombre} ${representante.primer_apellido}`, "success");
             setEstudiante(null);
@@ -126,18 +126,18 @@ function BuscarTutor() {
                     <button onClick={handleBuscarRepresentante}>Buscar</button>
                 </div>
             </div>
-            {modalRepresentante && <CrearRepresentante onCancel={toggleModalRepresentante} onSave={handleSaveRepresentante} entityToUpdate={entityToUpdate}/>}
+            {modalRepresentante && <CrearRepresentante onCancel={toggleModalRepresentante} onSave={handleSaveRepresentante} entityToUpdate={entityToUpdate} />}
             {!representante && (
                 <div className="contenedor-agregar">
                     <button className="agregar-representante" onClick={toggleModalRepresentante}>Agregar representante</button>
                 </div>
             )}
             {buscado && !representante && (
-                    <div>
-                        <p className="no-registros">No se encontró el representante.</p>
+                <div>
+                    <p className="no-registros">No se encontró el representante.</p>
 
-                    </div>
-                )}
+                </div>
+            )}
             {representante && (
                 <div>
                     <div className='Contendor-tabla'>
@@ -155,8 +155,8 @@ function BuscarTutor() {
                                     <td>{representante.email}</td>
                                     <td>{representante.celular}</td>
                                     <td>
-                                        {!exist &&(<FaEdit className="icon edit-icon" onClick={() => handleEditRepresentante(representante)} />)}
-                                        
+                                        {!exist && (<FaEdit className="icon edit-icon" onClick={() => handleEditRepresentante(representante)} />)}
+
                                         <FaTrash className="icon delete-icon" onClick={() => handleDelete('representante')} />
                                     </td>
                                 </tr>
@@ -194,14 +194,14 @@ function BuscarTutor() {
                                     </tbody>
                                 </table>
                             </div>
-                            <div className='contenedor-botonesFinales'> 
-                                
-                            <div className="botones-finales">
-                                <button onClick={handleRegistrar}>Guardar</button>
-                                <button onClick={() => { setEstudiante(null); setRepresentante(null); setBuscado(false) }}>Cancelar</button>
+                            <div className='contenedor-botonesFinales'>
+
+                                <div className="botones-finales">
+                                    <button onClick={handleRegistrar}>Guardar</button>
+                                    <button onClick={() => { setEstudiante(null); setRepresentante(null); setBuscado(false) }}>Cancelar</button>
+                                </div>
                             </div>
-                            </div>
-                            
+
                         </div>
                     )}
                 </div>

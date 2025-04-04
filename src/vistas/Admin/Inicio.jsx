@@ -14,7 +14,7 @@ const Inicio = () => {
   const [modulos] = useState([
     { id: 1, titulo: "Configuración", icono: <Settings size={40} className="text-gray-700" />, link: "/admin/periodos" },
     { id: 2, titulo: "Matriculación", icono: "✏️", link: "/admin/matriculacion" },
-    { id: 3, titulo: "Estudiantes", icono: <BiMaleFemale size={40}/>, link: "/admin/estudiantes"},
+    { id: 3, titulo: "Estudiantil", icono: <BiMaleFemale size={40}/>, link: "/admin/inscripcion"},
   ]);
 
   useEffect(() => {

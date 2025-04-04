@@ -1,9 +1,9 @@
 import React from 'react'
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ErrorMessage } from '../../../Utils/ErrorMesaje';
+import { ErrorMessage } from '../../../../../Utils/ErrorMesaje';
 import AutoCompleteInput from './AutoCompleteInput';
-import Boton from '../../../components/Boton';
+import Boton from '../../../../../components/Boton';
 
 function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
   const [paralelo, setParalelo] = useState("");

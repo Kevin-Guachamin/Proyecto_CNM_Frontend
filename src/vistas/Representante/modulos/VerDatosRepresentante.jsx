@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import ViewData from "../../Admin/Estudiantes/ViewData";
+import ViewData from "../../Admin/Modules/Estudiantil/Estudiantes/ViewData";
 import Header from "../../../components/Header";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";

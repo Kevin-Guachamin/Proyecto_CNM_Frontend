@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import Boton from '../../../components/Boton';
-import '../Styles/CrearEntidad.css';
+import Boton from '../../../../../components/Boton';
+import '../../../Styles/CrearEntidad.css';
 
 function CrearRepresentante({ onCancel, entityToUpdate, onSave }) {
   const [nroCedula, setNroCedula] = useState("")

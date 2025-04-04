@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import Boton from '../../../components/Boton';
+import Boton from '../../../../../components/Boton';
 import DatePicker from 'react-datepicker';
-import '../Styles/CrearEntidad.css';
+import '../../../Styles/CrearEntidad.css';
 import "react-datepicker/dist/react-datepicker.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 //import { faDownload } from '@fortawesome/free-solid-svg-icons';
 //import axios from 'axios';
-import { ErrorMessage } from '../../../Utils/ErrorMesaje';
+import { ErrorMessage } from '../../../../../Utils/ErrorMesaje';
 
-function CrearEstudiante({ onCancel, entityToUpdate, onSave,representante }) {
+function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
   const [nroCedula, setNroCedula] = useState("")
   const [primer_nombre, setPrimerNombre] = useState("");
   const [primer_apellido, setPrimerApellido] = useState("");
@@ -90,7 +90,7 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave,representante }) {
       [name]: files[0], // Solo se selecciona un archivo por input
     }));
   };
-//Funcion para descargar archivos NO BORRAR AÚN se la ba a usar en otro lado
+  //Funcion para descargar archivos NO BORRAR AÚN se la ba a usar en otro lado
   // const handleDownload = async (filePath) => {
   //   const parts = filePath.split("\\");
   //   const folder = parts[1]; // Subcarpeta (ej: "Estudiantes")
@@ -119,7 +119,7 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave,representante }) {
   // }
   const handleSubmit = () => {
     const direccion = [sector, parroquia, canton].join(" ")
-    
+
     console.log("fecha de nacimiento enviada a la base", fecha_nacimiento)
     const formData = new FormData();
     formData.append("copiaCedula", files.copiaCedula);
@@ -136,7 +136,7 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave,representante }) {
     formData.append("especialidad", especialidad)
     formData.append("IER", IER)
     formData.append("direccion", direccion)
-    formData.append("nroCedula_representante",representante)
+    formData.append("nroCedula_representante", representante)
 
 
     onSave(formData);
@@ -151,11 +151,11 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave,representante }) {
           <div className='rows'>
             <div className="form-group">
               <label htmlFor="nroCedula">Número de cédula:</label>
-              <input  required id="nroCedula" value={nroCedula} onChange={(e) => setNroCedula(e.target.value)} />
+              <input required id="nroCedula" value={nroCedula} onChange={(e) => setNroCedula(e.target.value)} />
             </div>
             <div className="form-group">
               <label htmlFor="nroMatricula">Código estudiante:</label>
-              <input  id="nroMatricula" value={entityToUpdate ? generarCodigoEstudiante(entityToUpdate.anioMatricula, entityToUpdate.ID) : ""} readOnly />
+              <input id="nroMatricula" value={entityToUpdate ? generarCodigoEstudiante(entityToUpdate.anioMatricula, entityToUpdate.ID) : ""} readOnly />
             </div>
           </div>
           <div className='rows'>
@@ -224,7 +224,7 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave,representante }) {
                 scrollableYearDropdown
                 yearDropdownItemNumber={100}
                 maxDate={new Date()}
-                openToDate={new Date(new Date().setFullYear(new Date().getFullYear() - 9))} 
+                openToDate={new Date(new Date().setFullYear(new Date().getFullYear() - 9))}
               />
             </div>
             <div className="form-group">
@@ -301,7 +301,7 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave,representante }) {
                 onChange={handleFileChange}
                 accept="application/pdf"
                 className="custom-file-input"
-               
+
               />
               {/* Botón de descarga condicional */}
               {/*entityToUpdate && (

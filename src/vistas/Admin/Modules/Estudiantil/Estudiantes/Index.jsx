@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import Header from "../../../components/Header";
-import Layout from '../../../layout/Layout'
-import Loading from "../../../components/Loading";
-import Contenedor from "../Components/Contenedor";
-import { modulesEstudiates } from "../Components/Modulos"
+import Header from "../../../../../components/Header";
+import Layout from '../../../../../layout/Layout'
+import Loading from "../../../../../components/Loading";
+import Contenedor from "../../../Components/Contenedor";
+import { modulesEstudiates } from "../../../Components/Modulos"
 import axios from 'axios'
 import CrearEstudiante from "./CrearEstudiante";
 import { IoEyeOutline } from "react-icons/io5";
-import { ErrorMessage } from "../../../Utils/ErrorMesaje";
-import Paginación from '../Components/Paginación';
+import { ErrorMessage } from "../../../../../Utils/ErrorMesaje";
+import Paginación from '../../../Components/Paginación';
 import { useNavigate } from "react-router-dom";
 
 function Index() {
@@ -18,7 +18,7 @@ function Index() {
   const [estudiantes, setEstudiantes] = useState([])
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const navigate=useNavigate()
+  const navigate = useNavigate()
 
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const headers = ["Cédula", "Nombre", "Apellido", "Fecha de nacimiento", "Género", "Jornada", "Acciones"];
@@ -34,7 +34,7 @@ function Index() {
     setLoading(true)
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = JSON.parse(storedUser);
-    if(!parsedUser || parsedUser.subRol!=="Administrador"){
+    if (!parsedUser || parsedUser.subRol !== "Administrador") {
       navigate("/")
     }
     axios.get(`${API_URL}/estudiante/obtener?page=${page}`)
@@ -52,7 +52,7 @@ function Index() {
     // Mientras no se conecte al backend, dejamos un usuario de prueba
 
     setUsuario(parsedUser);
-  }, [API_URL, page,navigate]);
+  }, [API_URL, page, navigate]);
 
   return (
     <div className="section-container">
