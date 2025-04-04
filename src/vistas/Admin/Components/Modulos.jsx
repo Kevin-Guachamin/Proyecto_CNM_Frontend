@@ -21,7 +21,7 @@ export const modulesMatricula = [
 export const modulesEstudiates=[
   {name: "Inicio",icon: <Home size={20}/>, path: "/admin"},
   {name: "Registro",icon: <NotebookPen size={20}/>, path: "/admin/inscripcion"},
-  {name: "Actualizar Registro",icon: <FaUserEdit size={20}/>, path: "/admin/inscripcion"},
+  {name: "Información Registros",icon: <FaUserEdit size={20}/>, path: "/admin/inscripcion"},
   {name: "Estudiantes", icon: <LuUsers size={20}/>, path: "/admin/estudiantes"},
   {name: "Representantes", icon: <FaUsersLine size={25}/>, path: "/admin/representantes"},
 ]
