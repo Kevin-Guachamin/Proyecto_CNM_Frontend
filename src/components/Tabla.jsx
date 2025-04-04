@@ -8,7 +8,7 @@ import "./Tabla.css";
 const Tabla = ({
   columnas, columnasAgrupadas, datos, onChange, columnasEditables = [],
   mostrarEditar = true, mostrarGuardar = true, onEditar, onGuardar, inputsDisabled, 
-  isWithinRange,rangoTexto }) => {
+  isWithinRange,rangoTexto,globalEdit,forceEdit }) => {
   const [editingRow, setEditingRow] = useState(null);
   const columnasRepetidas = ["Nro", "Nómina de Estudiantes"];
   const columnaFinal = "Acciones";
@@ -63,7 +63,7 @@ const Tabla = ({
                             <button
                               className="btn btn-sm btn-primary text-white"
                               onClick={() => {
-                                if (!isWithinRange) {
+                                if (!isWithinRange && !forceEdit) {
                                   Swal.fire({
                                     icon: rangoTexto ? "warning" : "info",
                                     title: rangoTexto ? "Fuera de fecha" : "Fechas no definidas",
@@ -72,7 +72,7 @@ const Tabla = ({
                                       : "Aún no se han definido fechas para esta sección.",
                                   });
                                   return;
-                                }                            
+                                }                                                            
                                 setEditingRow(i); // Habilita la edición para esta fila.
                                 if (onEditar) onEditar(i, fila);
                               }}>
@@ -161,7 +161,7 @@ const Tabla = ({
                               }}
                               className="form-control text-center screen-only"
                               data-columna={col}
-                              disabled={inputsDisabled || editingRow !== i}
+                              disabled={inputsDisabled || (globalEdit ? false : editingRow !== i)}
                             />
                           )
                         ) : (

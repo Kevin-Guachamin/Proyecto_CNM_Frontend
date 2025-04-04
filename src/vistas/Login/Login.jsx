@@ -6,6 +6,8 @@ import Footer from "../../components/Footer";
 import Input from "../../components/Input";
 import Loading from "../../components/Loading";
 import "./Login.css";
+import Swal from "sweetalert2";
+import { ErrorMessage } from "../../Utils/ErrorMesaje";
 
 function Login() {
   const navigate = useNavigate();
@@ -26,7 +28,6 @@ function Login() {
       const { token, ...user } = response.data;
       localStorage.setItem("usuario", JSON.stringify(user));
       localStorage.setItem("token", token);
-      console.log("este es el usuario", user)
       // Redirección basada en el rol del usuario:
       if (user.rol === "representante") {
         navigate("/representante");
@@ -41,16 +42,27 @@ function Login() {
       else if(user.subRol==="Vicerrector"){
         navigate("/inicio")
       }
+      else if(user.subRol==="Secretaria"){
+        navigate("/inicio")
+      }
       else {
-        // Aquí se puede agregar lógica para otros rols en el futuro
-        alert("Acceso no permitido");
+        Swal.fire({
+          icon: "error",
+          title: "Acceso no permitido",
+          text: "No tienes permiso para acceder a esta sección",
+          confirmButtonText: "Cerrar",
+        });
       }
     } catch (error) {
-      console.error("Error al iniciar sesión:", error);
       if (error.response && error.response.status === 401) {
-        alert("Cédula o contraseña incorrectos");
+        Swal.fire({
+          icon: "error",
+          title: "Error de autenticación",
+          text: "Cédula o contraseña incorrectos",
+          confirmButtonText: "Intentar de nuevo",
+        });
       } else {
-        alert("Ocurrió un error en el servidor");
+        ErrorMessage(error);
       }
     }
   };

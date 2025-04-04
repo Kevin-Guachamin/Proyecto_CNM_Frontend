@@ -6,7 +6,7 @@ import axios from "axios";
 import { ErrorMessage } from "../../Utils/ErrorMesaje";
 import "./Parcial.css";
 
-const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actualizarDatosQuim, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto }) => {
+const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actualizarDatosQuim, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit }) => {
 
   const idContenedor = `pdf-quimestral-quim${quimestreSeleccionado}`;
 
@@ -72,6 +72,11 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
   useEffect(() => {
     if (!datosModulo?.ID) return;
 
+    // ✅ Aquí agregamos el token antes de hacer cualquier request
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
+    }
     const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${datosModulo.ID}`;
     const urlQuimestrales = `${import.meta.env.VITE_URL_DEL_BACKEND}/quimestrales/asignacion/${datosModulo.ID}`;
 
@@ -143,7 +148,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
 
   // Función para manejar cambios en los inputs de la tabla (en este caso, solo para la columna "Examen")
   const handleInputChange = (rowIndex, columnName, value) => {
-    if (!isWithinRange) {
+    if (!isWithinRange && !forceEdit) {
       Swal.fire({
         icon: 'info',
         title: 'Fuera de fecha',
@@ -231,7 +236,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
   // Indicamos que la columna "Examen" es editable, similar a como se hace en el componente de Parcial
   const columnasEditables = ["Examen"];
 
-  const realmenteDeshabilitado = inputsDisabled || !isWithinRange;
+  const realmenteDeshabilitado = inputsDisabled || (!isWithinRange && !forceEdit);
 
   const handleGuardar = (rowIndex, rowData) => {
     if (!rowData.idQuimestral) {
@@ -316,6 +321,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
         onGuardar={handleGuardar}
         rangoTexto={rangoTexto}
         isWithinRange={isWithinRange}
+        globalEdit={forceEdit}
       />
     </div>
   );

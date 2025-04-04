@@ -27,8 +27,6 @@ function Header({ isAuthenticated, usuario }) {
   }, [isDropdownOpen]);
 
   const handleLogout = () => {
-    // Al cerrar sesión se elimina tanto el usuario como el token
-    console.log("Cerrando sesión...");
     localStorage.removeItem("usuario");
     localStorage.removeItem("token");
     navigate("/");

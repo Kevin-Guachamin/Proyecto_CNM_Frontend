@@ -3,22 +3,21 @@ import Header from "../components/Header";
 import Layout from "../layout/Layout";
 import Modulo from "../components/Modulo";
 import Loading from "../components/Loading";
-import { Home, Users, Settings, BookOpen } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ErrorMessage } from "../Utils/ErrorMesaje";
+import { getModulos, transformModulesForLayout } from "./getModulos";
+import Swal from "sweetalert2";
+
 
 function PanelCursos() {
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState(null);
   const [cursos, setCursos] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [modules, setModules] = useState([]);
 
-  const modules = [
-    { name: "Inicio", icon: <Home size={20} />, path: "/inicio" },
-    { name: "Usuarios", icon: <Users size={20} />, path: "/usuarios" },
-    { name: "Configuración", icon: <Settings size={20} />, path: "/configuracion" },
-  ];
 
   function formatearHorario(horario) {
     // Reemplaza cualquier ocurrencia de "HH:MM:SS" por "HH:MM"
@@ -33,33 +32,73 @@ function PanelCursos() {
       const parsedUser = JSON.parse(storedUser);
       setUsuario(parsedUser);
   
-      axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/asignacion/docente/${parsedUser.nroCedula}`)
+      const config = {
+        headers: {
+          Authorization: `Bearer ${storedToken}`
+        }
+      };
+      
+      const modulosBase = getModulos(parsedUser.subRol, true);
+      setModules(transformModulesForLayout(modulosBase));
+
+      // Paso 1: Verificar periodo académico activo
+      axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/periodo_academico/activo`, config)
         .then((response) => {
-          const data = response.data;
+          const periodoActivo = response.data;
   
-          if (Array.isArray(data) && data.length > 0) {
-            const cursosData = data.map((curso) => ({
-              id: curso.ID,
-              titulo: `Curso: ${curso.materia}`,
-              descripcion: `Paralelo: ${curso.paralelo}\n Horario: ${formatearHorario(curso.horario)}`,
-              link: "/calificaciones"
-            }));
-            setCursos(cursosData);
+          if (periodoActivo && periodoActivo.estado === "Activo") {
+            // Paso 2: Obtener cursos si el periodo está activo
+            axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/asignacion/docente/${parsedUser.nroCedula}`, config)
+              .then((response) => {
+                const data = response.data;
+  
+                if (Array.isArray(data) && data.length > 0) {
+                  const cursosData = data.map((curso) => ({
+                    id: curso.ID,
+                    titulo: `Curso: ${curso.materia}`,
+                    descripcion: `Paralelo: ${curso.paralelo}\n Horario: ${formatearHorario(curso.horario)}`,
+                    link: "/calificaciones"
+                  }));
+                  setCursos(cursosData);
+                } else {
+                  setCursos([]);
+                }
+              })
+              .catch((error) => {
+                ErrorMessage(error);
+                setCursos([]);
+              });
           } else {
+            Swal.fire({
+              icon: "info",
+              title: "Sin período activo",
+              text: "No hay un período académico activo actualmente.",
+            });
             setCursos([]);
           }
         })
         .catch((error) => {
-          ErrorMessage(error);
+          if (
+            error.response &&
+            error.response.status === 404 &&
+            error.response.data?.message === "Periodo no encontrado"
+          ) {
+            Swal.fire({
+              icon: "info",
+              title: "Sin período activo",
+              text: "No se ha encontrado un período académico activo.",
+            });
+          } else {
+            ErrorMessage(error);
+          }
           setCursos([]);
         });
     } else {
       navigate("/");
     }
-  }, [navigate]);
+  }, [navigate]); 
   
   const handleModuloClick = (modulo) => {
-    console.log("Modulo seleccionado:", modulo);  // <-- Añade este log
     setLoading(true);
     
     axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/asignacion/obtener/${modulo.id}`)

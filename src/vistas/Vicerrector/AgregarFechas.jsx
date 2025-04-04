@@ -30,8 +30,9 @@ function AgregarFechas() {
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const storedToken = localStorage.getItem("token");
-
+  
     if (storedUser && storedToken) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
       const parsedUser = JSON.parse(storedUser);
       setUsuario(parsedUser);
       const modulosBase = getModulos(parsedUser.subRol, true);
@@ -41,6 +42,7 @@ function AgregarFechas() {
       navigate("/");
     }
   }, [navigate]);
+  
 
   const parseFecha = (strFecha) => {
     if (!strFecha) return "";
