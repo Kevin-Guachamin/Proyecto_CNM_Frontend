@@ -17,35 +17,69 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true); // Activa el loading justo después de enviar el formulario
-    try {
-      // Realizar la solicitud POST usando cédula y contraseña (enviado como "contraseña")
-      const response = await axios.post(`${import.meta.env.VITE_URL_DEL_BACKEND}/login`, {
-        nroCedula,
-        password,
+  
+    // Validación: campos vacíos
+    if (!nroCedula && !password) {
+      Swal.fire({
+        icon: "error",
+        title: "Campos requeridos",
+        text: "Debe ingresar cédula y contraseña",
+        confirmButtonText: "Cerrar",
       });
-
+      return;
+    }
+  
+    if (!nroCedula) {
+      Swal.fire({
+        icon: "error",
+        title: "Cédula requerida",
+        text: "Por favor ingrese su cédula",
+        confirmButtonText: "Cerrar",
+      });
+      return;
+    }
+  
+    if (nroCedula.length < 10) {
+      Swal.fire({
+        icon: "error",
+        title: "Cédula incompleta",
+        text: "La cédula debe tener 10 dígitos",
+        confirmButtonText: "Cerrar",
+      });
+      return;
+    }
+  
+    if (!password) {
+      Swal.fire({
+        icon: "error",
+        title: "Contraseña requerida",
+        text: "Por favor ingrese su contraseña",
+        confirmButtonText: "Cerrar",
+      });
+      return;
+    }
+  
+    setLoading(true);
+  
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_URL_DEL_BACKEND}/login`,
+        { nroCedula, password }
+      );
+  
       const { token, ...user } = response.data;
       localStorage.setItem("usuario", JSON.stringify(user));
       localStorage.setItem("token", token);
-      // Redirección basada en el rol del usuario:
+  
       if (user.rol === "representante") {
         navigate("/representante");
       } else if (user.subRol === "Profesor") {
-        // Por el momento, para todos los rols de docentes se redirige a "/inicio"
-        // Luego se puede afinar la lógica según rols específicos
         navigate("/inicio");
-      } 
-      else if(user.subRol==="Administrador"){
-        navigate("/admin")
-      }
-      else if(user.subRol==="Vicerrector"){
-        navigate("/inicio")
-      }
-      else if(user.subRol==="Secretaria"){
-        navigate("/inicio")
-      }
-      else {
+      } else if (user.subRol === "Administrador") {
+        navigate("/admin");
+      } else if (user.subRol === "Vicerrector" || user.subRol === "Secretaria") {
+        navigate("/inicio");
+      } else {
         Swal.fire({
           icon: "error",
           title: "Acceso no permitido",
@@ -54,6 +88,7 @@ function Login() {
         });
       }
     } catch (error) {
+      setLoading(false);
       if (error.response && error.response.status === 401) {
         Swal.fire({
           icon: "error",
@@ -66,7 +101,7 @@ function Login() {
       }
     }
   };
-
+  
   // Función para manejar la entrada y permitir solo números, limitando a 10 caracteres.
   const handlenroCedulaChange = (e) => {
     // Remover caracteres no numéricos
@@ -86,7 +121,6 @@ function Login() {
       <Header />
       <div className="login-container">
         <div className="login-content">
-          {/* Logo e información */}
           <div className="login-logo-section">
             <img
               src="/ConservatorioNacional.png"
@@ -95,8 +129,6 @@ function Login() {
             />
             <h2 className="login-title">SISTEMA DE GESTIÓN ESTUDIANTIL</h2>
           </div>
-
-          {/* Formulario */}
           <div className="login-form-section">
             <div className="login-form-container">
               <h3 className="login-form-title">Iniciar Sesión</h3>
@@ -108,8 +140,7 @@ function Login() {
                     tipo="text"
                     value={nroCedula}
                     onChange={handlenroCedulaChange}
-                    required={true}
-                    maxLength={10} // Se asegura que el input no supere los 10 dígitos
+                    maxLength={10}
                   />
                   {nroCedula.length < 10 && (
                     <small className="input-help-text">Máximo 10 números</small>
@@ -121,7 +152,6 @@ function Login() {
                     fondo=""
                     tipo="password"
                     value={password}
-                    required={true}
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
