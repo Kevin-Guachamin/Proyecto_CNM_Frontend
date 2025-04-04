@@ -34,7 +34,7 @@ function Index() {
     setLoading(true)
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = JSON.parse(storedUser);
-    if(!parsedUser || parsedUser.subrol!=="Administrador"){
+    if(!parsedUser || parsedUser.subRol!=="Administrador"){
       navigate("/")
     }
     axios.get(`${API_URL}/estudiante/obtener?page=${page}`)

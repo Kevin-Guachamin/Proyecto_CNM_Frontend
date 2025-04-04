@@ -25,7 +25,7 @@ function Index() {
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = JSON.parse(storedUser);
-    if(!parsedUser || parsedUser.subrol!=="Administrador"){
+    if(!parsedUser || parsedUser.subRol!=="Administrador"){
       navigate("/")
     }
     ObtenerTodo(setDocentes, `${API_URL}/docente/obtener`, setLoading)

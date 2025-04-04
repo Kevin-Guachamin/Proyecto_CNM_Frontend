@@ -12,7 +12,7 @@ function Index() {
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = JSON.parse(storedUser);
-    if(!parsedUser || parsedUser.subrol!=="Administrador"){
+    if(!parsedUser || parsedUser.subRol!=="Administrador"){
       navigate("/")
     }
     setUsuario(parsedUser);
