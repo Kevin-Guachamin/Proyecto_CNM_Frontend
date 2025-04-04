@@ -5,6 +5,7 @@ import Tabla from '../Representante/components/Tabla_Representante';
 import Header from "../../components/Header";
 import Modulo from "../../components/Modulo";
 import Layout from "../../layout/Layout"; // antes "../../layout/components/Layout"
+import { RiLockPasswordFill } from "react-icons/ri";
 
 const Index = () => {
   const  navigate = useNavigate();
@@ -13,6 +14,7 @@ const Index = () => {
   const [modulos] = useState([
     { id: 1, titulo: "Información representante", icono: "📄", link: "/representante/perfil" },
     { id: 2, titulo: "Información estudiantil", icono: "✏️", link: "/representante/estudiantes" },
+    { id: 3, titulo: "Cambiar contraseña", icono: <RiLockPasswordFill  size={40}/>, link: "/representante/password"}
   ]);
 
   useEffect(() => {

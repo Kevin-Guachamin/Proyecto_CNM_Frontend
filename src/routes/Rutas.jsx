@@ -19,7 +19,7 @@ import Horarios from '../vistas/Admin/Matriculación/Horarios.jsx'
 import Inscripcion from '../vistas/Admin/Inscripcion/Index.jsx'
 import Representantes from '../vistas/Admin/Representantes/Index.jsx'
 import AgregarFechas from '../vistas/Vicerrector/AgregarFechas.jsx';
-
+import ChangePassword from '../vistas/Representante/modulos/ChangePassword/Index.jsx';
 
 
 function Rutas() {
@@ -42,8 +42,10 @@ function Rutas() {
         <Route path="/representante" element={<Representante/>} />
         <Route path="/representante/estudiantes" element={<ListaEstudiantes/>} />
         <Route path="/representante/perfil" element={<VerDatosRepresentante/>} />
+        <Route path="/representante/password" element={<ChangePassword/>} />
         <Route path="/estudiante/perfil" element={<VerDatosEstudiante/>} />
         <Route path="/reportes" element={<AgregarFechas/>} />
+        
     </Routes>
   )
 }
