@@ -14,18 +14,7 @@ export function ErrorMessage(error){
                   confirmButtonText: 'Intentelo más tarde',
                   confirmButtonColor: '#28a745'
                 });
-              } else if(error.message){
-                // En caso de que no haya respuesta del backend
-                console.log("entre aquí")
-                Swal.fire({
-                  title: 'Error',
-                  text: error.message,
-                  icon: 'error',
-                  iconColor:"#dc3545",
-                  confirmButtonText: 'Intentelo más tarde',
-                  confirmButtonColor: '#28a745'
-                });
-              }
+              } 
               else{
                 Swal.fire({
                   title: 'Error',
