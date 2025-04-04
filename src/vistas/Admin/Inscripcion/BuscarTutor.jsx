@@ -111,6 +111,7 @@ function BuscarTutor() {
             setEstudiante(null);
             setRepresentante(null);
             setBuscado(false);
+            setCedula(null)
         } catch (error) {
             ErrorMessage(error);
         }

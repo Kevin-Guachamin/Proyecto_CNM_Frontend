@@ -24,6 +24,7 @@ function Login() {
         nroCedula,
         password,
       });
+      console.log("esto me respondio el login",response)
 
       const { token, ...user } = response.data;
       localStorage.setItem("usuario", JSON.stringify(user));

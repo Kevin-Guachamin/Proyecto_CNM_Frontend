@@ -6,6 +6,7 @@ import Contenedor from "../Components/Contenedor";
 import { modulesSettings } from "../Components/Modulos"
 import { ObtenerTodo } from "../../../Utils/CRUD/ObjetenerTodo";
 import CrearDocente from "./CrearDocente";
+import { useNavigate } from "react-router-dom";
 
 
 function Index() {
@@ -18,14 +19,18 @@ function Index() {
   const colums = ["nroCedula", "primer_nombre", "primer_apellido", "segundo_nombre", "segundo_apellido", "email", "celular", "rol"]
   const filterKey = "nroCedula"
   const PK = "nroCedula"
+  const navigate=useNavigate()
   
 
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = JSON.parse(storedUser);
+    if(!parsedUser || parsedUser.subrol!=="Administrador"){
+      navigate("/")
+    }
     ObtenerTodo(setDocentes, `${API_URL}/docente/obtener`, setLoading)
     setUsuario(parsedUser);
-  }, [API_URL]);
+  }, [API_URL,navigate]);
 
   return (
     <div className="section-container">

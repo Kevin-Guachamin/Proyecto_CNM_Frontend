@@ -6,26 +6,31 @@ import Contenedor from "../Components/Contenedor";
 import { modulesSettings } from "../Components/Modulos"
 import { ObtenerTodo } from "../../../Utils/CRUD/ObjetenerTodo";
 import CrearAsignatura from "./CrearAsignatura";
-
+import { useNavigate } from "react-router-dom";
 
 function Index() {
 
   const [loading, setLoading] = useState(true); // Estado para mostrar la carga
   const [usuario, setUsuario] = useState(null);
   const [asignaturas, setAsginaturas] = useState([])
+  const navigate= useNavigate()
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const headers = ["ID", "Nombre", "Nivel","Edad mínima","Acciones"];
   const colums = ["ID", "nombre","nivel","edadMin"]
   const filterKey = "nombre"
   const PK = "ID"
-  const storedUser = localStorage.getItem("usuario");
+  
   useEffect(() => {
-
+    const storedUser = localStorage.getItem("usuario");
+    const parsedUser = JSON.parse(storedUser);
+    if(!parsedUser || parsedUser.subrol!=="Administrador"){
+      navigate("/")
+    }
     ObtenerTodo(setAsginaturas, `${API_URL}/materia/obtener`, setLoading)
     // Mientras no se conecte al backend, dejamos un usuario de prueba
 
-    setUsuario({ nombre:storedUser.primer_nombre, rol: storedUser.subRol });
-  }, [API_URL,storedUser]);
+    setUsuario(parsedUser);
+  }, [API_URL,navigate]);
 
   return (
     <div className="section-container">

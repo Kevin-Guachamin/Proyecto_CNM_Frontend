@@ -9,6 +9,7 @@ import CrearEstudiante from "./CrearEstudiante";
 import { IoEyeOutline } from "react-icons/io5";
 import { ErrorMessage } from "../../../Utils/ErrorMesaje";
 import Paginación from '../Components/Paginación';
+import { useNavigate } from "react-router-dom";
 
 function Index() {
 
@@ -17,6 +18,7 @@ function Index() {
   const [estudiantes, setEstudiantes] = useState([])
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const navigate=useNavigate()
 
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const headers = ["Cédula", "Nombre", "Apellido", "Fecha de nacimiento", "Género", "Jornada", "Acciones"];
@@ -32,6 +34,9 @@ function Index() {
     setLoading(true)
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = JSON.parse(storedUser);
+    if(!parsedUser || parsedUser.subrol!=="Administrador"){
+      navigate("/")
+    }
     axios.get(`${API_URL}/estudiante/obtener?page=${page}`)
       .then(response => {
 
@@ -47,7 +52,7 @@ function Index() {
     // Mientras no se conecte al backend, dejamos un usuario de prueba
 
     setUsuario(parsedUser);
-  }, [API_URL, page]);
+  }, [API_URL, page,navigate]);
 
   return (
     <div className="section-container">
