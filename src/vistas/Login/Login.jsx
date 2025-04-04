@@ -26,9 +26,6 @@ function Login() {
       });
       return;
     }
-  
-    
-  
     setLoading(true);
   
     try {
@@ -40,7 +37,7 @@ function Login() {
       const { token, ...user } = response.data;
       localStorage.setItem("usuario", JSON.stringify(user));
       localStorage.setItem("token", token);
-  
+      setLoading(false);
       if (user.rol === "representante") {
         navigate("/representante");
       } else if (user.subRol === "Profesor") {
@@ -50,7 +47,7 @@ function Login() {
       } else if (user.subRol === "Vicerrector" || user.subRol === "Secretaria") {
         navigate("/inicio");
       } else {
-        setLoading(false);
+        
         Swal.fire({
           icon: "error",
           title: "Acceso no permitido",
