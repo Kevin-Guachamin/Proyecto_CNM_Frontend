@@ -6,7 +6,7 @@ import axios from "axios";
 import { ErrorMessage } from "../../Utils/ErrorMesaje";
 import "./Parcial.css";
 
-const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputsDisabled, onEditar, isWithinRange, rangoTexto  }) => {
+const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit }) => {
   const [datos, setDatos] = useState([]);
 
   const idContenedor = `pdf-final`;
@@ -55,7 +55,12 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
   // Combinar los datos de Quimestre 1 y 2
   useEffect(() => {
     if (!datosModulo?.ID) return;
-
+    // ✅ Aquí agregamos el token antes de hacer cualquier request
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
+    }
+    
     const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${datosModulo.ID}`;
     const urlFinales = `${import.meta.env.VITE_URL_DEL_BACKEND}/finales/asignacion/${datosModulo.ID}`;
 
@@ -278,7 +283,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
     });
   }, [datos]);  
 
-  const realmenteDeshabilitado = inputsDisabled || !isWithinRange;
+  const realmenteDeshabilitado = inputsDisabled || (!isWithinRange && !forceEdit);
 
   const handleGuardar = (rowIndex, rowData) => {
     // Aquí asumimos que ya existe el registro (como en los otros componentes)
@@ -355,6 +360,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
         onGuardar={handleGuardar}
         rangoTexto={rangoTexto}
         isWithinRange={isWithinRange}
+        globalEdit={forceEdit}
       />
     </div>
   );

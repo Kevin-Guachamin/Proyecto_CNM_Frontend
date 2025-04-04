@@ -6,7 +6,7 @@ import { ErrorMessage } from "../../Utils/ErrorMesaje";
 import Swal from 'sweetalert2';
 import "./Parcial.css";
 
-function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto }) {
+function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit }) {
   // ID dinámico: pdf-parcial1-quim1, pdf-parcial2-quim1, pdf-parcial1-quim2, etc.
   const idContenedor = `pdf-parcial${parcialSeleccionado}-quim${quimestreSeleccionado}`;
 
@@ -92,7 +92,6 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
   const calcularValoracion = (valor) => {
     // 1) Truncar el valor (9.4 => 9)
     const truncado = Math.floor(valor);
-
     // 2) Asignar la letra en función del entero
     if (truncado === 10) return "A";
     if (truncado === 9) return "B";
@@ -132,7 +131,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
   };
 
   // Combina la lógica de "deshabilitado por fuera de fecha" y "deshabilitado por prop"
-  const realmenteDeshabilitado = inputsDisabled || !isWithinRange;
+  const realmenteDeshabilitado = inputsDisabled || (!isWithinRange && !forceEdit);
 
   // ✅ Nuevo useEffect que envía datos transformados al padre
   useEffect(() => {
@@ -150,7 +149,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
   // Manejar cambios en los inputs de la tabla
   const handleInputChange = (rowIndex, columnName, value) => {
     // Chequeamos si ya está bloqueado por prop o por fecha
-    if (!isWithinRange) {
+    if (!isWithinRange && !forceEdit) {
       Swal.fire({
         icon: 'info',
         title: 'Fuera de fecha',
@@ -165,7 +164,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
         text: 'Este parcial ya se bloqueó o se guardó definitivamente.',
       });
       return;
-    }
+    }    
     const nuevosDatos = datos.map((fila, i) => {
       if (i === rowIndex) {
         let nuevaFila = { ...fila };
@@ -264,6 +263,11 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
   useEffect(() => {
     if (!datosModulo?.ID) return;
 
+    // ✅ Aquí agregamos el token antes de hacer cualquier request
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
+    }
     const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${datosModulo.ID}`;
     const urlParciales = `${import.meta.env.VITE_URL_DEL_BACKEND}/parciales/asignacion/${datosModulo.ID}`;
 
@@ -391,6 +395,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
         onGuardar={handleGuardar}
         rangoTexto={rangoTexto}
         isWithinRange={isWithinRange}
+        globalEdit={forceEdit}
       />
     </div>
   );
