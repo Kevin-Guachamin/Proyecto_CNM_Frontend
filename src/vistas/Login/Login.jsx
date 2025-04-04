@@ -17,28 +17,6 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-  
-    // Validación: campos vacíos
-    if (!nroCedula && !password) {
-      Swal.fire({
-        icon: "error",
-        title: "Campos requeridos",
-        text: "Debe ingresar cédula y contraseña",
-        confirmButtonText: "Cerrar",
-      });
-      return;
-    }
-  
-    if (!nroCedula) {
-      Swal.fire({
-        icon: "error",
-        title: "Cédula requerida",
-        text: "Por favor ingrese su cédula",
-        confirmButtonText: "Cerrar",
-      });
-      return;
-    }
-  
     if (nroCedula.length < 10) {
       Swal.fire({
         icon: "error",
@@ -49,15 +27,7 @@ function Login() {
       return;
     }
   
-    if (!password) {
-      Swal.fire({
-        icon: "error",
-        title: "Contraseña requerida",
-        text: "Por favor ingrese su contraseña",
-        confirmButtonText: "Cerrar",
-      });
-      return;
-    }
+    
   
     setLoading(true);
   
@@ -80,6 +50,7 @@ function Login() {
       } else if (user.subRol === "Vicerrector" || user.subRol === "Secretaria") {
         navigate("/inicio");
       } else {
+        setLoading(false);
         Swal.fire({
           icon: "error",
           title: "Acceso no permitido",

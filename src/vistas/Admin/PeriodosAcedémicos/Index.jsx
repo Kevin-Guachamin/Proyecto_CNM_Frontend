@@ -7,6 +7,7 @@ import { modulesSettings } from "../Components/Modulos"
 import { ObtenerTodo } from "../../../Utils/CRUD/ObjetenerTodo";
 import CrearPeriodo from "./CrearPeriodo";
 import { Password } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 
 function Index() {
@@ -14,6 +15,7 @@ function Index() {
   const [loading, setLoading] = useState(true); // Estado para mostrar la carga
   const [usuario, setUsuario] = useState(null);
   const [periodos, setPeriodos] = useState([])
+  const navigate=useNavigate()
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const headers = ["Descripción", "Fecha inicio", "Fecha fin", "Estado", "Acciones"];
   const colums = ["descripcion", "fecha_inicio", "fecha_fin", "estado"]
@@ -24,11 +26,16 @@ function Index() {
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = JSON.parse(storedUser);
+    if(!parsedUser || parsedUser.subrol!=="Administrador"){
+      navigate("/")
+    }
     ObtenerTodo(setPeriodos, `${API_URL}/periodo_academico/obtener`, setLoading)
+    
     // Mientras no se conecte al backend, dejamos un usuario de prueba
     setUsuario(parsedUser);
     
-  }, [API_URL]);
+  }, [API_URL,navigate]);
+
 
   return (
     <div className="section-container">

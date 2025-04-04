@@ -3,16 +3,20 @@ import Header from "../../../components/Header";
 import Layout from '../../../layout/Layout'
 import BuscarTutor from "./BuscarTutor";
 import { modulesEstudiates } from "../Components/Modulos"
+import { useNavigate } from "react-router-dom";
 
 function Index() {
   const [usuario, setUsuario] = useState(null);
+  const navigate=useNavigate()
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = JSON.parse(storedUser);
-    
+    if(!parsedUser || parsedUser.subrol!=="Administrador"){
+      navigate("/")
+    }
     setUsuario(parsedUser);
-  }, [API_URL]);
+  }, [API_URL,navigate]);
 
   return (
     <div className="section-container">

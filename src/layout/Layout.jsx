@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar';
 import './Layout.css';
 
 function Layout({ modules, children, showSidebar = true, onNavigate }) {
+  
   return (
     <div className='app-layout'>
       <div className='main-content'>
