@@ -10,6 +10,7 @@ import { IoEyeOutline } from "react-icons/io5";
 import { ErrorMessage } from "../../../../../Utils/ErrorMesaje";
 import Paginación from '../../../Components/Paginación';
 import { useNavigate } from "react-router-dom";
+import TabSwitcher from "./Tabulador";
 
 function Index() {
 
@@ -26,9 +27,54 @@ function Index() {
   const filterKey = "primer_nombre"
   const PK = "ID"
 
-  const ViewData = () => {
-
+  const ViewData =()=>{
+    
   }
+  const tabs = [
+    {
+      id: 'tab3',
+      label: 'Pestaña 3',
+      component: loading ? (
+        <Loading />
+      ) : (
+        <Contenedor
+          data={estudiantes}
+          setData={setEstudiantes}
+          headers={headers}
+          columnsToShow={colums}
+          filterKey={filterKey}
+          apiEndpoint={"estudiante"}
+          CrearEntidad={CrearEstudiante}
+          PK={PK}
+          extraIcon={() => (
+            <IoEyeOutline
+              size={20}
+              onClick={ViewData}
+              className="icon view-icon"
+            />
+          )}
+          Paginación={
+            <Paginación
+              totalPages={totalPages}
+              page={page}
+              setPage={setPage}
+            />
+          }
+        />
+      ),
+    },
+    {
+      id: 'tab2',
+      label: 'Pestaña 2',
+      component: <div>Este es el contenido de la pestaña 2</div>,
+    },
+    {
+      id: 'tab1',
+      label: 'Pestaña 1',
+      component: <div>Contenido dinámico de la pestaña 1</div>,
+    },
+  ];
+
 
   useEffect(() => {
     setLoading(true)
@@ -61,21 +107,7 @@ function Index() {
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
       <Layout modules={modulesEstudiates}>
-        {loading ? <Loading /> :
-          <Contenedor
-            data={estudiantes}
-            setData={setEstudiantes}
-            headers={headers}
-            columnsToShow={colums}
-            filterKey={filterKey}
-            apiEndpoint={"estudiante"}
-            CrearEntidad={CrearEstudiante}
-            PK={PK}
-            extraIcon={() => <IoEyeOutline size={20} onClick={ViewData} className="icon view-icon" />}
-            Paginación={<Paginación totalPages={totalPages} page={page} setPage={setPage} />}
-          />
-        }
-
+        <TabSwitcher tabs={tabs}/>
       </Layout>
     </div>
   )
