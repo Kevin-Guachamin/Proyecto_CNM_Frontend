@@ -19,7 +19,7 @@ function ChangePassword({type,redireccion}) {
 
     try {
       const response = await axios.post(
-        `${API_URL}/password`,
+        `${API_URL}/${type}/password`,
         {
           currentPassword,
           newPassword,
@@ -37,7 +37,7 @@ function ChangePassword({type,redireccion}) {
       setCurrentPassword("");
       setNewPassword("");
     } catch (err) {
-      console.log("este es el error", err.response.data);
+      console.log("este es el error", err);
       setError(err.response.data.message)
 
     }

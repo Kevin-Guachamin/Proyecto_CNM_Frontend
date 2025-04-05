@@ -5,6 +5,7 @@ import Header from "../../components/Header";
 import Loading from "../../components/Loading";
 import { Settings,  } from "lucide-react";
 import { BiMaleFemale } from "react-icons/bi";
+import { RiLockPasswordFill } from "react-icons/ri";
 
 const Inicio = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const Inicio = () => {
     { id: 1, titulo: "Configuración", icono: <Settings size={40} className="text-gray-700" />, link: "/admin/periodos" },
     { id: 2, titulo: "Matriculación", icono: "✏️", link: "/admin/matriculacion" },
     { id: 3, titulo: "Estudiantil", icono: <BiMaleFemale size={40}/>, link: "/admin/inscripcion"},
+    { id: 4, titulo: "Cambiar contraseña", icono: <RiLockPasswordFill  size={40}/>, link: "/admin/password"}
   ]);
 
   useEffect(() => {
