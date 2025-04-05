@@ -16,7 +16,7 @@ import Admin from '../vistas/Admin/inicio.jsx'
 import Cursos from '../vistas/Admin/Modules/Configuration/Cursos/Index.jsx'
 import Busqueda from '../vistas/Admin/Modules/Matriculacion/MatriculacionGrupal/Index.jsx';
 import Horarios from '../vistas/Admin/Modules/Matriculacion/MatriculacionGrupal/Horarios.jsx'
-import Inscripcion from '../vistas/Admin/Modules/Estudiantil/Inscripcion/Index.jsx'
+import Inscripcion from '../vistas/Admin/Modules/Estudiantil/Registro/Index.jsx'
 import Representantes from '../vistas/Admin/Modules/Estudiantil/Representantes/Index.jsx'
 import AgregarFechas from '../vistas/Vicerrector/AgregarFechas.jsx';
 import ChangePassword_Representante from '../vistas/Representante/modulos/ChangePassword/Index.jsx';
@@ -28,7 +28,7 @@ function Rutas() {
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/inicio" element={<Inicio />} />
-      
+
       {/*RUTAS DEL ADMINISTRADOR*/}
       <Route path='/admin' element={<Admin />} />
       <Route path="/admin/periodos" element={<Periodos_Academicos />} />
