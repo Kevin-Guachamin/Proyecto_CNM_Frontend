@@ -77,6 +77,8 @@ function BuscarTutor() {
         setEntityToUpdate(null);
     };
     const toggleModalRepresentante = () => {
+        setExist(false)
+        setCedula("")
         setModalRepresentante((prev) => !prev);
         setEntityToUpdate(null);
     };
@@ -111,7 +113,8 @@ function BuscarTutor() {
             setEstudiante(null);
             setRepresentante(null);
             setBuscado(false);
-            setCedula(null)
+            setCedula("")
+            setExist(false)
         } catch (error) {
             ErrorMessage(error);
         }

@@ -90,34 +90,9 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
       [name]: files[0], // Solo se selecciona un archivo por input
     }));
   };
-  //Funcion para descargar archivos NO BORRAR AÚN se la ba a usar en otro lado
-  // const handleDownload = async (filePath) => {
-  //   const parts = filePath.split("\\");
-  //   const folder = parts[1]; // Subcarpeta (ej: "Estudiantes")
-  //   const filename = parts[2]; // Nombre del archivo (ej: "ProyectoCNM.pdf")
-
-  //   try {
-  //     const response = await axios.get(
-  //       `http://localhost:8000/estudiante/download/${folder}/${filename}`,
-  //       {
-  //         responseType: 'blob',
-  //       }
-  //     );
-
-  //     const url = window.URL.createObjectURL(new Blob([response.data]));
-  //     const link = document.createElement('a');
-  //     link.href = url;
-  //     link.setAttribute('download', filename);
-  //     document.body.appendChild(link);
-  //     link.click();
-  //     document.body.removeChild(link);
-  //     window.URL.revokeObjectURL(url);
-  //   } catch (error) {
-  //     console.error('Error al descargar el archivo:', error);
-  //     ErrorMessage(error)
-  //   }
-  // }
-  const handleSubmit = () => {
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
     const direccion = [sector, parroquia, canton].join(" ")
 
     console.log("fecha de nacimiento enviada a la base", fecha_nacimiento)
@@ -136,10 +111,15 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
     formData.append("especialidad", especialidad)
     formData.append("IER", IER)
     formData.append("direccion", direccion)
-    formData.append("nroCedula_representante", representante)
 
+    if(!entityToUpdate){
+      formData.append("nroCedula_representante", representante)
+      onSave(formData);
+    }else{
+      onSave(formData,{ headers: { "Content-Type": "multipart/form-data" } })
+    }
 
-    onSave(formData);
+    
   };
 
   return (

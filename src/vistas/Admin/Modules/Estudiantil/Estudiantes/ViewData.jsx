@@ -1,132 +1,186 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Boton from '../../../../../components/Boton';
-import Loading from '../../../../../components/Loading';
-import { useState } from 'react';
+import DatePicker from 'react-datepicker';
+import '../../../Styles/CrearEntidad.css';
+import "react-datepicker/dist/react-datepicker.css";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
+import { ErrorMessage } from '../../../../../Utils/ErrorMesaje';
 
-function ViewData({ onCancel, isLoading, entity }) {
-  const [nroCedula, setNroCedula] = useState(""); // Inicializar con cadena vacia si es que hay valores undefined en entity
-  const [primer_nombre, setPrimerNombre] = useState("");
-  const [celular, setCelular] = useState("");
-  const [primer_apellido, setPrimerApellido] = useState("");
-  const [segundo_nombre, setSegundoNombre] = useState("");
-  const [segundo_apellido, setSegundoApellido] = useState("");
-  const [convencional, setConvencional] = useState("");
-  const [emergencia, setEmergencia] = useState("");
-  const [email, setEmail] = useState("");
 
-  /* 
-    OJO FALTA COMPROBAR EL FUNCIONAMIENTO CON LOS ARCHIVOS PDFS SUBIDOS
-  */
+function ViewData({ estudiante }) {
 
-  if (isLoading) {
-    <Loading></Loading>
-  }
 
-  useEffect(() => {
-    if (entity) {
-      setNroCedula(entity.nroCedula || ""); // Set cadena vacia en caso de que haya un dato undefined
-      setPrimerNombre(entity.primer_nombre || "");
-      setCelular(entity.celular || "");
-      setPrimerApellido(entity.primer_apellido || "");
-      setSegundoNombre(entity.segundo_nombre || "");
-      setSegundoApellido(entity.segundo_apellido || "");
-      setConvencional(entity.convencional || "");
-      setEmergencia(entity.emergencia || "");
-      setEmail(entity.email || "");
+  const handleDownload = async (filePath) => {
+    const parts = filePath.split("\\");
+    const folder = parts[1]; // Subcarpeta (ej: "Estudiantes")
+    const filename = parts[2]; // Nombre del archivo (ej: "ProyectoCNM.pdf")
+
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/estudiante/download/${folder}/${filename}`,
+        {
+          responseType: 'blob',
+        }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error al descargar el archivo:', error);
+      ErrorMessage(error)
     }
-  }, [entity]);
-
-  const handleSubmit = () => {
-    // Comprobar que el formualrio es valido
-
-    // Comprobar que la actualizacion de datos este habilitada en la fecha establecida
   }
+
+  function calcularEdad(fechaNacimiento) {
+    console.log("esta fue la fecha", fechaNacimiento)
+    let fechaNac = fechaNacimiento; // Convertir la fecha a objeto Date
+    let hoy = new Date();
+
+    let edad = hoy.getFullYear() - fechaNac.getFullYear(); // Restar años
+
+    // Ajustar si aún no ha pasado el cumpleaños este año
+    let mesActual = hoy.getMonth();
+    let diaActual = hoy.getDate();
+    let mesNac = fechaNac.getMonth();
+    let diaNac = fechaNac.getDate();
+
+    if (mesActual < mesNac || (mesActual === mesNac && diaActual < diaNac)) {
+      edad--;
+    }
+
+    return edad;
+  }
+
+  const convertirFecha = (fecha) => {
+    if (!fecha) return null;
+    const [dia, mes, año] = fecha.split('/');
+    return new Date(`${año}-${mes}-${dia}`); // Convertir a formato ISO (yyyy-mm-dd)
+  };
+  const generarCodigoEstudiante = (anio, idEstudiante) => {
+    const secuencial = String(idEstudiante).padStart(4, "0"); // Asegura 4 dígitos
+    return `${anio}${secuencial}`;
+  };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-container">
-        <h2 className="modal-title">Información completa de {`${primer_nombre} ${primer_apellido}`}</h2>
+    <div className="Contenedor-general">
 
-        <div className="modal-form">
-          <div className='rows'>
-            <div className="form-group">
-              <label htmlFor="nroCedula">Número de cédula:</label>
-              <input id="nroCedula" value={nroCedula} onChange={(e) => setNroCedula(e.target.value)} placeholder="Ingrese un número de cédula" />
-            </div>
-            <div className="form-group">
-              <label htmlFor="celular">#Celular:</label>
-              <input id="celular" value={celular} onChange={(e) => setCelular(e.target.value)} placeholder="Ingrese un celular" />
-            </div>
+      <h2 className="modal-title">Información Estudiantil</h2>
 
-          </div>
-          <div className='rows'>
-            <div className="form-group">
-              <label htmlFor="primer_nombre">Primer nombre:</label>
-              <input id="primer_nombre" value={primer_nombre} onChange={(e) => setPrimerNombre(e.target.value)} placeholder="Ingrese un nombre" />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="primer_apellido">Primer apellido:</label>
-              <input id="primer_apellido" value={primer_apellido} onChange={(e) => setPrimerApellido(e.target.value)} placeholder="Ingrese un apellido" />
-            </div>
-          </div>
-
-          <div className='rows'>
-            <div className="form-group">
-              <label htmlFor="segundo_nombre">Segundo nombre:</label>
-              <input id="segundo_nombre" value={segundo_nombre} onChange={(e) => setSegundoNombre(e.target.value)} placeholder="Ingrese un nombre" />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="segundo_apellido">Segundo apellido:</label>
-              <input id="segundo_apellido" value={segundo_apellido} onChange={(e) => setSegundoApellido(e.target.value)} placeholder="Ingrese un apellido" />
-            </div>
-
-          </div>
-          <div className='rows'>
-            <div className="form-group">
-              <label htmlFor="convencional">#Convencional :</label>
-              <input id="convencional" value={convencional} onChange={(e) => setConvencional(e.target.value)} placeholder="Este campo es opcional" />
-            </div>
-            <div className="form-group">
-              <label htmlFor="convencional">#Emergencia :</label>
-              <input id="convencional" value={emergencia} onChange={(e) => setEmergencia(e.target.value)} placeholder="Ingrese un celular" />
-            </div>
+      <div className="modal-form">
+        <div className='rows'>
+          <div className="form-group">
+            <label htmlFor="nroCedula">Número de cédula:</label>
+            <label htmlFor="">{estudiante.nroCedula}</label>
           </div>
           <div className="form-group">
-            <label htmlFor="email">Email:</label>
-            <input id="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Ingrese un correo electrónico" />
+            <label htmlFor="nroMatricula">Código estudiante:</label>
+            <label htmlFor="">{generarCodigoEstudiante(estudiante.anioMatricula, estudiante.ID)}</label>
           </div>
-          <div className='rows'>
+        </div>
+        <div className='rows'>
+          <div className="form-group">
+            <label htmlFor="primer_nombre">Primer nombre:</label>
+            <label htmlFor="">{estudiante.primer_nombre}</label>
+          </div>
 
-            <label>
+          <div className="form-group">
+            <label htmlFor="primer_apellido">Primer apellido:</label>
+            <label htmlFor="">{estudiante.primer_apellido}</label>
+          </div>
+        </div>
+
+        <div className='rows'>
+          <div className="form-group">
+            <label htmlFor="segundo_nombre">Segundo nombre:</label>
+            <label htmlFor="">{estudiante.segundo_nombre}</label>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="segundo_apellido">Segundo apellido:</label>
+            <label htmlFor="">{estudiante.segundo_apellido}</label>
+          </div>
+
+        </div>
+        <div className='rows'>
+          <div className="form-group">
+            <label htmlFor="edad">Edad:</label>
+            <label htmlFor="">{calcularEdad(convertirFecha(estudiante.fecha_nacimiento))}</label>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="Nro matrícula">Nro. matrícula:</label>
+            <label htmlFor="">{generarCodigoEstudiante(estudiante.anioMatricula, estudiante.ID)}</label>
+          </div>
+        </div>
+        <div className='rows'>
+
+          <div className="form-group">
+            <label htmlFor="jornada">Jornada :</label>
+            <label htmlFor="">{estudiante.jornada}</label>
+          </div>
+          <div className="form-group">
+            <label htmlFor="genero">Genero:</label>
+            <label htmlFor="">{estudiante.genero}</label>
+          </div>
+        </div>
+        <div className='rows'>
+          <div className="form-group">
+            <label htmlFor="fecha_nacimiento">Fecha de nacimiento:</label>
+            <label htmlFor="">{estudiante.fecha_nacimiento}</label>
+          </div>
+          <div className="form-group">
+            <label htmlFor="grupo_etnico">Grupo Etnico:</label>
+            <label htmlFor="">{estudiante.grupo_etnico}</label>
+          </div>
+        </div>
+        <div className='rows'>
+          <div className="form-group">
+            <label htmlFor="especialidad">Especialidad:</label>
+            <label htmlFor="">{estudiante.especialidad}</label>
+          </div>
+          <div className="form-group">
+            <label htmlFor="IER">Institución de eduación regular:</label>
+            <label htmlFor="">{estudiante.IER}</label>
+          </div>
+        </div>
+        <div className='rows'>
+          <label htmlFor="direccion">Dirección:</label>
+          <label htmlFor="">{estudiante.direccion}</label>
+        </div>
+        <div className="file-upload-container">
+          <div className="file-upload">
+            <label htmlFor="copiaCedula" className="custom-file-label">
               Copia de Cédula:
-              <input
-                type="file"
-                name="copiaCedula"
+            </label>
+            <button className="download-button" onClick={() => handleDownload(estudiante.cedula_PDF)}>
+              <FontAwesomeIcon icon={faDownload} className="icon" />
+              Descargar documento
+            </button>
 
-                //onChange={handleFileChange}
-                accept="application/pdf"
-              />
+          </div>
+          <div className="file-upload">
+            <label htmlFor="matricula_IER" className="custom-file-label">
+              Matrícula IER:
             </label>
-            <label>
-              Croquis:
-              <input
-                type="file"
-                name="croquis"
-                //onChange={handleFileChange}
-                accept="application/pdf"
-              />
-            </label>
+            <button className="download-button" onClick={() => handleDownload(estudiante.matricula_IER_PDF)}>
+              <FontAwesomeIcon icon={faDownload} className="icon" />
+              Descargar documento
+            </button>
 
           </div>
         </div>
 
-        <div className="botones">
-          <Boton texto="Guardar" onClick={() => handleSubmit()} estilo="boton-crear" />
-          <Boton texto="Cancelar" onClick={onCancel} estilo="boton-cancelar" />
-        </div>
+
       </div>
+
     </div>
   )
 

@@ -2,15 +2,16 @@ import React, { useState, useEffect } from "react";
 import Header from "../../../../../components/Header";
 import Layout from '../../../../../layout/Layout'
 import Loading from "../../../../../components/Loading";
-import Contenedor from "../../../Components/Contenedor";
+import ContenedorEstudiante from "./ContenedorEstudiante";
 import { modulesEstudiates } from "../../../Components/Modulos"
 import axios from 'axios'
 import CrearEstudiante from "./CrearEstudiante";
-import { IoEyeOutline } from "react-icons/io5";
+
 import { ErrorMessage } from "../../../../../Utils/ErrorMesaje";
 import Paginación from '../../../Components/Paginación';
 import { useNavigate } from "react-router-dom";
 import TabSwitcher from "./Tabulador";
+import ViewData from "./ViewData";
 
 function Index() {
 
@@ -20,24 +21,28 @@ function Index() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate()
+  const [estudiante,setEstudiante]=useState({})
 
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const headers = ["Cédula", "Nombre", "Apellido", "Fecha de nacimiento", "Género", "Jornada", "Acciones"];
   const colums = ["nroCedula", "primer_nombre", "primer_apellido", "fecha_nacimiento", "genero", "jornada"]
   const filterKey = "primer_nombre"
   const PK = "ID"
+  
 
-  const ViewData =()=>{
-    
+  const DatosEstudiante =(estudiante)=>{
+    setActiveTabId("tab2")
+    openTab("tab2")
+    setEstudiante(estudiante)
   }
   const tabs = [
     {
-      id: 'tab3',
-      label: 'Pestaña 3',
+      id: 'tab1',
+      label: 'Estudiantes',
       component: loading ? (
         <Loading />
       ) : (
-        <Contenedor
+        <ContenedorEstudiante
           data={estudiantes}
           setData={setEstudiantes}
           headers={headers}
@@ -45,14 +50,8 @@ function Index() {
           filterKey={filterKey}
           apiEndpoint={"estudiante"}
           CrearEntidad={CrearEstudiante}
+          OnView={DatosEstudiante}
           PK={PK}
-          extraIcon={() => (
-            <IoEyeOutline
-              size={20}
-              onClick={ViewData}
-              className="icon view-icon"
-            />
-          )}
           Paginación={
             <Paginación
               totalPages={totalPages}
@@ -65,8 +64,8 @@ function Index() {
     },
     {
       id: 'tab2',
-      label: 'Pestaña 2',
-      component: <div>Este es el contenido de la pestaña 2</div>,
+      label: `${estudiante.primer_nombre} ${estudiante.primer_apellido} `,
+      component: <ViewData estudiante={estudiante}/>,
     },
     {
       id: 'tab1',
@@ -74,31 +73,38 @@ function Index() {
       component: <div>Contenido dinámico de la pestaña 1</div>,
     },
   ];
-
+  const firstTabId = tabs[0]?.id;
+  const [activeTabId, setActiveTabId] = useState(tabs[0].id);
+  const [activeTabs, setActiveTabs] = useState([firstTabId]);
+  const openTab = (id) => {
+    if (!activeTabs.includes(id)) {
+      setActiveTabs([...activeTabs, id]);
+    }
+    setActiveTabId(id);
+  };
 
   useEffect(() => {
-    setLoading(true)
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = JSON.parse(storedUser);
     if (!parsedUser || parsedUser.subRol !== "Administrador") {
-      navigate("/")
+      navigate("/");
+    } else {
+      setUsuario(parsedUser);
     }
+  }, [navigate]);
+  useEffect(() => {
+    setLoading(true);
     axios.get(`${API_URL}/estudiante/obtener?page=${page}`)
       .then(response => {
-
-        setEstudiantes(response.data.estudiantes); // Guardar la información del usuario en el estado
-        setTotalPages(response.data.totalPages)
+        setEstudiantes(response.data.estudiantes);
+        setTotalPages(response.data.totalPages);
         setLoading(false);
       })
       .catch(error => {
-        ErrorMessage(error)
+        ErrorMessage(error);
         setLoading(false);
       });
-
-    // Mientras no se conecte al backend, dejamos un usuario de prueba
-
-    setUsuario(parsedUser);
-  }, [API_URL, page, navigate]);
+  }, [page]); 
 
   return (
     <div className="section-container">
@@ -107,7 +113,7 @@ function Index() {
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
       <Layout modules={modulesEstudiates}>
-        <TabSwitcher tabs={tabs}/>
+        <TabSwitcher tabs={tabs} activeTabId={activeTabId} setActiveTabId={setActiveTabId} activeTabs={activeTabs} setActiveTabs={setActiveTabs}/>
       </Layout>
     </div>
   )
