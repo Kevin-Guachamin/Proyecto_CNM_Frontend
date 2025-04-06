@@ -15,7 +15,7 @@ function ContenedorEstudiante({ data, setData, headers, columnsToShow, filterKey
 
   
   const filteredData = data.filter((item) =>
-    item[filterKey]?.toLowerCase()
+    item[filterKey]?.toLowerCase().includes(search.toLowerCase())
   );
 
   const toggleModal = () => {

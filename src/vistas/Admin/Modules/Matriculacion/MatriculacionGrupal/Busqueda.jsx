@@ -63,8 +63,9 @@ function Busqueda() {
             if (!cedula) {
                 return
             }
-            const response = await axios.get(`${API_URL}/estdudiante/obtener/${cedula}`);
-            setEstudiante(response)
+            const response = await axios.get(`${API_URL}/estudiante/obtener/${cedula}`);
+            setEstudiante(response.data)
+            
 
         } catch (error) {
             ErrorMessage(error);

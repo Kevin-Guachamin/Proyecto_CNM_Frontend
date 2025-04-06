@@ -15,7 +15,7 @@ function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpo
 
   
   const filteredData = data.filter((item) =>
-    item[filterKey]?.toLowerCase()
+    item[filterKey]?.toLowerCase().includes(search.toLowerCase())
   );
 
   const toggleModal = () => {

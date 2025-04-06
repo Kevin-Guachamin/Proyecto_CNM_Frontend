@@ -17,7 +17,7 @@ function Index() {
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const headers = ["Cédula", "Primer nombre", "Primer Apellido", "Segundo Nombre", "Segundo Apellido", "Email", "Celular", "Rol", "Acciones"];
   const colums = ["nroCedula", "primer_nombre", "primer_apellido", "segundo_nombre", "segundo_apellido", "email", "celular", "rol"]
-  const filterKey = "nroCedula"
+  const filterKey = "primer_nombre"
   const PK = "nroCedula"
   const navigate = useNavigate()
 

@@ -70,7 +70,9 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
       else {
         dias = [dia1, dia2]
       }
-
+      if(dia1===dia2){
+        throw new Error("Los días deben ser diferentes")
+      }
 
       const newAsignacion = { paralelo, horaInicio, horaFin, dias, cupos: Number(cupos), id_periodo_academico: Number(periodo), nroCedula_docente: docente.nroCedula, id_materia: Number(asignatura.ID), cuposDisponibles: Number(cupos) };
       onSave(newAsignacion);
