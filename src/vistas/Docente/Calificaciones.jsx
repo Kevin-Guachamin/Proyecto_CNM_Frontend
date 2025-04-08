@@ -31,6 +31,7 @@ function Calificaciones() {
   const [datosModulo, setDatosModulo] = useState(moduloSeleccionado || {});
   const [estadoFechas, setEstadoFechas] = useState({});
   const [textoRangoFechas, setTextoRangoFechas] = useState({});
+  const soloLectura = usuario?.subRol?.toLowerCase() === "secretaria";
 
   const makeKey = ({ id_inscripcion, quimestre, parcial }) => `${id_inscripcion}-${quimestre}-${parcial}`;
   const makeKeyQuim = ({ id_inscripcion, quimestre }) => `${id_inscripcion}-${quimestre}`;
@@ -54,11 +55,23 @@ function Calificaciones() {
   const handleActualizarFinal = React.useCallback((datos) => {
     setFinalData(datos);}, []);
 
-  const modules = [
-    { name: "Inicio", icon: <Home size={20} />, path: "/panelcursos" },
-    { name: "Usuarios", icon: <Users size={20} /> },
-    { name: "Configuración", icon: <Settings size={20} /> },
-  ];
+    const modules = React.useMemo(() => {
+      if (!usuario) return [];
+    
+      const esSecretaria = usuario.subRol?.toLowerCase() === "secretaria";
+    
+      return [
+        {
+          name: "Inicio",
+          icon: <Home size={20} />,
+          path: esSecretaria
+            ? `/periodo/materias/${datosModulo.idPeriodo}`
+            : "/panelcursos",
+        },
+        { name: "Usuarios", icon: <Users size={20} /> },
+        { name: "Configuración", icon: <Settings size={20} /> },
+      ];
+    }, [usuario, datosModulo.idPeriodo]);        
   
   useEffect(() => {
     if (localStorage.getItem("inputsLocked") === null) {
@@ -293,9 +306,10 @@ function Calificaciones() {
   };
 
   const handleSidebarNavigation = (path) => {
+    if (!path) return;
     setLoading(true);
     setTimeout(() => navigate(path), 800);
-  };
+  };  
 
   if (loading) {
     return <Loading />;
@@ -448,6 +462,7 @@ function Calificaciones() {
       handleActualizarQuim2={handleActualizarQuim2}
       handleActualizarFinal={handleActualizarFinal}
       handleEditarFila={handleEditarFila}
+      soloLectura={soloLectura}
     />
   );
 }

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import Header from "../components/Header";
-import Layout from "../layout/Layout";
-import Modulo from "../components/Modulo";
-import Loading from "../components/Loading";
+import Header from "../../components/Header";
+import Layout from "../../layout/Layout";
+import Modulo from "../../components/Modulo";
+import Loading from "../../components/Loading";
 import { BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ErrorMessage } from "../Utils/ErrorMesaje";
-import { getModulos, transformModulesForLayout } from "./getModulos";
+import { ErrorMessage } from "../../Utils/ErrorMesaje";
+import { getModulos, transformModulesForLayout } from "../getModulos";
 import Swal from "sweetalert2";
 
 
@@ -133,7 +133,7 @@ function PanelCursos() {
 
       <Layout modules={modules} onNavigate={handleSidebarNavigation}>
         <div className="content-container">
-          <h2 className="mb-4">Panel de Cursos</h2>
+          <h2 className="mb-4">Cursos</h2>
           <Modulo modulos={cursosModulos} onModuloClick={(modulo) => handleModuloClick(modulo)} />
           </div>
       </Layout>
