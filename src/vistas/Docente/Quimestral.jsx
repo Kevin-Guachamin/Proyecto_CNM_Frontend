@@ -6,7 +6,7 @@ import axios from "axios";
 import { ErrorMessage } from "../../Utils/ErrorMesaje";
 import "./Parcial.css";
 
-const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actualizarDatosQuim, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit }) => {
+const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actualizarDatosQuim, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura }) => {
 
   const idContenedor = `pdf-quimestral-quim${quimestreSeleccionado}`;
 
@@ -236,7 +236,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
   // Indicamos que la columna "Examen" es editable, similar a como se hace en el componente de Parcial
   const columnasEditables = ["Examen"];
 
-  const realmenteDeshabilitado = inputsDisabled || (!isWithinRange && !forceEdit);
+  const realmenteDeshabilitado = soloLectura || inputsDisabled || (!isWithinRange && !forceEdit);
 
   const handleGuardar = (rowIndex, rowData) => {
     if (!rowData.idQuimestral) {
@@ -322,6 +322,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
         rangoTexto={rangoTexto}
         isWithinRange={isWithinRange}
         globalEdit={forceEdit}
+        soloLectura={soloLectura}
       />
     </div>
   );

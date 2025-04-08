@@ -177,3 +177,39 @@
 .pdf-export .columna-final {
   display: none !important;
 }
+
+/* ======================================
+   3) Estilos para tablas de ListadoCursos
+====================================== */
+/* Estilos específicos para tablas de ListadoCursos */
+.tabla-listado th,
+.tabla-listado td {
+  height: 40px !important;
+  font-size: 1.1rem;
+  padding: 6px 10px !important;
+  white-space: nowrap;
+}
+
+.tabla-listado th {
+  height: 50px !important;
+  vertical-align: middle;
+}
+
+.tabla-listado th:nth-child(1),
+.tabla-listado td:nth-child(1) {
+  width: 60px !important;
+}
+
+.tabla-listado th:nth-child(2),
+.tabla-listado td:nth-child(2) {
+  width: 280px !important;
+}
+
+/* ======================================
+   4) Estilos para tablas en subRol Secretaria
+====================================== */
+
+/* Ocultar columna final cuando sea modo soloLectura */
+.ocultar-acciones .columna-final {
+  display: none !important;
+}

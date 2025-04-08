@@ -8,7 +8,7 @@ import Asignaguras from "../vistas/Admin/Modules/Configuration/Asignaturas/Index
 import Docentes from "../vistas/Admin/Modules/Configuration/Docentes/Index.jsx"
 import Representante from '../vistas/Representante/index.jsx'
 import Estudiantes from '../vistas/Admin/Modules/Estudiantil/Estudiantes/Index.jsx'
-import PanelCursos from '../vistas/PanelCursos.jsx';
+import PanelCursos from '../vistas/Docente/PanelCursos.jsx';
 import ListaEstudiantes from '../vistas/Representante/modulos/listaEstudiantes.jsx';
 import VerDatosRepresentante from '../vistas/Representante/modulos/VerDatosRepresentante.jsx';
 import VerDatosEstudiante from '../vistas/Representante/modulos/VerDatosEstudiante.jsx';
@@ -21,7 +21,9 @@ import Representantes from '../vistas/Admin/Modules/Estudiantil/Representantes/I
 import AgregarFechas from '../vistas/Vicerrector/AgregarFechas.jsx';
 import ChangePassword_Representante from '../vistas/Representante/modulos/ChangePassword/Index.jsx';
 import ChangePassword_Admin from '../vistas/Admin/Modules/ChangePassword/Index.jsx';
-
+import GestionEscolar from '../vistas/Secretaria/GestionEscolar.jsx';
+import MateriasPorPeriodo from '../vistas/Secretaria/MateriasPorPeriodo.jsx';
+import ListadoCursos from '../vistas/Secretaria/ListadoCursos.jsx';
 
 function Rutas() {
   return (
@@ -41,16 +43,26 @@ function Rutas() {
       <Route path='/admin/inscripcion' element={<Inscripcion />} />
       <Route path='/admin/representantes' element={<Representantes />} />
       <Route path="/admin/password" element={<ChangePassword_Admin />} />
-
+      
+      {/*RUTAS DEL DOCENTE-Profesor*/}
       <Route path="/calificaciones" element={<Calificaciones />} />
       <Route path="/panelcursos" element={<PanelCursos />} />
+
+      {/*Rutas DEL REPRESENTANTE*/}
       <Route path="/representante" element={<Representante />} />
       <Route path="/representante/estudiantes" element={<ListaEstudiantes />} />
       <Route path="/representante/perfil" element={<VerDatosRepresentante />} />
       <Route path="/representante/password" element={<ChangePassword_Representante />} />
       <Route path="/estudiante/perfil" element={<VerDatosEstudiante />} />
+      
+      {/*RUTAS DEL DOCENTE-Vicerrector*/}
       <Route path="/reportes" element={<AgregarFechas />} />
 
+      {/*RUTAS DEL DOCENTE-Secretaria*/}
+      <Route path="/administracion-escolar" element={<GestionEscolar />} />
+      <Route path="/periodo/materias/:idPeriodo" element={<MateriasPorPeriodo />} />
+      <Route path="/periodo/materias/estudiantes/:id_asignacion" element={<ListadoCursos />} />
+      <Route path="/calificaciones/asignacion/:asigId" element={<Calificaciones />} />
     </Routes>
   )
 }

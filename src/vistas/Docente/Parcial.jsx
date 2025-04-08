@@ -6,7 +6,7 @@ import { ErrorMessage } from "../../Utils/ErrorMesaje";
 import Swal from 'sweetalert2';
 import "./Parcial.css";
 
-function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit }) {
+function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura }) {
   // ID dinámico: pdf-parcial1-quim1, pdf-parcial2-quim1, pdf-parcial1-quim2, etc.
   const idContenedor = `pdf-parcial${parcialSeleccionado}-quim${quimestreSeleccionado}`;
 
@@ -131,7 +131,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
   };
 
   // Combina la lógica de "deshabilitado por fuera de fecha" y "deshabilitado por prop"
-  const realmenteDeshabilitado = inputsDisabled || (!isWithinRange && !forceEdit);
+  const realmenteDeshabilitado = soloLectura || inputsDisabled || (!isWithinRange && !forceEdit);
 
   // ✅ Nuevo useEffect que envía datos transformados al padre
   useEffect(() => {
@@ -396,6 +396,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
         rangoTexto={rangoTexto}
         isWithinRange={isWithinRange}
         globalEdit={forceEdit}
+        soloLectura={soloLectura}
       />
     </div>
   );

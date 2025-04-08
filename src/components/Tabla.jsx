@@ -7,12 +7,14 @@ import "./Tabla.css";
 
 const Tabla = ({
   columnas, columnasAgrupadas, datos, onChange, columnasEditables = [],
-  mostrarEditar = true, mostrarGuardar = true, onEditar, onGuardar, inputsDisabled, 
-  isWithinRange,rangoTexto,globalEdit,forceEdit }) => {
+  mostrarEditar = true, mostrarGuardar = true, onEditar, onGuardar, inputsDisabled,
+  isWithinRange, rangoTexto, globalEdit, forceEdit, clasePersonalizada = "", soloLectura }) => {
   const [editingRow, setEditingRow] = useState(null);
   const columnasRepetidas = ["Nro", "Nómina de Estudiantes"];
   const columnaFinal = "Acciones";
-  const columnasFinales = [...columnasRepetidas, ...columnas, columnaFinal];
+  const columnasFinales = (mostrarEditar || mostrarGuardar) && !soloLectura
+    ? [...columnasRepetidas, ...columnas, columnaFinal]
+    : [...columnasRepetidas, ...columnas];
 
   const columnasFormateables = [
     "INSUMO 1",
@@ -24,7 +26,7 @@ const Tabla = ({
 
   return (
     <div className="table-responsive mt-3">
-      <table className="table table-bordered table-striped custom-table tabla-parciales">
+      <table className={`table table-bordered table-striped custom-table tabla-parciales ${clasePersonalizada} ${soloLectura ? 'ocultar-acciones' : ''}`}>
         <thead>
           {columnasAgrupadas && (
             <tr>
@@ -33,8 +35,9 @@ const Tabla = ({
                   {grupo.titulo}
                 </th>
               ))}
-              {/* Asigna la clase columna-final en el th */}
-              <th className="text-center columna-final">{columnaFinal}</th>
+              {(mostrarEditar || mostrarGuardar) && (
+                <th className="text-center columna-final">{columnaFinal}</th>
+              )}
             </tr>
           )}
           <tr className="table-primary">
@@ -54,8 +57,8 @@ const Tabla = ({
             datos.map((fila, i) => (
               <tr key={i}>
                 {columnasFinales.map((col, j) => {
-                  if (col === columnaFinal) {
-                    // Renderizamos la columna de acciones con la clase columna-final
+                  if ((col === columnaFinal) && (mostrarEditar || mostrarGuardar)) {
+                    if (soloLectura) return null;
                     return (
                       <td key={j} className="text-center columna-final">
                         <div className="d-flex justify-content-around">
@@ -67,12 +70,12 @@ const Tabla = ({
                                   Swal.fire({
                                     icon: rangoTexto ? "warning" : "info",
                                     title: rangoTexto ? "Fuera de fecha" : "Fechas no definidas",
-                                    text: rangoTexto 
-                                      ? "No se puede editar fuera del rango de fechas establecido." 
+                                    text: rangoTexto
+                                      ? "No se puede editar fuera del rango de fechas establecido."
                                       : "Aún no se han definido fechas para esta sección.",
                                   });
                                   return;
-                                }                                                            
+                                }
                                 setEditingRow(i); // Habilita la edición para esta fila.
                                 if (onEditar) onEditar(i, fila);
                               }}>
@@ -97,21 +100,21 @@ const Tabla = ({
                     const esEditable = columnasEditables.includes(col);
                     return (
                       <td key={j} className={`text-center ${col === "PROMEDIO PARCIAL" &&
+                        !isNaN(parseFloat(fila[col])) &&
+                        parseFloat(fila[col]) < 7
+                        ? "text-danger-strong"
+                        : col === "Promedio Final" &&
                           !isNaN(parseFloat(fila[col])) &&
                           parseFloat(fila[col]) < 7
                           ? "text-danger-strong"
-                          : col === "Promedio Final" &&
-                            !isNaN(parseFloat(fila[col])) &&
-                            parseFloat(fila[col]) < 7
-                            ? "text-danger-strong"
-                            : ""
+                          : ""
                         }`}>
                         {/* Texto que solo se muestra en PDF */}
                         <span className="pdf-only">
                           {fila[col] !== undefined && fila[col] !== "" ? fila[col] : "-"}
                         </span>
                         {/* Vista normal: input si es editable, texto si no */}
-                        {esEditable ? (
+                        {esEditable && !soloLectura ? (
                           col === "Examen Supletorio" ? (
                             (() => {
                               // Calculamos el promedio anual para decidir si mostrar input o no
