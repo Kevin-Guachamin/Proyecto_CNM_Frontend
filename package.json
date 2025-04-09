@@ -21,6 +21,7 @@
     "axios": "^1.8.1",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
+    "buffer": "^6.0.3",
     "file-saver": "^2.0.5",
     "framer-motion": "^12.4.10",
     "html2canvas": "^1.4.1",
@@ -36,9 +37,12 @@
     "react-router-dom": "^7.2.0",
     "react-spinners": "^0.15.0",
     "sweetalert2": "^11.17.2",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "xlsx-populate": "^1.21.0"
   },
   "devDependencies": {
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "@eslint/js": "^9.21.0",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",

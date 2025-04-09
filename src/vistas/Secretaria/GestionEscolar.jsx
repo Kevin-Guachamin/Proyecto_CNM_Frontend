@@ -50,7 +50,7 @@ function GestionEscolar() {
   }, [navigate]);
 
   const handleModuloClick = (modulo) => {
-    navigate(`/periodo/materias/${modulo.id}`, { state: modulo });
+    navigate(`/secretaria/periodo/materias/${modulo.id}`, { state: modulo });
   };
 
   const handleSidebarNavigation = (path) => {
@@ -74,7 +74,7 @@ function GestionEscolar() {
       </>
     ),
     descripcion: `Estado: ${periodo.estado}`,
-    link: `/periodo/materias/${periodo.ID}`,
+    link: `/secretaria/periodo/materias/${periodo.ID}`,
     icono: icono, // sigue usando el ícono grande que tienes al centro
   }));
 

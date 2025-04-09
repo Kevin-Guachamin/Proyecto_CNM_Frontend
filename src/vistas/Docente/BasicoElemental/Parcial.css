@@ -1,0 +1,9 @@
+.tabla-quimestral, .tabla-parciales, .tabla-final {
+    font-size: 15px; /* Texto de la tabla */
+}
+
+/* Override: SOLO para .tabla-quimestral y .tabla-final */
+.tabla-quimestral .vertical-text,
+.tabla-final .vertical-text {
+  font-size: 1.05rem !important; /* o el valor que desees */
+}
