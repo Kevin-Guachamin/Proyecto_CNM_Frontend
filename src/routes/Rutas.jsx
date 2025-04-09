@@ -24,6 +24,9 @@ import ChangePassword_Admin from '../vistas/Admin/Modules/ChangePassword/Index.j
 import GestionEscolar from '../vistas/Secretaria/GestionEscolar.jsx';
 import MateriasPorPeriodo from '../vistas/Secretaria/MateriasPorPeriodo.jsx';
 import ListadoCursos from '../vistas/Secretaria/ListadoCursos.jsx';
+import ChangePassword_Profesor from '../vistas/Docente/ChangePassword/Index.jsx';
+import ChangePassword_Secretaria from '../vistas/Secretaria/ChangePassword/Index.jsx';
+import ChangePassword_Vicerrector from '../vistas/Vicerrector/ChangePassword/Index.jsx';
 
 function Rutas() {
   return (
@@ -45,8 +48,9 @@ function Rutas() {
       <Route path="/admin/password" element={<ChangePassword_Admin />} />
       
       {/*RUTAS DEL DOCENTE-Profesor*/}
-      <Route path="/calificaciones" element={<Calificaciones />} />
-      <Route path="/panelcursos" element={<PanelCursos />} />
+      <Route path="/profesor/panelcursos/calificaciones" element={<Calificaciones />} />
+      <Route path="/profesor/panelcursos" element={<PanelCursos />} />
+      <Route path ="/profesor/password" element={<ChangePassword_Profesor />} />
 
       {/*Rutas DEL REPRESENTANTE*/}
       <Route path="/representante" element={<Representante />} />
@@ -56,13 +60,15 @@ function Rutas() {
       <Route path="/estudiante/perfil" element={<VerDatosEstudiante />} />
       
       {/*RUTAS DEL DOCENTE-Vicerrector*/}
-      <Route path="/reportes" element={<AgregarFechas />} />
+      <Route path="/vicerrector/reportes" element={<AgregarFechas />} />
+      <Route path="/vicerrector/password" element={<ChangePassword_Vicerrector />} />
 
       {/*RUTAS DEL DOCENTE-Secretaria*/}
-      <Route path="/administracion-escolar" element={<GestionEscolar />} />
-      <Route path="/periodo/materias/:idPeriodo" element={<MateriasPorPeriodo />} />
-      <Route path="/periodo/materias/estudiantes/:id_asignacion" element={<ListadoCursos />} />
-      <Route path="/calificaciones/asignacion/:asigId" element={<Calificaciones />} />
+      <Route path="/secretaria/administracion-escolar" element={<GestionEscolar />} />
+      <Route path="/secretaria/periodo/materias/:idPeriodo" element={<MateriasPorPeriodo />} />
+      <Route path="/secretaria/periodo/materias/estudiantes/:id_asignacion" element={<ListadoCursos />} />
+      <Route path="/secretaria/calificaciones/asignacion/:asigId" element={<Calificaciones />} />
+      <Route path="/secretaria/password" element={<ChangePassword_Secretaria />} />
     </Routes>
   )
 }

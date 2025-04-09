@@ -83,7 +83,13 @@ function ListadoCursos() {
             <span className="label-text">Exportaciones:</span>
             <button
               className="btn btn-success btn-sm"
-              onClick={() => exportarListadoAExcel(tablaFormateada, datosModulo)}
+              onClick={() => {
+                const datosModuloConJornada = {
+                  ...datosModulo,
+                  jornada: determinarJornada(datosModulo.horario),
+                };
+                exportarListadoAExcel(tablaFormateada, datosModuloConJornada);
+              }}              
               title="Exportar a Excel"
             >
               <i className="bi bi-file-earmark-excel-fill"></i>
@@ -117,7 +123,7 @@ function ListadoCursos() {
           <button
             className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1 px-3"
             style={{ maxWidth: "100px" }}
-            onClick={() => navigate(`/periodo/materias/${idPeriodo}`)}
+            onClick={() => navigate(`/secretaria/periodo/materias/${idPeriodo}`)}
           >
             <i className="bi bi-arrow-left-circle-fill"></i> Regresar
           </button>

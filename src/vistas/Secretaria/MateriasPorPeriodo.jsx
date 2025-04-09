@@ -142,7 +142,7 @@ function MateriasPorPeriodo() {
                                                             <button
                                                                 className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1"
                                                                 onClick={() =>
-                                                                    navigate(`/periodo/materias/estudiantes/${asig.ID}`, {
+                                                                    navigate(`/secretaria/periodo/materias/estudiantes/${asig.ID}`, {
                                                                         state: {
                                                                           ID: asig.ID,
                                                                           materia: asig.Materia?.nombre,
@@ -161,7 +161,7 @@ function MateriasPorPeriodo() {
                                                             <button
                                                                 className="btn btn-primary btn-sm d-flex align-items-center gap-1"
                                                                 onClick={() =>
-                                                                    navigate(`/calificaciones/asignacion/${asig.ID}`, {
+                                                                    navigate(`/secretaria/calificaciones/asignacion/${asig.ID}`, {
                                                                       state: {
                                                                         ID: asig.ID,
                                                                         materia: asig.Materia?.nombre,
