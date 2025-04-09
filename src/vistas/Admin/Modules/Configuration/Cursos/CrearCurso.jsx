@@ -17,7 +17,7 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
   const [cupos, setCupos] = useState("")
   const [docentes, setDocentes] = useState([])
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
-
+  const token=localStorage.getItem("token")
   useEffect(() => {
     axios.get(`${API_URL}/docente/obtener`)
       .then(response => {
@@ -75,7 +75,9 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
       }
 
       const newAsignacion = { paralelo, horaInicio, horaFin, dias, cupos: Number(cupos), id_periodo_academico: Number(periodo), nroCedula_docente: docente.nroCedula, id_materia: Number(asignatura.ID), cuposDisponibles: Number(cupos) };
-      onSave(newAsignacion);
+      onSave(newAsignacion, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
     } catch (error) {
       ErrorMessage(error)
     }

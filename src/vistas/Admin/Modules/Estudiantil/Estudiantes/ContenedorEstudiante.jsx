@@ -21,6 +21,7 @@ function ContenedorEstudiante({ data, setData, headers, columnsToShow, filterKey
   const toggleModal = () => {
     setIsModalOpen((prev) => !prev);
     setEntityToUpdate(null);
+    
   };
 
   const handleSaveEntity = (newEntity,headers) => {

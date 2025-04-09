@@ -11,7 +11,7 @@ export function ErrorMessage(error){
                   text: errorMessage,
                   icon: 'error',
                   iconColor:"#dc3545",
-                  confirmButtonText: 'Intentelo más tarde',
+                  confirmButtonText: 'Intentar de nuevo',
                   confirmButtonColor: '#28a745'
                 });
               } 
@@ -21,7 +21,7 @@ export function ErrorMessage(error){
                   text: "No se pudo conectar con el servidor",
                   icon: 'error',
                   iconColor:"#dc3545",
-                  confirmButtonText: 'Intentelo más tarde',
+                  confirmButtonText: 'Intentar de nuevo',
                   confirmButtonColor: '#28a745'
                 });
               }
@@ -31,7 +31,7 @@ export function ErrorMessage(error){
                   text: `${error.message}`,
                   icon: 'error',
                   iconColor:"#dc3545",
-                  confirmButtonText: 'Intentelo más tarde',
+                  confirmButtonText: 'Intentar de nuevo',
                   confirmButtonColor: '#28a745'
                 });
               }

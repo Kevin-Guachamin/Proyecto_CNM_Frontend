@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Header from "../../components/Header";
@@ -14,6 +14,10 @@ function Login() {
   const [nroCedula, setnroCedula] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+ useEffect(()=>{
+  localStorage.removeItem("usuario");
+  localStorage.removeItem("token");
+ },[])
 
   const handleLogin = async (e) => {
     e.preventDefault();
