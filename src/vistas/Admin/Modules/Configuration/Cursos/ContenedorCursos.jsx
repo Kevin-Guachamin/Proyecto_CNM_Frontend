@@ -38,7 +38,7 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
         setPeriodo(selectedPeriodo);
 
         if (!selectedPeriodo) return; // Evitar peticiones innecesarias
-        console.log("yo me ejecute")
+        
         axios.get(`${API_URL}/asignacion/obtener/periodo/${selectedPeriodo}`)
             .then(response => {
                 console.log(response.data)
@@ -110,7 +110,7 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
         console.log("este es el item", item)
         const value = item?.[key1]?.[key2]; // Usamos el encadenamiento opcional para evitar errores si alguna propiedad no existe
         console.log("este es el value", value)
-        return value ? value.toLowerCase() : false;
+        return value ? value.toLowerCase().includes(search.toLowerCase()) : false;
     });
 
     const toggleModal = () => {

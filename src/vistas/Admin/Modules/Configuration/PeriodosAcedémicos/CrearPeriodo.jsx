@@ -8,7 +8,7 @@ function CrearPeriodo({ onCancel, entityToUpdate, onSave }) {
     const [descripcion, setDescripcion] = useState("");
     const [fecha_inicio, setFecha_inicio] = useState("");
     const [fecha_fin, setFecha_fin] = useState("");
-    const [estado, setEstado] = useState("");
+    const token=localStorage.getItem("token")
 
     // Función para convertir una fecha de formato dd/mm/yyyy a un objeto Date
     const convertirFecha = (fecha) => {
@@ -27,15 +27,17 @@ function CrearPeriodo({ onCancel, entityToUpdate, onSave }) {
             // Convertir las fechas de dd/mm/yyyy a objetos Date
             setFecha_fin(convertirFecha(entityToUpdate.fecha_fin) || "");
             setFecha_inicio(convertirFecha(entityToUpdate.fecha_inicio) || "");
-            setEstado(entityToUpdate.estado || "");
+            
         }
     }, [entityToUpdate]);
 
     const handleSubmit = () => {
 
 
-        const newPeriodo = { descripcion, fecha_inicio, fecha_fin, estado };
-        onSave(newPeriodo);
+        const newPeriodo = { descripcion, fecha_inicio, fecha_fin };
+        onSave(newPeriodo,{
+            headers: { Authorization: `Bearer ${token}` },
+          });
     };
 
     return (
@@ -54,19 +56,7 @@ function CrearPeriodo({ onCancel, entityToUpdate, onSave }) {
                         />
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="estado">Estado</label>
-                        <select
-                            id="estado"
-                            value={estado}
-                            onChange={(e) => setEstado(e.target.value)}
-                            className="input-field"
-                        >
-                            <option value="">Selecciona un estado</option>
-                            <option value="Activo">Activo</option>
-                            <option value="Finalizado">Finalizado</option>
-                        </select>
-                    </div>
+                    
 
                     <div className="form-group">
                         <label htmlFor="fecha_inicio">Fecha inicio</label>

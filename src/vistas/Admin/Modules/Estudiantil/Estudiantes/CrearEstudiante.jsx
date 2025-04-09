@@ -23,29 +23,8 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
   const [sector, setSector] = useState("")
   const [parroquia, setParroquia] = useState("")
   const [canton, setCanton] = useState("")
-  const [edad, setEdad] = useState("")
-  const [nroMatricula, setNroMatricula] = useState("")
-
-  function calcularEdad(fechaNacimiento) {
-    console.log("esta fue la fecha", fechaNacimiento)
-    let fechaNac = fechaNacimiento; // Convertir la fecha a objeto Date
-    let hoy = new Date();
-
-    let edad = hoy.getFullYear() - fechaNac.getFullYear(); // Restar años
-
-    // Ajustar si aún no ha pasado el cumpleaños este año
-    let mesActual = hoy.getMonth();
-    let diaActual = hoy.getDate();
-    let mesNac = fechaNac.getMonth();
-    let diaNac = fechaNac.getDate();
-
-    if (mesActual < mesNac || (mesActual === mesNac && diaActual < diaNac)) {
-      edad--;
-    }
-
-    return edad;
-  }
-
+  const [nacionalidad,setNacionalidad]=useState("")
+  const token=localStorage.getItem("token")
   const convertirFecha = (fecha) => {
     if (!fecha) return null;
     const [dia, mes, año] = fecha.split('/');
@@ -68,16 +47,10 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
       setSector(palabras[0] || "")
       setParroquia(palabras[1] || "")
       setCanton(palabras[2] || "")
-      setNroMatricula(entityToUpdate.nroMatricula || "")
-
-      setEdad(calcularEdad(convertirFecha(entityToUpdate.fecha_nacimiento)) || "")
-
+      setNacionalidad(entityToUpdate.nacionalidad || "")
     }
   }, [entityToUpdate]);
-  const generarCodigoEstudiante = (anio, idEstudiante) => {
-    const secuencial = String(idEstudiante).padStart(4, "0"); // Asegura 4 dígitos
-    return `${anio}${secuencial}`;
-  };
+  
 
   const [files, setFiles] = useState({
     matricula_IER: entityToUpdate ? entityToUpdate.matricula_IER : null,
@@ -90,34 +63,9 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
       [name]: files[0], // Solo se selecciona un archivo por input
     }));
   };
-  //Funcion para descargar archivos NO BORRAR AÚN se la ba a usar en otro lado
-  // const handleDownload = async (filePath) => {
-  //   const parts = filePath.split("\\");
-  //   const folder = parts[1]; // Subcarpeta (ej: "Estudiantes")
-  //   const filename = parts[2]; // Nombre del archivo (ej: "ProyectoCNM.pdf")
-
-  //   try {
-  //     const response = await axios.get(
-  //       `http://localhost:8000/estudiante/download/${folder}/${filename}`,
-  //       {
-  //         responseType: 'blob',
-  //       }
-  //     );
-
-  //     const url = window.URL.createObjectURL(new Blob([response.data]));
-  //     const link = document.createElement('a');
-  //     link.href = url;
-  //     link.setAttribute('download', filename);
-  //     document.body.appendChild(link);
-  //     link.click();
-  //     document.body.removeChild(link);
-  //     window.URL.revokeObjectURL(url);
-  //   } catch (error) {
-  //     console.error('Error al descargar el archivo:', error);
-  //     ErrorMessage(error)
-  //   }
-  // }
-  const handleSubmit = () => {
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
     const direccion = [sector, parroquia, canton].join(" ")
 
     console.log("fecha de nacimiento enviada a la base", fecha_nacimiento)
@@ -136,10 +84,16 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
     formData.append("especialidad", especialidad)
     formData.append("IER", IER)
     formData.append("direccion", direccion)
-    formData.append("nroCedula_representante", representante)
+    formData.append("nacionalidad",nacionalidad)
 
+    if(!entityToUpdate){
+      formData.append("nroCedula_representante", representante)
+      onSave(formData, { headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` }});
+    }else{
+      onSave(formData,{ headers: { "Content-Type": "multipart/form-data",  Authorization: `Bearer ${token}` } })
+    }
 
-    onSave(formData);
+    
   };
 
   return (
@@ -150,12 +104,12 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
         <form onSubmit={(e) => handleSubmit(e)} className="modal-form">
           <div className='rows'>
             <div className="form-group">
-              <label htmlFor="nroCedula">Número de cédula:</label>
+              <label htmlFor="nroCedula">Cédula/Pasaporte:</label>
               <input required id="nroCedula" value={nroCedula} onChange={(e) => setNroCedula(e.target.value)} />
             </div>
             <div className="form-group">
-              <label htmlFor="nroMatricula">Código estudiante:</label>
-              <input id="nroMatricula" value={entityToUpdate ? generarCodigoEstudiante(entityToUpdate.anioMatricula, entityToUpdate.ID) : ""} readOnly />
+              <label htmlFor="nacionalidad">Nacionalidad:</label>
+              <input required id="nacionalidad" value={nacionalidad} onChange={(e) => setNacionalidad(e.target.value)} />
             </div>
           </div>
           <div className='rows'>
@@ -183,15 +137,9 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
 
           </div>
           <div className='rows'>
-            <div className="form-group">
-              <label htmlFor="edad">Edad:</label>
-              <input id="edad" value={edad} readOnly />
-            </div>
+            
 
-            <div className="form-group">
-              <label htmlFor="Nro matrícula">Nro. matrícula:</label>
-              <input id="nro matrícula" value={nroMatricula} readOnly />
-            </div>
+            
           </div>
           <div className='rows'>
 
@@ -281,13 +229,7 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
                 accept="application/pdf"
                 className="custom-file-input"
               />
-              {/* Botón de descarga condicional */}
-              {/*entityToUpdate && (
-                <button className="download-button" onClick={() => handleDownload(entityToUpdate.cedula_PDF)}>
-                  <FontAwesomeIcon icon={faDownload} className="icon" />
-                  Descargar documento
-                </button>
-              )*/}
+              
             </div>
 
             <div className="file-upload">
@@ -303,13 +245,7 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
                 className="custom-file-input"
 
               />
-              {/* Botón de descarga condicional */}
-              {/*entityToUpdate && (
-                <button className="download-button" onClick={() => handleDownload(entityToUpdate.matricula_IER_PDF)}>
-                  <FontAwesomeIcon icon={faDownload} className="icon" />
-                  Descargar documento
-                </button>
-              )*/}
+
             </div>
           </div>
           <div className='rows-botones'>

@@ -12,7 +12,7 @@ function CrearDocente({ onCancel, entityToUpdate, onSave }) {
     const [email, setEmail] = useState("");
     const [celular, setCelular] = useState("");
     const [rol, setRol] = useState("");
-
+    const token=localStorage.getItem("token")
 
 
     useEffect(() => {
@@ -31,7 +31,9 @@ function CrearDocente({ onCancel, entityToUpdate, onSave }) {
     const handleSubmit = () => {
 
         const newDocente = { nroCedula, primer_nombre, primer_apellido, segundo_apellido, segundo_nombre, email, celular, rol };
-        onSave(newDocente);
+        onSave(newDocente,{
+            headers: { Authorization: `Bearer ${token}` },
+          });
     };
 
     return (

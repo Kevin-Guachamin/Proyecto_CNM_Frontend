@@ -1,8 +1,9 @@
 import { FaEdit, FaTrash } from 'react-icons/fa'; // Importar íconos
-import "../Styles/Tabla.css";
+import { IoEyeOutline } from "react-icons/io5";
+import "../../../Styles/Tabla.css";
 
 
-function Tabla({ filteredData, OnDelete, OnEdit, headers, columnsToShow}) {
+function TablaEstudiantes({ filteredData, OnDelete, OnEdit, headers, columnsToShow,OnView}) {
   
   return (
     <div className="Contendor-tabla">
@@ -32,6 +33,10 @@ function Tabla({ filteredData, OnDelete, OnEdit, headers, columnsToShow}) {
                     className="icon delete-icon"
                     onClick={() => OnDelete(item)}
                   />
+                  <IoEyeOutline
+                  className='view-icon'
+                  onClick={()=>OnView(item)}
+                  />
                   
                 </td>
               </tr>
@@ -47,4 +52,4 @@ function Tabla({ filteredData, OnDelete, OnEdit, headers, columnsToShow}) {
   );
 }
 
-export default Tabla;
+export default TablaEstudiantes;

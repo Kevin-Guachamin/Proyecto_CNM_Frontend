@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { ErrorMessage } from '../../../../../Utils/ErrorMesaje';
-
+import Horarios from './Horarios';
+import Swal from 'sweetalert2';
 
 function Busqueda() {
     const [periodo, setPeriodo] = useState("")
@@ -9,11 +10,19 @@ function Busqueda() {
     const [estudiante, setEstudiante] = useState("")
     const [buscado, setBuscado] = useState(false); // Estado para saber si ya se buscó
     const [asignaciones, setAsignaciones] = useState([])
-    const [asignatura, setAsignatura] = useState("")
+    const [asignatura, setAsignatura] = useState(null)
+    const [matricula, setMatricula] = useState("")
+    const [inscripciones, setInscripciones] = useState([])
+    const [buscarAsignacion, setBucarAsignacion] = useState(false)
+    const token=localStorage.getItem("token")
+
+
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
     useEffect(() => {
 
-        axios.get(`${API_URL}/periodo_academico/activo`)
+        axios.get(`${API_URL}/periodo_academico/activo`,{
+            headers: { Authorization: `Bearer ${token}` },
+          })
             .then(response => {
                 setPeriodo(response.data);
             })
@@ -21,11 +30,12 @@ function Busqueda() {
                 ErrorMessage(error)
 
             });
-    }, [API_URL]);
+    }, [API_URL,token]);
+
 
 
     function calcularEdad(fechaNacimiento) {
-        console.log("esta fue la fecha", fechaNacimiento)
+
         let fechaNac = fechaNacimiento; // Convertir la fecha a objeto Date
         let hoy = new Date();
 
@@ -59,12 +69,17 @@ function Busqueda() {
 
     const HandleBuscarEstudiante = async () => {
         setBuscado(true)
+        setEstudiante(null)
+        setMatricula(null)
         try {
             if (!cedula) {
                 return
             }
-            const response = await axios.get(`${API_URL}/estdudiante/obtener/${cedula}`);
-            setEstudiante(response)
+            const response = await axios.get(`${API_URL}/estudiante/obtener/${cedula}`,{
+                headers: { Authorization: `Bearer ${token}` },
+              });
+            setEstudiante(response.data)
+
 
         } catch (error) {
             ErrorMessage(error);
@@ -72,7 +87,11 @@ function Busqueda() {
         }
     }
     const HandleBuscarAsignaturas = () => {
-        axios.get(`${API_URL}/asignacion/obtener/materias/${periodo}/${estudiante.nivel}/${asignatura}`)
+        setBucarAsignacion(true)
+
+        axios.get(`${API_URL}/asignacion/obtener/materias/${periodo.ID}/${estudiante.nivel}/${asignatura}`,{
+            headers: { Authorization: `Bearer ${token}` },
+          })
             .then((response) => {
                 setAsignaciones(response.data)
             })
@@ -80,6 +99,82 @@ function Busqueda() {
                 ErrorMessage(error)
             }
             )
+    }
+    const HandleMatricular = async () => {
+
+        try {
+            const response = await axios.get(`${API_URL}/matricula/estudiante/periodo/${estudiante.ID}/${periodo.ID}`,{
+                headers: { Authorization: `Bearer ${token}` },
+              })
+            console.log("este es el response, ", response)
+            setMatricula(response.data)
+            if (!response.data) {
+                const newMatricula = await axios.post(`${API_URL}/matricula/crear`, { nivel: estudiante.nivel, estado: "En curso", ID_estudiante: estudiante.ID, ID_periodo_academico: periodo.ID },{
+                    headers: { Authorization: `Bearer ${token}` },
+                  })
+                setMatricula(newMatricula)
+            }
+        } catch (error) {
+            ErrorMessage(error)
+        }
+
+    }
+    const obtenerAsignaciones = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/asignacion/obtener/matricula/${matricula.ID}`,{
+                headers: { Authorization: `Bearer ${token}` },
+              })
+            console.log("este es el response, ", response)
+            setInscripciones(response.data)
+
+        } catch (error) {
+            ErrorMessage(error)
+        }
+
+    }
+    const tienenDiasSolapados = (dias1, dias2) => {
+        return dias1.some(dia => dias2.includes(dia));
+    }
+
+    const tienenHorariosSolapados = (horaInicioA, horaFinA, horaInicioB, horaFinB) => {
+        return horaInicioA < horaFinB && horaFinA > horaInicioB;
+    }
+    const Inscribir = async (asignacion) => {
+        try {
+            // Primero, verifica si hay conflicto de días + horarios
+            const conflicto = inscripciones.some(asig => {
+                const hayDiasSolapados = tienenDiasSolapados(asig.dias, asignacion.dias);
+                const hayHorarioSolapado = tienenHorariosSolapados(
+                    asignacion.horaInicio,
+                    asignacion.horaFin,
+                    asig.horaInicio,
+                    asig.horaFin
+                );
+
+                return hayDiasSolapados && hayHorarioSolapado;
+            });
+
+            if (conflicto) {
+                throw new Error("Inscripcion no valida por cruze de horarios")
+            }
+            await axios.post(`${API_URL}/inscripcion/crear`, {
+                ID_matricula: matricula.ID,
+                ID_asignacion: asignacion.ID
+            },{
+                headers: { Authorization: `Bearer ${token}` },
+              });
+            Swal.fire({
+                icon: "success",
+                title: "Inscripción exitosa",
+                iconColor: "#218838",
+                confirmButtonText: "Entendido",
+                confirmButtonColor: "#003F89",
+            });
+            obtenerAsignaciones()
+            HandleBuscarAsignaturas()
+        } catch (error) {
+            ErrorMessage(error);
+        }
     }
     return (
         <div>
@@ -96,72 +191,81 @@ function Busqueda() {
                 )}
 
                 {estudiante && (
-                    <table className="tabla_registros">
-                        <thead>
-                            <tr>
-                                <th>Cédula</th>
-                                <th>Primer nombre</th>
-                                <th>Primer apellido</th>
-                                <th>Edad</th>
-                                <th>Género</th>
-                                <th>Jornada</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{estudiante.nroCedula}</td>
-                                <td>{estudiante.primer_nombre}</td>
-                                <td>{estudiante.primer_apellido}</td>
-                                <td>{calcularEdad(convertirFecha(estudiante.fecha_nacimiento))}</td>
-                                <td>{estudiante.genero}</td>
-                                <td>{estudiante.jornada}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                )}
-            </div>
-            <label htmlFor="">Ingrese el nombre de la Materia</label>
-            <input type="text" />
-            <button onClick={HandleBuscarAsignaturas}>Buscar</button>
-            <div className="Contendor-tabla">
-                {asignaciones.length === 0 ? (
-                    <p className="no-registros">No se encontraron coincidencias</p>
-                ) : (
-                    <table className="tabla_registros">
-                        <thead>
-                            <tr>
-                                <th>Nivel</th>
-                                <th>Paraleo</th>
-                                <th>Docente</th>
-                                <th>Materia</th>
-                                <th>Días</th>
-                                <th>Hora Inicio</th>
-                                <th>Hora Fin</th>
-                                <th>Cupos disponibles</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {asignaciones.map((item, index) => (
-                                <tr key={index}>
-                                    <td>{item.Materia.nivel}</td>
-                                    <td>{item.paralelo}</td>
-                                    <td>{`${item.Docente.primer_nombre} ${item.Docente.primer_apellido}`}</td>
-                                    <td>{item.Materia.nombre}</td>
-                                    <td>{`${item.dias[0]}${item.dias[1] ? `-${item.dias[1]}` : ''}`}</td>
-                                    <td>{item.horaInicio}</td>
-                                    <td>{item.horaFin}</td>
-                                    <td>{item.cuposDisponibles}</td>
+                    <div>
+                        <table className="tabla_registros">
+                            <thead>
+                                <tr>
+                                    <th>Cédula</th>
+                                    <th>Primer nombre</th>
+                                    <th>Primer apellido</th>
+                                    <th>Edad</th>
+                                    <th>Género</th>
+                                    <th>Jornada</th>
+                                    <th>Nivel</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{estudiante.nroCedula}</td>
+                                    <td>{estudiante.primer_nombre}</td>
+                                    <td>{estudiante.primer_apellido}</td>
+                                    <td>{calcularEdad(convertirFecha(estudiante.fecha_nacimiento))}</td>
+                                    <td>{estudiante.genero}</td>
+                                    <td>{estudiante.jornada}</td>
+                                    <td>{estudiante.nivel}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button onClick={HandleMatricular}>Empezar matrícula</button>
+                    </div>
 
                 )}
-
-
-
             </div>
+            {matricula && (<div>
+                <label htmlFor="">Ingrese el nombre de la Materia</label>
+                <input type="text" value={asignatura} onChange={(e) => setAsignatura(e.target.value)} />
+                <button onClick={HandleBuscarAsignaturas}>Buscar</button>
+                <div className="Contendor-tabla">
+                    {buscarAsignacion ? (
+                        asignaciones.length === 0 ? (
+                            <p className="no-registros">No se encontraron coincidencias</p>
+                        ) : (
+                            <table className="tabla_registros">
+                                <thead>
+                                    <tr>
+                                        <th>Nivel</th>
+                                        <th>Paralelo</th>
+                                        <th>Docente</th>
+                                        <th>Materia</th>
+                                        <th>Días</th>
+                                        <th>Hora Inicio</th>
+                                        <th>Hora Fin</th>
+                                        <th>Cupos disponibles</th>
+                                        <th>Seleccionar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {asignaciones.map((item, index) => (
+                                        <tr key={index}>
+                                            <td>{item.Materia.nivel}</td>
+                                            <td>{item.paralelo}</td>
+                                            <td>{`${item.Docente.primer_nombre} ${item.Docente.primer_apellido}`}</td>
+                                            <td>{item.Materia.nombre}</td>
+                                            <td>{`${item.dias[0]}${item.dias[1] ? `-${item.dias[1]}` : ''}`}</td>
+                                            <td>{item.horaInicio}</td>
+                                            <td>{item.horaFin}</td>
+                                            <td>{item.cuposDisponibles}</td>
+                                            <td><button onClick={() => Inscribir(item)}>Inscribir</button></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )
+                    ) : null}
+                </div>
+            </div>)}
+            {inscripciones.length > 0 && (<Horarios asignaciones={inscripciones} />)}
+
         </div>
     )
 }

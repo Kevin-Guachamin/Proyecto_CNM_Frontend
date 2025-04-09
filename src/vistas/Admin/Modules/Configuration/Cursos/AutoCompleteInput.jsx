@@ -6,6 +6,13 @@ const AutoCompleteInput = ({ opciones, inputValue, setInputValue, key1, key2 }) 
   const [input,setInput]=useState("")
  
   // Función que maneja el cambio en el input
+  useEffect(()=>{
+    if(inputValue){
+      setInput(`${inputValue[key1]} ${inputValue[key2]}`)
+    }
+
+  },[inputValue])
+  
   const handleInputChange = (e) => {
     const value = e.target.value;
     setInput(value);

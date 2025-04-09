@@ -1,25 +1,31 @@
 import axios from 'axios'
 import { ErrorMessage } from '../ErrorMesaje';
+import Swal from 'sweetalert2';
+
 
 export function Editar (dataToUpdate,newData, URL, setData, setIsModalOpen, PK,headers){
-    console.log("esto es lo que se va a enviar",newData)
+    
     if (dataToUpdate) {
         // Si estamos editando un usuario, lo actualizamos
+        
         axios
           .put(`${URL}/editar/${dataToUpdate[PK]}`, newData,headers)
           .then((res) => {
-            // Actualizamos el array de usuarios con la respuesta del servidor
-            console.log("esto llego de la base después de editar", res.data)
+            
             setData((prevData) => {
-              // Comprobar el valor de prevData dentro de la actualización
-              console.log("prevData dentro de setData:", prevData);
-              
               return prevData.map((data) =>
                 data[PK] === dataToUpdate[PK] ? res.data : data
               );
             });
             
             setIsModalOpen(false); // Cerrar el modal
+           Swal.fire({
+                 icon: "success",
+                 title: "Cambios guardados con éxito",
+                 iconColor: "#218838",
+                 confirmButtonText: "Entendido",
+                 confirmButtonColor: "#003F89",
+               });
           })
           .catch((error) => {
             ErrorMessage(error)
@@ -33,6 +39,13 @@ export function Editar (dataToUpdate,newData, URL, setData, setIsModalOpen, PK,h
           .then((res) => {
             console.log("este llego de la base despues de crear",res.data)
             setData((prevData) => [...prevData, res.data]);
+            Swal.fire({
+              icon: "success",
+              title: "Datos creados con éxito",
+              iconColor: "#218838",
+              confirmButtonText: "Entendido",
+              confirmButtonColor: "#003F89",
+            });
             setIsModalOpen(false); // Cerrar el modal
           })
           .catch((error) => {

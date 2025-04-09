@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import Filtro from './Filtro';
-import Tabla from './Tabla';
-import { Eliminar } from '../../../Utils/CRUD/Eliminar';
-import { Editar } from '../../../Utils/CRUD/Editar';
-import "../Styles/Contenedor.css"
+import Filtro from '../../../Components/Filtro';
+import TablaEstudiantes from './TablaEstudiantes';
+import { Eliminar } from '../../../../../Utils/CRUD/Eliminar';
+import { Editar } from '../../../../../Utils/CRUD/Editar';
+import "../../../Styles/Contenedor.css"
 
 
-function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpoint,CrearEntidad, PK,extraIcon, Paginación}) {
+function ContenedorEstudiante({ data, setData, headers, columnsToShow, filterKey, apiEndpoint,CrearEntidad, PK,OnView, Paginación}) {
   const [search, setSearch] = useState('');
   const [entityToUpdate, setEntityToUpdate] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,6 +21,7 @@ function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpo
   const toggleModal = () => {
     setIsModalOpen((prev) => !prev);
     setEntityToUpdate(null);
+    
   };
 
   const handleSaveEntity = (newEntity,headers) => {
@@ -48,17 +49,18 @@ function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpo
               onSave={handleSaveEntity}
             />
       )}
-      <Tabla
+      <TablaEstudiantes
         filteredData={filteredData}
         OnEdit={handleEdit}
         OnDelete={handleDelete}
+        OnView={OnView}
         headers={headers}
         columnsToShow={columnsToShow}
-        extraIcon={extraIcon}
+        
       />
       {Paginación && data.length > 0 && <div className='Paginación'>{Paginación}</div>}
     </div>
   );
 }
 
-export default Contenedor;
+export default ContenedorEstudiante;

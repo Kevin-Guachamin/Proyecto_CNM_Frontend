@@ -12,6 +12,8 @@ function ChangePassword({type,redireccion}) {
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
+  const token=localStorage.getItem("token")
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMsg("");
@@ -26,10 +28,9 @@ function ChangePassword({type,redireccion}) {
           type: type,
         },
         {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
+        
       );
 
       setMsg(response.data.message);

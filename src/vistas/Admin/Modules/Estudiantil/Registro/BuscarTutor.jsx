@@ -77,6 +77,8 @@ function BuscarTutor() {
         setEntityToUpdate(null);
     };
     const toggleModalRepresentante = () => {
+        setExist(false)
+        setCedula("")
         setModalRepresentante((prev) => !prev);
         setEntityToUpdate(null);
     };
@@ -107,11 +109,19 @@ function BuscarTutor() {
             }
             console.log("este es el estudiante antes de guardar", estudiante)
             await axios.post(`${API_URL}/estudiante/crear`, estudiante, { headers: { "Content-Type": "multipart/form-data" } });
-            Swal.fire("Registro exitoso!", `Estudiante ${estudiante.primer_nombre} ${estudiante.primer_apellido} con su representante ${representante.primer_nombre} ${representante.primer_apellido}`, "success");
+            
+            Swal.fire({
+                icon: "success",
+                title: `Estudiante ${estudiante.primer_nombre} ${estudiante.primer_apellido} con su representante ${representante.primer_nombre} ${representante.primer_apellido}`,
+                iconColor: "#218838",
+                confirmButtonText: "Entendido",
+                confirmButtonColor: "#003F89",
+            });
             setEstudiante(null);
             setRepresentante(null);
             setBuscado(false);
-            setCedula(null)
+            setCedula("")
+            setExist(false)
         } catch (error) {
             ErrorMessage(error);
         }

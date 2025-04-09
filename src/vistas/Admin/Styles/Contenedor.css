@@ -1,6 +1,6 @@
 /* Estilos para el contenedor */
 .Contenedor-general {
-    padding: 20px;
+    padding: 10px;
   }
   
   .modal {
@@ -28,6 +28,7 @@
     display: block;
     animation: fadeIn 0.3s ease-in-out;
 }
+
 
 @keyframes fadeIn {
     from {
