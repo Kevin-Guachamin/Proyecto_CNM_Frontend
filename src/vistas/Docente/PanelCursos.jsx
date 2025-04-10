@@ -24,6 +24,12 @@ function PanelCursos() {
     return horario.replace(/(\d{2}:\d{2}):\d{2}/g, "$1");
   }
   
+  const storedToken = localStorage.getItem("token");
+  const config = {
+    headers: {
+      Authorization: `Bearer ${storedToken}`
+    }
+  };
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const storedToken = localStorage.getItem("token");
@@ -32,12 +38,6 @@ function PanelCursos() {
       const parsedUser = JSON.parse(storedUser);
       setUsuario(parsedUser);
   
-      const config = {
-        headers: {
-          Authorization: `Bearer ${storedToken}`
-        }
-      };
-      
       const modulosBase = getModulos(parsedUser.subRol, true);
       setModules(transformModulesForLayout(modulosBase));
 
@@ -56,8 +56,9 @@ function PanelCursos() {
                   const cursosData = data.map((curso) => ({
                     id: curso.ID,
                     titulo: `Curso: ${curso.materia}`,
-                    descripcion: `Paralelo: ${curso.paralelo}\n Horario: ${formatearHorario(curso.horario)}`,
-                    link: "/profesor/panelcursos/calificaciones"
+                    descripcion: `Paralelo: ${curso.paralelo}\n Horario: ${formatearHorario(curso.horario)}\n Nivel: ${curso.nivel}`,
+                    link: "/profesor/panelcursos/calificaciones",
+                    nivel: curso.nivel,
                   }));
                   setCursos(cursosData);
                 } else {
@@ -101,9 +102,12 @@ function PanelCursos() {
   const handleModuloClick = (modulo) => {
     setLoading(true);
     
-    axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/asignacion/obtener/${modulo.id}`)
+    axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/asignacion/obtener/${modulo.id}`,config)
       .then((response) => {
-        const moduloCompleto = response.data;
+        const moduloCompleto = {
+          ...response.data,
+          nivel: modulo.nivel
+        };
         navigate("/profesor/panelcursos/calificaciones", { state: moduloCompleto });
       })
       .catch((error) => {

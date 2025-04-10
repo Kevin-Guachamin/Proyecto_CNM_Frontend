@@ -9,9 +9,11 @@ const Tabla = ({
   columnas, columnasAgrupadas, datos, onChange, columnasEditables = [],
   mostrarEditar = true, mostrarGuardar = true, onEditar, onGuardar, inputsDisabled,
   isWithinRange, rangoTexto, globalEdit, forceEdit, clasePersonalizada = "", soloLectura }) => {
+  
   const [editingRow, setEditingRow] = useState(null);
   const columnasRepetidas = ["Nro", "Nómina de Estudiantes"];
   const columnaFinal = "Acciones";
+  
   const columnasFinales = (mostrarEditar || mostrarGuardar) && !soloLectura
     ? [...columnasRepetidas, ...columnas, columnaFinal]
     : [...columnasRepetidas, ...columnas];
@@ -20,9 +22,15 @@ const Tabla = ({
     "INSUMO 1",
     "INSUMO 2",
     "EVALUACIÓN SUMATIVA",
+    "EVALUACIÓN MEJORAMIENTO",
     "Examen Supletorio",
     "Examen"
   ];
+
+  const esNotaBaja = (col, fila) => {
+    const columnasEvaluadas = ["PROMEDIO PARCIAL", "Promedio Final", "PROMEDIO", "Primer Parcial","Segundo Parcial","Promedio Quimestral"];
+    return columnasEvaluadas.includes(col) && !isNaN(parseFloat(fila[col])) && parseFloat(fila[col]) < 7;
+  };
 
   return (
     <div className="table-responsive mt-3">
@@ -99,16 +107,7 @@ const Tabla = ({
                     // Renderizamos las celdas normales
                     const esEditable = columnasEditables.includes(col);
                     return (
-                      <td key={j} className={`text-center ${col === "PROMEDIO PARCIAL" &&
-                        !isNaN(parseFloat(fila[col])) &&
-                        parseFloat(fila[col]) < 7
-                        ? "text-danger-strong"
-                        : col === "Promedio Final" &&
-                          !isNaN(parseFloat(fila[col])) &&
-                          parseFloat(fila[col]) < 7
-                          ? "text-danger-strong"
-                          : ""
-                        }`}>
+                      <td key={j} className={`text-center ${esNotaBaja(col, fila) ? "text-danger-strong" : ""}`}>
                         {/* Texto que solo se muestra en PDF */}
                         <span className="pdf-only">
                           {fila[col] !== undefined && fila[col] !== "" ? fila[col] : "-"}

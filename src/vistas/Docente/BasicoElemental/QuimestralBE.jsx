@@ -1,45 +1,43 @@
 import React, { useState, useEffect } from "react";
-import HeaderTabla from "../../components/HeaderTabla";
-import Tabla from "../../components/Tabla";
+import HeaderTabla from "../../../components/HeaderTabla";
+import Tabla from "../../../components/Tabla";
 import Swal from 'sweetalert2';
 import axios from "axios";
-import { ErrorMessage } from "../../Utils/ErrorMesaje";
-import "./Parcial.css";
+import { ErrorMessage } from "../../../Utils/ErrorMesaje";
+import "../Parcial.css";
 
-const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actualizarDatosQuim, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura }) => {
+const QuimestralBE = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actualizarDatosQuim, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, escala }) => {
 
   const idContenedor = `pdf-quimestral-quim${quimestreSeleccionado}`;
 
   // Estado que contendrá los datos combinados (por estudiante) provenientes de los parciales
   const [datos, setDatos] = useState([]);
 
-  // Función para calcular la valoración (para comportamiento) según la suma total
-  const calcularValoracion = (valor) => {
-    // 1) Truncar el valor (9.4 => 9)
-    const truncado = Math.floor(valor);
+  const convertirNota = (nota) => {
+    const n = parseFloat(nota);
+    if (isNaN(n) || n < 0 || n > 10) return "";
 
-    // 2) Asignar la letra en función del entero
-    if (truncado === 10) return "A";
-    if (truncado === 9) return "B";
-    if (truncado >= 7) return "C"; // Esto abarca 7 y 8
-    if (truncado >= 5) return "D"; // Esto abarca 5 y 6
-    return "E";                     // Menos de 5
-  };
+    if (escala === "cuantitativa" || escala === "1") {
+      if (n >= 9) return "DA";
+      if (n >= 7) return "AA";
+      if (n > 4) return "PA";
+      return "NA";
+    }
 
-  const abreviarNivel = (nivel) => {
-    if (!nivel || typeof nivel !== "string") return "";
+    if (escala === "cualitativa" || escala === "2") {
+      if (n >= 9.5) return "A+";
+      if (n >= 9) return "A-";
+      if (n >= 8.5) return "B+";
+      if (n >= 7.5) return "B-";
+      if (n >= 7) return "C+";
+      if (n >= 6.5) return "C-";
+      if (n >= 4) return "D+";
+      if (n >= 3.5) return "D-";
+      if (n >= 2) return "E+";
+      return "E-";
+    }
 
-    const partes = nivel.split(" ");
-    if (partes.length < 2) return "";
-
-    const grado = partes[0][0]; // Ej. "1ro" => "1"
-
-    if (nivel.includes("Bachillerato")) return `${grado}BCH`;
-    if (nivel.includes("Básico Elemental")) return `${grado}BE`;
-    if (nivel.includes("Básico Medio")) return `${grado}BM`;
-    if (nivel.includes("Básico Superior")) return `${grado}BS`;
-
-    return ""; // Por defecto si no matchea nada
+    return "";
   };
 
   const obtenerEtiquetaQuimestre = () => {
@@ -60,13 +58,19 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
         id_inscripcion: fila.idInscripcion, // 👈 ojo con la nomenclatura
         examen: parseCampoNumerico(fila["Examen"]),
         quimestre: obtenerEtiquetaQuimestre(),
-        "Promedio Completo": parseCampoNumerico(fila["Promedio Final"]),
-        "Promedio Comportamiento Completo": parseCampoNumerico(fila["Promedio Comportamiento"])
+        "Promedio Final": parseCampoNumerico(fila["Promedio Quimestral"]),
       };
     });
   };
 
   const [datosOriginales, setDatosOriginales] = useState([]);
+
+  const [mostrarExtras, setMostrarExtras] = useState({
+    extra1: false,
+    extra2: false,
+    extra3: false,
+    extra4: false,
+  });
 
   // Cada vez que lleguen datos de ambos parciales, se combinan
   useEffect(() => {
@@ -78,7 +82,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
       axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
     }
     const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${datosModulo.ID}`;
-    const urlQuimestrales = `${import.meta.env.VITE_URL_DEL_BACKEND}/quimestrales/asignacion/${datosModulo.ID}`;
+    const urlQuimestrales = `${import.meta.env.VITE_URL_DEL_BACKEND}/quimestralesbe/asignacion/${datosModulo.ID}`;
 
     Promise.all([axios.get(urlInscripciones), axios.get(urlQuimestrales)])
       .then(([respEstudiantes, respQuimestrales]) => {
@@ -92,38 +96,68 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
             q.idInscripcion === est.idInscripcion &&
             q.quimestre === obtenerEtiquetaQuimestre()
           ) || {};
-
-          const parcial1 = parseFloat(p1["Promedio Final"] || 0);
-          const parcial2 = parseFloat(p2["Promedio Final"] || 0);
-          const promedioAcademico = (parcial1 + parcial2) / 2;
-          const ponderacion70 = promedioAcademico * 0.7;
+        
+          const parcial1 = parseFloat(p1["Promedio Final"]);
+          const parcial2 = parseFloat(p2["Promedio Final"]);
+        
+          const parcial1Valido = !isNaN(parcial1);
+          const parcial2Valido = !isNaN(parcial2);
+          const promedioAcademico = (parcial1Valido && parcial2Valido)
+            ? (parcial1 + parcial2) / 2
+            : null;
+        
+          const ponderacion70 = promedioAcademico !== null ? promedioAcademico * 0.7 : 0;
+        
           const notaExamen = saved.examen ?? "";
-          const ponderacion30 = parseFloat(notaExamen || 0) * 0.3;
+          const examenValido = !isNaN(parseFloat(notaExamen));
+          const ponderacion30 = examenValido ? parseFloat(notaExamen) * 0.3 : 0;
           const promedioFinal = ponderacion70 + ponderacion30;
-
-          const comportamientoP1 = parseFloat(p1["Promedio Comportamiento"] || 0);
-          const comportamientoP2 = parseFloat(p2["Promedio Comportamiento"] || 0);
-
-          const comportamientoTotal = (comportamientoP1 + comportamientoP2) / 2;
-          const comportamientoFinal = calcularValoracion(comportamientoTotal);
-
+        
           return {
             idInscripcion: est.idInscripcion,
             idQuimestral: saved.id,
             "Nro": est.nro,
             "Nómina de Estudiantes": est.nombre,
-            "Primer Parcial": parcial1.toFixed(2),
-            "Segundo Parcial": parcial2.toFixed(2),
-            "Ponderación 70%": ponderacion70.toFixed(2),
+            "Primer Parcial": parcial1Valido ? parcial1.toFixed(2) : "",
+            [nombreColumnaExtra]: parcial1Valido ? convertirNota(parcial1.toFixed(2)) : "-",
+            "Segundo Parcial": parcial2Valido ? parcial2.toFixed(2) : "",
+            [nombreColumnaExtra1]: parcial2Valido ? convertirNota(parcial2.toFixed(2)) : "-",
+            "Promedio": promedioAcademico !== null ? promedioAcademico.toFixed(2) : "",
+            [nombreColumnaExtra2]: promedioAcademico !== null ? convertirNota(promedioAcademico.toFixed(2)) : "-",
+            "Ponderación 70%": promedioAcademico !== null ? ponderacion70.toFixed(2) : "",
             "Examen": notaExamen,
-            "Ponderación 30%": ponderacion30.toFixed(2),
-            "Promedio Final": promedioFinal.toFixed(2),
-            "Promedio Comportamiento": comportamientoTotal,
-            "Nivel": abreviarNivel(est.nivel),
-            "Comportamiento Final": comportamientoFinal,
+            "Ponderación 30%": examenValido ? ponderacion30.toFixed(2) : "",
+            "Promedio Quimestral": examenValido ? promedioFinal.toFixed(2) : "",
+            [nombreColumnaExtra3]: examenValido ? convertirNota(promedioFinal.toFixed(2)) : "-"
           };
+        }); 
+        
+        const hayParcial1 = estudiantes.some(est => {
+          const p1 = parcial1Data.find(p => p.id_inscripcion === est.idInscripcion);
+          return p1 && !isNaN(parseFloat(p1["Promedio Final"]));
         });
+        
+        const hayParcial2 = estudiantes.some(est => {
+          const p2 = parcial2Data.find(p => p.id_inscripcion === est.idInscripcion);
+          return p2 && !isNaN(parseFloat(p2["Promedio Final"]));
+        });
+        
+        const hayAmbosPromedios = estudiantes.some(est => {
+          const p1 = parcial1Data.find(p => p.id_inscripcion === est.idInscripcion);
+          const p2 = parcial2Data.find(p => p.id_inscripcion === est.idInscripcion);
+          return p1 && p2 && !isNaN(parseFloat(p1["Promedio Final"])) && !isNaN(parseFloat(p2["Promedio Final"]));
+        });
+        
+        const hayExamen = quimestrales.some(q => !isNaN(parseFloat(q.examen)));
+        
+        setMostrarExtras({
+          extra1: hayParcial1,
+          extra2: hayParcial2,
+          extra3: hayAmbosPromedios,
+          extra4: hayExamen,
+        });       
         setDatos(nuevosDatos);
+
         setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
         actualizarDatosQuim(nuevosDatos);        
       })
@@ -137,7 +171,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
     if (!datos || datos.length === 0) return;
 
     // Filtra filas válidas (aquí todas tienen “Promedio Final” calculado)
-    const datosCompletos = datos.filter(fila => fila["Promedio Final"] !== undefined && fila["Comportamiento Final"] !== undefined);
+    const datosCompletos = datos.filter(fila => fila["Promedio Quimestral"] !== undefined );
 
 
     if (typeof actualizarDatosQuim === "function" && datosCompletos.length > 0) {
@@ -170,6 +204,19 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
       if (i === rowIndex) {
         let nuevaFila = { ...fila };
 
+        if (!(nombreColumnaExtra in nuevaFila)) {
+          nuevaFila[nombreColumnaExtra] = "-";
+        }
+        if (!(nombreColumnaExtra1 in nuevaFila)) {
+          nuevaFila[nombreColumnaExtra1] = "-";
+        }
+        if (!(nombreColumnaExtra2 in nuevaFila)) {
+          nuevaFila[nombreColumnaExtra2] = "-";
+        }
+        if (!(nombreColumnaExtra3 in nuevaFila)) {
+          nuevaFila[nombreColumnaExtra3] = "-";
+        }
+
         if (columnName === "Examen") {
           if (value === "") {
             nuevaFila["Examen"] = "";
@@ -193,16 +240,40 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
         const promedioFinal = ponderacion70 + ponderacion30;
 
         nuevaFila["Ponderación 30%"] = ponderacion30.toFixed(2);
-        nuevaFila["Promedio Final"] = promedioFinal.toFixed(2);
-
+        nuevaFila["Promedio Quimestral"] = promedioFinal.toFixed(2);
+        nuevaFila[nombreColumnaExtra3] = convertirNota(promedioFinal.toFixed(2));
         return nuevaFila;
       }
       return fila;
     });
     setDatos(nuevosDatos);
+    const hayExamenNuevo = nuevosDatos.some(f => !isNaN(parseFloat(f["Examen"])));
+    setMostrarExtras(prev => ({ ...prev, extra4: hayExamenNuevo }));
   };
 
-  const subtitulo = `ACTA DE RESUMEN DEL ${quimestreSeleccionado === "1" ? "PRIMER" : "SEGUNDO"} QUIMESTRE`;
+  useEffect(() => {
+    if (!datos || datos.length === 0) return;
+  
+    const nuevosDatos = datos.map(fila => {
+      const nuevoFila = { ...fila };
+  
+      const parcial1 = parseFloat(fila["Primer Parcial"]);
+      const parcial2 = parseFloat(fila["Segundo Parcial"]);
+      const promedio = parseFloat(fila["Promedio"]);
+      const promedioFinal = parseFloat(fila["Promedio Quimestral"]);
+  
+      nuevoFila[nombreColumnaExtra] = !isNaN(parcial1) ? convertirNota(parcial1) : "-";
+      nuevoFila[nombreColumnaExtra1] = !isNaN(parcial2) ? convertirNota(parcial2) : "-";
+      nuevoFila[nombreColumnaExtra2] = !isNaN(promedio) ? convertirNota(promedio) : "-";
+      nuevoFila[nombreColumnaExtra3] = !isNaN(promedioFinal) ? convertirNota(promedioFinal) : "-";
+  
+      return nuevoFila;
+    });
+  
+    setDatos(nuevosDatos);
+  }, [escala]);
+  
+  const subtitulo = `INFORME DE RENDIMIENTO ACADÉMICO QUIMESTRE ${quimestreSeleccionado === "1" ? "1" : "2"} `;
 
   const determinarJornada = (horario) => {
     const horaInicio = horario.split("-")[0];
@@ -225,13 +296,24 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
 
   const columnasAgrupadas = [
     { titulo: "", colspan: 2 },
-    { titulo: "RESUMEN DE APRENDIZAJES Y COMPORTAMIENTO", colspan: 9 },
+    { titulo: "RESUMEN DE APRENDIZAJES ", colspan: 7 },
+    { titulo: "EVALUACIÓN", colspan: 2 },
+    { titulo: "", colspan: 1 }
   ];
 
+  const nombreColumnaExtra = escala === "cualitativa" ? "Cualitativa" : "Cuantitativa";
+  const nombreColumnaExtra1 = escala === "cualitativa" ? "Cualitativa\u00A0" : "Cuantitativa\u00A0";
+  const nombreColumnaExtra2 = escala === "cualitativa" ? "Cualitativa " : "CCuantitativa ";
+  const nombreColumnaExtra3 = escala === "cualitativa" ? "Cualitativa  " : "Cuantitativa  ";
+
   const columnas = [
-    "Primer Parcial", "Segundo Parcial", "Ponderación 70%",
-    "Examen", "Ponderación 30%", "Promedio Final", "Promedio Comportamiento", "Nivel", "Comportamiento Final"
+    "Primer Parcial", nombreColumnaExtra,
+    "Segundo Parcial", nombreColumnaExtra1,
+    "Promedio", nombreColumnaExtra2,
+    "Ponderación 70%", "Examen", "Ponderación 30%",
+    "Promedio Quimestral", nombreColumnaExtra3
   ];
+    
 
   // Indicamos que la columna "Examen" es editable, similar a como se hace en el componente de Parcial
   const columnasEditables = ["Examen"];
@@ -277,7 +359,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
     };
   
     axios
-      .put(`${import.meta.env.VITE_URL_DEL_BACKEND}/quimestrales/${rowData.idQuimestral}`, body)
+      .put(`${import.meta.env.VITE_URL_DEL_BACKEND}/quimestralesbe/${rowData.idQuimestral}`, body)
       .then(() => {
         Swal.fire({
           icon: "success",
@@ -328,4 +410,4 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
   );
 };
 
-export default Quimestral;
+export default QuimestralBE;
