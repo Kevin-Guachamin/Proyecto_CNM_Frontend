@@ -19,14 +19,17 @@ const Index = () => {
   ]);
 
   useEffect(() => {
-    setUsuario({primer_nombre: "Maria", primer_apellido: "Rodriguez", rol: "Representante"});
+    const usuarioGuardado = localStorage.getItem("usuario");
+    if (usuarioGuardado) {
+      setUsuario(JSON.parse(usuarioGuardado));
+    } 
   }, []);
   
   const handleModuloClick = (modulo) => {
     setLoading(true);
     setTimeout(() => {
       navigate(modulo.link, {
-        state: { nroCedula: '0102030405'}
+        state: { nroCedula: usuario.nroCedula}
       }); // accedes a la propiedad link del objeto
     }, 800);
   };
