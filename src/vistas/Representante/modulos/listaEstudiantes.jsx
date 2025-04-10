@@ -18,7 +18,12 @@ function ListaEstudiantes() {
   const handleVerCalificaciones = async (estudianteId) => {
     console.log("ver calificaciones de: ", estudianteId);
     try {
-      const respuesta = await axios.get(`http://localhost:8000/estudiante/obtener/${estudianteId}`);
+      const token = localStorage.getItem("token");
+      const respuesta = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/estudiante/obtener/${estudianteId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
       setEstudianteSeleccionado(respuesta.data);
       
 
@@ -35,7 +40,13 @@ function ListaEstudiantes() {
 
   const handleVerDatosEstudiante = async (estudianteCedula) => {
    try {
-    const respuesta = await axios.get(`http://localhost:8000/estudiante/obtener/${estudianteCedula}`);
+
+    const token = localStorage.getItem("token");
+    const respuesta = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/estudiante/obtener/${estudianteCedula}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
     setEstudianteSeleccionado(respuesta.data);
     setIsModalOpen(true);
 
@@ -47,47 +58,50 @@ function ListaEstudiantes() {
  
   }
 
-  // Mientras no se conecte al backend, dejamos un usuario de prueba
-  const cargarDatos = async () => {
-    try {
-      setIsLoading(true);
-
-      // Peticion para obtener datos del representante logeado
-      const representante = await axios.get('http://localhost:8000/representante/obtener/0102030405');
-
-      // Peticion para obtener los estudiantes a cargo del representante logeado
-      const respuesta = await axios.get('http://localhost:8000/api/representantes/0102030405/estudiantes');
-
-      setUsuario({ primer_nombre: representante.data.primer_nombre,
-                    primer_apellido: representante.data.primer_apellido, 
-                    rol: "Representante" 
-      });
-      setDatosEstudiante(respuesta.data);
-      
-      
-    } catch (error) {
-      console.error("Error al cargar datos: ", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }
   
-  // Simulación de usuario ficticio mientras se conecta con el backend
+  //  Obtener los datos del representante guardados en localStorage
   useEffect(() => {
-    // Aquí se realizará la petición al backend cuando esté disponible
-    // axios.get("URL_DEL_BACKEND/usuarioConectado", { headers: { Authorization: `Bearer ${TOKEN}` } })
-    //   .then(response => {
-    //     setUsuario(response.data); // Guardar la información del usuario en el estado
-    //   })
-    //   .catch(error => {
-    //     console.error("Error al obtener los datos del usuario:", error);
-    //   });
-
-    
-    
-    cargarDatos();  
-    
+    const cargarDatos = async () => {
+      setIsLoading(true);
+      try {
+        // Obtener datos del representante logeado
+        const usuarioGuardado = JSON.parse(localStorage.getItem("usuario"));
+        if (usuarioGuardado) {
+          setUsuario(usuarioGuardado);
+        } else {
+          return console.log('El usuario es NULL');
+        }
+      } catch (error) {
+        console.error("Error al cargar datos: ", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    cargarDatos();
   }, []);
+
+  // Obtener los estudiantes a cargo de un representante
+  useEffect(() => {
+    const cargarDatosEstudiantes = async () => {
+      if(!usuario) {
+        return;
+      }
+      try {
+        // Peticion para obtener los estudiantes a cargo del representante logeado
+        const token = localStorage.getItem("token");
+        const respuesta = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/api/representantes/${usuario.nroCedula}/estudiantes`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+      setDatosEstudiante(respuesta.data);
+
+      } catch (error) {
+       console.error("Error al cargar datos del estudiante: ", error); 
+      }  
+    }
+    cargarDatosEstudiantes();
+  }, [usuario]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
