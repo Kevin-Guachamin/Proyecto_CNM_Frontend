@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import HeaderTabla from "../../components/HeaderTabla";
 import Tabla from "../../components/Tabla";
 import Swal from 'sweetalert2';
@@ -15,12 +15,12 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
   const calcularValoracion = (valor) => {
     // 1) Truncar el valor (9.4 => 9)
     const truncado = Math.floor(valor);
-  
+
     // 2) Asignar la letra en función del entero
     if (truncado === 10) return "A";
-    if (truncado === 9)  return "B";
-    if (truncado >= 7)  return "C"; // Esto abarca 7 y 8
-    if (truncado >= 5)  return "D"; // Esto abarca 5 y 6
+    if (truncado === 9) return "B";
+    if (truncado >= 7) return "C"; // Esto abarca 7 y 8
+    if (truncado >= 5) return "D"; // Esto abarca 5 y 6
     return "E";                     // Menos de 5
   };
 
@@ -39,7 +39,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
 
     return ""; // Por defecto si no matchea nada
   };
-  
+
   const transformarDatosFinalParaGuardar = (datos) => {
     return datos.map((fila) => {
       return {
@@ -51,7 +51,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
   };
 
   const [datosOriginales, setDatosOriginales] = useState([]);
-  
+
   // Combinar los datos de Quimestre 1 y 2
   useEffect(() => {
     if (!datosModulo?.ID) return;
@@ -60,7 +60,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
     if (storedToken) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
     }
-    
+
     const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${datosModulo.ID}`;
     const urlFinales = `${import.meta.env.VITE_URL_DEL_BACKEND}/finales/asignacion/${datosModulo.ID}`;
 
@@ -102,7 +102,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
             const examenVal = parseFloat(examenSupletorio) || 0;
             pFinal = examenVal > promedioAnual ? examenVal : promedioAnual;
           }
-          const estado = pFinal >= 7 ? "Aprobado" : "Reprobado";
+          const estado = pFinal >= 7 ? "Aprobado" : pFinal >= 4 && pFinal < 7 ? "Supletorio" : "Reprobado";
 
           // Nota que guardamos en propiedades "numéricas" (prefijo _)
           // y también en las llaves visibles si quieres un valor inicial
@@ -152,7 +152,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
     if (typeof actualizarDatosFinal === "function") {
       const datosTransformados = transformarDatosFinalParaGuardar(datos);
       actualizarDatosFinal(datosTransformados);
-      }
+    }
   }, [datos, actualizarDatosFinal]);
 
   // Manejar cambios en la columna "Examen Supletorio"
@@ -171,7 +171,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
         });
         return;
       }
-  
+
       // C) Validar que sea un número de 0.00 a 7.00
       const regexDecimal = /^\d{1,2}(\.\d{0,2})?$/;
       if (value !== "") {
@@ -188,7 +188,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
         }
       }
     }
-  
+
     // 2) Luego, actualizas el estado “datos” igual que antes
     setDatos((prevDatos) =>
       prevDatos.map((row, i) => {
@@ -203,7 +203,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
             }
             newRow._promedioFinal = pFinal;
             newRow["Promedio Final"] = pFinal;
-            newRow["Estado"] = pFinal >= 7 ? "Aprobado" : "Reprobado";
+            newRow["Estado"] = pFinal >= 7 ? "Aprobado" : pFinal >= 4 && pFinal < 7 ? "Supletorio" : "Reprobado";
             newRow.promedioFinalInsuficiente = pFinal < 7;
           }
           return newRow;
@@ -212,7 +212,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
       })
     );
   };
-  
+
   const determinarJornada = (horario) => {
     const horaInicio = horario.split("-")[0];
     const horaNumerica = parseInt(horaInicio.split(":")[0], 10);
@@ -276,12 +276,16 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
           ? <span style={{ color: "red" }}>{promedioFinalStr}</span>
           : promedioFinalStr,
         "Estado":
-          row["Estado"] === "Aprobado"
-            ? <span style={{ backgroundColor: "green", color: "#fff", padding: "2px 4px" }}>Aprobado</span>
-            : <span style={{ backgroundColor: "red", color: "#fff", padding: "2px 4px" }}>Reprobado</span>
+          row["Estado"] === "Aprobado" ? (
+            <span style={{ backgroundColor: "green", color: "#fff", padding: "2px 4px" }}>Aprobado</span>
+          ) : row["Estado"] === "Supletorio" ? (
+            <span style={{ backgroundColor: "yellow", color: "#000", padding: "2px 4px" }}>Supletorio</span>
+          ) : (
+            <span style={{ backgroundColor: "red", color: "#fff", padding: "2px 4px" }}>Reprobado</span>
+          )
       };
     });
-  }, [datos]);  
+  }, [datos]);
 
   const realmenteDeshabilitado = soloLectura || inputsDisabled || (!isWithinRange && !forceEdit);
 
@@ -289,7 +293,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
     // Aquí asumimos que ya existe el registro (como en los otros componentes)
     const original = datos[rowIndex];
     const haCambiado = JSON.stringify(rowData) !== JSON.stringify(original);
-  
+
     if (!haCambiado) {
       Swal.fire({
         icon: "info",
@@ -298,7 +302,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
       });
       return;
     }
-  
+
     const examen = parseFloat(rowData["Examen Supletorio"]);
     if (isNaN(examen) || examen < 0 || examen > 7) {
       Swal.fire({
@@ -308,12 +312,12 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
       });
       return;
     }
-  
+
     const body = {
       id_inscripcion: rowData.idInscripcion,
       examen_recuperacion: examen,
     };
-  
+
     axios
       .put(`${import.meta.env.VITE_URL_DEL_BACKEND}/finales/${rowData.idInscripcion}`, body)
       .then(() => {
@@ -335,7 +339,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
         ErrorMessage(error);
       });
   };
-  
+
   return (
     <div id={idContenedor} className="container tabla-final">
       <HeaderTabla

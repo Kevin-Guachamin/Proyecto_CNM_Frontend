@@ -13,7 +13,7 @@ function ListadoCursos() {
   const { id_asignacion } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const datosModulo = location.state || {};
+  const datosModulo = location.state || JSON.parse(sessionStorage.getItem("datosModulo") || "{}");
 
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -39,13 +39,21 @@ function ListadoCursos() {
     const parsedUser = JSON.parse(storedUser);
     setUsuario(parsedUser);
 
+    if (location.state) {
+      sessionStorage.setItem("datosModulo", JSON.stringify(location.state));
+    }
+    
     axios
       .get(`${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${id_asignacion}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
         setEstudiantes(res.data || []);
-        setIdPeriodo(datosModulo.idPeriodo); // Lo obtienes del location.state
+        if (datosModulo.idPeriodo) {
+          setIdPeriodo(datosModulo.idPeriodo);
+        } else {
+          console.warn("No se encontró idPeriodo en datosModulo");
+        }        
       })
       .catch(ErrorMessage)
       .finally(() => setLoading(false));

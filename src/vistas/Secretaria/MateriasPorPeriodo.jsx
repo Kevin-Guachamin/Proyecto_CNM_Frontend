@@ -150,7 +150,7 @@ function MateriasPorPeriodo() {
                                                                           paralelo: asig.paralelo,
                                                                           descripcionPeriodo: asig.Periodo_Academico?.descripcion,
                                                                           horario: `${asig.horaInicio}-${asig.horaFin}`,
-                                                                          idPeriodo: asig.id_periodo_academico, 
+                                                                          idPeriodo, 
                                                                         }
                                                                       })                                                                      
                                                                 }
@@ -169,7 +169,8 @@ function MateriasPorPeriodo() {
                                                                         paralelo: asig.paralelo,
                                                                         periodo: asig.Periodo_Academico?.descripcion,
                                                                         horario: `${asig.horaInicio}-${asig.horaFin}`,
-                                                                        idPeriodo: asig.id_periodo_academico,
+                                                                        idPeriodo,
+                                                                        nivel: asig.Materia?.nivel,
                                                                         soloLectura: true, 
                                                                       }
                                                                     })

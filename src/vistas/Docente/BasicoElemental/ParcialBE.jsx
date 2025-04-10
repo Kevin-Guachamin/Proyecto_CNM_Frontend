@@ -1,16 +1,43 @@
 import React, { useState, useEffect, useRef } from "react";
-import HeaderTabla from "../../components/HeaderTabla";
-import Tabla from "../../components/Tabla";
+import HeaderTabla from "../../../components/HeaderTabla";
+import Tabla from "../../../components/Tabla";
 import axios from "axios";
-import { ErrorMessage } from "../../Utils/ErrorMesaje";
+import { ErrorMessage } from "../../../Utils/ErrorMesaje";
 import Swal from 'sweetalert2';
-import "./Parcial.css";
+import "../Parcial.css";
 
-function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura }) {
+function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, escala }) {
   // ID dinámico: pdf-parcial1-quim1, pdf-parcial2-quim1, pdf-parcial1-quim2, etc.
   const idContenedor = `pdf-parcial${parcialSeleccionado}-quim${quimestreSeleccionado}`;
 
-  const subtitulo = `ACTA DE CALIFICACIONES ${parcialSeleccionado === "1" ? "PRIMER" : "SEGUNDO"} PARCIAL - ${quimestreSeleccionado === "1" ? "PRIMER" : "SEGUNDO"} QUIMESTRE`;
+  const subtitulo = `NOTA DEL ${parcialSeleccionado === "1" ? "PRIMER" : "SEGUNDO"} PARCIAL - ${quimestreSeleccionado === "1" ? "PRIMER" : "SEGUNDO"} QUIMESTRE`;
+
+  const convertirNota = (nota) => {
+    const n = parseFloat(nota);
+    if (isNaN(n) || n < 0 || n > 10) return "";
+
+    if (escala === "cuantitativa" || escala === "1") {
+      if (n >= 9) return "DA";
+      if (n >= 7) return "AA";
+      if (n > 4) return "PA";
+      return "NA";
+    }
+
+    if (escala === "cualitativa" || escala === "2") {
+      if (n >= 9.5) return "A+";
+      if (n >= 9) return "A-";
+      if (n >= 8.5) return "B+";
+      if (n >= 7.5) return "B-";
+      if (n >= 7) return "C+";
+      if (n >= 6.5) return "C-";
+      if (n >= 4) return "D+";
+      if (n >= 3.5) return "D-";
+      if (n >= 2) return "E+";
+      return "E-";
+    }
+
+    return "";
+  };
 
   // ⬇️ Aquí implementamos la función para determinar la jornada
   const determinarJornada = (horario) => {
@@ -44,61 +71,26 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
 
   const columnasAgrupadas = [
     { titulo: "", colspan: 2 },
-    { titulo: "Evaluación de Aprendizajes", colspan: 6 },
-    { titulo: "Evaluación del Comportamiento", colspan: 13 },
+    { titulo: "Evaluación de Aprendizajes", colspan: 5 },
+    { titulo: "Evaluaciones Sumativas", colspan: 5 },
+    { titulo: "", colspan: 2 }
   ];
 
-
+  const nombreColumnaExtra = escala === "cualitativa" ? "CUALITATIVA" : "CUANTITATIVA";
+  const nombreColumnaExtra1 = escala === "cualitativa" ? "CUALITATIVA\u00A0" : "CUANTITATIVA\u00A0";
+  
   const columnas = [
-    "INSUMO 1", "INSUMO 2", "PONDERACIÓN 70%", "EVALUACIÓN SUMATIVA", "PONDERACIÓN 30%", "PROMEDIO PARCIAL",
-    "RESPETO Y CONSIDERACION", "VALORACION DE LA DIVERSIDAD", "CUMPLIMIENTO DE LAS NORMA DE CONVIVENCIA",
-    "CUIDADO  DEL PATRIMONIO INSTITUCIONAL", "RESPETO A LA PROPIEDAD AJENA", "PUNTUALIDAD Y ASISTENCIA", "HONESTIDAD ",
-    "PRESENTACION PERSONAL (LIMPIEZA Y UNIFORME)", "PARTICIPACION COMUNITARIA", "RESPONSABILIDAD ", "PROMEDIO COMPORTAMIENTO",
-    "NIVEL", "VALORACION"
+    "INSUMO 1", "INSUMO 2", "PROMEDIO", nombreColumnaExtra, "PONDERACIÓN 70%", "EVALUACIÓN SUMATIVA", "EVALUACIÓN MEJORAMIENTO",
+    "PROMEDIO DE MEJORA", "PROMEDIO SUMATIVAS", "PONDERACIÓN 30%", "NOTA PARCIAL",
+    nombreColumnaExtra1
   ];
 
   const [datos, setDatos] = useState([]);
 
   // Definir qué columnas son editables en Parciales
   const columnasEditables = [
-    "INSUMO 1", "INSUMO 2", "EVALUACIÓN SUMATIVA",
-    "RESPETO Y CONSIDERACION", "VALORACION DE LA DIVERSIDAD", "CUMPLIMIENTO DE LAS NORMA DE CONVIVENCIA",
-    "CUIDADO  DEL PATRIMONIO INSTITUCIONAL", "RESPETO A LA PROPIEDAD AJENA", "PUNTUALIDAD Y ASISTENCIA", "HONESTIDAD ",
-    "PRESENTACION PERSONAL (LIMPIEZA Y UNIFORME)", "PARTICIPACION COMUNITARIA", "RESPONSABILIDAD "
+    "INSUMO 1", "INSUMO 2", "EVALUACIÓN SUMATIVA", "EVALUACIÓN MEJORAMIENTO",
   ];
-  const columnasComportamiento = [
-    "RESPETO Y CONSIDERACION", "VALORACION DE LA DIVERSIDAD", "CUMPLIMIENTO DE LAS NORMA DE CONVIVENCIA",
-    "CUIDADO  DEL PATRIMONIO INSTITUCIONAL", "RESPETO A LA PROPIEDAD AJENA", "PUNTUALIDAD Y ASISTENCIA", "HONESTIDAD ",
-    "PRESENTACION PERSONAL (LIMPIEZA Y UNIFORME)", "PARTICIPACION COMUNITARIA", "RESPONSABILIDAD "
-  ];
-
-  const abreviarNivel = (nivel) => {
-    if (!nivel || typeof nivel !== "string") return "";
-
-    const partes = nivel.split(" ");
-    if (partes.length < 2) return "";
-
-    const grado = partes[0][0]; // Ej. "1ro" => "1"
-
-    if (nivel.includes("Bachillerato")) return `${grado}BCH`;
-    if (nivel.includes("Básico Elemental")) return `${grado}BE`;
-    if (nivel.includes("Básico Medio")) return `${grado}BM`;
-    if (nivel.includes("Básico Superior")) return `${grado}BS`;
-
-    return ""; // Por defecto si no matchea nada
-  };
-
-  // Función para calcular la valoración según la suma total de comportamiento
-  const calcularValoracion = (valor) => {
-    // 1) Truncar el valor (9.4 => 9)
-    const truncado = Math.floor(valor);
-    // 2) Asignar la letra en función del entero
-    if (truncado === 10) return "A";
-    if (truncado === 9) return "B";
-    if (truncado >= 7) return "C"; // Esto abarca 7 y 8
-    if (truncado >= 5) return "D"; // Esto abarca 5 y 6
-    return "E";                     // Menos de 5
-  };
 
   function parseCampoNumerico(valor) {
     if (typeof valor === "string" && valor.trim() === "") {
@@ -111,21 +103,15 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
   // 🔁 Transformador que ajusta la estructura a lo que necesita el backend
   const transformarDatosParaGuardar = (datos) => {
     return datos.map((fila) => {
-      const comportamiento = columnasComportamiento.map((col) => {
-        const parsed = parseInt(fila[col]);
-        return isNaN(parsed) ? null : parsed;
-      });
-
       return {
         id_inscripcion: fila.idInscripcion,
         insumo1: parseCampoNumerico(fila["INSUMO 1"]),
         insumo2: parseCampoNumerico(fila["INSUMO 2"]),
         evaluacion: parseCampoNumerico(fila["EVALUACIÓN SUMATIVA"]),
-        comportamiento, // array con valores numéricos o null
+        mejoramiento: parseCampoNumerico(fila["EVALUACIÓN MEJORAMIENTO"]),
         quimestre: obtenerEtiquetaQuimestre(),
         parcial: obtenerEtiquetaParcial(),
-        "Promedio Final": parseCampoNumerico(fila["PROMEDIO PARCIAL"]),
-        "Promedio Comportamiento": parseCampoNumerico(fila["PROMEDIO COMPORTAMIENTO"])
+        "Promedio Final": parseCampoNumerico(fila["NOTA PARCIAL"]),
       };
     });
   };
@@ -138,7 +124,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
     // ✅ Nos aseguramos de que ya haya datos con cálculos listos
     if (!datos || datos.length === 0) return;
 
-    const datosCompletos = datos.filter(fila => fila["PROMEDIO PARCIAL"] !== undefined);
+    const datosCompletos = datos.filter(fila => fila["NOTA PARCIAL"] !== undefined);
 
     if (actualizarDatosParcial && datosCompletos.length > 0) {
       const datosTransformados = transformarDatosParaGuardar(datos);
@@ -148,7 +134,6 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
 
   // Manejar cambios en los inputs de la tabla
   const handleInputChange = (rowIndex, columnName, value) => {
-    // Chequeamos si ya está bloqueado por prop o por fecha
     if (!isWithinRange && !forceEdit) {
       Swal.fire({
         icon: 'info',
@@ -157,6 +142,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
       });
       return;
     }
+
     if (inputsDisabled) {
       Swal.fire({
         icon: 'info',
@@ -164,68 +150,69 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
         text: 'Este parcial ya se bloqueó o se guardó definitivamente.',
       });
       return;
-    }    
+    }
+
     const nuevosDatos = datos.map((fila, i) => {
       if (i === rowIndex) {
         let nuevaFila = { ...fila };
 
-        // Validar que Insumo 1, Insumo 2 y Evaluación Sumativa acepten solo valores entre 0.00 y 10.00
-        if (["INSUMO 1", "INSUMO 2", "EVALUACIÓN SUMATIVA"].includes(columnName)) {
+        if (!(nombreColumnaExtra in nuevaFila)) {
+          nuevaFila[nombreColumnaExtra] = "-";
+        }
+        if (!(nombreColumnaExtra1 in nuevaFila)) {
+          nuevaFila[nombreColumnaExtra1] = "-";
+        }
+
+        // Validación básica
+        if (["INSUMO 1", "INSUMO 2", "EVALUACIÓN SUMATIVA", "EVALUACIÓN MEJORAMIENTO"].includes(columnName)) {
           if (value === "") {
-            nuevaFila[columnName] = ""; // Permitir borrar el dato
+            nuevaFila[columnName] = "";
           } else if (!/^\d{0,2}(\.\d{0,2})?$/.test(value) || value > 10 || value < 0) {
             Swal.fire({
               icon: 'error',
               title: 'Error de Validación',
               text: 'El valor debe estar entre 0.00 y 10.00 con máximo dos decimales.',
-              confirmButtonColor: '#3085d6',
             });
-            return fila; // No actualizar si el valor es inválido
+            return fila;
           } else {
             nuevaFila[columnName] = value;
           }
         }
 
-        // Validar que las columnas de comportamiento solo acepten 0 o 1
-        else if (columnasComportamiento.includes(columnName)) {
-          if (value === "") {
-            nuevaFila[columnName] = ""; // Permitir borrar el dato
-          } else if (value !== "0" && value !== "1") {
-            Swal.fire({
-              icon: 'error',
-              title: 'Error de Validación',
-              text: 'Solo se permite ingresar 0 o 1 en este campo.',
-              confirmButtonColor: '#3085d6',
-            });
-            return fila; // No actualizar si el valor no es 0 o 1
-          } else {
-            nuevaFila[columnName] = value;
-          }
-        }
-
-        // Cálculo de suma de comportamiento
-        const sumaComportamiento = columnasComportamiento.reduce(
-          (acc, col) => acc + (parseInt(nuevaFila[col]) || 0),
-          0
-        );
-
-        // Cálculo automático de los promedios académicos
         const insumo1 = parseFloat(nuevaFila["INSUMO 1"]) || 0;
         const insumo2 = parseFloat(nuevaFila["INSUMO 2"]) || 0;
-        const evaluacion = parseFloat(nuevaFila["EVALUACIÓN SUMATIVA"]) || 0;
+        const promedio = (insumo1 + insumo2) / 2;
+        const ponderacion70 = promedio * 0.7;
 
-        const ponderacion70 = ((insumo1 + insumo2) / 2) * 0.7;
-        const ponderacion30 = evaluacion * 0.3;
-        const promedioParcial = ponderacion70 + ponderacion30;
+        const evaluacion = parseFloat(nuevaFila["EVALUACIÓN SUMATIVA"]);
+        const mejora = parseFloat(nuevaFila["EVALUACIÓN MEJORAMIENTO"]);
+        let promedioMejora = "";
+        let promedioSumativas = isNaN(evaluacion) ? 0 : evaluacion;
 
-        // Actualizar los valores en la fila
+        if (!isNaN(evaluacion) && !isNaN(mejora)) {
+          const promedioDeMejora = (evaluacion + mejora) / 2;
+          promedioMejora = promedioDeMejora.toFixed(2);
+
+          if (mejora >= evaluacion) {
+            promedioSumativas = ((promedioDeMejora + evaluacion) / 2);
+          } else {
+            promedioSumativas = evaluacion;
+          }
+        }
+
+        const ponderacion30 = parseFloat(promedioSumativas) * 0.3;
+        const notaParcial = ponderacion70 + ponderacion30;
+
         return {
           ...nuevaFila,
+          "PROMEDIO": promedio.toFixed(2),
+          [nombreColumnaExtra]: convertirNota(promedio.toFixed(2)),
+          "PROMEDIO DE MEJORA": promedioMejora,
+          "PROMEDIO SUMATIVAS": promedioSumativas.toFixed(2),
           "PONDERACIÓN 70%": ponderacion70.toFixed(2),
           "PONDERACIÓN 30%": ponderacion30.toFixed(2),
-          "PROMEDIO PARCIAL": promedioParcial.toFixed(2),
-          "PROMEDIO COMPORTAMIENTO": sumaComportamiento, // Para la sección de comportamiento
-          "VALORACION": calcularValoracion(sumaComportamiento),
+          "NOTA PARCIAL": notaParcial.toFixed(2),
+          [nombreColumnaExtra1]: !isNaN(evaluacion) ? convertirNota(notaParcial.toFixed(2)) : ""
         };
       }
       return fila;
@@ -237,28 +224,49 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
   const safe = (val) => (val === 0 || val === "0") ? "0" : (val !== undefined && val !== null ? val : "");
 
   const calcularDatosFila = (fila) => {
+    const evaluacion = parseFloat(fila["EVALUACIÓN SUMATIVA"]);
+    const mejora = parseFloat(fila["EVALUACIÓN MEJORAMIENTO"] || 0);
     const insumo1 = parseFloat(fila["INSUMO 1"]) || 0;
     const insumo2 = parseFloat(fila["INSUMO 2"]) || 0;
-    const evaluacion = parseFloat(fila["EVALUACIÓN SUMATIVA"]) || 0;
+    const promedio = (insumo1 + insumo2) / 2;
+    const ponderacion70 = promedio * 0.7;
 
-    const ponderacion70 = ((insumo1 + insumo2) / 2) * 0.7;
-    const ponderacion30 = evaluacion * 0.3;
-    const promedioParcial = ponderacion70 + ponderacion30;
+    let promedioMejora = "";
+    let promedioSumativas = isNaN(evaluacion) ? 0 : evaluacion;
 
-    const sumaComportamiento = columnasComportamiento.reduce(
-      (acc, col) => acc + (parseInt(fila[col]) || 0),
-      0
-    );
+    if (!isNaN(evaluacion) && !isNaN(mejora)) {
+      const promedioDeMejora = (evaluacion + mejora) / 2;
+      promedioMejora = promedioDeMejora.toFixed(2);
+
+      if (mejora >= evaluacion) {
+        promedioSumativas = ((promedioDeMejora + evaluacion) / 2);
+      } else {
+        promedioSumativas = evaluacion;
+      }
+    }
+
+    const ponderacion30 = parseFloat(promedioSumativas) * 0.3;
+    const notaParcial = ponderacion70 + ponderacion30;
 
     return {
       ...fila,
+      "PROMEDIO": promedio.toFixed(2),
+      [nombreColumnaExtra]: convertirNota(promedio.toFixed(2)),
+      "PROMEDIO DE MEJORA": promedioMejora,
+      "PROMEDIO SUMATIVAS": promedioSumativas.toFixed(2),
       "PONDERACIÓN 70%": ponderacion70.toFixed(2),
       "PONDERACIÓN 30%": ponderacion30.toFixed(2),
-      "PROMEDIO PARCIAL": promedioParcial.toFixed(2),
-      "PROMEDIO COMPORTAMIENTO": sumaComportamiento,
-      "VALORACION": calcularValoracion(sumaComportamiento),
+      "NOTA PARCIAL": notaParcial.toFixed(2),
+      [nombreColumnaExtra1]: !isNaN(evaluacion) ? convertirNota(notaParcial.toFixed(2)) : ""
     };
   };
+
+  useEffect(() => {
+    if (!datos || datos.length === 0) return;
+
+    const nuevosDatos = datos.map(fila => calcularDatosFila(fila));
+    setDatos(nuevosDatos);
+  }, [escala]);
 
   useEffect(() => {
     if (!datosModulo?.ID) return;
@@ -269,7 +277,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
       axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
     }
     const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${datosModulo.ID}`;
-    const urlParciales = `${import.meta.env.VITE_URL_DEL_BACKEND}/parciales/asignacion/${datosModulo.ID}`;
+    const urlParciales = `${import.meta.env.VITE_URL_DEL_BACKEND}/parcialesbe/asignacion/${datosModulo.ID}`;
 
     Promise.all([axios.get(urlInscripciones), axios.get(urlParciales)])
       .then(([respEstudiantes, respParciales]) => {
@@ -291,22 +299,10 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
             "INSUMO 1": safe(parcialGuardado?.insumo1),
             "INSUMO 2": safe(parcialGuardado?.insumo2),
             "EVALUACIÓN SUMATIVA": safe(parcialGuardado?.evaluacion),
-            "RESPETO Y CONSIDERACION": safe(parcialGuardado?.comportamiento?.[0]),
-            "VALORACION DE LA DIVERSIDAD": safe(parcialGuardado?.comportamiento?.[1]),
-            "CUMPLIMIENTO DE LAS NORMA DE CONVIVENCIA": safe(parcialGuardado?.comportamiento?.[2]),
-            "CUIDADO  DEL PATRIMONIO INSTITUCIONAL": safe(parcialGuardado?.comportamiento?.[3]),
-            "RESPETO A LA PROPIEDAD AJENA": safe(parcialGuardado?.comportamiento?.[4]),
-            "PUNTUALIDAD Y ASISTENCIA": safe(parcialGuardado?.comportamiento?.[5]),
-            "HONESTIDAD ": safe(parcialGuardado?.comportamiento?.[6]),
-            "PRESENTACION PERSONAL (LIMPIEZA Y UNIFORME)": safe(parcialGuardado?.comportamiento?.[7]),
-            "PARTICIPACION COMUNITARIA": safe(parcialGuardado?.comportamiento?.[8]),
-            "RESPONSABILIDAD ": safe(parcialGuardado?.comportamiento?.[9]),
+            "EVALUACIÓN MEJORAMIENTO": safe(parcialGuardado?.mejoramiento),
             "PONDERACIÓN 70%": "",
             "PONDERACIÓN 30%": "",
-            "PROMEDIO PARCIAL": "",
-            "PROMEDIO COMPORTAMIENTO": "",
-            "NIVEL": abreviarNivel(est.nivel),
-            "VALORACION": ""
+            "NOTA PARCIAL": ""
           };
           return calcularDatosFila(fila);
         });
@@ -340,22 +336,18 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
       return;
     }
 
-    const comportamiento = columnasComportamiento.map((col) =>
-      parseInt(rowData[col]) || 0
-    );
-
     const body = {
       id_inscripcion: rowData.idInscripcion,
       insumo1: parseFloat(rowData["INSUMO 1"]),
       insumo2: parseFloat(rowData["INSUMO 2"]),
       evaluacion: parseFloat(rowData["EVALUACIÓN SUMATIVA"]),
-      comportamiento,
+      mejoramiento: parseFloat(rowData["EVALUACIÓN MEJORAMIENTO"]),
       quimestre: obtenerEtiquetaQuimestre(),
       parcial: obtenerEtiquetaParcial(),
     };
 
     axios
-      .put(`${import.meta.env.VITE_URL_DEL_BACKEND}/parciales/${rowData.idParcial}`, body)
+      .put(`${import.meta.env.VITE_URL_DEL_BACKEND}/parcialesbe/${rowData.idParcial}`, body)
       .then(() => {
         Swal.fire({
           icon: "success",
@@ -402,4 +394,4 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
   );
 }
 
-export default Parcial;
+export default ParcialBE;
