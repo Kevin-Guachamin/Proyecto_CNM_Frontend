@@ -58,23 +58,26 @@ h2.mb-4 {
 }
 
 .card:hover {
-  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.12);
-  transform: scale(1.015);
+  box-shadow: 0 4px 12px rgba(20, 92, 201, 0.12);
+  
+  transform: scale(1.05) ;
+  border-color: #0b5ed7;
 }
 
+
 .card-title {
-  font-size: 16px;
+  font-size: 22px;
   font-weight: 600;
   color: #0d6efd;
 }
 
 .card-subtitle {
-  font-size: 13px;
+  font-size: 16px;
   color: #6c757d;
 }
 
 .card-text {
-  font-size: 14px;
+  font-size: 16px;
   margin-top: 10px;
   line-height: 1.4;
 }

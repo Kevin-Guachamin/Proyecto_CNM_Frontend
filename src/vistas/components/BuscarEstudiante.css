@@ -1,0 +1,94 @@
+/* Estilos para el título del periodo académico */
+.periodo-title {
+    font-size: 28px;
+    color: #0d6efd;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.search-container {
+    display: flex;
+    align-items: center; /* Alineamos todo verticalmente al centro */
+    justify-content: start;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0px;
+    border: 1px solid #e7f1ff;
+    border-radius: 8px;
+    
+}
+
+/* Estilo para el contenedor de input y label (en una fila) */
+.search-input-container {
+    display: flex;
+    align-items: center;
+    
+    gap: 10px; /* Espacio entre label, input y boton */
+    max-width: 70%;
+    flex: 1 1 auto; /* Permite que los elementos se ajusten dentro del contenedor */
+}
+
+/* Estilo para la etiqueta (label) */
+.label-search {
+    font-size: 20px ;
+    color: #052c65;
+    margin-right: 10px;
+    white-space: nowrap; /* Evita que el texto del label se parta */
+}
+
+/* Estilo para el input */
+.input-cedula {
+    font-size: 18px;
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    flex-grow: 1; /* El input ocupa todo el espacio disponible */
+    max-width: 200px; /* Establecer un tamaño máximo para el input */
+    box-sizing: border-box;
+}
+
+/* Estilo para el botón */
+.btn-buscar {
+    background-color: #0d6efd;
+    color: #ffffff;
+    font-size: 18px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    min-width: 180px; /* Limitar el ancho máximo del botón */
+    width: auto; /* Permitir que el botón se ajuste según el contenido */
+    padding-top: 6px;
+}
+
+.btn-buscar:hover {
+    background-color:#00408A;
+}
+
+/* Estilo responsivo para pantallas pequeñas */
+@media (max-width: 768px) {
+    .search-container {
+        padding: 15px;
+    }
+
+    .search-input-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .label-search {
+        margin-right: 0;
+        margin-bottom: 5px;
+    }
+
+    .input-cedula {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .btn-buscar {
+        margin-top: 10px;
+        width: 100%;
+    }
+}

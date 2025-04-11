@@ -1,0 +1,109 @@
+.horario-table-responsive {
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+  
+  .horario-tabla {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #fdfdfd;
+  }
+  
+  .horario-header {
+    background-color: #00408A !important;
+    color: #ced4da !important;
+    font-weight: bold;
+    border: 1px solid #ced4da;
+    padding: 10px;
+  }
+  
+  .horario-hora {
+    background-color:#CFD8DC !important;
+    border: 1px solid #90A4AE !important;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .horario-celda {
+    border: 1px solid #90A4AE !important;
+    padding: 10px;
+    vertical-align: middle;
+    background-color: #CFD8DC !important;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+ 
+  
+  .horario-celda-asignada {
+    background-color:#FEFF3C !important;
+    
+  }
+  .horario-materia-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .horario-materia-nombre {
+    font-weight: 500;
+    color: #000405;
+    font-size: 1.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .container-btn-finalizar{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn-finalizar{
+    background-color: #007bff;
+    color: white;
+    max-width: 8.4rem;
+    border-radius: 10%;
+    font-size: 1.2rem;
+  }
+  .btn-finalizar:hover{
+    background-color: #00408A;
+  }
+
+  
+  .horario-boton {
+    font-size: 0.75rem;
+    padding: 2px 6px;
+    line-height: 1;
+    border-radius: 4px;
+    height: auto;
+    background-color: #EF5350 !important;
+    color: white;
+    border: none;
+    max-width: 2.2rem;
+  }
+  .horario-boton:hover {
+    background-color: #e53935 !important;
+    color: white;
+  }
+  
+  @media (max-width: 768px) {
+    .horario-header,
+    .horario-celda,
+    .horario-hora {
+      font-size: 0.8rem;
+      padding: 6px;
+    }
+  
+    .horario-materia-nombre {
+      font-size: 0.8rem;
+    }
+  
+    .horario-boton {
+      font-size: 0.7rem;
+      padding: 2px 4px;
+    }
+  }
+  
+  

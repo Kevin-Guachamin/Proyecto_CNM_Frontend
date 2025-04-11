@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Header from "../../../../../components/Header";
-import Layout from '../../../../../layout/Layout'
-import Busqueda from "./Busqueda";
+import Layout from "../../../../../layout/Layout";
+import BuscarMaterias from "./BuscarMaterias";
 import { modulesMatricula } from "../../../Components/Modulos"
 import { useNavigate } from "react-router-dom";
 
@@ -25,7 +25,7 @@ function Index() {
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
       <Layout modules={modulesMatricula}>
-        <Busqueda />
+        <BuscarMaterias />
 
       </Layout>
     </div>

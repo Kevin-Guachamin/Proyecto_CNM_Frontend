@@ -2,8 +2,8 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import { ErrorMessage } from '../ErrorMesaje';
 
-export function Eliminar (data, URL, descripcion, setData, PK){
-    const token= localStorage.getItem("token")
+export function Eliminar(data, URL, descripcion, setData, PK) {
+    const token = localStorage.getItem("token")
     Swal.fire({
         title: '¿Estás seguro?',
         text: `¿Quieres eliminar a ${descripcion}?`,
@@ -17,16 +17,21 @@ export function Eliminar (data, URL, descripcion, setData, PK){
         if (result.isConfirmed) {
             // Eliminar usuario por PK
             axios
-                .delete(`${URL}/${data[PK]}`, 
-                    {headers: { Authorization: `Bearer ${token}` },
-                  })
+                .delete(`${URL}/${data[PK]}`,
+                    {
+                        headers: { Authorization: `Bearer ${token}` },
+                    })
                 .then(() => {
-                  
-                  setData((prevData) => prevData.filter((d) => d[PK] !== data[PK]));
-                    Swal.fire(
-                        'Eliminado!',
-                        `${descripcion} ha sido eliminado.`,
-                        'success'
+
+                    setData((prevData) => prevData.filter((d) => d[PK] !== data[PK]));
+                    
+                    Swal.fire({
+                        icon: "success",
+                        title: "Eliminado!",
+                        text: `${descripcion} ha sido eliminado.`,
+                        iconColor: "#218838",
+                        confirmButtonText: "Entendido",
+                        confirmButtonColor: "#003F89",}
                     );
                 })
                 .catch((error) => {

@@ -8,20 +8,20 @@ function CrearAsignatura({ onCancel, entityToUpdate, onSave }) {
     const [nombre, setNombre] = useState("");
     const [nivel, setNivel] = useState("");
     const [edadMin, setEdadMin] = useState("")
-    const [tipo, setTipo]= useState("")
+    
     const token=localStorage.getItem("token")
     useEffect(() => {
         if (entityToUpdate) {
             setNombre(entityToUpdate.nombre || "");
             setNivel(entityToUpdate.nivel || "");
             setEdadMin(entityToUpdate.edadMin || "");
-            setTipo(entityToUpdate.tipo || "");
+           
         }
     }, [entityToUpdate]);
 
     const handleSubmit = () => {
 
-        const newAsignatura = { nombre, nivel, edadMin,tipo };
+        const newAsignatura = { nombre, nivel, edadMin,tipo:"grupal" };
         onSave(newAsignatura, 
             {headers: { Authorization: `Bearer ${token}` },
           });
@@ -43,23 +43,7 @@ function CrearAsignatura({ onCancel, entityToUpdate, onSave }) {
                                 />
                             </div>
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="tipo">Tipo</label>
-                            <select
-                                id="tipo"
-                                value={tipo}
-                                onChange={(e) => setNivel(e.target.value)}
-                                className="input-field"
-                            >
-                                <option value="">Selecciona el tipo</option>
-                                <option value="grupal">1ro BE</option>
-                                <option value="individual">2do BE</option>
-                                <option value="pianistas">1ro BM</option>
-                                <option value="cantantes">2do BM</option>
-                                <option value="instrumentistas">3ro BM</option>
-                                
-                            </select>
-                        </div>
+                        
                         <div className="form-group">
                             <label htmlFor="nivel">Nivel</label>
                             <select

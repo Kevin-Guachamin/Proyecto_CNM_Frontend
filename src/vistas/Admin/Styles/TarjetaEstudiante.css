@@ -1,0 +1,40 @@
+/* ==== TARJETA DE ESTUDIANTE (estilo similar a materias) ==== */
+.student-card {
+    border: 1px solid #e7f1ff;
+    border-radius: 10px;
+    padding: 10px;
+    transition: box-shadow 0.2s ease-in-out;
+    background-color: #CFD8DC !important;
+  }
+  
+  .student-card:hover {
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.12);
+    transform: scale(1.00) !important;
+    border-color: #ffffff !important;
+  }
+  
+  .student-card h5 {
+    font-size: 22px;
+    color: #0d6efd;
+    text-align: center;
+  }
+  
+  .info-label {
+    color: #052c65;
+    font-size: 18px;
+  }
+  .info{
+    font-size: 18px;
+  }
+  
+  /* ==== RESPONSIVE ==== */
+  @media (max-width: 768px) {
+    .student-card h5 {
+      font-size: 16px;
+    }
+  
+    .student-card .info-label,
+    .student-card .row {
+      font-size: 13px;
+    }
+  }

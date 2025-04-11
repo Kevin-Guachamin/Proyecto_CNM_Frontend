@@ -10,10 +10,10 @@ function Tabla({ filteredData, OnDelete, OnEdit, headers, columnsToShow}) {
         <p className="no-registros">No hay registros disponibles.</p>
       ) : (
         <table className="tabla_registros">
-          <thead>
+          <thead >
             <tr>
               {headers.map((header, index) => (
-                <th key={index}>{header}</th>
+                <th className='tabla-head' key={index}>{header}</th>
               ))}
             </tr>
           </thead>
@@ -21,17 +21,21 @@ function Tabla({ filteredData, OnDelete, OnEdit, headers, columnsToShow}) {
             {filteredData.map((item, index) => (
               <tr key={index}>
                 {columnsToShow.map((col, subIndex) => (
-                  <td key={subIndex}>{item[col]}</td>
+                  <td className='tabla-celda' key={subIndex}>{item[col]}</td>
                 ))}
-                <td>
+                <td className='botones-icon'>
+                 
                   <FaEdit
+                    size={20}
                     className="icon edit-icon"
                     onClick={() => OnEdit(item)}
                   />
                   <FaTrash
+                  size={20}
                     className="icon delete-icon"
                     onClick={() => OnDelete(item)}
                   />
+               
                   
                 </td>
               </tr>

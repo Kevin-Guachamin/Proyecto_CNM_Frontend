@@ -15,7 +15,8 @@ export const modulesSettings = [
 
 export const modulesMatricula = [
   {name: "Inicio",icon: <Home size={20}/>, path: "/admin"},
-  { name: "Matriculación",icon: <NotebookPen size={20}/>, path: "/admin/matriculacion"}
+  { name: "Matriculación",icon: <NotebookPen size={20}/>, path: "/admin/matriculacion"},
+ 
 ]
 
 export const modulesEstudiates=[

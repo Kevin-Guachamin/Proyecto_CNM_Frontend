@@ -30,7 +30,7 @@ function Index() {
       navigate("/")
     }
     ObtenerTodo(setPeriodos, `${API_URL}/periodo_academico/obtener`, setLoading)
-
+    
     // Mientras no se conecte al backend, dejamos un usuario de prueba
     setUsuario(parsedUser);
 
