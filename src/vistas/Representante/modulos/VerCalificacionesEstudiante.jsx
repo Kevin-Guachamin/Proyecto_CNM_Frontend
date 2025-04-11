@@ -3,12 +3,7 @@ import TablaEstudianteCalificaciones from "../components/Tabla_EstudianteCalific
 import Boton from "../../../components/Boton";
 import { useState } from "react";
 
-const VerCalificacionesEstudiante = ({onCancel, estudianteId}) => {
-    const [estudiante, setEstudiante] =  useState({
-            primer_nombre: "Nombre",
-            primer_apellido: "Apellido"
-        }
-    );
+const VerCalificacionesEstudiante = ({onCancel, estudiante}) => {
     return (
       <div className="modal-overlay">
         <div className="modal-container">
