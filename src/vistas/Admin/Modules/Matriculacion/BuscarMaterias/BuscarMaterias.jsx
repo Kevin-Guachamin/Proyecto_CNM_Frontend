@@ -99,7 +99,7 @@ function BuscarMaterias() {
                                 const nombreCompletoDocente = `${asig.Docente?.primer_nombre}  ${asig.Docente?.primer_apellido} `.trim();
                                 return (
                                     <Col key={asig.ID} className="d-flex justify-content-center p-1">
-                                        <Card style={{ maxWidth: "300px", cursor: "pointer" }} onClick={() => Inscribir(asig)}>
+                                        <Card style={{ maxWidth: "300px", cursor: "pointer", backgroundColor: "#CFD8DC" }} onClick={() => Inscribir(asig)}>
                                             <Card.Body>
                                                 <Card.Title>{asig.Materia?.nombre}</Card.Title>
                                                 <Card.Subtitle className="mb-2 text-muted">
