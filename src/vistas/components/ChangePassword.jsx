@@ -37,6 +37,11 @@ function ChangePassword({type,redireccion}) {
       console.log("este es el response", response)
       setCurrentPassword("");
       setNewPassword("");
+      setTimeout(() => {
+        console.log("Redirigiendo...");
+        window.location.href = redireccion;
+      }, 1500);
+      
     } catch (err) {
       console.log("este es el error", err);
       setError(err.response.data.message)

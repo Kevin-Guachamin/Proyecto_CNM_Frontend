@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Notas from "./Notas";
+import NotasBE from "./BasicoElemental/NotasBE";
 import { Home, Users, Settings } from "lucide-react";
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { handleExportExcel, handleExportPDF, parseFecha, handleEditar as ejecutarHandleEditar  } from "./FuncionesCalificaciones";
+import { handleExportExcel, handleExportPDF, parseFecha, handleEditar as ejecutarHandleEditar } from "./FuncionesCalificaciones";
 import { useNavigate, useLocation } from "react-router-dom";
 import Loading from "../../components/Loading";
 import axios from "axios";
@@ -32,53 +33,90 @@ function Calificaciones() {
   const [estadoFechas, setEstadoFechas] = useState({});
   const [textoRangoFechas, setTextoRangoFechas] = useState({});
   const soloLectura = usuario?.subRol?.toLowerCase() === "secretaria";
-
-  const makeKey = ({ id_inscripcion, quimestre, parcial }) => `${id_inscripcion}-${quimestre}-${parcial}`;
-  const makeKeyQuim = ({ id_inscripcion, quimestre }) => `${id_inscripcion}-${quimestre}`;
+  
+  const obtenerParcialBE = (subtab) => {
+    if (subtab.includes("parcial1")) return "P1";
+    if (subtab.includes("parcial2")) return "P2";
+    return "??";
+  };
+  
+  const makeKey = ({ id_inscripcion, quimestre, parcial }) => {
+    const esBe = datosModulo?.nivel?.toLowerCase().includes("be");
+    if (esBe) {
+      const tab = activeMainTab === "quimestre1" ? "Q1" :
+                  activeMainTab === "quimestre2" ? "Q2" : "FINAL";
+      const subtab = activeMainTab === "quimestre1" ? activeSubTabQuim1 :
+                     activeMainTab === "quimestre2" ? activeSubTabQuim2 : "";
+      const parcialBE = obtenerParcialBE(subtab);
+      return `${id_inscripcion}-${tab}-${parcialBE}`;
+    }
+    return `${id_inscripcion}-${quimestre}-${parcial}`;
+  };  
+  
+  const makeKeyQuim = ({ id_inscripcion, quimestre }) => {
+    const esBe = datosModulo?.nivel?.toLowerCase().includes("be");
+    if (esBe) {
+      const tab =
+        activeMainTab === "quimestre1" ? "Q1" :
+        activeMainTab === "quimestre2" ? "Q2" :
+        "FINAL";
+      return `${id_inscripcion}-${tab}-QUIMESTRAL`;
+    }
+    return `${id_inscripcion}-${quimestre}`;
+  };
+  
   const makeKeyFinal = ({ id_inscripcion }) => `${id_inscripcion}`;
+  
   const [savedKeys, setSavedKeys] = useState(new Set());
   const [savedKeysQuim, setSavedKeysQuim] = useState(new Set());
   const [savedKeysFinal, setSavedKeysFinal] = useState(new Set());
 
   const handleActualizarParcial1Quim1 = React.useCallback((datos) => {
-    setParcial1Quim1Data(datos);}, []);
+    setParcial1Quim1Data(datos);
+  }, []);
   const handleActualizarParcial2Quim1 = React.useCallback((datos) => {
-    setParcial2Quim1Data(datos);}, []);
+    setParcial2Quim1Data(datos);
+  }, []);
   const handleActualizarParcial1Quim2 = React.useCallback((datos) => {
-    setParcial1Quim2Data(datos);}, []);
+    setParcial1Quim2Data(datos);
+  }, []);
   const handleActualizarParcial2Quim2 = React.useCallback((datos) => {
-    setParcial2Quim2Data(datos);}, []);
+    setParcial2Quim2Data(datos);
+  }, []);
   const handleActualizarQuim1 = React.useCallback((datos) => {
-    setQuim1Data(datos);}, []);
+    setQuim1Data(datos);
+  }, []);
   const handleActualizarQuim2 = React.useCallback((datos) => {
-    setQuim2Data(datos);}, []);
+    setQuim2Data(datos);
+  }, []);
   const handleActualizarFinal = React.useCallback((datos) => {
-    setFinalData(datos);}, []);
+    setFinalData(datos);
+  }, []);
 
-    const modules = React.useMemo(() => {
-      if (!usuario) return [];
-    
-      const esSecretaria = usuario.subRol?.toLowerCase() === "secretaria";
-    
-      return [
-        {
-          name: "Inicio",
-          icon: <Home size={20} />,
-          path: esSecretaria
-            ? `/periodo/materias/${datosModulo.idPeriodo}`
-            : "/panelcursos",
-        },
-        { name: "Usuarios", icon: <Users size={20} /> },
-        { name: "Configuración", icon: <Settings size={20} /> },
-      ];
-    }, [usuario, datosModulo.idPeriodo]);        
-  
+  const modules = React.useMemo(() => {
+    if (!usuario) return [];
+
+    const esSecretaria = usuario.subRol?.toLowerCase() === "secretaria";
+
+    return [
+      {
+        name: "Inicio",
+        icon: <Home size={20} />,
+        path: esSecretaria
+          ? `/secretaria/periodo/materias/${datosModulo.idPeriodo}`
+          : "/profesor/panelcursos",
+      },
+      { name: "Usuarios", icon: <Users size={20} /> },
+      { name: "Configuración", icon: <Settings size={20} /> },
+    ];
+  }, [usuario, datosModulo.idPeriodo]);
+
   useEffect(() => {
     if (localStorage.getItem("inputsLocked") === null) {
       localStorage.setItem("inputsLocked", "false");
     }
   }, []);
-  
+
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const storedToken = localStorage.getItem("token");
@@ -88,7 +126,7 @@ function Calificaciones() {
       setUsuario(JSON.parse(storedUser));
       setDatosModulo(moduloSeleccionado);
     } else {
-      navigate("/panelcursos"); // Si falta módulo seleccionado o usuario/token, regresamos.
+      navigate("/profesor/panelcursos"); // Si falta módulo seleccionado o usuario/token, regresamos.
     }
   }, [moduloSeleccionado, navigate]);
 
@@ -97,6 +135,8 @@ function Calificaciones() {
     let activeData = [];
     let isQuimestral = false;
     let isFinal = false;
+    const esBe = datosModulo?.nivel?.toLowerCase().includes("be");
+
     // 1) Determinar qué pestaña (Parcial, Quimestral o Final) está activa
     if (activeMainTab === "quimestre1") {
       if (activeSubTabQuim1 === "parcial1-quim1") {
@@ -147,8 +187,10 @@ function Calificaciones() {
         requiredFields = ["examen"];
       } else {
         // Solo parcial
-        requiredFields = ["insumo1", "insumo2", "evaluacion", "comportamiento"];
-        // O los campos que tú necesites en parciales
+        requiredFields = ["insumo1", "insumo2", "evaluacion"];
+        if (!esBe) {
+          requiredFields.push("comportamiento"); // Solo si NO es BE
+        }
       }
       // 2) Verificar que ninguno de los campos requeridos esté vacío o nulo
       const camposVacios = newRows.some(row =>
@@ -160,7 +202,7 @@ function Calificaciones() {
             return row[field] == null || row[field] === "";
           }
         })
-      );      
+      );
       if (camposVacios) {
         return Swal.fire({
           icon: "warning",
@@ -169,9 +211,13 @@ function Calificaciones() {
         });
       }
       // 3) Realizar el POST
-      const endpoint = isQuimestral
-        ? `${import.meta.env.VITE_URL_DEL_BACKEND}/quimestrales/bulk`
-        : `${import.meta.env.VITE_URL_DEL_BACKEND}/parciales/bulk`;
+      const endpoint = esBE
+        ? isQuimestral
+          ? `${import.meta.env.VITE_URL_DEL_BACKEND}/quimestralesbe/bulk`
+          : `${import.meta.env.VITE_URL_DEL_BACKEND}/parcialesbe/bulk`
+        : isQuimestral
+          ? `${import.meta.env.VITE_URL_DEL_BACKEND}/quimestrales/bulk`
+          : `${import.meta.env.VITE_URL_DEL_BACKEND}/parciales/bulk`;
 
       axios.post(endpoint, newRows)
         .then((response) => {
@@ -182,7 +228,7 @@ function Calificaciones() {
               icon: "success",
               title: "Guardado",
               text: "Calificaciones guardadas correctamente."
-            }).then(() => {setInputsDisabled(true); localStorage.setItem("inputsLocked", "true");});
+            }).then(() => { setInputsDisabled(true); localStorage.setItem("inputsLocked", "true"); });
             // Aquí actualizas tus savedKeys como venías haciendo
             if (isQuimestral) {
               setSavedKeysQuim(prev => {
@@ -309,7 +355,7 @@ function Calificaciones() {
     if (!path) return;
     setLoading(true);
     setTimeout(() => navigate(path), 800);
-  };  
+  };
 
   if (loading) {
     return <Loading />;
@@ -321,7 +367,7 @@ function Calificaciones() {
     setForceEdit(false);
     setInputsDisabled(true);
   }, [activeMainTab, activeSubTabQuim1, activeSubTabQuim2]);
-  
+
   const tieneDatosGuardados = () => {
     const tieneCamposLlenos = (data, campos) =>
       data.length > 0 && data.every(row =>
@@ -347,8 +393,8 @@ function Calificaciones() {
       return tieneCamposLlenos(finalData, ["examen_recuperacion"]);
     }
     return false;
-  };  
-  
+  };
+
   const handleEditar = () => {
     ejecutarHandleEditar({
       activeMainTab,
@@ -360,8 +406,8 @@ function Calificaciones() {
       setInputsDisabled,
       tieneDatosGuardados
     });
-  };      
-  
+  };
+
   useEffect(() => {
     const verificarFechas = async () => {
       const mapping = {
@@ -420,15 +466,19 @@ function Calificaciones() {
       }
     };
     verificarFechas();
-  }, [activeMainTab, activeSubTabQuim1, activeSubTabQuim2]);  
+  }, [activeMainTab, activeSubTabQuim1, activeSubTabQuim2]);
 
   const handleEditarFila = (rowIndex, rowData) => {
     localStorage.removeItem("inputsLocked");
     setInputsDisabled(false);
   };
-  
+
+  const esBE = datosModulo?.nivel?.toLowerCase().includes("be");
+
+  const ComponenteNotas = esBE ? NotasBE : Notas;
+
   return (
-    <Notas
+    <ComponenteNotas
       usuario={usuario}
       modules={modules}
       datosModulo={datosModulo}

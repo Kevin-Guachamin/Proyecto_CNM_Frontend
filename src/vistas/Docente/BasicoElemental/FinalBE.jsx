@@ -1,159 +1,99 @@
-import React, { useState, useEffect, useMemo } from "react";
-import HeaderTabla from "../../components/HeaderTabla";
-import Tabla from "../../components/Tabla";
+import React, { useState, useEffect,useMemo } from "react";
+import HeaderTabla from "../../../components/HeaderTabla";
+import Tabla from "../../../components/Tabla";
 import Swal from 'sweetalert2';
 import axios from "axios";
-import { ErrorMessage } from "../../Utils/ErrorMesaje";
-import "./Parcial.css";
+import { ErrorMessage } from "../../../Utils/ErrorMesaje";
+import "../Parcial.css";
 
-const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura }) => {
+const FinalBE = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, escala }) => {
   const [datos, setDatos] = useState([]);
 
   const idContenedor = `pdf-final`;
-
-  // Función para convertir el promedio de comportamiento en letra
-  const calcularValoracion = (valor) => {
-    // 1) Truncar el valor (9.4 => 9)
-    const truncado = Math.floor(valor);
-
-    // 2) Asignar la letra en función del entero
-    if (truncado === 10) return "A";
-    if (truncado === 9) return "B";
-    if (truncado >= 7) return "C"; // Esto abarca 7 y 8
-    if (truncado >= 5) return "D"; // Esto abarca 5 y 6
-    return "E";                     // Menos de 5
-  };
-
-  const abreviarNivel = (nivel) => {
-    if (!nivel || typeof nivel !== "string") return "";
-
-    const partes = nivel.split(" ");
-    if (partes.length < 2) return "";
-
-    const grado = partes[0][0]; // Ej. "1ro" => "1"
-
-    if (nivel.includes("Bachillerato")) return `${grado}BCH`;
-    if (nivel.includes("Básico Elemental")) return `${grado}BE`;
-    if (nivel.includes("Básico Medio")) return `${grado}BM`;
-    if (nivel.includes("Básico Superior")) return `${grado}BS`;
-
-    return ""; // Por defecto si no matchea nada
-  };
-
-  const transformarDatosFinalParaGuardar = (datos) => {
-    return datos.map((fila) => {
-      return {
-        id_inscripcion: fila.idInscripcion, // 👈 cambia la clave a minúscula y con guión bajo      
-        examen_recuperacion: parseFloat(fila["Examen Supletorio"]) || 0,
-        _promedioAnual: fila._promedioAnual,
-      };
-    });
-  };
-
+  
   const [datosOriginales, setDatosOriginales] = useState([]);
-
+  const convertirNota = (nota) => {
+    const n = parseFloat(nota);
+    if (isNaN(n) || n < 0 || n > 10) return "";
+  
+    if (escala === "cuantitativa" || escala === "1") {
+      if (n >= 9) return "DA";
+      if (n >= 7) return "AA";
+      if (n > 4) return "PA";
+      return "NA";
+    }
+  
+    if (escala === "cualitativa" || escala === "2") {
+      if (n >= 9.5) return "A+";
+      if (n >= 9) return "A-";
+      if (n >= 8.5) return "B+";
+      if (n >= 7.5) return "B-";
+      if (n >= 7) return "C+";
+      if (n >= 6.5) return "C-";
+      if (n >= 4) return "D+";
+      if (n >= 3.5) return "D-";
+      if (n >= 2) return "E+";
+      return "E-";
+    }
+  
+    return "";
+  };  
+  
   // Combinar los datos de Quimestre 1 y 2
   useEffect(() => {
     if (!datosModulo?.ID) return;
-    // ✅ Aquí agregamos el token antes de hacer cualquier request
+  
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
     }
-
+  
     const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${datosModulo.ID}`;
-    const urlFinales = `${import.meta.env.VITE_URL_DEL_BACKEND}/finales/asignacion/${datosModulo.ID}`;
-
-    Promise.all([axios.get(urlInscripciones), axios.get(urlFinales)])
-      .then(([respEstudiantes, respFinales]) => {
+  
+    axios.get(urlInscripciones)
+      .then((respEstudiantes) => {
         const estudiantes = respEstudiantes.data;
-        const finales = respFinales.data;
-
+  
         const nuevosDatos = estudiantes.map((est) => {
-          // Buscar examen supletorio en "finales"
-          const finalGuardado = finales.find(
-            (f) => f.idInscripcion === est.idInscripcion
-          ) || {};
-
-          // Buscar sus datos de quimestre 1 y 2
           const quim1 = quim1Data.find(
             (q) => q.id_inscripcion === est.idInscripcion
           ) || {};
           const quim2 = quim2Data.find(
             (q) => q.id_inscripcion === est.idInscripcion
           ) || {};
-
-          // Tomar los promedios finales (numéricos) de Q1 y Q2
-          const q1PF = parseFloat(quim1["Promedio Completo"]) || 0;
-          const q2PF = parseFloat(quim2["Promedio Completo"]) || 0;
+  
+          const q1PF = parseFloat(quim1["Promedio Final"]) || 0;
+          const q2PF = parseFloat(quim2["Promedio Final"]) || 0;
           const promedioAnual = (q1PF + q2PF) / 2;
-          // Tomar los promedios de comportamiento (numéricos)
-          const q1PC = parseFloat(quim1["Promedio Comportamiento Completo"]) || 0;
-          const q2PC = parseFloat(quim2["Promedio Comportamiento Completo"]) || 0;
-          const promedioComportamiento = (q1PC + q2PC) / 2;
-          const comportamiento = calcularValoracion(promedioComportamiento);
-
-          // Examen supletorio guardado (si existe)
-          const examenSupletorio = finalGuardado.examen_recuperacion ?? "";
-
-          // Cálculo del promedio final según la lógica
-          let pFinal = promedioAnual;
-          if (promedioAnual < 7 && examenSupletorio !== "") {
-            const examenVal = parseFloat(examenSupletorio) || 0;
-            pFinal = examenVal > promedioAnual ? examenVal : promedioAnual;
-          }
-          const estado = pFinal >= 7 ? "Aprobado" : pFinal >= 4 && pFinal < 7 ? "Supletorio" : "Reprobado";
-
-          // Nota que guardamos en propiedades "numéricas" (prefijo _)
-          // y también en las llaves visibles si quieres un valor inicial
+  
+          const estado = promedioAnual >= 7 ? "Aprobado" : promedioAnual >= 4 && promedioAnual < 7 ? "Supletorio" : "Reprobado";
+          
           return {
-            // Identificador
-            idInscripcion: est.idInscripcion, // o est.idInscripcion, según tu BD
-            idFinal: finalGuardado.id,
-            // Props numéricas internas
+            idInscripcion: est.idInscripcion,
             _primerQuimestre: q1PF,
             _segundoQuimestre: q2PF,
             _promedioAnual: promedioAnual,
-            _promedioFinal: pFinal,
-
-            // Flags
+            _promedioFinal: promedioAnual,
             promedioAnualRequeridoSupletorio: promedioAnual < 7,
-            promedioFinalInsuficiente: pFinal < 7,
-
-            // Campos para la tabla
+            promedioFinalInsuficiente: promedioAnual < 7,
+            examen_recuperacion: "", // se llenará cuando el usuario lo escriba
             Nro: est.nro,
             "Nómina de Estudiantes": est.nombre,
-            "Primer Quimestre": q1PF,          // Puedes poner .toFixed(2) aquí si gustas
+            "Primer Quimestre": q1PF,
             "Segundo Quimestre": q2PF,
             "Promedio Anual": promedioAnual,
-            "Comportamiento": comportamiento,
-            "Examen Supletorio": examenSupletorio,
-            "Promedio Final": pFinal,         // Valor inicial (se convertirá en <span> o string después)
-            "Nivel": abreviarNivel(est.nivel),
+            "Promedio Final": promedioAnual,
             "Estado": estado,
           };
         });
-
+  
         setDatos(nuevosDatos);
         setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
       })
       .catch((err) => {
         ErrorMessage(err);
       });
-  }, [datosModulo, quim1Data, quim2Data]);
-
-  useEffect(() => {
-    if (datos.length === 0) return;
-
-    // Filtrar filas válidas si hace falta
-    // const datosCompletos = datos.filter(...);
-
-    // Aquí no definiste "datosCompletos", así que puedes usar "datos" directamente
-    if (typeof actualizarDatosFinal === "function") {
-      const datosTransformados = transformarDatosFinalParaGuardar(datos);
-      actualizarDatosFinal(datosTransformados);
-    }
-  }, [datos, actualizarDatosFinal]);
+  }, [datosModulo, quim1Data, quim2Data]);  
 
   // Manejar cambios en la columna "Examen Supletorio"
   const handleInputChange = (rowIndex, columnName, value) => {
@@ -171,7 +111,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
         });
         return;
       }
-
+  
       // C) Validar que sea un número de 0.00 a 7.00
       const regexDecimal = /^\d{1,2}(\.\d{0,2})?$/;
       if (value !== "") {
@@ -188,7 +128,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
         }
       }
     }
-
+  
     // 2) Luego, actualizas el estado “datos” igual que antes
     setDatos((prevDatos) =>
       prevDatos.map((row, i) => {
@@ -212,7 +152,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
       })
     );
   };
-
+  
   const determinarJornada = (horario) => {
     const horaInicio = horario.split("-")[0];
     const horaNumerica = parseInt(horaInicio.split(":")[0], 10);
@@ -221,7 +161,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
 
   const datosEncabezado = {
     titulo: "CONSERVATORIO NACIONAL DE MUSICA",
-    subtitulo: "ACTA DE RESUMEN FINAL",
+    subtitulo: "INFORME DE RENDIMIENTO ACADÉMICO ANUAL",
     info: {
       "Profesor": datosModulo.docente,
       "Asignatura": datosModulo.materia,
@@ -236,56 +176,54 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
   const columnasAgrupadas = [
     { titulo: "", colspan: 2 },
     { titulo: "RESUMEN DE APRENDIZAJES", colspan: 6 },
-    { titulo: "", colspan: 2 }
+    { titulo: "", colspan: 1 }
   ];
 
+  const nombreColumnaExtra = escala === "cualitativa" ? "Cualitativa" : "Cuantitativa";
+  const nombreColumnaExtra1 = escala === "cualitativa" ? "Cualitativa\u00A0" : "Cuantitativa\u00A0";
+  const nombreColumnaExtra2 = escala === "cualitativa" ? "Cualitativa " : "CCuantitativa ";
+  
   const columnas = [
-    "Primer Quimestre",
-    "Segundo Quimestre",
-    "Promedio Anual",
-    "Comportamiento",
-    "Examen Supletorio",
-    "Promedio Final",
-    "Nivel",
-    "Estado"
+    "Primer Quimestre",nombreColumnaExtra,
+    "Segundo Quimestre",nombreColumnaExtra1,
+    "Promedio Final",nombreColumnaExtra2,"Estado"
   ];
 
   // Aplicamos estilos condicionales en la data
   const datosConEstilos = useMemo(() => {
     return datos.map((row) => {
-      // Tomar valores numéricos de las props internas
       const primerQNum = parseFloat(row._primerQuimestre) || 0;
       const segundoQNum = parseFloat(row._segundoQuimestre) || 0;
       const pAnualNum = parseFloat(row._promedioAnual) || 0;
       const pFinalNum = parseFloat(row._promedioFinal) || 0;
-
-      // Convertir a string con 2 decimales
+  
       const primerQuimestreStr = primerQNum.toFixed(2);
       const segundoQuimestreStr = segundoQNum.toFixed(2);
       const promedioAnualStr = pAnualNum.toFixed(2);
       const promedioFinalStr = pFinalNum.toFixed(2);
-
+  
       return {
         ...row,
         "Primer Quimestre": primerQuimestreStr,
+        [nombreColumnaExtra]: convertirNota(primerQuimestreStr),
+  
         "Segundo Quimestre": segundoQuimestreStr,
-        "Promedio Anual": row.promedioAnualRequeridoSupletorio
-          ? <span style={{ color: "red" }}>{promedioAnualStr}</span>
-          : promedioAnualStr,
+        [nombreColumnaExtra1]: convertirNota(segundoQuimestreStr),
+  
         "Promedio Final": row.promedioFinalInsuficiente
           ? <span style={{ color: "red" }}>{promedioFinalStr}</span>
           : promedioFinalStr,
+        [nombreColumnaExtra2]: convertirNota(promedioFinalStr),
+  
         "Estado":
-          row["Estado"] === "Aprobado" ? (
-            <span style={{ backgroundColor: "green", color: "#fff", padding: "2px 4px" }}>Aprobado</span>
-          ) : row["Estado"] === "Supletorio" ? (
-            <span style={{ backgroundColor: "yellow", color: "#000", padding: "2px 4px" }}>Supletorio</span>
-          ) : (
-            <span style={{ backgroundColor: "red", color: "#fff", padding: "2px 4px" }}>Reprobado</span>
-          )
+          row["Estado"] === "Aprobado"
+            ? <span style={{ backgroundColor: "green", color: "#fff", padding: "2px 4px" }}>Aprobado</span>
+            : row["Estado"] === "Supletorio"
+              ? <span style={{ backgroundColor: "orange", color: "#fff", padding: "2px 4px" }}>Supletorio</span>
+              : <span style={{ backgroundColor: "red", color: "#fff", padding: "2px 4px" }}>Reprobado</span>
       };
     });
-  }, [datos]);
+  }, [datos, escala]);    
 
   const realmenteDeshabilitado = soloLectura || inputsDisabled || (!isWithinRange && !forceEdit);
 
@@ -293,7 +231,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
     // Aquí asumimos que ya existe el registro (como en los otros componentes)
     const original = datos[rowIndex];
     const haCambiado = JSON.stringify(rowData) !== JSON.stringify(original);
-
+  
     if (!haCambiado) {
       Swal.fire({
         icon: "info",
@@ -302,7 +240,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
       });
       return;
     }
-
+  
     const examen = parseFloat(rowData["Examen Supletorio"]);
     if (isNaN(examen) || examen < 0 || examen > 7) {
       Swal.fire({
@@ -312,12 +250,12 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
       });
       return;
     }
-
+  
     const body = {
       id_inscripcion: rowData.idInscripcion,
       examen_recuperacion: examen,
     };
-
+  
     axios
       .put(`${import.meta.env.VITE_URL_DEL_BACKEND}/finales/${rowData.idInscripcion}`, body)
       .then(() => {
@@ -339,7 +277,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
         ErrorMessage(error);
       });
   };
-
+  
   return (
     <div id={idContenedor} className="container tabla-final">
       <HeaderTabla
@@ -371,4 +309,4 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
   );
 };
 
-export default Final;
+export default FinalBE;
