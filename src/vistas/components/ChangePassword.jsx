@@ -76,8 +76,8 @@ function ChangePassword({type,redireccion}) {
         </div>
 
         <div className="button-group">
-          <button type="submit" className="btn primary">Cambiar</button>
-          <button type="button" className="btn secondary" onClick={OnCancel}>Cancelar</button>
+          <button type="submit" className="btns primary">Cambiar</button>
+          <button type="button" className="btns secondary" onClick={OnCancel}>Cancelar</button>
         </div>
       </form>
     </div>

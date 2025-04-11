@@ -28,6 +28,7 @@ function Index() {
   const colums = ["nroCedula", "primer_nombre", "primer_apellido", "fecha_nacimiento", "genero", "jornada"]
   const filterKey = "primer_nombre"
   const PK = "ID"
+  const token=localStorage.getItem("token")
   
 
   const DatosEstudiante =(estudiante)=>{
@@ -94,7 +95,8 @@ function Index() {
   }, [navigate]);
   useEffect(() => {
     setLoading(true);
-    axios.get(`${API_URL}/estudiante/obtener?page=${page}`)
+    axios.get(`${API_URL}/estudiante/obtener?page=${page}`,{headers: { Authorization: `Bearer ${token}` },
+    })
       .then(response => {
         setEstudiantes(response.data.estudiantes);
         setTotalPages(response.data.totalPages);

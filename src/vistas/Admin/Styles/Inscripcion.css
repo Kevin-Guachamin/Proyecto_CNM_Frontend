@@ -43,7 +43,7 @@
 .contenedor-agregar, .contenedor-buscar {
     display: flex;
     justify-content: center; /* Centra horizontalmente */
-    margin-top: 10px;
+    
 }
 .agregar-representante {
     padding: 8px 12px;
@@ -51,11 +51,11 @@
     color: white;
     border: none;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 18px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
-    margin-top: 10px;
-    width: 200px;
+    
+    width: 220px;
 }
 
 .agregar-representante:hover {

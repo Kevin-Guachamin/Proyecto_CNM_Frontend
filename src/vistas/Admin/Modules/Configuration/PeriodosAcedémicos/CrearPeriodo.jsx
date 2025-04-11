@@ -3,6 +3,7 @@ import DatePicker from 'react-datepicker';
 import Boton from '../../../../../components/Boton';
 import "react-datepicker/dist/react-datepicker.css"; // Importa el CSS de react-datepicker
 import '../../../Styles/CrearEntidad.css';
+import { convertirFecha } from '../../../../../Utils/Funciones';
 
 function CrearPeriodo({ onCancel, entityToUpdate, onSave }) {
     const [descripcion, setDescripcion] = useState("");
@@ -11,12 +12,7 @@ function CrearPeriodo({ onCancel, entityToUpdate, onSave }) {
     const token=localStorage.getItem("token")
 
     // Función para convertir una fecha de formato dd/mm/yyyy a un objeto Date
-    const convertirFecha = (fecha) => {
-        if (!fecha) return null;
-        const [dia, mes, año] = fecha.split('/');
-        return new Date(`${año}-${mes}-${dia}`); // Convertir a formato ISO (yyyy-mm-dd)
-    };
-
+    
     useEffect(() => {
         //console.log("esto es lo que entro",entityToUpdate.fecha_fin)
         console.log("esto se intenta crear", fecha_fin);

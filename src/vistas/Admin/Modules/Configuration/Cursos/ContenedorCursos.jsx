@@ -22,9 +22,11 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
     const key1 = "Materia"
     const key2 = "nombre"
+    const token=localStorage.getItem("token")
 
     useEffect(() => {
-        axios.get(`${API_URL}/periodo_academico/obtener`)
+        axios.get(`${API_URL}/periodo_academico/obtener`,{headers: { Authorization: `Bearer ${token}` },
+        })
             .then(response => {
                 setPeriodos(response.data);
 
@@ -39,7 +41,8 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
 
         if (!selectedPeriodo) return; // Evitar peticiones innecesarias
         
-        axios.get(`${API_URL}/asignacion/obtener/periodo/${selectedPeriodo}`)
+        axios.get(`${API_URL}/asignacion/obtener/periodo/${selectedPeriodo}`,{headers: { Authorization: `Bearer ${token}` },
+        })
             .then(response => {
                 console.log(response.data)
                 setData(response.data);
@@ -54,7 +57,8 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
             if (!periodo) {
                 throw new Error("No se ha seleccionado un periodo");
             }
-            const response = await axios.get(`${API_URL}/${apiEndpoint}/nivel/${tipo}/${periodo}`);
+            const response = await axios.get(`${API_URL}/${apiEndpoint}/nivel/${tipo}/${periodo}`,{headers: { Authorization: `Bearer ${token}` },
+            });
             setLoading(false);
             return response.data; // Retornar los datos obtenidos
         } catch (error) {

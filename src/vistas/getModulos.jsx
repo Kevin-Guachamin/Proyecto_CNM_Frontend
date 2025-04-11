@@ -20,6 +20,7 @@ export const getModulos = (subRol, includeInicio = false) => {
         baseModules = [
           { id: 1, titulo: "Administración Escolar", icono: "🗃", link: "/administracion-escolar" },
           { id: 2, titulo: "Agenda de Citas", icono: "📅", link: "/agenda-citas" },
+          
         ];
         break;
       default:

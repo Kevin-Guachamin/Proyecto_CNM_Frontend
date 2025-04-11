@@ -24,16 +24,19 @@ function TablaEstudiantes({ filteredData, OnDelete, OnEdit, headers, columnsToSh
                 {columnsToShow.map((col, subIndex) => (
                   <td key={subIndex}>{item[col]}</td>
                 ))}
-                <td>
+                <td className='botones-icon'>
                   <FaEdit
+                  size={20}
                     className="icon edit-icon"
                     onClick={() => OnEdit(item)}
                   />
                   <FaTrash
+                  size={20}
                     className="icon delete-icon"
                     onClick={() => OnDelete(item)}
                   />
                   <IoEyeOutline
+                  size={20}
                   className='view-icon'
                   onClick={()=>OnView(item)}
                   />
