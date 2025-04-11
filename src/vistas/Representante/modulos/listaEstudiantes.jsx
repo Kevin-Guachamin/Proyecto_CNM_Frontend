@@ -8,9 +8,10 @@ import VerCalificacionesEstudiante from "./VerCalificacionesEstudiante";
 
 function ListaEstudiantes() {
   // Estado para almacenar la información del usuario conectado
-  const [usuario, setUsuario] = useState(null);
+  const [usuario, setUsuario] = useState([]);  
   const [datosEstudiante, setDatosEstudiante] = useState([]);
-  const [estudianteSeleccionado, setEstudianteSeleccionado] = useState(null);
+  const [estudianteSeleccionado, setEstudianteSeleccionado] = useState([]);
+  const [notasEstudiante, setNotasEstudiante] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCalificacionesOpen, setIsCalificacionesOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -19,16 +20,14 @@ function ListaEstudiantes() {
     console.log("ver calificaciones de: ", estudianteId);
     try {
       const token = localStorage.getItem("token");
+      // Hacer solicitud a la API para obtener las calificaciones del estudiante
+      // y enviarlas al modal
       const respuesta = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/estudiante/obtener/${estudianteId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setEstudianteSeleccionado(respuesta.data);
-      
-
-      // Obtener las notas del estudiante 
-      
       setIsCalificacionesOpen(true);
 
     } catch (error) {
@@ -83,7 +82,7 @@ function ListaEstudiantes() {
   // Obtener los estudiantes a cargo de un representante
   useEffect(() => {
     const cargarDatosEstudiantes = async () => {
-      if(!usuario) {
+      if(!usuario || usuario.length ==- 0) {
         return;
       }
       try {
@@ -134,6 +133,7 @@ function ListaEstudiantes() {
         {isCalificacionesOpen && (
           <VerCalificacionesEstudiante
             onCancel={handleCloseModal} 
+            estudiante={estudianteSeleccionado}
             // notas
           />
         )}
