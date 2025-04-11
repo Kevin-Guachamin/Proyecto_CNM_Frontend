@@ -24,8 +24,8 @@ function Index() {
   const [estudiante,setEstudiante]=useState({})
 
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
-  const headers = ["Cédula", "Nombre", "Apellido", "Fecha de nacimiento", "Género", "Jornada", "Acciones"];
-  const colums = ["nroCedula", "primer_nombre", "primer_apellido", "fecha_nacimiento", "genero", "jornada"]
+  const headers = ["Cédula", "Nombre", "Apellido", "Jornada", "Especialidad", "Nivel", "Acciones"];
+  const colums = ["nroCedula", "primer_nombre", "primer_apellido", "jornada", "especialidad", "nivel"]
   const filterKey = "primer_nombre"
   const PK = "ID"
   const token=localStorage.getItem("token")

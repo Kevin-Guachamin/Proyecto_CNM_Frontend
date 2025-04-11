@@ -13,7 +13,7 @@ function Tabla({ filteredData, OnDelete, OnEdit, headers, columnsToShow}) {
           <thead >
             <tr>
               {headers.map((header, index) => (
-                <th key={index}>{header}</th>
+                <th className='tabla-head' key={index}>{header}</th>
               ))}
             </tr>
           </thead>
@@ -21,7 +21,7 @@ function Tabla({ filteredData, OnDelete, OnEdit, headers, columnsToShow}) {
             {filteredData.map((item, index) => (
               <tr key={index}>
                 {columnsToShow.map((col, subIndex) => (
-                  <td key={subIndex}>{item[col]}</td>
+                  <td className='tabla-celda' key={subIndex}>{item[col]}</td>
                 ))}
                 <td className='botones-icon'>
                  

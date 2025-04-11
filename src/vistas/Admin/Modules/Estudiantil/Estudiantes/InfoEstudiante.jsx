@@ -39,7 +39,7 @@ function InfoEstudiante({estudiante}) {
     <h5 className="mb-4">Información del Estudiante</h5>
 
     <Row   className="mb-2">
-      <Col sm={3}><strong className="info-label">Cédula:</strong></Col>
+      <Col sm={3}><strong className="info-label">Cédula/Pasaporte:</strong></Col>
       <Col sm={3} className="info" >{estudiante.nroCedula}</Col>
 
       <Col sm={3}><strong className="info-label">Código Estudiante:</strong></Col>

@@ -190,7 +190,7 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
                 OnEdit={handleEdit}
                 OnDelete={handleDelete}
                 headers={Headers}
-                extraIcon={extraIcon}
+                
             />
             }
             {Paginación && data.length > 0 && <div className='Paginación'>{Paginación}</div>}
