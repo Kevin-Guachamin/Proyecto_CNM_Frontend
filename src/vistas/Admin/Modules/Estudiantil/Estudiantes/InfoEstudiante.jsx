@@ -8,17 +8,21 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import '../../../Styles/TarjetaEstudiante.css'
 
 function InfoEstudiante({estudiante}) {
+    const token=localStorage.getItem("token")
     const handleDownload = async (filePath) => {
         const parts = filePath.split("\\");
         const folder = parts[1]; // Subcarpeta (ej: "Estudiantes")
         const filename = parts[2]; // Nombre del archivo (ej: "ProyectoCNM.pdf")
-    
+        const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
+
         try {
           const response = await axios.get(
-            `http://localhost:8000/estudiante/download/${folder}/${filename}`,
+            `${API_URL}/estudiante/download/${folder}/${filename}`,
             {
               responseType: 'blob',
-            }
+            },{
+                headers: { Authorization: `Bearer ${token}` },
+              }
           );
     
           const url = window.URL.createObjectURL(new Blob([response.data]));
