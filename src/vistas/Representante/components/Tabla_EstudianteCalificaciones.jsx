@@ -7,7 +7,7 @@ const TablaEstudianteCalificaciones = () => {
        <div className="content-container">
            <Container className="mt-4">
                <div className="d-flex justify-content-between align-items-center mb-4">
-                   <h2 className="mb-0">Gestión de Calificaciones</h2>
+                   <h2 className="mb-0">Exportar a PDF</h2>
                    <div>
                        <button
                            className="btn btn-danger me-2"
@@ -18,6 +18,7 @@ const TablaEstudianteCalificaciones = () => {
                        </button>
                    </div>
                </div>
+
 
                {/* TABS PRINCIPALES */}
                <Tabs defaultActiveKey="quimestre1" id="calificaciones-tabs" className="mb-3" fill>
