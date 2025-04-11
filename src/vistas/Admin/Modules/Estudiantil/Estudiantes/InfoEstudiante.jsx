@@ -35,7 +35,7 @@ function InfoEstudiante({estudiante}) {
         }
       }
   return (
-    <Card className="student-card p-4">
+    <Card className="student-card">
     <h5 className="mb-4">Información del Estudiante</h5>
 
     <Row   className="mb-2">

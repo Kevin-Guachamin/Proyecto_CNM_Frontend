@@ -2,6 +2,7 @@
 .student-card {
     border: 1px solid #e7f1ff;
     border-radius: 10px;
+    padding: 10px;
     transition: box-shadow 0.2s ease-in-out;
     background-color: #CFD8DC !important;
   }
