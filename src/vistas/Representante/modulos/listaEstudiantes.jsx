@@ -20,42 +20,46 @@ function ListaEstudiantes() {
 
   const handleVerCalificaciones = async (estudianteCedula) => {
     console.log("ver calificaciones de: ", estudianteCedula);
+     
     try {
       const token = localStorage.getItem("token");
-      
-      const respuesta = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/estudiante/obtener/${estudianteCedula}`, {
+      const baseURL = import.meta.env.VITE_URL_DEL_BACKEND;
+      const headers = {
         headers: {
           Authorization: `Bearer ${token}`
         }
-      });
-      const estudiante = respuesta.data;
+      }
+      
+      // Solicitud para obtener los datos de un estudiante en caso
+      // de que se haga click en su correspondiente boton
+      // de Ver calificaciones
+      const { data: estudiante } = await axios.get(
+        `${baseURL}/estudiante/obtener/${estudianteCedula}`, 
+        headers
+      );
       setEstudianteSeleccionado(estudiante);
       
       // Solicitud para ver todos los periodos academicos en los que un estudiante se matriculo 
-      const respuestaPeriodos = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/matricula/estudiante/${estudiante.ID}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      periodosMatriculados = respuestaPeriodos.data  
+      const { data: periodosMatriculados } = await axios.get(
+        `${baseURL}/matricula/estudiante/${estudiante.ID}`, 
+        headers
+      ); 
+      // Devuelve un array con objetos. 
+      // Formato de objetos {ID de la matricula:, ID periodo academico:} 
+      // Ejemplo [{ID: 21, ID_periodo_academico: "Periodo academico 2024-2025"}]
 
       // Solicitud par obtener datos de los periodos academicos en los que se matriculo el estudiante
       const respuestaPeriodosDatos = await Promise.all(
-        periodosMatriculados.map(periodoId => {
-          return axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/periodo_academico/obtener/${periodoId}`, {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          });
-        })
+        periodosMatriculados.map(matricula => 
+          axios.get(`${baseURL}/periodo_academico/obtener/${matricula.ID_periodo_academico}`, headers)
+            .then(response => ({
+              ...matricula,
+              descripcion: response.data.descripcion
+            }))
+        )
       );
-      const datos = respuestaPeriodosDatos.map(res => {
-        return {
-          ID: res.data.ID,
-          descripcion: res.data.descripcion 
-        }
-      } );
-      setPeriodosDatos(datos); // OJO con los datos vacios
+  
+      setPeriodosDatos(respuestaPeriodosDatos);
       setIsCalificacionesOpen(true);
 
     } catch (error) {
