@@ -1,8 +1,18 @@
 // Tabla para ver reporte de calificaciones de un estudiante
+import { useEffect, useState } from "react";
 import { Tabs, Tab, Container } from "react-bootstrap";
 
 
 const TablaEstudianteCalificaciones = () => {
+    const [periodosMatricualdos, setPeriodosMatriculados] = useState([]);
+
+    /* useEffect(() => {
+        const cargarPerdiodosAcademicos = async () => {
+
+        }
+    }, []); */
+
+    // Lista para sele
    return(
        <div className="content-container">
            <Container className="mt-4">
