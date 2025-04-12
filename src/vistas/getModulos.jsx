@@ -1,5 +1,5 @@
 import { RiLockPasswordFill } from "react-icons/ri";
-
+import { FileText } from "lucide-react";
 export const getModulos = (subRol, includeInicio = false) => {
     let baseModules = [];
   
@@ -8,7 +8,8 @@ export const getModulos = (subRol, includeInicio = false) => {
         baseModules = [
           { id: 1, titulo: "Información Estudiantil", icono: "📄", link: "/profesor/informacion" },
           { id: 2, titulo: "Calificaciones", icono: "📊", link: "/profesor/panelcursos" },
-          { id: 3, titulo: "Cambiar contraseña", icono: <RiLockPasswordFill  size={40}/>, link: "/profesor/password"}
+          { id: 3, titulo: "Cambiar contraseña", icono: <RiLockPasswordFill  size={40}/>, link: "/profesor/password"},
+          { id: 4, titulo: "Solicitudes", icono: <FileText  size={40}/>, link: "/profesor/solicitudes"}
         ];
         break;
       case "Vicerrector":

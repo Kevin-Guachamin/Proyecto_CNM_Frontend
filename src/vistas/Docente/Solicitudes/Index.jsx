@@ -1,32 +1,41 @@
 import React, { useState, useEffect } from 'react'
-import Solicitudes from './Solicitudes.jsx'
+import SolicitudesDocente from './SolicitudesDocente.jsx'
 import { useNavigate } from 'react-router-dom';
 import Layout from '../../../layout/Layout.jsx';
 import Header from '../../../components/Header.jsx';
 import { Home } from "lucide-react";
-import NotificacionesIcon from './NotificacionesIcon.jsx';
-import { ObtenerTodo } from '../../../Utils/CRUD/ObjetenerTodo.jsx';
+import NotificacionesIcon from './NotificationIconDocente.jsx';
 import Loading from '../../../components/Loading.jsx';
+import axios from 'axios';
+
 
 function Index() {
   const [usuario, setUsuario] = useState(null);
   const [solicitudes, setSolicitudes] = useState([])
   const [loading, setLoading] = useState(false)
-
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
+  const token=localStorage.getItem("token")
   const navigate = useNavigate()
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = JSON.parse(storedUser);
-    if (!parsedUser || parsedUser.subRol !== "Secretaria") {
+    if (!parsedUser || parsedUser.subRol !== "Profesor") {
       navigate("/")
     }
     setUsuario(parsedUser);
   }, [API_URL, navigate]);
   useEffect(() => {
-    ObtenerTodo(setSolicitudes, `${API_URL}/solicitud/obtener`, setLoading)
+    axios.get(`${API_URL}/solicitud/obtener/docente/`,{
+        headers: { Authorization: `Bearer ${token}` },
+      })
+    .then(res=>{
+        setLoading(false)
+        setSolicitudes(res.data)
+    })
   }, [])
-  const pendientes = solicitudes.filter(s => s.estado === "Pendiente");
+    const aceptadas = solicitudes.filter(s => s.estado === "Aceptada");
+    const rechazadas = solicitudes.filter(s => s.estado === "Rechazada");
+    const cantidad = (aceptadas?.length || 0) + (rechazadas?.length || 0);
   return (
     <div className="section-container">
       {/* Encabezado */}
@@ -35,10 +44,10 @@ function Index() {
       </div>
       <Layout modules={[
         { name: "Inicio", icon: <Home size={20} />, path: "/inicio" },
-        { name: "Solicitudes", icon: <NotificacionesIcon cantidad={pendientes.length} />, path: "/secretaria/solicitudes" },
+        { name: "Solicitudes", icon: <NotificacionesIcon cantidad={cantidad} />, path: "/profesor/solicitudes" },
 
       ]}>
-        {loading ? <Loading /> : <Solicitudes solicitudes={solicitudes} setSolicitudes={setSolicitudes} />}
+        {loading ? <Loading /> : <SolicitudesDocente usuario={usuario} solicitudes={solicitudes} setSolicitudes={setSolicitudes}/>}
 
       </Layout>
     </div>

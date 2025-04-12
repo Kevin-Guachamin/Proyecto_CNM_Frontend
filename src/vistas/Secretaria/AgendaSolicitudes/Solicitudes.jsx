@@ -3,18 +3,44 @@ import './Solicitudes.css'
 import axios from 'axios'
 import { ErrorMessage } from '../../../Utils/ErrorMesaje'
 import Swal from 'sweetalert2'
-ErrorMessage
+import EstablecerPlazos from './EstablecerPlazos'
+import { Card, Row, Col } from "react-bootstrap";
+
 function Solicitudes({ solicitudes }) {
   const [solicitudesPendientes, setSolicitudesPendientes] = useState([])
   const [solicitudesAceptadas, setSolicitudesAceptadas] = useState([])
   const [solicitudesRechazadas, setSolicitudesRechazadas] = useState([])
   const [vistaActual, setVistaActual] = useState("pendientes");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [id, setID] = useState("")
+  const [estado, setEstado] = useState("")
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const token = localStorage.getItem("token")
   useEffect(() => {
     filtrarSolicitudes();
   }, [solicitudes]);
+  const toggleModal = () => {
+    setIsModalOpen((prev) => !prev);
 
+  };
+  function formatearFechaLegible(fechaISO) {
+    const fecha = new Date(fechaISO);
+
+    return fecha.toLocaleString("es-EC", {
+      weekday: "long",     // sábado
+      year: "numeric",     // 2025
+      month: "long",       // abril
+      day: "numeric",      // 12
+      hour: "2-digit",     // 14
+      minute: "2-digit",   // 58
+      hour12: false,       // formato 24h
+    });
+  }
+  const handlePlazos = (id, estado) => {
+    setID(id)
+    setEstado(estado)
+    setIsModalOpen(true);
+  };
   const filtrarSolicitudes = () => {
     const pendientes = solicitudes.filter(s => s.estado === "Pendiente");
     const aceptadas = solicitudes.filter(s => s.estado === "Aceptada");
@@ -24,11 +50,21 @@ function Solicitudes({ solicitudes }) {
     setSolicitudesAceptadas(aceptadas);
     setSolicitudesRechazadas(rechazadas);
   };
-  const handleActualizarEstado = async (id, nuevoEstado) => {
+  const handleActualizarEstado = async (id, nuevoEstado, fecha_inicio, fecha_fin) => {
+    setIsModalOpen(false)
     try {
-      const solicitud = solicitudesPendientes.find((s) => s.id === id);
+      const solicitud = solicitudesPendientes.find((s) => s.ID === id);
+      console.log("esta es la solicitud", solicitudes)
       if (!solicitud) return;
-      solicitud.estado = nuevoEstado
+      if (nuevoEstado === "Aceptada") {
+        solicitud.estado = nuevoEstado
+        solicitud.fecha_inicio = fecha_inicio
+        solicitud.fecha_fin = fecha_fin
+      }
+      else {
+        solicitud.estado = nuevoEstado
+      }
+      console.log("este es el ID", id)
       // Actualizamos el estado local (y podrías también enviar al backend si quieres)
       const nuevaSolicitud = await axios.put(`${API_URL}/solicitud/editar/${id}`, solicitud
         , {
@@ -36,14 +72,14 @@ function Solicitudes({ solicitudes }) {
         })
 
       // Quitar de pendientes
-      const nuevasPendientes = solicitudesPendientes.filter((s) => s.id !== id);
-      setSolicitudesPendientes(nuevasPendientes);
+
+      setSolicitudesPendientes((prev) => prev.filter(s => s.ID !== id));
 
       // Agregar al estado correspondiente
-      if (nuevoEstado === "aceptada") {
-        setSolicitudesAceptadas((prev) => [...prev, nuevaSolicitud]);
-      } else if (nuevoEstado === "rechazada") {
-        setSolicitudesRechazadas((prev) => [...prev, nuevaSolicitud]);
+      if (nuevoEstado === "Aceptada") {
+        setSolicitudesAceptadas((prev) => [...prev, nuevaSolicitud.data]);
+      } else if (nuevoEstado === "Rechazada") {
+        setSolicitudesRechazadas((prev) => [...prev, nuevaSolicitud.data]);
       }
     } catch (error) {
       ErrorMessage(error)
@@ -52,29 +88,43 @@ function Solicitudes({ solicitudes }) {
   };
   const handleEliminarSolicitud = (id) => {
     // Aquí puedes hacer una petición al backend o simplemente filtrar del estado
-    axios.delete(`${API_URL}/solicitud/eliminar/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    }).then(res => {
-      Swal.fire({
-        icon: "success",
-        title: "Eliminado!",
-        text: `La solicitud de ${res.data.Docente.primer_nombre} ${res.data.Docente.primer_apellido} ha sido eliminada.`,
-        iconColor: "#218838",
-        confirmButtonText: "Entendido",
-        confirmButtonColor: "#003F89",
-      }
-      );
-      if (vistaActual === "aceptadas") {
-        setSolicitudesAceptadas(prev => prev.filter(s => s.id !== id));
-      } else if (vistaActual === "rechazadas") {
-        setSolicitudesRechazadas(prev => prev.filter(s => s.id !== id));
-      }
-    })
-    .catch(err=>{
-      ErrorMessage(err)
-    })
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: `¿Quieres eliminar esta solicitud?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios.delete(`${API_URL}/solicitud/eliminar/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }).then(res => {
 
-  };
+          Swal.fire({
+            icon: "success",
+            title: "Eliminado!",
+            text: `La solicitud de ${res.data.Docente.primer_nombre} ${res.data.Docente.primer_apellido} ha sido eliminada.`,
+            iconColor: "#218838",
+            confirmButtonText: "Entendido",
+            confirmButtonColor: "#003F89",
+          }
+          );
+          if (vistaActual === "aceptadas") {
+            setSolicitudesAceptadas(prev => prev.filter(s => s.ID !== id));
+          } else if (vistaActual === "rechazadas") {
+            setSolicitudesRechazadas(prev => prev.filter(s => s.ID !== id));
+          }
+        })
+          .catch(err => {
+            ErrorMessage(err)
+          })
+
+      };
+    })
+  }
   const renderizarLista = () => {
     let lista = [];
     if (vistaActual === "pendientes") lista = solicitudesPendientes;
@@ -86,26 +136,42 @@ function Solicitudes({ solicitudes }) {
     }
 
     return (
-      <ul className="lista-solicitudes">
-        {lista.map((s) => (
-          <li key={s.id} className="item-solicitud">
-            <span><strong>Profesor:</strong> {s.profesor}</span>
-            <span><strong>Motivo:</strong> {s.motivo}</span>
-            <span><strong>Fecha:</strong> {s.fecha}</span>
+      <Row xs={1} md={2} lg={5} className="solicitudes-card">
+          {lista.map((s) => {
+            return (
+              <Col key={s.ID}>
+                <Card>
+                  <Card.Body>
+                    <Card.Title>{`${s.Docente.primer_nombre} ${s.Docente.primer_apellido}`}</Card.Title>
+                    <Card.Text className='solicitudes-card-texto'>
+                      <strong>Fecha:</strong> {formatearFechaLegible(s.fechaSolicitud)} <br />
+                      <strong>Motivo:</strong> {s.motivo} <br />
+                      
+                      {vistaActual === "aceptadas" && (
+                        <>
+                          <strong style={{ color: "black" }}>PLAZO ESTABLECIDO</strong> <br />
+                          <strong>Fecha inicio:</strong> {s.fecha_inicio} <br />
+                          <strong>Fecha fin:</strong> {s.fecha_fin} <br />
+                        </>
+                      )}
+                      {vistaActual === "pendientes" ? (
+                        <div className="acciones-solicitud">
+                          <button onClick={() => handlePlazos(s.ID, "Aceptada")} className="btn-aceptar">Aceptar</button>
+                          <button onClick={() => handleActualizarEstado(s.ID, "Rechazada")} className="btn-rechazar">Rechazar</button>
+                        </div>
+                      ) : (
+                        <div className="acciones-solicitud">
 
-            {vistaActual === "pendientes" ? (
-              <div className="acciones-solicitud">
-                <button onClick={() => handleActualizarEstado(s.id, "aceptada")} className="btn-aceptar">Aceptar</button>
-                <button onClick={() => handleActualizarEstado(s.id, "rechazada")} className="btn-rechazar">Rechazar</button>
-              </div>
-            ) : (
-              <div className="acciones-solicitud">
-                <button onClick={() => handleEliminarSolicitud(s.id)} className="btn-eliminar">Eliminar</button>
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
+                          <button onClick={() => handleEliminarSolicitud(s.ID)} className="btn-eliminar">Eliminar</button>
+                        </div>
+                      )}
+                    </Card.Text>
+                  </Card.Body>
+                </Card>
+              </Col>
+            );
+          })}
+        </Row>
     );
   };
 
@@ -125,7 +191,7 @@ function Solicitudes({ solicitudes }) {
           Rechazadas ({solicitudesRechazadas.length})
         </button>
       </div>
-
+      {isModalOpen && <EstablecerPlazos onSave={handleActualizarEstado} onCancel={toggleModal} id={id} estado={estado} />}
       <div className="contenedor-lista">
         {renderizarLista()}
       </div>
