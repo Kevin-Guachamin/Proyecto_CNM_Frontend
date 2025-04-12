@@ -11,23 +11,51 @@ function ListaEstudiantes() {
   const [usuario, setUsuario] = useState([]);  
   const [datosEstudiante, setDatosEstudiante] = useState([]);
   const [estudianteSeleccionado, setEstudianteSeleccionado] = useState([]);
-  const [notasEstudiante, setNotasEstudiante] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCalificacionesOpen, setIsCalificacionesOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  let periodosMatriculados = [];
+  //let periodosDatos = [];
+  const [periodosDatos, setPeriodosDatos] = useState([]);
 
-  const handleVerCalificaciones = async (estudianteId) => {
-    console.log("ver calificaciones de: ", estudianteId);
+  const handleVerCalificaciones = async (estudianteCedula) => {
+    console.log("ver calificaciones de: ", estudianteCedula);
     try {
       const token = localStorage.getItem("token");
-      // Hacer solicitud a la API para obtener las calificaciones del estudiante
-      // y enviarlas al modal
-      const respuesta = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/estudiante/obtener/${estudianteId}`, {
+      
+      const respuesta = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/estudiante/obtener/${estudianteCedula}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      setEstudianteSeleccionado(respuesta.data);
+      const estudiante = respuesta.data;
+      setEstudianteSeleccionado(estudiante);
+      
+      // Solicitud para ver todos los periodos academicos en los que un estudiante se matriculo 
+      const respuestaPeriodos = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/matricula/estudiante/${estudiante.ID}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      periodosMatriculados = respuestaPeriodos.data  
+
+      // Solicitud par obtener datos de los periodos academicos en los que se matriculo el estudiante
+      const respuestaPeriodosDatos = await Promise.all(
+        periodosMatriculados.map(periodoId => {
+          return axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/periodo_academico/obtener/${periodoId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+        })
+      );
+      const datos = respuestaPeriodosDatos.map(res => {
+        return {
+          ID: res.data.ID,
+          descripcion: res.data.descripcion 
+        }
+      } );
+      setPeriodosDatos(datos); // OJO con los datos vacios
       setIsCalificacionesOpen(true);
 
     } catch (error) {
@@ -134,7 +162,8 @@ function ListaEstudiantes() {
           <VerCalificacionesEstudiante
             onCancel={handleCloseModal} 
             estudiante={estudianteSeleccionado}
-            // notas
+            periodosMatriculados={periodosDatos}
+            
           />
         )}
 
