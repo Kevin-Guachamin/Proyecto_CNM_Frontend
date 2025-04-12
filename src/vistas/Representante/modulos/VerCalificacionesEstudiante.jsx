@@ -7,11 +7,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const VerCalificacionesEstudiante = ({onCancel, estudiante, periodosMatriculados}) => {
   const [notasEstudiante, setNotasEstudiante] = useState([]);
-  const handleCalificaciones = async (peridodoMAtriculadoID) => {
-    // Tenemos los periodos matriculados, id del estudiante
-    console.log('Este es el id del periodo academico: ', peridodoMAtriculadoID);
+  const handleCalificaciones = async (matriculaID) => {
+    console.log('Este es el id de la matricula: ', matriculaID);
     
-    // Necesitamos las notas de cada periodo seleccionado
+    // Necesitamos todas las notas con ID de matricula: matriculaID
+
 
   }
 
