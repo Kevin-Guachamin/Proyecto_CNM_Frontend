@@ -92,8 +92,12 @@ function SolicitudesDocente({ usuario, solicitudes, setSolicitudes }) {
                     );
                     if (vistaActual === "aceptadas") {
                         setSolicitudesAceptadas(prev => prev.filter(s => s.ID !== id));
+
                     } else if (vistaActual === "rechazadas") {
                         setSolicitudesRechazadas(prev => prev.filter(s => s.ID !== id));
+                    }
+                    else if (vistaActual === "pendientes") {
+                        setSolicitudesPendientes(prev => prev.filter(s => s.ID !== id));
                     }
                 })
                     .catch(err => {
