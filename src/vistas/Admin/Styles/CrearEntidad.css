@@ -274,3 +274,7 @@
   margin-right: 8px; /* Espacio entre el ícono y el texto */
   font-size: 18px; /* Tamaño del ícono */
 }
+.boton-crear-solicitud{
+  display: flex;
+  justify-content: center;
+}
