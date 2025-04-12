@@ -22,8 +22,9 @@ export const getModulos = (subRol, includeInicio = false) => {
       case "Secretaria":
         baseModules = [
           { id: 1, titulo: "Administración Escolar", icono: "🗃", link: "/secretaria/administracion-escolar" },
-          { id: 2, titulo: "Matriculación", icono: "✏️", link: "/secretaria/agenda-citas" },
-          { id: 3, titulo: "Cambiar contraseña", icono: <RiLockPasswordFill  size={40}/>, link: "/secretaria/password"}
+          { id: 2, titulo: "Matriculación", icono: "✏️", link: "/secretaria/matriculación" },
+          { id: 3, titulo: "Cambiar contraseña", icono: <RiLockPasswordFill  size={40}/>, link: "/secretaria/password"},
+          {id:4, titulo: "Agenda soliciturdes",icono: "📅",link: "/secretaria/solicitudes"}
         ];
         break;
       default:

@@ -28,7 +28,7 @@ import BuscarMaterias from '../vistas/Admin/Modules/Matriculacion/BuscarMaterias
 import ChangePassword_Profesor from '../vistas/Docente/ChangePassword/Index.jsx';
 import ChangePassword_Secretaria from '../vistas/Secretaria/ChangePassword/Index.jsx';
 import ChangePassword_Vicerrector from '../vistas/Vicerrector/ChangePassword/Index.jsx';
-
+import Solicitudes from '../vistas/Secretaria/AgendaSolicitudes/Index.jsx'
 
 function Rutas() {
   return (
@@ -72,6 +72,7 @@ function Rutas() {
       <Route path="/secretaria/periodo/materias/estudiantes/:id_asignacion" element={<ListadoCursos />} />
       <Route path="/secretaria/calificaciones/asignacion/:asigId" element={<Calificaciones />} />
       <Route path="/secretaria/password" element={<ChangePassword_Secretaria />} />
+      <Route path="/secretaria/solicitudes" element={<Solicitudes />} />
     </Routes>
   )
 }
