@@ -89,7 +89,7 @@ function BuscarMaterias() {
 
 
             </div>
-            <div className="Contendor-tabla">
+            <div className="Contenedor-tabla">
                 {buscarAsignacion ? (
                     asignaciones.length === 0 ? (
                         <p className="no-registros">No se encontraron coincidencias</p>

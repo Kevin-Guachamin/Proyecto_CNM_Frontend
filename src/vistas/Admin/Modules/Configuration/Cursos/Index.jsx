@@ -5,12 +5,20 @@ import ContenedorCursos from "./ContenedorCursos";
 import { modulesSettings } from "../../../Components/Modulos"
 import { useNavigate } from "react-router-dom";
 
-
+import Paginación from "../../../Components/Paginación";
 
 function Index() {
   const [usuario, setUsuario] = useState(null);
+  const [cursos, setCursos] = useState([])
+  
+  const [page, setPage] = useState(1);
+  
+  
+  
+  
   const PK = "ID"
   const navigate = useNavigate()
+  
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = JSON.parse(storedUser);
@@ -19,7 +27,7 @@ function Index() {
     }
     setUsuario(parsedUser);
   }, [navigate]);
-
+  
   return (
     <div className="section-container">
       {/* Encabezado */}
@@ -27,7 +35,10 @@ function Index() {
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
       <Layout modules={modulesSettings}>
-        <ContenedorCursos apiEndpoint={"asignacion"} PK={PK} />
+        
+          
+        <ContenedorCursos apiEndpoint={"asignacion"} PK={PK} data={cursos} setData={setCursos}   />
+        
 
       </Layout>
     </div>
