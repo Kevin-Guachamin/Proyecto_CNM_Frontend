@@ -18,7 +18,7 @@ function Index() {
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = JSON.parse(storedUser);
-    if (!parsedUser || parsedUser.subRol !== "Secretaria") {
+    if (!parsedUser || parsedUser.subRol !== "Vicerrector") {
       navigate("/")
     }
     setUsuario(parsedUser);
@@ -35,7 +35,7 @@ function Index() {
       </div>
       <Layout modules={[
         { name: "Inicio", icon: <Home size={20} />, path: "/inicio" },
-        { name: "Solicitudes", icon: <NotificacionesIcon cantidad={pendientes.length} />, path: "/secretaria/solicitudes" },
+        { name: "Solicitudes", icon: <NotificacionesIcon cantidad={pendientes.length} />, path: "/vicerrector/solicitudes" },
 
       ]}>
         {loading ? <Loading /> : <Solicitudes solicitudes={solicitudes} setSolicitudes={setSolicitudes} />}

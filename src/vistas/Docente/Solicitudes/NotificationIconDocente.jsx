@@ -1,15 +1,15 @@
 import { Bell } from "lucide-react";
-import "../../Secretaria/AgendaSolicitudes/NotificacionesIcon.css"; // Importa el CSS externo
+import "../../Vicerrector/AgendaSolicitudes/NotificacionesIcon.css"; // Importa el CSS externo
 
 export default function NotificacionesIcon({ cantidad = 0 }) {
-  return (
-    <div className="notificacion-container">
-      <Bell size={20} className="notificacion-icon" />
-      {cantidad > 0 && (
-        <span className="notificacion-badge">
-          {cantidad}
-        </span>
-      )}
-    </div>
-  );
+    return (
+        <div className="notificacion-container">
+            <Bell size={20} className="notificacion-icon" />
+            {cantidad > 0 && (
+                <span className="notificacion-badge">
+                    {cantidad}
+                </span>
+            )}
+        </div>
+    );
 }

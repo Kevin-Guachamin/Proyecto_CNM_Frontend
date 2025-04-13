@@ -16,7 +16,7 @@ export const getModulos = (subRol, includeInicio = false) => {
         baseModules = [
           { id: 1, titulo: "Distributivo de Docentes", icono: "🧑‍🏫", link: "/vicerrector/distributivo" },
           { id: 2, titulo: "Fechas para notas", icono: "📅", link: "/vicerrector/reportes" },
-          { id: 3, titulo: "Fechas temporalaes", icono: "📝", link: "/vicerrector/password"},
+          { id: 3, titulo: "Agenda solicitudes", icono: "📝", link: "/vicerrector/solicitudes"},
           { id: 4, titulo: "Cambiar contraseña", icono: <RiLockPasswordFill  size={40}/>, link: "/vicerrector/password"}
         ];
         break;
@@ -24,8 +24,8 @@ export const getModulos = (subRol, includeInicio = false) => {
         baseModules = [
           { id: 1, titulo: "Administración Escolar", icono: "🗃", link: "/secretaria/administracion-escolar" },
           { id: 2, titulo: "Matriculación", icono: "✏️", link: "/secretaria/matriculación" },
-          { id: 3, titulo: "Cambiar contraseña", icono: <RiLockPasswordFill  size={40}/>, link: "/secretaria/password"},
-          {id:4, titulo: "Agenda soliciturdes",icono: "📅",link: "/secretaria/solicitudes"}
+          { id: 3, titulo: "Cambiar contraseña", icono: <RiLockPasswordFill  size={40}/>, link: "/secretaria/password"}
+          
         ];
         break;
       default:
