@@ -28,3 +28,7 @@ export  function convertirFecha  (fecha)  {
     const secuencial = String(idEstudiante).padStart(4, "0"); // Asegura 4 dígitos
     return `${anio}${secuencial}`;
   };
+
+    
+   
+ 

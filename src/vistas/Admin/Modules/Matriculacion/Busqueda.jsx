@@ -71,7 +71,7 @@ function Busqueda() {
         <div className='Contenedor-general' >
             <h1 className="periodo-title">{`Periodo académico activo ${periodo.descripcion}`}</h1>
             <BuscarEstudiante estudiante={estudiante} setEstudiante={setEstudiante} setBuscado={setBuscado} cedula={cedula} setCedula={setCedula} />
-            <div className="Contendor-tabla">
+            <div className="Contenedor-tabla">
                 {buscado && !estudiante && (
                     <p className="no-registros">No se encontró el estudiante.</p>
                 )}

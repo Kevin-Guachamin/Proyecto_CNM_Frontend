@@ -4,7 +4,7 @@ import "../../../Styles/Tabla.css"
 function Tabla({ filteredData, OnDelete, OnEdit, extraIcon }) {
 
     return (
-        <div className="Contendor-tabla">
+        <div className="Contenedor-tabla">
             {filteredData.length === 0 ? (
                 <p className="no-registros">No hay registros disponibles.</p>
             ) : (

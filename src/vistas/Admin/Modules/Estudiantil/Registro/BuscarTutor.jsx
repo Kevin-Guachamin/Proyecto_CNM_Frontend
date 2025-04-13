@@ -153,7 +153,7 @@ function BuscarTutor() {
             )}
             {representante && (
                 <div>
-                    <div className='Contendor-tabla'>
+                    <div className='Contenedor-tabla'>
                         <table className="tabla_registros">
                             <thead >
                                 <tr >
@@ -184,7 +184,7 @@ function BuscarTutor() {
                     {modalEstudiante && <CrearEstudiante onCancel={toggleModalEstudiante} onSave={handleSaveEstudiante} representante={representante.nroCedula} entityToUpdate={entityToUpdate} />}
                     {estudiante && (
                         <div>
-                            <div className='Contendor-tabla'>
+                            <div className='Contenedor-tabla'>
                                 <table className="tabla_registros">
                                     <thead >
                                         <tr >

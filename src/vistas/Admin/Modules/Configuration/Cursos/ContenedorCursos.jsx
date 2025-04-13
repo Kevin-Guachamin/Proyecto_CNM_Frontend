@@ -9,47 +9,70 @@ import "../../../Styles/Contenedor.css"
 import CrearCurso from "./CrearCurso";
 import { useEffect } from 'react';
 import Loading from '../../../../../components/Loading';
+import Paginación from '../../../Components/Paginación';
 
-
-function ContenedorCursos({ apiEndpoint, PK, Paginación }) {
-    const [data, setData] = useState([])
+function ContenedorCursos({ apiEndpoint, PK}) {
+    const [data,setData]=useState([])
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('')
     const [entityToUpdate, setEntityToUpdate] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [periodo, setPeriodo] = useState("")
     const [periodos, setPeriodos] = useState([])
+    const [page,setPage]=useState(1)
+    const [totalPages, setTotalPages] = useState(1);
+    const [width, setWidth] = useState(window.innerWidth);
+      const [limit, setLimit] = useState(0);
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
+    
+    const token = localStorage.getItem("token")
     const key1 = "Materia"
     const key2 = "nombre"
-    const token = localStorage.getItem("token")
+    // ✅ Detectar cambio de tamaño de pantalla
+      useEffect(() => {
+        const handleResize = () => setWidth(window.innerWidth);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+      }, []);
+    
+      // ✅ Establecer límite de resultados según resolución
+      useEffect(() => {
+    
+        const isLaptop = width <= 1822;
+        setLimit(isLaptop ? 13 : 21);
+      }, [width]);
 
     useEffect(() => {
         axios.get(`${API_URL}/periodo_academico/obtener`, {
             headers: { Authorization: `Bearer ${token}` },
         })
             .then(response => {
-                setPeriodos(response.data);
-
+                setPeriodos(response.data.data);
+                
             })
             .catch(error => {
                 ErrorMessage(error);
             })
     }, [API_URL])
+    
+    
+      
+    
     const handlePeriodoChange = (e) => {
         const selectedPeriodo = e.target.value;
         setPeriodo(selectedPeriodo);
 
         if (!selectedPeriodo) {
-            setData(null)
+            setData([])
             return; // Evitar peticiones innecesarias
         }
-        axios.get(`${API_URL}/asignacion/obtener/periodo/${selectedPeriodo}`, {
+        axios.get(`${API_URL}/asignacion/obtener/periodo/${selectedPeriodo}?page=${page}&limit=${limit}`, {
             headers: { Authorization: `Bearer ${token}` },
         })
             .then(response => {
                 console.log(response.data)
-                setData(response.data);
+                setData(response.data.data);
+                setTotalPages(response.data.totalPages);
             })
             .catch(error => {
                 ErrorMessage(error);
@@ -87,7 +110,7 @@ function ContenedorCursos({ apiEndpoint, PK, Paginación }) {
 
     const HandleTable = (valor) => {
         if (!periodo) {
-            return 
+            return
         }
         const grupos = {
             "BE": ["1ro BE", "2do BE"],
@@ -118,11 +141,11 @@ function ContenedorCursos({ apiEndpoint, PK, Paginación }) {
 
     const filteredData = Array.isArray(data)
         ? data.filter((item) => {
-            console.log("este es el item", item);
+            
 
             const value = item?.[key1]?.[key2];
 
-            console.log("este es el value", value);
+           
 
             return typeof value === "string"
                 ? value.toLowerCase().includes(search.toLowerCase())
@@ -206,7 +229,7 @@ function ContenedorCursos({ apiEndpoint, PK, Paginación }) {
 
             />
             }
-            {Paginación && data.length > 0 && <div className='Paginación'>{Paginación}</div>}
+            {Paginación && data.length > 0 && <Paginación totalPages={totalPages} page={page} setPage={setPage} />}
         </div>
     );
 }
