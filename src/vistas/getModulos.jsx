@@ -14,7 +14,7 @@ export const getModulos = (subRol, includeInicio = false) => {
         break;
       case "Vicerrector":
         baseModules = [
-          { id: 1, titulo: "Distributivo de Docentes", icono: "🧑‍🏫", link: "/vicerrector/gestion-academica" },
+          { id: 1, titulo: "Distributivo de Docentes", icono: "🧑‍🏫", link: "/vicerrector/distributivo" },
           { id: 2, titulo: "Fechas para notas", icono: "📅", link: "/vicerrector/reportes" },
           { id: 3, titulo: "Fechas temporalaes", icono: "📝", link: "/vicerrector/password"},
           { id: 4, titulo: "Cambiar contraseña", icono: <RiLockPasswordFill  size={40}/>, link: "/vicerrector/password"}

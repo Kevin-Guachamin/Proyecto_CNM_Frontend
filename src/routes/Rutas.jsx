@@ -30,6 +30,7 @@ import ChangePassword_Secretaria from '../vistas/Secretaria/ChangePassword/Index
 import ChangePassword_Vicerrector from '../vistas/Vicerrector/ChangePassword/Index.jsx';
 import Solicitudes from '../vistas/Secretaria/AgendaSolicitudes/Index.jsx'
 import SolicitudesDocente from '../vistas/Docente/Solicitudes/Index.jsx';
+import Distributivo from '../vistas/Vicerrector/Distributivo/Index.jsx'
 
 function Rutas() {
   return (
@@ -67,6 +68,7 @@ function Rutas() {
       {/*RUTAS DEL DOCENTE-Vicerrector*/}
       <Route path="/vicerrector/reportes" element={<AgregarFechas />} />
       <Route path="/vicerrector/password" element={<ChangePassword_Vicerrector />} />
+      <Route path="/vicerrector/distributivo" element={<Distributivo />} />
 
       {/*RUTAS DEL DOCENTE-Secretaria*/}
       <Route path="/secretaria/administracion-escolar" element={<GestionEscolar />} />

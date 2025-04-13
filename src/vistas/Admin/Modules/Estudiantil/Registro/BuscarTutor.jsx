@@ -198,6 +198,7 @@ function BuscarTutor() {
                                             <td className='tabla-celda'>{estudiante.primer_apellido}</td>
                                             <td className='tabla-celda'>{formatDate(estudiante.fecha_nacimiento)}</td>
                                             <td className='tabla-celda'>{estudiante.genero}</td>
+                                            <td className='tabla-celda'>{estudiante.jornada}</td>
                                             <td className='botones-icon'>
                                                 <FaEdit size={20} className="icon edit-icon" onClick={() => handleEditEstudiante(estudiante)} />
                                                 <FaTrash size={20} className="icon delete-icon" onClick={() => handleDelete('estudiante')} />

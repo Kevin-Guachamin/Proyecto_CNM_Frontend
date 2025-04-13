@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import Loading from '../../../../../components/Loading';
 
 
-function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
+function ContenedorCursos({ apiEndpoint, PK, Paginación }) {
     const [data, setData] = useState([])
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('')
@@ -22,10 +22,11 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
     const key1 = "Materia"
     const key2 = "nombre"
-    const token=localStorage.getItem("token")
+    const token = localStorage.getItem("token")
 
     useEffect(() => {
-        axios.get(`${API_URL}/periodo_academico/obtener`,{headers: { Authorization: `Bearer ${token}` },
+        axios.get(`${API_URL}/periodo_academico/obtener`, {
+            headers: { Authorization: `Bearer ${token}` },
         })
             .then(response => {
                 setPeriodos(response.data);
@@ -39,9 +40,12 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
         const selectedPeriodo = e.target.value;
         setPeriodo(selectedPeriodo);
 
-        if (!selectedPeriodo) return; // Evitar peticiones innecesarias
-        
-        axios.get(`${API_URL}/asignacion/obtener/periodo/${selectedPeriodo}`,{headers: { Authorization: `Bearer ${token}` },
+        if (!selectedPeriodo) {
+            setData(null)
+            return; // Evitar peticiones innecesarias
+        }
+        axios.get(`${API_URL}/asignacion/obtener/periodo/${selectedPeriodo}`, {
+            headers: { Authorization: `Bearer ${token}` },
         })
             .then(response => {
                 console.log(response.data)
@@ -57,7 +61,8 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
             if (!periodo) {
                 throw new Error("No se ha seleccionado un periodo");
             }
-            const response = await axios.get(`${API_URL}/${apiEndpoint}/nivel/${tipo}/${periodo}`,{headers: { Authorization: `Bearer ${token}` },
+            const response = await axios.get(`${API_URL}/${apiEndpoint}/nivel/${tipo}/${periodo}`, {
+                headers: { Authorization: `Bearer ${token}` },
             });
             setLoading(false);
             return response.data; // Retornar los datos obtenidos
@@ -82,7 +87,7 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
 
     const HandleTable = (valor) => {
         if (!periodo) {
-            return false
+            return 
         }
         const grupos = {
             "BE": ["1ro BE", "2do BE"],
@@ -98,7 +103,9 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
         }
         else {
             console.log("este es el periodo ID", periodo)
-            axios.get(`${API_URL}/asignacion/obtener/periodo/${periodo}`)
+            axios.get(`${API_URL}/asignacion/obtener/periodo/${periodo}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            })
                 .then(response => {
                     setData(response.data);
                 })
@@ -109,13 +116,19 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
         console.log("Esta es la data", data);
     };
 
-    const filteredData = data.filter((item) => {
+    const filteredData = Array.isArray(data)
+        ? data.filter((item) => {
+            console.log("este es el item", item);
 
-        console.log("este es el item", item)
-        const value = item?.[key1]?.[key2]; // Usamos el encadenamiento opcional para evitar errores si alguna propiedad no existe
-        console.log("este es el value", value)
-        return value ? value.toLowerCase().includes(search.toLowerCase()) : false;
-    });
+            const value = item?.[key1]?.[key2];
+
+            console.log("este es el value", value);
+
+            return typeof value === "string"
+                ? value.toLowerCase().includes(search.toLowerCase())
+                : false;
+        })
+        : [];
 
     const toggleModal = () => {
         setIsModalOpen((prev) => !prev);
@@ -190,7 +203,7 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
                 OnEdit={handleEdit}
                 OnDelete={handleDelete}
                 headers={Headers}
-                
+
             />
             }
             {Paginación && data.length > 0 && <div className='Paginación'>{Paginación}</div>}
@@ -198,4 +211,4 @@ function Contenedor({ apiEndpoint, PK, extraIcon, Paginación }) {
     );
 }
 
-export default Contenedor;
+export default ContenedorCursos;
