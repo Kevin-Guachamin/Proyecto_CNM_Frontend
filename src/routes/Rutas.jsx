@@ -33,6 +33,7 @@ import SolicitudesDocente from '../vistas/Docente/Solicitudes/Index.jsx';
 import Distributivo from '../vistas/Vicerrector/Distributivo/Index.jsx'
 import InformacionEstudiantil from '../vistas/Secretaria/InformacionEstudiantil/InformacionEstudiantil.jsx';
 import InformacionRepresentantes from '../vistas/Secretaria/InformacionEstudiantil/InformacionRepresentantes.jsx';
+import FechasProcesos from '../vistas/Secretaria/FechasProcesos/FechasProcesos.jsx';
 //import InformacionEstudiantes from '../vistas/Secretaria/InformacionEstudiantil/Estudiantes/Index.jsx';
 
 function Rutas() {
@@ -83,6 +84,7 @@ function Rutas() {
       <Route path="/secretaria/informacion" element={<InformacionEstudiantil />} />
       <Route path="/secretaria/informacion/representantes" element={<InformacionRepresentantes />} />
       {/*<Route path="/secretaria/informacion/estudiantes" element={<InformacionEstudiantes />} />*/}
+      <Route path="/secretaria/procesos" element={<FechasProcesos />} />
       
     </Routes>
   )
