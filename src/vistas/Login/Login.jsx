@@ -47,7 +47,7 @@ function Login() {
       } else if (user.subRol === "Profesor") {
         navigate("/inicio");
       } else if (user.subRol === "Administrador") {
-        navigate("/admin");
+        navigate("/inicio");
       } else if (user.subRol === "Vicerrector" || user.subRol === "Secretaria") {
         navigate("/inicio");
       } else {

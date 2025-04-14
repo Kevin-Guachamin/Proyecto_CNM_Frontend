@@ -1,5 +1,8 @@
 import { RiLockPasswordFill } from "react-icons/ri";
 import { FileText } from "lucide-react";
+import { Settings,  } from "lucide-react";
+import { BiMaleFemale } from "react-icons/bi";
+
 export const getModulos = (subRol, includeInicio = false) => {
     let baseModules = [];
   
@@ -27,7 +30,16 @@ export const getModulos = (subRol, includeInicio = false) => {
           { id: 3, titulo: "Información Estudiantil", icono: "📄", link: "/secretaria/informacion" },
           { id: 4, titulo: "Fechas Procesos", icono: "📅", link: "/secretaria/procesos" },
           { id: 5, titulo: "Cambiar contraseña", icono: <RiLockPasswordFill  size={40}/>, link: "/secretaria/password"}
+
         ];
+        break;
+        case "Administrador":
+        baseModules=[
+          { id: 1, titulo: "Configuración", icono: <Settings size={40} className="text-gray-700" />, link: "/admin/periodos" },
+          { id: 2, titulo: "Matriculación", icono: "✏️", link: "/admin/matriculacion" },
+          { id: 3, titulo: "Estudiantil", icono: <BiMaleFemale size={40}/>, link: "/admin/inscripcion"},
+          { id: 4, titulo: "Cambiar contraseña", icono: <RiLockPasswordFill  size={40}/>, link: "/admin/password"}
+        ]
         break;
       default:
         baseModules = [];

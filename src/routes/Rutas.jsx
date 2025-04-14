@@ -12,7 +12,6 @@ import PanelCursos from '../vistas/Docente/PanelCursos.jsx';
 import ListaEstudiantes from '../vistas/Representante/modulos/listaEstudiantes.jsx';
 import VerDatosRepresentante from '../vistas/Representante/modulos/VerDatosRepresentante.jsx';
 import VerDatosEstudiante from '../vistas/Representante/modulos/VerDatosEstudiante.jsx';
-import Admin from '../vistas/Admin/inicio.jsx'
 import Cursos from '../vistas/Admin/Modules/Configuration/Cursos/Index.jsx'
 import Matriculacion from '../vistas/Admin/Modules/Matriculacion/Index.jsx';
 import Horarios from '../vistas/Admin/Modules/Matriculacion/Horarios.jsx'
@@ -43,7 +42,6 @@ function Rutas() {
       <Route path="/inicio" element={<Inicio />} />
 
       {/*RUTAS DEL ADMINISTRADOR*/}
-      <Route path='/admin' element={<Admin />} />
       <Route path="/admin/periodos" element={<Periodos_Academicos />} />
       <Route path="/admin/asignaturas" element={<Asignaguras />} />
       <Route path="/admin/docentes" element={<Docentes />} />
