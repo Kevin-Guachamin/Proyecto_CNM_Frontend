@@ -92,7 +92,7 @@
 }
 
 /* Fuerza el contenedor del header a usar todo ese ancho */
-.pdf-export .container.tabla-parciales {
+.pdf-export .container.tabla-parciales .tabla-parciales-be {
   max-width: none !important;
   width: 100% !important;
   margin: 0 !important;

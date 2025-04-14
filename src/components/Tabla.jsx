@@ -34,7 +34,7 @@ const Tabla = ({
 
   return (
     <div className="table-responsive mt-3">
-      <table className={`table table-bordered table-striped custom-table tabla-parciales ${clasePersonalizada} ${soloLectura ? 'ocultar-acciones' : ''}`}>
+      <table className={`table table-bordered table-striped custom-table tabla-parciales tabla-parciales-be ${clasePersonalizada} ${soloLectura ? 'ocultar-acciones' : ''}`}>
         <thead>
           {columnasAgrupadas && (
             <tr>

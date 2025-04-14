@@ -2,8 +2,8 @@ import { FaEdit, FaTrash } from 'react-icons/fa'; // Importar íconos
 import "../Styles/Tabla.css";
 
 
-function Tabla({ filteredData, OnDelete, OnEdit, headers, columnsToShow}) {
-  
+function Tabla({ filteredData, OnDelete, OnEdit, headers, columnsToShow }) {
+
   return (
     <div className="Contenedor-tabla">
       {filteredData.length === 0 ? (
@@ -24,29 +24,24 @@ function Tabla({ filteredData, OnDelete, OnEdit, headers, columnsToShow}) {
                   <td className='tabla-celda' key={subIndex}>{item[col]}</td>
                 ))}
                 <td className='botones-icon'>
-                 
+
                   <FaEdit
                     size={20}
                     className="icon edit-icon"
                     onClick={() => OnEdit(item)}
                   />
-                  <FaTrash
-                  size={20}
-                    className="icon delete-icon"
-                    onClick={() => OnDelete(item)}
-                  />
-               
-                  
+                  {OnDelete && (
+                    <FaTrash
+                      className="icon delete-icon"
+                      onClick={() => OnDelete(item)}
+                    />
+                  )}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-        
       )}
-      
-      
-      
     </div>
   );
 }

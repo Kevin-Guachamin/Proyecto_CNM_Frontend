@@ -24,8 +24,9 @@ export const getModulos = (subRol, includeInicio = false) => {
         baseModules = [
           { id: 1, titulo: "Administración Escolar", icono: "🗃", link: "/secretaria/administracion-escolar" },
           { id: 2, titulo: "Matriculación", icono: "✏️", link: "/secretaria/matriculación" },
-          { id: 3, titulo: "Cambiar contraseña", icono: <RiLockPasswordFill  size={40}/>, link: "/secretaria/password"}
-          
+          { id: 3, titulo: "Información Estudiantil", icono: "📄", link: "/secretaria/informacion" },
+          { id: 4, titulo: "Fechas Procesos", icono: "📅", link: "/secretaria/procesos" },
+          { id: 5, titulo: "Cambiar contraseña", icono: <RiLockPasswordFill  size={40}/>, link: "/secretaria/password"}
         ];
         break;
       default:
@@ -49,4 +50,3 @@ export const transformModulesForLayout = (modulosBase) => {
       path: mod.link         // Convertimos "link" en "path"
     }));
   };
-  
