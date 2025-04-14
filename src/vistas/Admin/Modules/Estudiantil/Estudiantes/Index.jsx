@@ -87,7 +87,7 @@ function Index() {
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = JSON.parse(storedUser);
-    if (!parsedUser || parsedUser.subRol !== "Administrador") {
+    if (!parsedUser || parsedUser.subRol !== "Administrador" && parsedUser.subRol !=="Secretaria") {
       navigate("/");
     } else {
       setUsuario(parsedUser);
@@ -98,7 +98,7 @@ function Index() {
     axios.get(`${API_URL}/estudiante/obtener?page=${page}`,{headers: { Authorization: `Bearer ${token}` },
     })
       .then(response => {
-        setEstudiantes(response.data.estudiantes);
+        setEstudiantes(response.data.data);
         setTotalPages(response.data.totalPages);
         setLoading(false);
       })

@@ -83,7 +83,7 @@ function Rutas() {
       <Route path="/secretaria/password" element={<ChangePassword_Secretaria />} />
       <Route path="/secretaria/informacion" element={<InformacionEstudiantil />} />
       <Route path="/secretaria/informacion/representantes" element={<InformacionRepresentantes />} />
-      {/*<Route path="/secretaria/informacion/estudiantes" element={<InformacionEstudiantes />} />*/}
+      <Route path="/secretaria/informacion/estudiantes" element={<Estudiantes />} />
       <Route path="/secretaria/procesos" element={<FechasProcesos />} />
       
     </Routes>
