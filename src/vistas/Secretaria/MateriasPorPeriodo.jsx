@@ -53,8 +53,8 @@ function MateriasPorPeriodo() {
                 headers: { Authorization: `Bearer ${token}` },
             })
             .then((res) => {
-                setAsignaciones(res.data);
-                agruparPorNivelData(res.data);
+                setAsignaciones(res.data.data);
+                agruparPorNivelData(res.data.data);
             })
             .catch((err) => {
                 ErrorMessage(err);

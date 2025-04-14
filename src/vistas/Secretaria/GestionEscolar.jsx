@@ -38,7 +38,7 @@ function GestionEscolar() {
         headers: { Authorization: `Bearer ${storedToken}` },
       })
       .then((response) => {
-        setPeriodos(response.data);
+        setPeriodos(response.data.data);
       })
       .catch((error) => {
         ErrorMessage(error);
