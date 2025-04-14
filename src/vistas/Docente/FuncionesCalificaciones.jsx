@@ -45,7 +45,7 @@ export const handleExportExcel = () => {
     saveAs(blob, "Calificaciones.xlsx");
   } catch (error) {
     ErrorMessage(error);
-    
+
   }
 };
 
@@ -131,7 +131,7 @@ export const handleExportPDF = async () => {
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       const xOffset = 30;
       const yOffset = ((pageHeight - imgHeight) / 10);
-    
+
       pdf.addImage(imgData, "PNG", xOffset, yOffset, imgWidth, imgHeight);
     } else {
       // Configuración para QUIMESTRAL, FINAL u otros
@@ -139,9 +139,9 @@ export const handleExportPDF = async () => {
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       const xOffset = 40;
       const yOffset = ((pageHeight - imgHeight) / 8);
-    
+
       pdf.addImage(imgData, "PNG", xOffset, yOffset, imgWidth, imgHeight);
-    }    
+    }
 
     let fileName = "Calificaciones.pdf";
     if (contentToPrint.id.startsWith("pdf-")) {
@@ -172,65 +172,72 @@ export const handleExportPDF = async () => {
 };
 
 export const parseFecha = (strFecha) => {
-    if (!strFecha) return null;
-    if (strFecha.includes("-")) return new Date(strFecha);
-    const [dia, mes, anio] = strFecha.split("/");
-    return new Date(`${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`);
-  };
-  
-  export const handleEditar = ({
-    activeMainTab,
-    activeSubTabQuim1,
-    activeSubTabQuim2,
-    estadoFechas,
-    forceEdit,
-    setForceEdit,
-    setInputsDisabled,
-    tieneDatosGuardados
-  }) => {
-    let currentSubTab = "";
-    if (activeMainTab === "quimestre1") {
-      currentSubTab = activeSubTabQuim1;
-    } else if (activeMainTab === "quimestre2") {
-      currentSubTab = activeSubTabQuim2;
-    } else if (activeMainTab === "notaFinal") {
-      currentSubTab = "notaFinal";
-    }
-  
-    const isWithinRange = estadoFechas[currentSubTab] ?? false;
-    if (!isWithinRange) {
-      Swal.fire({
-        icon: "warning",
-        title: "No se pueden desbloquear",
-        text: "No se pueden editar los datos fuera del rango permitido.",
-      });
-      return;
-    }
-  
-    if (forceEdit) {
-      Swal.fire({
-        icon: "info",
-        title: "Ya están desbloqueados",
-        text: "Los campos ya se encuentran disponibles para edición.",
-      });
-      return;
-    }
-  
-    if (tieneDatosGuardados()) {
-      Swal.fire({
-        icon: "warning",
-        title: "Edición no permitida",
-        text: "Las calificaciones ya fueron guardadas. Usa el ✏️ de cada fila si necesitas editar.",
-      });
-      return;
-    }
-  
-    setForceEdit(true);
-    localStorage.removeItem("inputsLocked");
-    setInputsDisabled(false);
+  if (!strFecha) return null;
+  if (strFecha.includes("-")) return new Date(strFecha);
+  const [dia, mes, anio] = strFecha.split("/");
+  return new Date(`${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`);
+};
+
+export const handleEditar = ({
+  activeMainTab,
+  activeSubTabQuim1,
+  activeSubTabQuim2,
+  estadoFechas,
+  forceEdit,
+  setForceEdit,
+  setInputsDisabled,
+  tieneDatosGuardados,
+  solicitudAceptada // nuevo
+}) => {
+  let currentSubTab = "";
+  if (activeMainTab === "quimestre1") {
+    currentSubTab = activeSubTabQuim1;
+  } else if (activeMainTab === "quimestre2") {
+    currentSubTab = activeSubTabQuim2;
+  } else if (activeMainTab === "notaFinal") {
+    currentSubTab = "notaFinal";
+  }
+
+  const isDentroRango = estadoFechas[currentSubTab] ?? false;
+  const coincideConSolicitud = solicitudAceptada?.descripcion.replaceAll("_", "-") === currentSubTab;
+  const isWithinRange = isDentroRango || coincideConSolicitud;
+  if (!isWithinRange) {
     Swal.fire({
-      icon: "success",
-      title: "Edición habilitada",
-      text: "Los campos se han desbloqueado para edición.",
+      icon: "warning",
+      title: "No se pueden desbloquear",
+      text: "No se pueden editar los datos fuera del rango permitido.",
     });
-  };
+    return;
+  }
+
+  if (forceEdit) {
+    Swal.fire({
+      icon: "info",
+      title: "Ya están desbloqueados",
+      text: "Los campos ya se encuentran disponibles para edición.",
+    });
+    return;
+  }
+
+  if (tieneDatosGuardados()) {
+    Swal.fire({
+      icon: "warning",
+      title: "Edición no permitida",
+      text: "Las calificaciones ya fueron guardadas. Usa el ✏️ de cada fila si necesitas editar.",
+    });
+    return;
+  }
+
+  setForceEdit(true);
+  localStorage.removeItem("inputsLocked");
+  setInputsDisabled(false);
+  const mensaje = coincideConSolicitud
+    ? "La edición fue habilitada gracias a una solicitud de permiso aprobada. Puedes ingresar las calificaciones."
+    : "Los campos se han desbloqueado para edición.";    
+  Swal.fire({
+    icon: "success",
+    title: "Edición habilitada",
+    text: mensaje,
+  });
+
+};

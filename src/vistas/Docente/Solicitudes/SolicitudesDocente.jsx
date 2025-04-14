@@ -128,6 +128,7 @@ function SolicitudesDocente({ usuario, solicitudes, setSolicitudes }) {
                                     <Card.Text className='solicitudes-card-texto'>
                                         <strong>Fecha:</strong> {formatearFechaLegible(s.fechaSolicitud)} <br />
                                         <strong>Motivo:</strong> {s.motivo} <br />
+                                        <strong>Parcial solicitado:</strong> {descripcionLegible[s.descripcion] || s.descripcion} <br />
 
                                         {vistaActual === "aceptadas" && (
                                             <>
@@ -151,6 +152,15 @@ function SolicitudesDocente({ usuario, solicitudes, setSolicitudes }) {
         );
     };
 
+    const descripcionLegible = {
+        parcial1_quim1: "Parcial 1 - Quimestre 1",
+        parcial2_quim1: "Parcial 2 - Quimestre 1",
+        quimestre1: "Quimestre 1",
+        parcial1_quim2: "Parcial 1 - Quimestre 2",
+        parcial2_quim2: "Parcial 2 - Quimestre 2",
+        quimestre2: "Quimestre 2",
+        nota_final: "Nota Final"
+    };
 
     return (
         <div className="contenedor-solicitudes">

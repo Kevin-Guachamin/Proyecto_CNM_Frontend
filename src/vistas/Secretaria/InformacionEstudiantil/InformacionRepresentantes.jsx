@@ -38,7 +38,7 @@ const InformacionRepresentantes = () => {
     axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/periodo_academico/obtener`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((res) => setPeriodos(res.data))
+      .then((res) => setPeriodos(res.data.data))
       .catch((err) => ErrorMessage(err));
   }, [navigate]);
 
@@ -54,7 +54,7 @@ const InformacionRepresentantes = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       })
       .then((res) => {
-        const agrupados = agruparRepresentantes(res.data);
+        const agrupados = agruparRepresentantes(res.data.data);
         setDatosAgrupados(agrupados);
         setNivelActivo(Object.keys(agrupados)[0] || null);
       })
