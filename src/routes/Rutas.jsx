@@ -21,9 +21,9 @@ import Representantes from '../vistas/Admin/Modules/Estudiantil/Representantes/I
 import AgregarFechas from '../vistas/Vicerrector/AgregarFechas.jsx';
 import ChangePassword_Representante from '../vistas/Representante/modulos/ChangePassword/Index.jsx';
 import ChangePassword_Admin from '../vistas/Admin/Modules/ChangePassword/Index.jsx';
-import GestionEscolar from '../vistas/Secretaria/GestionEscolar.jsx';
-import MateriasPorPeriodo from '../vistas/Secretaria/MateriasPorPeriodo.jsx';
-import ListadoCursos from '../vistas/Secretaria/ListadoCursos.jsx';
+import GestionEscolar from '../vistas/Secretaria/GestionEscolar/GestionEscolar.jsx';
+import MateriasPorPeriodo from '../vistas/Secretaria/GestionEscolar/MateriasPorPeriodo.jsx';
+import ListadoCursos from '../vistas/Secretaria/GestionEscolar/ListadoCursos.jsx';
 import BuscarMaterias from '../vistas/Admin/Modules/Matriculacion/BuscarMaterias/Index.jsx';
 import ChangePassword_Profesor from '../vistas/Docente/ChangePassword/Index.jsx';
 import ChangePassword_Secretaria from '../vistas/Secretaria/ChangePassword/Index.jsx';

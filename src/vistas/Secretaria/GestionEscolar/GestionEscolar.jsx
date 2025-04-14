@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import Header from "../../components/Header";
-import Layout from "../../layout/Layout";
-import Modulo from "../../components/Modulo";
-import Loading from "../../components/Loading";
+import Header from "../../../components/Header";
+import Layout from "../../../layout/Layout";
+import Modulo from "../../../components/Modulo";
+import Loading from "../../../components/Loading";
 import { NotebookTabs } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { getModulos, transformModulesForLayout } from "../getModulos";
-import { ErrorMessage } from "../../Utils/ErrorMesaje";
+import { getModulos, transformModulesForLayout } from "../../getModulos";
+import { ErrorMessage } from "../../../Utils/ErrorMesaje";
 
 function GestionEscolar() {
   const navigate = useNavigate();
