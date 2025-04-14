@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../../components/Header";
-import Layout from "../../layout/Layout";
-import Loading from "../../components/Loading";
+import Header from "../../../components/Header";
+import Layout from "../../../layout/Layout";
+import Loading from "../../../components/Loading";
 import axios from "axios";
-import { ErrorMessage } from "../../Utils/ErrorMesaje";
+import { ErrorMessage } from "../../../Utils/ErrorMesaje";
 import CrearFechas from "./CrearFechas";
-import Filtro from "../Admin/Components/Filtro";
-import Tabla from "../Admin/Components/Tabla";
+import Filtro from "../../Admin/Components/Filtro";
+import Tabla from "../../Admin/Components/Tabla";
 import Swal from "sweetalert2";
-import { getModulos, transformModulesForLayout } from "../getModulos";
-import { Eliminar } from '../../Utils/CRUD/Eliminar';
+import { getModulos, transformModulesForLayout } from "../../getModulos";
+import { Eliminar } from '../../../Utils/CRUD/Eliminar';
 
 function AgregarFechas() {
   const navigate = useNavigate();

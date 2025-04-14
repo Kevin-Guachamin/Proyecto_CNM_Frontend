@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import Boton from '../../components/Boton';
+import Boton from '../../../components/Boton';
 import "react-datepicker/dist/react-datepicker.css"; // Si deseas usar react-datepicker o su CSS
-import '../Admin/Styles/CrearEntidad.css';
+import '../../Admin/Styles/CrearEntidad.css';
 
 function CrearFechas({ onCancel, entityToUpdate, onSave, fechas }) {
   const [fechaInicio, setFechaInicio] = useState("");

@@ -18,7 +18,7 @@ import Matriculacion from '../vistas/Admin/Modules/Matriculacion/Index.jsx';
 import Horarios from '../vistas/Admin/Modules/Matriculacion/Horarios.jsx'
 import Inscripcion from '../vistas/Admin/Modules/Estudiantil/Registro/Index.jsx'
 import Representantes from '../vistas/Admin/Modules/Estudiantil/Representantes/Index.jsx'
-import AgregarFechas from '../vistas/Vicerrector/AgregarFechas.jsx';
+import AgregarFechas from '../vistas/Vicerrector/FechasNotas/AgregarFechas.jsx';
 import ChangePassword_Representante from '../vistas/Representante/modulos/ChangePassword/Index.jsx';
 import ChangePassword_Admin from '../vistas/Admin/Modules/ChangePassword/Index.jsx';
 import GestionEscolar from '../vistas/Secretaria/GestionEscolar/GestionEscolar.jsx';
