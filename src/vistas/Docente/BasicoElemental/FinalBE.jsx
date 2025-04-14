@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import HeaderTabla from "../../../components/HeaderTabla";
 import Tabla from "../../../components/Tabla";
 import Swal from 'sweetalert2';
@@ -10,19 +10,18 @@ const FinalBE = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inpu
   const [datos, setDatos] = useState([]);
 
   const idContenedor = `pdf-final`;
-  
-  const [datosOriginales, setDatosOriginales] = useState([]);
+
   const convertirNota = (nota) => {
     const n = parseFloat(nota);
     if (isNaN(n) || n < 0 || n > 10) return "";
-  
+
     if (escala === "cuantitativa" || escala === "1") {
       if (n >= 9) return "DA";
       if (n >= 7) return "AA";
       if (n > 4) return "PA";
       return "NA";
     }
-  
+
     if (escala === "cualitativa" || escala === "2") {
       if (n >= 9.5) return "A+";
       if (n >= 9) return "A-";
@@ -35,25 +34,25 @@ const FinalBE = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inpu
       if (n >= 2) return "E+";
       return "E-";
     }
-  
+
     return "";
-  };  
-  
+  };
+
   // Combinar los datos de Quimestre 1 y 2
   useEffect(() => {
     if (!datosModulo?.ID) return;
-  
+
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
     }
-  
+
     const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${datosModulo.ID}`;
-  
+
     axios.get(urlInscripciones)
       .then((respEstudiantes) => {
         const estudiantes = respEstudiantes.data;
-  
+
         const nuevosDatos = estudiantes.map((est) => {
           const quim1 = quim1Data.find(
             (q) => q.id_inscripcion === est.idInscripcion
@@ -61,13 +60,13 @@ const FinalBE = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inpu
           const quim2 = quim2Data.find(
             (q) => q.id_inscripcion === est.idInscripcion
           ) || {};
-  
+
           const q1PF = parseFloat(quim1["Promedio Final"]) || 0;
           const q2PF = parseFloat(quim2["Promedio Final"]) || 0;
           const promedioAnual = (q1PF + q2PF) / 2;
-  
+
           const estado = promedioAnual >= 7 ? "Aprobado" : promedioAnual >= 4 && promedioAnual < 7 ? "Supletorio" : "Reprobado";
-          
+
           return {
             idInscripcion: est.idInscripcion,
             _primerQuimestre: q1PF,
@@ -86,14 +85,13 @@ const FinalBE = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inpu
             "Estado": estado,
           };
         });
-  
+
         setDatos(nuevosDatos);
-        setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
       })
       .catch((err) => {
         ErrorMessage(err);
       });
-  }, [datosModulo, quim1Data, quim2Data]);  
+  }, [datosModulo, quim1Data, quim2Data]);
 
   // Manejar cambios en la columna "Examen Supletorio"
   const handleInputChange = (rowIndex, columnName, value) => {
@@ -111,7 +109,7 @@ const FinalBE = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inpu
         });
         return;
       }
-  
+
       // C) Validar que sea un número de 0.00 a 7.00
       const regexDecimal = /^\d{1,2}(\.\d{0,2})?$/;
       if (value !== "") {
@@ -128,7 +126,7 @@ const FinalBE = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inpu
         }
       }
     }
-  
+
     // 2) Luego, actualizas el estado “datos” igual que antes
     setDatos((prevDatos) =>
       prevDatos.map((row, i) => {
@@ -152,7 +150,7 @@ const FinalBE = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inpu
       })
     );
   };
-  
+
   const determinarJornada = (horario) => {
     const horaInicio = horario.split("-")[0];
     const horaNumerica = parseInt(horaInicio.split(":")[0], 10);
@@ -175,18 +173,19 @@ const FinalBE = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inpu
   // Columnas
   const columnasAgrupadas = [
     { titulo: "", colspan: 2 },
-    { titulo: "RESUMEN DE APRENDIZAJES", colspan: 6 },
+    { titulo: "RESUMEN DE APRENDIZAJES", colspan: escala === "cuantitativa" ? 6 : 5 },
     { titulo: "", colspan: 1 }
   ];
 
   const nombreColumnaExtra = escala === "cualitativa" ? "Cualitativa" : "Cuantitativa";
   const nombreColumnaExtra1 = escala === "cualitativa" ? "Cualitativa\u00A0" : "Cuantitativa\u00A0";
-  const nombreColumnaExtra2 = escala === "cualitativa" ? "Cualitativa " : "CCuantitativa ";
-  
+  const nombreColumnaExtra2 = escala === "cualitativa" ? "Cualitativa " : "Cuantitativa ";
+
   const columnas = [
-    "Primer Quimestre",nombreColumnaExtra,
-    "Segundo Quimestre",nombreColumnaExtra1,
-    "Promedio Final",nombreColumnaExtra2,"Estado"
+    "Primer Quimestre", nombreColumnaExtra,
+    "Segundo Quimestre", nombreColumnaExtra1,
+    "Promedio Final", nombreColumnaExtra2,
+    ...(escala === "cuantitativa" ? ["Estado"] : [])
   ];
 
   // Aplicamos estilos condicionales en la data
@@ -196,34 +195,36 @@ const FinalBE = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inpu
       const segundoQNum = parseFloat(row._segundoQuimestre) || 0;
       const pAnualNum = parseFloat(row._promedioAnual) || 0;
       const pFinalNum = parseFloat(row._promedioFinal) || 0;
-  
+
       const primerQuimestreStr = primerQNum.toFixed(2);
       const segundoQuimestreStr = segundoQNum.toFixed(2);
       const promedioAnualStr = pAnualNum.toFixed(2);
       const promedioFinalStr = pFinalNum.toFixed(2);
-  
+
       return {
         ...row,
         "Primer Quimestre": primerQuimestreStr,
         [nombreColumnaExtra]: convertirNota(primerQuimestreStr),
-  
+
         "Segundo Quimestre": segundoQuimestreStr,
         [nombreColumnaExtra1]: convertirNota(segundoQuimestreStr),
-  
+
         "Promedio Final": row.promedioFinalInsuficiente
           ? <span style={{ color: "red" }}>{promedioFinalStr}</span>
           : promedioFinalStr,
         [nombreColumnaExtra2]: convertirNota(promedioFinalStr),
-  
-        "Estado":
-          row["Estado"] === "Aprobado"
-            ? <span style={{ backgroundColor: "green", color: "#fff", padding: "2px 4px" }}>Aprobado</span>
-            : row["Estado"] === "Supletorio"
-              ? <span style={{ backgroundColor: "orange", color: "#fff", padding: "2px 4px" }}>Supletorio</span>
-              : <span style={{ backgroundColor: "red", color: "#fff", padding: "2px 4px" }}>Reprobado</span>
+
+        ...(escala === "cuantitativa" ? {
+          "Estado":
+            row["Estado"] === "Aprobado"
+              ? <span style={{ backgroundColor: "green", color: "#fff", padding: "2px 4px" }}>Aprobado</span>
+              : row["Estado"] === "Supletorio"
+                ? <span style={{ backgroundColor: "orange", color: "#fff", padding: "2px 4px" }}>Supletorio</span>
+                : <span style={{ backgroundColor: "red", color: "#fff", padding: "2px 4px" }}>Reprobado</span>
+        } : {})
       };
     });
-  }, [datos, escala]);    
+  }, [datos, escala]);
 
   const realmenteDeshabilitado = soloLectura || inputsDisabled || (!isWithinRange && !forceEdit);
 
@@ -231,7 +232,7 @@ const FinalBE = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inpu
     // Aquí asumimos que ya existe el registro (como en los otros componentes)
     const original = datos[rowIndex];
     const haCambiado = JSON.stringify(rowData) !== JSON.stringify(original);
-  
+
     if (!haCambiado) {
       Swal.fire({
         icon: "info",
@@ -240,7 +241,7 @@ const FinalBE = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inpu
       });
       return;
     }
-  
+
     const examen = parseFloat(rowData["Examen Supletorio"]);
     if (isNaN(examen) || examen < 0 || examen > 7) {
       Swal.fire({
@@ -250,12 +251,12 @@ const FinalBE = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inpu
       });
       return;
     }
-  
+
     const body = {
       id_inscripcion: rowData.idInscripcion,
       examen_recuperacion: examen,
     };
-  
+
     axios
       .put(`${import.meta.env.VITE_URL_DEL_BACKEND}/finales/${rowData.idInscripcion}`, body)
       .then(() => {
@@ -277,7 +278,7 @@ const FinalBE = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inpu
         ErrorMessage(error);
       });
   };
-  
+
   return (
     <div id={idContenedor} className="container tabla-final">
       <HeaderTabla
@@ -295,15 +296,16 @@ const FinalBE = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inpu
         columnas={columnas}
         datos={datosConEstilos}
         onChange={handleInputChange}
-        // Sólo la columna "Examen Supletorio" es editable
-        columnasEditables={["Examen Supletorio"]}
-        inputsDisabled={realmenteDeshabilitado}
-        onEditar={onEditar}
-        onGuardar={handleGuardar}
-        rangoTexto={rangoTexto}
+        columnasEditables={[]} // Ninguna columna editable
+        mostrarEditar={false} // 🔥 No mostrar botón editar
+        mostrarGuardar={false} // 🔥 No mostrar botón guardar
+        inputsDisabled={true} // o según tu lógica
+        onEditar={null}
+        onGuardar={null} rangoTexto={rangoTexto}
         isWithinRange={isWithinRange}
         globalEdit={forceEdit}
         soloLectura={soloLectura}
+
       />
     </div>
   );

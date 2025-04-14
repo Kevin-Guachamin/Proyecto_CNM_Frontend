@@ -31,6 +31,9 @@ import ChangePassword_Vicerrector from '../vistas/Vicerrector/ChangePassword/Ind
 import Solicitudes from '../vistas/Vicerrector/AgendaSolicitudes/Index.jsx'
 import SolicitudesDocente from '../vistas/Docente/Solicitudes/Index.jsx';
 import Distributivo from '../vistas/Vicerrector/Distributivo/Index.jsx'
+import InformacionEstudiantil from '../vistas/Secretaria/InformacionEstudiantil/InformacionEstudiantil.jsx';
+import InformacionRepresentantes from '../vistas/Secretaria/InformacionEstudiantil/InformacionRepresentantes.jsx';
+//import InformacionEstudiantes from '../vistas/Secretaria/InformacionEstudiantil/Estudiantes/Index.jsx';
 
 function Rutas() {
   return (
@@ -77,7 +80,10 @@ function Rutas() {
       <Route path="/secretaria/periodo/materias/estudiantes/:id_asignacion" element={<ListadoCursos />} />
       <Route path="/secretaria/calificaciones/asignacion/:asigId" element={<Calificaciones />} />
       <Route path="/secretaria/password" element={<ChangePassword_Secretaria />} />
-
+      <Route path="/secretaria/informacion" element={<InformacionEstudiantil />} />
+      <Route path="/secretaria/informacion/representantes" element={<InformacionRepresentantes />} />
+      {/*<Route path="/secretaria/informacion/estudiantes" element={<InformacionEstudiantes />} />*/}
+      
     </Routes>
   )
 }
