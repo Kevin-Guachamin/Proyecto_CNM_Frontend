@@ -5,46 +5,43 @@ import Input from '../../components/Input';
 import "./ChangePassword.css";
 
 
-function ChangePassword({type,redireccion}) {
+function ChangePassword({redireccion}) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const navigate = useNavigate()
-  const [msg, setMsg] = useState("");
+  const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const token=localStorage.getItem("token")
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMsg("");
     setError("");
 
     try {
-      const response = await axios.post(
-        `${API_URL}/${type}/password`,
+       await axios.post(
+        `${API_URL}/change_password`,
         {
           currentPassword,
           newPassword,
-          type: type,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
         
       );
-
-      setMsg(response.data.message);
-      console.log("este es el response", response)
+      setSuccess(true)
       setCurrentPassword("");
       setNewPassword("");
       setTimeout(() => {
         console.log("Redirigiendo...");
         window.location.href = redireccion;
-      }, 1500);
+      }, 2000);
       
     } catch (err) {
       console.log("este es el error", err);
       setError(err.response.data.message)
+      setSuccess(false)
 
     }
   };
@@ -56,10 +53,12 @@ function ChangePassword({type,redireccion}) {
     <div className="change-password-container">
       <h2 className="title">Cambiar Contraseña</h2>
 
-      {msg && <p className="success-message">{msg}</p>}
-      {error && <p className="error-message">{error}</p>}
-
-      <form onSubmit={handleSubmit} className="form">
+      {success ? (
+        <p className='success-message'>¡Tu contraseña ha sido actualizada correctamente!</p>
+      ) : (
+        
+        <form onSubmit={handleSubmit} className="form">
+        {error && <p className="error-message">{error}</p>}
         <div className="login-field">
           <label>Contraseña actual:</label>
           <Input
@@ -79,14 +78,20 @@ function ChangePassword({type,redireccion}) {
             onChange={(e) => setNewPassword(e.target.value)}
           />
         </div>
-
+        <ul className="password-rules">
+            <li>🔒 Mínimo 8 caracteres</li>
+            <li>🔠 Al menos una letra mayúscula</li>
+            <li>🔢 Al menos un número</li>
+            <li>🔣 Al menos un carácter especial (ej. !, @, #, $)</li>
+          </ul>
         <div className="button-group">
           <button type="submit" className="btns primary">Cambiar</button>
           <button type="button" className="btns secondary" onClick={OnCancel}>Cancelar</button>
         </div>
       </form>
+      )}
     </div>
-
+      
   )
 }
 

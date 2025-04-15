@@ -27,7 +27,7 @@ function Index() {
                 {usuario && <Header isAuthenticated={true} usuario={usuario} />}
             </div>
 
-            <ChangePassword type={"representante"} redireccion={"/representante"}/>
+            <ChangePassword  redireccion={"/representante"}/>
 
 
         </div>
