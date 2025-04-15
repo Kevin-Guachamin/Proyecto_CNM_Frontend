@@ -9,7 +9,9 @@
   padding: 0;
   overflow-x: hidden; /* Evita el scroll horizontal */
 }
-
+.links{
+  margin-top: 1rem;
+}
 /* Contenedor de Contenido */
 .login-content {
   display: flex;
@@ -80,6 +82,7 @@
 .login-field label {
   font-weight: bold;
   margin-bottom: 5px;
+  font-size: 20px;
 }
 
 .login-field input {

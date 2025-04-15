@@ -33,6 +33,9 @@ import Distributivo from '../vistas/Vicerrector/Distributivo/Index.jsx'
 import InformacionEstudiantil from '../vistas/Secretaria/InformacionEstudiantil/InformacionEstudiantil.jsx';
 import InformacionRepresentantes from '../vistas/Secretaria/InformacionEstudiantil/InformacionRepresentantes.jsx';
 import FechasProcesos from '../vistas/Secretaria/FechasProcesos/FechasProcesos.jsx';
+import VerificarCorreo from '../vistas/Recover-Password/VerificarCorreo/Index.jsx';
+import ResetPassword from '../vistas/Recover-Password/ResetPassword/Index.jsx';
+
 //import InformacionEstudiantes from '../vistas/Secretaria/InformacionEstudiantil/Estudiantes/Index.jsx';
 
 function Rutas() {
@@ -40,6 +43,8 @@ function Rutas() {
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/inicio" element={<Inicio />} />
+      <Route path="/request-recover-password" element={<VerificarCorreo />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       {/*RUTAS DEL ADMINISTRADOR*/}
       <Route path="/admin/periodos" element={<Periodos_Academicos />} />

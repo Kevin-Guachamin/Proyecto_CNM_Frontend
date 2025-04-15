@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from 'react-router-dom';
 import axios from "axios";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -9,15 +9,16 @@ import "./Login.css";
 import Swal from "sweetalert2";
 import { ErrorMessage } from "../../Utils/ErrorMesaje";
 
+
 function Login() {
   const navigate = useNavigate();
   const [nroCedula, setnroCedula] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
- useEffect(()=>{
-  localStorage.removeItem("usuario");
-  localStorage.removeItem("token");
- },[])
+  useEffect(() => {
+    localStorage.removeItem("usuario");
+    localStorage.removeItem("token");
+  }, [])
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -31,13 +32,13 @@ function Login() {
       return;
     }
     setLoading(true);
-  
+
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_URL_DEL_BACKEND}/login`,
         { nroCedula, password }
       );
-  
+
       const { token, ...user } = response.data;
       localStorage.setItem("usuario", JSON.stringify(user));
       localStorage.setItem("token", token);
@@ -51,7 +52,7 @@ function Login() {
       } else if (user.subRol === "Vicerrector" || user.subRol === "Secretaria") {
         navigate("/inicio");
       } else {
-        
+
         Swal.fire({
           icon: "error",
           title: "Acceso no permitido",
@@ -73,7 +74,7 @@ function Login() {
       }
     }
   };
-  
+
   // Función para manejar la entrada y permitir solo números, limitando a 10 caracteres.
   const handlenroCedulaChange = (e) => {
     // Remover caracteres no numéricos
@@ -131,7 +132,13 @@ function Login() {
                   Ingresar
                 </button>
               </form>
+              <div className="links">
+                <Link to='/request-recover-password'>
+                  <div>¿Olvidaste tu contraseña?</div>
+                </Link>
+              </div>
             </div>
+            
           </div>
         </div>
       </div>
