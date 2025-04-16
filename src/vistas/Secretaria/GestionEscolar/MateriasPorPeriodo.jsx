@@ -49,7 +49,7 @@ function MateriasPorPeriodo() {
 
         setLoading(true);
         axios
-            .get(`${import.meta.env.VITE_URL_DEL_BACKEND}/asignacion/obtener/periodo/${idPeriodo}`, {
+            .get(`${import.meta.env.VITE_URL_DEL_BACKEND}/asignacion/obtener/periodo_academico/${idPeriodo}`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             .then((res) => {
