@@ -27,6 +27,7 @@ import ListadoCursos from '../vistas/Secretaria/ListadoCursos.jsx';
 import ChangePassword_Profesor from '../vistas/Docente/ChangePassword/Index.jsx';
 import ChangePassword_Secretaria from '../vistas/Secretaria/ChangePassword/Index.jsx';
 import ChangePassword_Vicerrector from '../vistas/Vicerrector/ChangePassword/Index.jsx';
+import InscripcionRepresentante from '../../src/vistas/Representante/modulos/Matriculacion/Index.jsx'
 
 function Rutas() {
   return (
@@ -58,6 +59,7 @@ function Rutas() {
       <Route path="/representante/perfil" element={<VerDatosRepresentante />} />
       <Route path="/representante/password" element={<ChangePassword_Representante />} />
       <Route path="/estudiante/perfil" element={<VerDatosEstudiante />} />
+      <Route path="/representante/inscripcion" element={<InscripcionRepresentante />} />
       
       {/*RUTAS DEL DOCENTE-Vicerrector*/}
       <Route path="/vicerrector/reportes" element={<AgregarFechas />} />
