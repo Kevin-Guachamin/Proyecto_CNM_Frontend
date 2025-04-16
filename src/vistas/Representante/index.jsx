@@ -15,7 +15,7 @@ const Index = () => {
     { id: 1, titulo: "Información representante", icono: "📄", link: "/representante/perfil" },
     { id: 2, titulo: "Información estudiantil", icono: "✏️", link: "/representante/estudiantes" },
     { id: 3, titulo: "Cambiar contraseña", icono: <RiLockPasswordFill  size={40}/>, link: "/representante/password"},
-    { id: 4, titulo: "Matriculación", icono: "📝",  link: ""}
+    { id: 4, titulo: "Matriculación", icono: "📝",  link: "/representante/inscripcion"}
   ]);
 
   useEffect(() => {
