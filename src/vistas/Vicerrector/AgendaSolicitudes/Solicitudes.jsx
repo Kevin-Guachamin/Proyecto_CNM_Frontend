@@ -136,42 +136,42 @@ function Solicitudes({ solicitudes }) {
     }
 
     return (
-      <Row xs={1} md={2} lg={5} className="solicitudes-card">
-          {lista.map((s) => {
-            return (
-              <Col key={s.ID}>
-                <Card>
-                  <Card.Body>
-                    <Card.Title>{`${s.Docente.primer_nombre} ${s.Docente.primer_apellido}`}</Card.Title>
-                    <Card.Text className='solicitudes-card-texto'>
-                      <strong>Fecha:</strong> {formatearFechaLegible(s.fechaSolicitud)} <br />
-                      <strong>Motivo:</strong> {s.motivo} <br />
-                      
-                      {vistaActual === "aceptadas" && (
-                        <>
-                          <strong style={{ color: "black" }}>PLAZO ESTABLECIDO</strong> <br />
-                          <strong>Fecha inicio:</strong> {s.fecha_inicio} <br />
-                          <strong>Fecha fin:</strong> {s.fecha_fin} <br />
-                        </>
-                      )}
-                      {vistaActual === "pendientes" ? (
-                        <div className="acciones-solicitud">
-                          <button onClick={() => handlePlazos(s.ID, "Aceptada")} className="btn-aceptar">Aceptar</button>
-                          <button onClick={() => handleActualizarEstado(s.ID, "Rechazada")} className="btn-rechazar">Rechazar</button>
-                        </div>
-                      ) : (
-                        <div className="acciones-solicitud">
+      <Row xs={1} sm={2} md={2} lg={3} xl={4} className="g-4">
+        {lista.map((s) => {
+          return (
+            <Col key={s.ID}>
+              <Card>
+                <Card.Body>
+                  <Card.Title>{`${s.Docente.primer_nombre} ${s.Docente.primer_apellido}`}</Card.Title>
+                  <Card.Text className='solicitudes-card-texto'>
+                    <strong>Fecha:</strong> {formatearFechaLegible(s.fechaSolicitud)} <br />
+                    <strong>Motivo:</strong> {s.motivo} <br />
 
-                          <button onClick={() => handleEliminarSolicitud(s.ID)} className="btn-eliminar">Eliminar</button>
-                        </div>
-                      )}
-                    </Card.Text>
-                  </Card.Body>
-                </Card>
-              </Col>
-            );
-          })}
-        </Row>
+                    {vistaActual === "aceptadas" && (
+                      <>
+                        <strong style={{ color: "black" }}>PLAZO ESTABLECIDO</strong> <br />
+                        <strong>Fecha inicio:</strong> {s.fecha_inicio} <br />
+                        <strong>Fecha fin:</strong> {s.fecha_fin} <br />
+                      </>
+                    )}
+                    {vistaActual === "pendientes" ? (
+                      <div className="acciones-solicitud">
+                        <button onClick={() => handlePlazos(s.ID, "Aceptada")} className="btn-aceptar">Aceptar</button>
+                        <button onClick={() => handleActualizarEstado(s.ID, "Rechazada")} className="btn-rechazar">Rechazar</button>
+                      </div>
+                    ) : (
+                      <div className="acciones-solicitud">
+
+                        <button onClick={() => handleEliminarSolicitud(s.ID)} className="btn-eliminar">Eliminar</button>
+                      </div>
+                    )}
+                  </Card.Text>
+                </Card.Body>
+              </Card>
+            </Col>
+          );
+        })}
+      </Row>
     );
   };
 

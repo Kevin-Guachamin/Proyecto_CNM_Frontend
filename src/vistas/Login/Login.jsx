@@ -138,11 +138,11 @@ function Login() {
                 </Link>
               </div>
             </div>
-            
+
           </div>
         </div>
+        <Footer />
       </div>
-      <Footer />
     </>
   );
 }
