@@ -55,9 +55,26 @@ function ResetPassword() {
       );
     }
   };
+
   const OnCancel = () => {
     navigate("/")
   }
+
+  const [rules, setRules] = useState({
+    length: false,
+    uppercase: false,
+    number: false,
+    special: false,
+  });
+
+  const validatePassword = (password) => {
+    setRules({
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      number: /[0-9]/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+    });
+  };
 
   return (
     <div className="change-password-container">
@@ -73,15 +90,30 @@ function ResetPassword() {
               fondo=""
               tipo="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                validatePassword(e.target.value);
+              }}
             />
+
           </div>
-          {/* Requisitos de la contraseña */}
           <ul className="password-rules">
-            <li>🔒 Mínimo 8 caracteres</li>
-            <li>🔠 Al menos una letra mayúscula</li>
-            <li>🔢 Al menos un número</li>
-            <li>🔣 Al menos un carácter especial (ej. !, @, #, $)</li>
+            <li className={rules.length ? "rule-pass" : "rule-fail"}>
+              <i className={`bi ${rules.length ? "bi-check-circle-fill" : "bi-x-circle-fill"}`}></i>
+              <span> 🔒 Mínimo 8 caracteres</span>
+            </li>
+            <li className={rules.uppercase ? "rule-pass" : "rule-fail"}>
+              <i className={`bi ${rules.uppercase ? "bi-check-circle-fill" : "bi-x-circle-fill"}`}></i>
+              <span> 🔠 Al menos una letra mayúscula</span>
+            </li>
+            <li className={rules.number ? "rule-pass" : "rule-fail"}>
+              <i className={`bi ${rules.number ? "bi-check-circle-fill" : "bi-x-circle-fill"}`}></i>
+              <span> 🔢 Al menos un número</span>
+            </li>
+            <li className={rules.special ? "rule-pass" : "rule-fail"}>
+              <i className={`bi ${rules.special ? "bi-check-circle-fill" : "bi-x-circle-fill"}`}></i>
+              <span> 🔣 Al menos un carácter especial (ej. !, @, #, $)</span>
+            </li>
           </ul>
           <div className="button-group">
             <button type="submit" className="btns primary">Cambiar</button>

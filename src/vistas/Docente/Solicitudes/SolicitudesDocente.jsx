@@ -5,6 +5,7 @@ import { ErrorMessage } from '../../../Utils/ErrorMesaje'
 import BotonAdd from '../../../components/BotonAdd'
 import CrearSolicitud from './CrearSolicitud'
 import { Card, Row, Col } from "react-bootstrap";
+import '../../Vicerrector/AgendaSolicitudes/Solicitudes.css'
 
 function SolicitudesDocente({ usuario, solicitudes, setSolicitudes }) {
     const [solicitudesPendientes, setSolicitudesPendientes] = useState([])
@@ -118,7 +119,7 @@ function SolicitudesDocente({ usuario, solicitudes, setSolicitudes }) {
         }
 
         return (
-            <Row xs={1} md={2} lg={5} className="solicitudes-card">
+            <Row xs={1} sm={2} md={2} lg={3} xl={4} className="g-4">
                 {lista.map((s) => {
                     return (
                         <Col key={s.ID}>

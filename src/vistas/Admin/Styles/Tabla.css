@@ -55,3 +55,10 @@
     vertical-align: middle;
     background-color: #CFD8DC !important;
   }
+
+  /* Nuevo contenedor con scroll vertical */
+.tabla-scroll {
+  max-height: 500px; /* Ajusta la altura según lo que necesites */
+  overflow-y: auto;
+  border: 1px solid #ccc;
+}

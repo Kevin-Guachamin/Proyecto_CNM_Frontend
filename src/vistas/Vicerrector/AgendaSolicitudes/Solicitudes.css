@@ -1,6 +1,6 @@
 .contenedor-solicitudes {
     max-width: 100%;
-    max-height: 95%;
+    max-height: 90vh;
     margin: 0 auto;
     overflow-y: scroll;
     background-color: #ffffff;
@@ -58,11 +58,11 @@
     display: flex;
     flex-wrap: wrap;
   }
-  .solicitudes-card-texto{
-    white-space: nowrap; 
-    line-height: 1.6; /* Ajusta este valor para más o menos espacio entre líneas */
-   
-  }
+  .solicitudes-card-texto {
+    white-space: normal; /* ✅ Permite saltos de línea */
+    word-wrap: break-word; /* ✅ Rompe texto largo si es necesario */
+    line-height: 1.6;
+  }  
   .solicitudes-card .card {
     min-width: 350px;
   }
