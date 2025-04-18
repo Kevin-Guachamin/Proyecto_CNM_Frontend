@@ -17,7 +17,7 @@ function Busqueda({usuario}) {
     const [estudiantesRepresentante, setEstudiantesRepresentante] = useState(null)
     const token=localStorage.getItem("token")
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
-    
+
     useEffect(() => {
 
         axios.get(`${API_URL}/periodo_academico/activo`,{
@@ -89,7 +89,7 @@ function Busqueda({usuario}) {
     const HandleBuscarAsignaturas = () => {
         setBucarAsignacion(true)
 
-        axios.get(`${API_URL}/asignacion/obtener/materias/${periodo.ID}/${estudiante.nivel}/${asignatura}`,{
+        axios.get(`${API_URL}/asignacion/obtener/materias/${periodo.ID}/${encodeURIComponent(estudiante.nivel)}/${asignatura}/${estudiante.jornada}`,{
             headers: { Authorization: `Bearer ${token}` },
           })
             .then((response) => {
@@ -100,7 +100,7 @@ function Busqueda({usuario}) {
             }
             )
     }
-    const HandleMatricular = async () => {
+    const HandleMatricular = async (estudiante) => {
 
         try {
             const response = await axios.get(`${API_URL}/matricula/estudiante/periodo/${estudiante.ID}/${periodo.ID}`,{
@@ -192,12 +192,19 @@ function Busqueda({usuario}) {
         }
     };
 
+    const handleEstudianteSeleccionado = (estudiante) => {
+        setEstudiante(estudiante);
+        HandleMatricular(estudiante);
+    }
+
     useEffect(() => {
         if (!usuario) {
             return;
         }
         getEstudiantesRepresentante();
     }, [usuario]);
+
+
 
     return (
         <div>
@@ -219,6 +226,7 @@ function Busqueda({usuario}) {
                                     <th>Género</th>
                                     <th>Jornada</th>
                                     <th>Nivel</th>
+                                    <th>Accion</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -231,11 +239,13 @@ function Busqueda({usuario}) {
                                     <td>{estudiante.genero}</td>
                                     <td>{estudiante.jornada}</td>
                                     <td>{estudiante.nivel}</td>
+                                    <td>
+                                        <button onClick={() => handleEstudianteSeleccionado(estudiante)}>Empezar matrícula</button>
+                                    </td>
                                 </tr>
                                ))} 
                             </tbody>
                         </table>
-                        <button onClick={HandleMatricular}>Empezar matrícula</button>
                     </div>
 
                 )}
