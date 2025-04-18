@@ -27,6 +27,7 @@ import BuscarMaterias from '../vistas/Admin/Modules/Matriculacion/BuscarMaterias
 import ChangePassword_Profesor from '../vistas/Docente/ChangePassword/Index.jsx';
 import ChangePassword_Secretaria from '../vistas/Secretaria/ChangePassword/Index.jsx';
 import ChangePassword_Vicerrector from '../vistas/Vicerrector/ChangePassword/Index.jsx';
+import InscripcionRepresentante from '../../src/vistas/Representante/modulos/Matriculacion/Index.jsx'
 import Solicitudes from '../vistas/Vicerrector/AgendaSolicitudes/Index.jsx'
 import SolicitudesDocente from '../vistas/Docente/Solicitudes/Index.jsx';
 import Distributivo from '../vistas/Vicerrector/Distributivo/Index.jsx'
@@ -71,7 +72,8 @@ function Rutas() {
       <Route path="/representante/perfil" element={<VerDatosRepresentante />} />
       <Route path="/representante/password" element={<ChangePassword_Representante />} />
       <Route path="/estudiante/perfil" element={<VerDatosEstudiante />} />
-
+      <Route path="/representante/inscripcion" element={<InscripcionRepresentante />} />
+      
       {/*RUTAS DEL DOCENTE-Vicerrector*/}
       <Route path="/vicerrector/reportes" element={<AgregarFechas />} />
       <Route path="/vicerrector/password" element={<ChangePassword_Vicerrector />} />
