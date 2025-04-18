@@ -17,12 +17,11 @@ function InfoEstudiante({estudiante}) {
 
         try {
           const response = await axios.get(
-            `${API_URL}/estudiante/download/${folder}/${filename}`,
+            `${API_URL}/download/${folder}/${filename}`,
             {
               responseType: 'blob',
-            },{
-                headers: { Authorization: `Bearer ${token}` },
-              }
+              headers: { Authorization: `Bearer ${token}` },
+            }
           );
     
           const url = window.URL.createObjectURL(new Blob([response.data]));

@@ -34,6 +34,18 @@
     width: auto; /* Hace que el ancho del botón sea solo el necesario */
     min-width: 100px; /* Establece un ancho mínimo si es necesario */
 }
+.boton-download {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 12px; /* Ajuste del tamaño del botón */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px; /* Ajuste del tamaño del texto */
+    width: auto; /* Hace que el ancho del botón sea solo el necesario */
+    min-width: 100px; /* Establece un ancho mínimo si es necesario */
+}
+
 
 /* Ajuste para el contenedor de filtro en pantallas más pequeñas */
 @media (max-width: 768px) {
