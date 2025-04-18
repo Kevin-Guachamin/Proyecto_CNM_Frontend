@@ -103,7 +103,7 @@ function BuscarMaterias() {
                                             <Card.Body>
                                                 <Card.Title>{asig.Materia?.nombre}</Card.Title>
                                                 <Card.Subtitle className="mb-2 text-muted">
-                                                    Paralelo:  {asig.paralelo} <br />
+                                                    Paralelo:  {asig.paralelo} || Cupos: {asig.cuposDisponibles}<br />
                                                 </Card.Subtitle>
                                                 <Card.Text>
                                                     <strong>Nivel:</strong> {asig.Materia.nivel} <br />
