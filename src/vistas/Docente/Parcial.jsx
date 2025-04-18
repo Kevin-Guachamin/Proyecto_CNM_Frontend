@@ -380,7 +380,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
     <div id={idContenedor} className="container tabla-parciales">
       <HeaderTabla datosEncabezado={datosEncabezado} imagenIzquierda={"/ConservatorioNacional.png"} />
       {!isWithinRange && (
-        <div className="alert alert-warning text-center">
+        <div className="alert alert-warning text-center screen-only">
           🕒 {rangoTexto || "Este parcial aún no está disponible para edición."}
         </div>
       )}

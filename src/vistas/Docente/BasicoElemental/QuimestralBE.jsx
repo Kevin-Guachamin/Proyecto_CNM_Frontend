@@ -388,7 +388,7 @@ const QuimestralBE = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actua
         imagenDerecha={"/Ministerio.png"}
       />
       {!isWithinRange && (
-        <div className="alert alert-warning text-center">
+        <div className="alert alert-warning text-center screen-only">
           🕒 {rangoTexto || "Este parcial aún no está disponible para edición."}
         </div>
       )}

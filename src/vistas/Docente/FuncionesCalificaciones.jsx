@@ -187,7 +187,8 @@ export const handleEditar = ({
   setForceEdit,
   setInputsDisabled,
   tieneDatosGuardados,
-  solicitudAceptada // nuevo
+  solicitudAceptada,
+  solicitudEnRango
 }) => {
   let currentSubTab = "";
   if (activeMainTab === "quimestre1") {
@@ -200,15 +201,22 @@ export const handleEditar = ({
 
   const isDentroRango = estadoFechas[currentSubTab] ?? false;
   const coincideConSolicitud = solicitudAceptada?.descripcion.replaceAll("_", "-") === currentSubTab;
-  const isWithinRange = isDentroRango || coincideConSolicitud;
+  const isWithinRange = isDentroRango || (coincideConSolicitud && solicitudEnRango);
+
   if (!isWithinRange) {
+    let mensaje = "No se pueden editar los datos fuera del rango permitido.";
+  
+    if (coincideConSolicitud && !solicitudEnRango) {
+      mensaje = "La solicitud de edición ha expirado. Ya no está dentro del rango de fechas permitido.";
+    }
+  
     Swal.fire({
       icon: "warning",
-      title: "No se pueden desbloquear",
-      text: "No se pueden editar los datos fuera del rango permitido.",
+      title: "Edición no permitida",
+      text: mensaje,
     });
     return;
-  }
+  }  
 
   if (forceEdit) {
     Swal.fire({

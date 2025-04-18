@@ -34,6 +34,7 @@ function Calificaciones() {
   const [textoRangoFechas, setTextoRangoFechas] = useState({});
   const soloLectura = usuario?.subRol?.toLowerCase() === "secretaria";
   const [solicitudAceptada, setSolicitudAceptada] = useState(null);
+  const [solicitudEnRango, setSolicitudEnRango] = useState(false);
 
   const getRangoValido = (clave) => {
     return estadoFechas[clave] || (solicitudAceptada?.descripcion === clave);
@@ -126,13 +127,23 @@ function Calificaciones() {
     const obtenerSolicitud = async () => {
       try {
         const resp = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/solicitud/ultima/obtener`);
-        setSolicitudAceptada(resp.data); // Guardamos la solicitud
+        const solicitud = resp.data;
+        setSolicitudAceptada(solicitud);
+    
+        // Obtener fecha actual del backend
+        const fechaResp = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/fechas_notas/fecha_actual`);
+        const hoy = parseFecha(fechaResp.data.fechaActual);
+        const fechaInicio = parseFecha(solicitud.fecha_inicio);
+        const fechaFin = parseFecha(solicitud.fecha_fin);
+        const dentroDeRango = hoy >= fechaInicio && hoy <= fechaFin;
+    
+        setSolicitudEnRango(dentroDeRango);
       } catch (error) {
         console.log("No hay solicitud aprobada o falló la petición");
-        setSolicitudAceptada(null); // Por si acaso
+        setSolicitudAceptada(null);
+        setSolicitudEnRango(false);
       }
-    };
-  
+    };    
     obtenerSolicitud();
   }, []);
   
@@ -424,7 +435,8 @@ function Calificaciones() {
       setForceEdit,
       setInputsDisabled,
       tieneDatosGuardados,
-      solicitudAceptada
+      solicitudAceptada,
+      solicitudEnRango
     });
   };
 
