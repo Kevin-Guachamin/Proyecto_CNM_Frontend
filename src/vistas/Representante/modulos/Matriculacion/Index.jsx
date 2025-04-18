@@ -7,16 +7,39 @@ import { useNavigate } from "react-router-dom";
 
 function Index() {
   const [usuario, setUsuario] = useState(null);
-  const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const navigate = useNavigate()
+
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
-    const parsedUser = JSON.parse(storedUser);
+
+    if (!storedUser) {
+      navigate("/");
+      return;
+    }
+
+    let parsedUser;
+    try {
+      parsedUser = JSON.parse(storedUser);
+      
+    } catch (error) {
+      console.log("Error parseando el usuario de localStorage: ", error);
+      navigate("/");
+      return; 
+
+    }
+
     if (!parsedUser || parsedUser.subRol === 'Admin') {
       navigate("/")
+      return;
     }
     setUsuario(parsedUser);
-  }, [API_URL, navigate]);
+
+  }, []);
+
+  // Mientras carga, `usuario` es null
+  if (usuario === null) {
+    return <div>Cargando…</div>;
+  }
 
   return (
     <div className="section-container">
@@ -24,9 +47,8 @@ function Index() {
       <div className="container-fluid p-0">
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
-      <Layout modules={modulesMatricula}>
-        <Busqueda />
-
+      <Layout showSidebar={false} modules={modulesMatricula}>
+        <Busqueda usuario={usuario} />
       </Layout>
     </div>
   )
