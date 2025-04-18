@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import Header from "../../../../components/Header";
 import Layout from '../../../../layout/Layout'
 import Busqueda from "./Busqueda";
-import { modulesMatricula } from "../../../Admin/Components/Modulos"
 import { useNavigate } from "react-router-dom";
 
 function Index() {
@@ -47,7 +46,7 @@ function Index() {
       <div className="container-fluid p-0">
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
-      <Layout showSidebar={false} modules={modulesMatricula}>
+      <Layout showSidebar={false}>
         <Busqueda usuario={usuario} />
       </Layout>
     </div>
