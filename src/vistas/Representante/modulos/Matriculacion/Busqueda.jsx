@@ -4,7 +4,7 @@ import { ErrorMessage } from '../../../../Utils/ErrorMesaje';
 import Horarios from './Horarios';
 import Swal from 'sweetalert2';
 
-function Busqueda() {
+function Busqueda({usuario}) {
     const [periodo, setPeriodo] = useState("")
     const [cedula, setCedula] = useState("")
     const [estudiante, setEstudiante] = useState("")
@@ -13,11 +13,11 @@ function Busqueda() {
     const [asignatura, setAsignatura] = useState(null)
     const [matricula, setMatricula] = useState("")
     const [inscripciones, setInscripciones] = useState([])
-    const [buscarAsignacion, setBucarAsignacion] = useState(false)
+    const [buscarAsignacion, setBucarAsignacion] = useState(false);
+    const [estudiantesRepresentante, setEstudiantesRepresentante] = useState(null)
     const token=localStorage.getItem("token")
-
-
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
+    
     useEffect(() => {
 
         axios.get(`${API_URL}/periodo_academico/activo`,{
@@ -176,21 +176,38 @@ function Busqueda() {
             ErrorMessage(error);
         }
     }
+
+    const getEstudiantesRepresentante = async () => {
+        try {
+            const { data: respuestaEstudiantes } = await axios.get(`${API_URL}/api/representantes/${usuario.nroCedula}/estudiantes`, 
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+            setEstudiantesRepresentante(respuestaEstudiantes);
+        } catch (error) {
+            console.log("No se pudo obtener los estudiantes a cargo del representante", error);
+        }
+    };
+
+    useEffect(() => {
+        if (!usuario) {
+            return;
+        }
+        getEstudiantesRepresentante();
+    }, [usuario]);
+
     return (
         <div>
             <h1>{`Periodo académico activo ${periodo.descripcion}`}</h1>
-            <div>
-                <label htmlFor="">Buscar estudiante por cédula</label>
-                <input type="text" value={cedula} onChange={handlenroCedulaChange} />
-                <button onClick={HandleBuscarEstudiante}>Buscar</button>
-
-            </div>
             <div className="Contendor-tabla">
-                {buscado && !estudiante && (
-                    <p className="no-registros">No se encontró el estudiante.</p>
+                {!estudiantesRepresentante && (
+                    <p className="no-registros">No se encontraron estudiantes.</p>
                 )}
 
-                {estudiante && (
+                {estudiantesRepresentante && (
                     <div>
                         <table className="tabla_registros">
                             <thead>
@@ -205,7 +222,8 @@ function Busqueda() {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                               {estudiantesRepresentante.map((estudiante, index) => (
+                                    <tr key={index}>
                                     <td>{estudiante.nroCedula}</td>
                                     <td>{estudiante.primer_nombre}</td>
                                     <td>{estudiante.primer_apellido}</td>
@@ -214,6 +232,7 @@ function Busqueda() {
                                     <td>{estudiante.jornada}</td>
                                     <td>{estudiante.nivel}</td>
                                 </tr>
+                               ))} 
                             </tbody>
                         </table>
                         <button onClick={HandleMatricular}>Empezar matrícula</button>
