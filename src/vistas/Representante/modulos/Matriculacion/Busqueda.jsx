@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios'
 import { ErrorMessage } from '../../../../Utils/ErrorMesaje';
 import Horarios from './Horarios';
@@ -16,6 +17,7 @@ function Busqueda({usuario}) {
     const [buscarAsignacion, setBucarAsignacion] = useState(false);
     const [estudiantesRepresentante, setEstudiantesRepresentante] = useState(null)
     const token=localStorage.getItem("token")
+    const navigate = useNavigate();
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
 
     useEffect(() => {
@@ -197,6 +199,10 @@ function Busqueda({usuario}) {
         HandleMatricular(estudiante);
     }
 
+    const handleVolverModulos = () => {
+        navigate('/representante'); // Usa el navigate ya definido
+    }
+
     useEffect(() => {
         if (!usuario) {
             return;
@@ -209,6 +215,11 @@ function Busqueda({usuario}) {
     return (
         <div>
             <h1>{`Periodo académico activo ${periodo.descripcion}`}</h1>
+            <div className="d-flex justify-content-center mt-3">
+                <button className="btn btn-primary btn-sm mt-3 mx-3" style={{ width: 'fit-content' }} onClick={() => handleVolverModulos()}>
+                    Volver a modulos
+                </button>
+            </div>
             <div className="Contendor-tabla">
                 {!estudiantesRepresentante && (
                     <p className="no-registros">No se encontraron estudiantes.</p>
