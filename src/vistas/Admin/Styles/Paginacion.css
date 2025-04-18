@@ -46,3 +46,8 @@
     border: none;
   }
   
+  .paginacion-ajustada {
+    margin-top: 2rem; /* Aumenta separación desde arriba */
+    padding-bottom: 2rem; /* Asegura espacio visible en la parte baja */
+  }
+  

@@ -5,15 +5,12 @@ import { Eliminar } from '../../../../../Utils/CRUD/Eliminar';
 import { Editar } from '../../../../../Utils/CRUD/Editar';
 import "../../../Styles/Contenedor.css"
 
-
-function ContenedorEstudiante({ data, setData, headers, columnsToShow, filterKey, apiEndpoint,CrearEntidad, PK,OnView, Paginación}) {
+function ContenedorEstudiante({ data, setData, headers, columnsToShow, filterKey, apiEndpoint, CrearEntidad, PK, OnView, Paginación }) {
   const [search, setSearch] = useState('');
   const [entityToUpdate, setEntityToUpdate] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
- 
 
-  
   const filteredData = data.filter((item) =>
     item[filterKey]?.toLowerCase().includes(search.toLowerCase())
   );
@@ -21,12 +18,11 @@ function ContenedorEstudiante({ data, setData, headers, columnsToShow, filterKey
   const toggleModal = () => {
     setIsModalOpen((prev) => !prev);
     setEntityToUpdate(null);
-    
   };
 
-  const handleSaveEntity = (newEntity,headers) => {
+  const handleSaveEntity = (newEntity, headers) => {
     console.log("estoy llegando hasta aca")
-    Editar(entityToUpdate, newEntity, `${API_URL}/${apiEndpoint}`, setData, setIsModalOpen,PK,headers);
+    Editar(entityToUpdate, newEntity, `${API_URL}/${apiEndpoint}`, setData, setIsModalOpen, PK, headers);
   };
 
   const handleEdit = (entity) => {
@@ -40,14 +36,13 @@ function ContenedorEstudiante({ data, setData, headers, columnsToShow, filterKey
 
   return (
     <div className='Contenedor-general'>
-      
-      <Filtro search={search} setSearch={setSearch} toggleModal={toggleModal} filterKey={filterKey}/>
+      <Filtro search={search} setSearch={setSearch} toggleModal={toggleModal} filterKey={filterKey} />
       {isModalOpen && (
-            <CrearEntidad
-              onCancel={toggleModal}
-              entityToUpdate={entityToUpdate}
-              onSave={handleSaveEntity}
-            />
+        <CrearEntidad
+          onCancel={toggleModal}
+          entityToUpdate={entityToUpdate}
+          onSave={handleSaveEntity}
+        />
       )}
       <TablaEstudiantes
         filteredData={filteredData}
@@ -56,7 +51,6 @@ function ContenedorEstudiante({ data, setData, headers, columnsToShow, filterKey
         OnView={OnView}
         headers={headers}
         columnsToShow={columnsToShow}
-        
       />
       {Paginación && data.length > 0 && <div className='Paginación'>{Paginación}</div>}
     </div>

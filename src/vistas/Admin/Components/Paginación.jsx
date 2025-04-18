@@ -8,18 +8,18 @@ function Paginación({ totalPages, page, setPage }) {
   };
 
   return (
-    <div>
+    <div className="paginacion-ajustada">
       <ReactPaginate
         previousLabel={"← Anterior"}
         nextLabel={"Siguiente →"}
         breakLabel={"..."}
         pageCount={totalPages}
-        marginPagesDisplayed={1} // Cantidad de páginas visibles en los extremos
-        pageRangeDisplayed={3} // Cantidad de páginas visibles en el centro
+        marginPagesDisplayed={1}
+        pageRangeDisplayed={3}
         onPageChange={handlePageClick}
-        containerClassName={"pagination"} // Clase para estilizar
-        activeClassName={"selected"} // Clase para la página activa
-        forcePage={page - 1} // Para sincronizar con el estado
+        containerClassName={"pagination"}
+        activeClassName={"selected"}
+        forcePage={page - 1}
       />
     </div>
   );

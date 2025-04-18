@@ -3,7 +3,7 @@ import Header from "../../../../../components/Header";
 import Layout from '../../../../../layout/Layout'
 import Loading from "../../../../../components/Loading";
 import Contenedor from "../../../Components/Contenedor";
-import { modulesSettings } from "../../../Components/Modulos"
+import { moduloInicio, modulesSettingsBase, construirModulosConPrefijo } from "../../../Components/Modulos";
 import { ErrorMessage } from "../../../../../Utils/ErrorMesaje";
 import CrearDocente from "./CrearDocente";
 import { useNavigate } from "react-router-dom";
@@ -20,8 +20,8 @@ function Index() {
   const [limit, setLimit] = useState(0);
   const [width, setWidth] = useState(window.innerWidth);
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
-  const token=localStorage.getItem("token")
-
+  const token = localStorage.getItem("token")
+  const [modulos, setModulos] = useState([])
   const headers = ["Cédula", "Primer nombre", "Primer Apellido", "Segundo Nombre", "Segundo Apellido", "Email", "Celular", "Rol", "Acciones"];
   const colums = ["nroCedula", "primer_nombre", "primer_apellido", "segundo_nombre", "segundo_apellido", "email", "celular", "rol"]
   const filterKey = "primer_nombre"
@@ -47,7 +47,7 @@ function Index() {
     const fetchAsignaturas = async () => {
       try {
         setLoading(true);
-       
+
         const { data } = await axios.get(`${API_URL}/docente/obtener?page=${page}&limit=${limit}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -69,6 +69,11 @@ function Index() {
       navigate("/")
     }
     setUsuario(parsedUser);
+    const modulosDinamicos = [
+      moduloInicio,
+      ...construirModulosConPrefijo(parsedUser.subRol, modulesSettingsBase)
+    ];
+    setModulos(modulosDinamicos);
   }, [API_URL, navigate]);
 
   return (
@@ -77,10 +82,10 @@ function Index() {
       <div className="container-fluid p-0">
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
-      <Layout modules={modulesSettings}>
+      <Layout modules={modulos}>
         {loading ? <Loading /> : <Contenedor data={docentes} setData={setDocentes} headers={headers} columnsToShow={colums} filterKey={filterKey} apiEndpoint={"docente"} CrearEntidad={CrearDocente} PK={PK} Paginación={
-              <Paginación totalPages={totalPages} page={page} setPage={setPage} />
-            }/>}
+          <Paginación totalPages={totalPages} page={page} setPage={setPage} />
+        } />}
 
       </Layout>
     </div>

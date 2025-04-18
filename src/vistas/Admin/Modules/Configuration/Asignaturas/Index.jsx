@@ -3,7 +3,7 @@ import Header from "../../../../../components/Header";
 import Layout from "../../../../../layout/Layout";
 import Loading from "../../../../../components/Loading";
 import Contenedor from "../../../Components/Contenedor";
-import { modulesSettings } from "../../../Components/Modulos";
+import { moduloInicio, modulesSettingsBase, construirModulosConPrefijo } from "../../../Components/Modulos";
 import CrearAsignatura from "./CrearAsignatura";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -18,7 +18,7 @@ function Index() {
   const [totalPages, setTotalPages] = useState(1);
   const [limit, setLimit] = useState(0);
   const [width, setWidth] = useState(window.innerWidth);
-
+  const [modulos, setModulos] = useState([]);
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const token = localStorage.getItem("token");
@@ -37,7 +37,7 @@ function Index() {
 
   // ✅ Establecer límite de resultados según resolución
   useEffect(() => {
-    
+
     const isLaptop = width <= 1822;
     setLimit(isLaptop ? 13 : 21);
   }, [width]);
@@ -51,6 +51,11 @@ function Index() {
       navigate("/");
     } else {
       setUsuario(parsedUser);
+      const modulosDinamicos = [
+        moduloInicio,
+        ...construirModulosConPrefijo(parsedUser.subRol, modulesSettingsBase)
+      ];
+      setModulos(modulosDinamicos);
     }
   }, [navigate]);
 
@@ -61,7 +66,7 @@ function Index() {
     const fetchAsignaturas = async () => {
       try {
         setLoading(true);
-        console.log("este es el limite",limit)
+        console.log("este es el limite", limit)
         const { data } = await axios.get(`${API_URL}/materia/obtener?page=${page}&limit=${limit}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -82,7 +87,7 @@ function Index() {
       <div className="container-fluid p-0">
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
-      <Layout modules={modulesSettings}>
+      <Layout modules={modulos}>
         {loading ? (
           <Loading />
         ) : (
