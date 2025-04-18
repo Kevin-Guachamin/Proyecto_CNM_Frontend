@@ -226,8 +226,8 @@ function Busqueda({usuario}) {
                 )}
 
                 {estudiantesRepresentante && (
-                    <div>
-                        <table className="tabla_registros">
+                    <div className="tableresponsive mt-3">
+                        <table className="table table-bordered table-striped">
                             <thead>
                                 <tr>
                                     <th>Cédula</th>
