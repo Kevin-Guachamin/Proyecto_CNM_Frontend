@@ -1,15 +1,16 @@
 /* Contenedor Principal */
 .login-container {
-  width: 100vw; /* Usa el 100% del viewport */
+  width: 100vw;
   min-height: 90vh;
+  max-height: 93vh;
+  overflow-y: auto; /* habilita el scroll vertical */
+  overflow-x: hidden;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden; /* Evita el scroll horizontal */
+  flex-direction: column; /* apila Header, contenido, Footer */
 }
-
+.links{
+  margin-top: 1rem;
+}
 /* Contenedor de Contenido */
 .login-content {
   display: flex;
@@ -80,6 +81,7 @@
 .login-field label {
   font-weight: bold;
   margin-bottom: 5px;
+  font-size: 20px;
 }
 
 .login-field input {

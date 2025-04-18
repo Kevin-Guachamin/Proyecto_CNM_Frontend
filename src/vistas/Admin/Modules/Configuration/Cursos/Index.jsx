@@ -1,17 +1,24 @@
 import React, { useState, useEffect } from "react";
 import Header from "../../../../../components/Header";
 import Layout from '../../../../../layout/Layout'
-import Contenedor from "./ContenedorCursos";
-import { modulesSettings } from "../../../Components/Modulos"
+import ContenedorCursos from "./ContenedorCursos";
+import { moduloInicio, modulesSettingsBase, construirModulosConPrefijo } from "../../../Components/Modulos";
 import { useNavigate } from "react-router-dom";
 
-
+import Paginación from "../../../Components/Paginación";
 
 function Index() {
   const [usuario, setUsuario] = useState(null);
-  const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
+  const [cursos, setCursos] = useState([])
+  const [modulos, setModulos] = useState([])
+  const [page, setPage] = useState(1);
+
+
+
+
   const PK = "ID"
   const navigate = useNavigate()
+
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = JSON.parse(storedUser);
@@ -19,7 +26,14 @@ function Index() {
       navigate("/")
     }
     setUsuario(parsedUser);
-  }, [API_URL, navigate]);
+    const modulosDinamicos = [
+      moduloInicio,
+      ...construirModulosConPrefijo(parsedUser.subRol, modulesSettingsBase)
+    ];
+    setModulos(modulosDinamicos);
+
+  },
+    [navigate]);
 
   return (
     <div className="section-container">
@@ -27,8 +41,11 @@ function Index() {
       <div className="container-fluid p-0">
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
-      <Layout modules={modulesSettings}>
-        <Contenedor apiEndpoint={"asignacion"} PK={PK} />
+      <Layout modules={modulos}>
+
+
+        <ContenedorCursos apiEndpoint={"asignacion"} PK={PK} data={cursos} setData={setCursos} />
+
 
       </Layout>
     </div>

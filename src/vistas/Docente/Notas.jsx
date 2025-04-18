@@ -10,7 +10,7 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
   forceEdit, inputsDisabled, estadoFechas, textoRangoFechas, activeMainTab, activeSubTabQuim1, activeSubTabQuim2, setActiveMainTab,
   setActiveSubTabQuim1, setActiveSubTabQuim2, parcial1Quim1Data, parcial2Quim1Data, parcial1Quim2Data, parcial2Quim2Data, quim1Data,
   quim2Data, finalData, handleActualizarParcial1Quim1, handleActualizarParcial2Quim1, handleActualizarParcial1Quim2, handleActualizarParcial2Quim2,
-  handleActualizarQuim1, handleActualizarQuim2, handleActualizarFinal, handleEditarFila, soloLectura }) {
+  handleActualizarQuim1, handleActualizarQuim2, handleActualizarFinal, handleEditarFila, soloLectura, getRangoValido}) {
   return (
     <>
       <div className="container-fluid p-0">
@@ -71,7 +71,7 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                       activo={activeMainTab === "quimestre1" && activeSubTabQuim1 === "parcial1-quim1"}
                       inputsDisabled={inputsDisabled}
                       onEditar={handleEditarFila}
-                      isWithinRange={estadoFechas["parcial1-quim1"] ?? false}
+                      isWithinRange={getRangoValido("parcial1-quim1")}
                       rangoTexto={textoRangoFechas["parcial1-quim1"]}
                       forceEdit={forceEdit}
                       soloLectura={soloLectura}
@@ -87,7 +87,7 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                       activo={activeMainTab === "quimestre1" && activeSubTabQuim1 === "parcial2-quim1"}
                       inputsDisabled={inputsDisabled}
                       onEditar={handleEditarFila}
-                      isWithinRange={estadoFechas["parcial2-quim1"] ?? false}
+                      isWithinRange={getRangoValido("parcial2-quim1")}
                       rangoTexto={textoRangoFechas["parcial2-quim1"]}
                       forceEdit={forceEdit}
                       soloLectura={soloLectura}
@@ -103,7 +103,7 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                       datosModulo={datosModulo}
                       inputsDisabled={inputsDisabled}
                       onEditar={handleEditarFila}
-                      isWithinRange={estadoFechas["quimestral-quim1"] ?? false}
+                      isWithinRange={getRangoValido("quimestral-quim1")}
                       rangoTexto={textoRangoFechas["quimestral-quim1"]}
                       forceEdit={forceEdit}
                       soloLectura={soloLectura}
@@ -124,7 +124,7 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                       activo={activeMainTab === "quimestre2" && activeSubTabQuim2 === "parcial1-quim2"}
                       inputsDisabled={inputsDisabled}
                       onEditar={handleEditarFila}
-                      isWithinRange={estadoFechas["parcial1-quim2"] ?? false}
+                      isWithinRange={getRangoValido("parcial1-quim2")}
                       rangoTexto={textoRangoFechas["parcial1-quim2"]}
                       forceEdit={forceEdit}
                       soloLectura={soloLectura}
@@ -140,7 +140,7 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                       activo={activeMainTab === "quimestre2" && activeSubTabQuim2 === "parcial2-quim2"}
                       inputsDisabled={inputsDisabled}
                       onEditar={handleEditarFila}
-                      isWithinRange={estadoFechas["parcial2-quim2"] ?? false}
+                      isWithinRange={getRangoValido("parcial2-quim2")}
                       rangoTexto={textoRangoFechas["parcial2-quim2"]}
                       forceEdit={forceEdit}
                       soloLectura={soloLectura}
@@ -156,7 +156,7 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                       datosModulo={datosModulo}
                       inputsDisabled={inputsDisabled}
                       onEditar={handleEditarFila}
-                      isWithinRange={estadoFechas["quimestral-quim2"] ?? false}
+                      isWithinRange={getRangoValido("quimestral-quim2")}
                       rangoTexto={textoRangoFechas["quimestral-quim2"]}
                       forceEdit={forceEdit}
                       soloLectura={soloLectura}
@@ -175,7 +175,7 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                     actualizarDatosFinal={handleActualizarFinal}
                     inputsDisabled={inputsDisabled}
                     onEditar={handleEditarFila}
-                    isWithinRange={estadoFechas["notaFinal"] ?? false}
+                    isWithinRange={getRangoValido("notaFinal")}
                     rangoTexto={textoRangoFechas["notaFinal"]}
                     forceEdit={forceEdit}
                     soloLectura={soloLectura}

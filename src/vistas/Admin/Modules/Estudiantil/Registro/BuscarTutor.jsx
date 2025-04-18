@@ -17,6 +17,7 @@ function BuscarTutor() {
     const [estudiante, setEstudiante] = useState(null);
     const [exist, setExist] = useState(false);
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
+    const token = localStorage.getItem("token")
     function formatDate(date) {
         // Si el valor es una cadena, lo convertimos a un objeto Date
         if (typeof date === "string") {
@@ -41,7 +42,7 @@ function BuscarTutor() {
                 setRepresentante(null);
                 return;
             }
-            const response = await axios.get(`${API_URL}/representante/obtener/${cedula}`);
+            const response = await axios.get(`${API_URL}/representante/obtener/${cedula}`, { headers: { Authorization: `Bearer ${token}` } });
             setRepresentante(response.data);
             setExist(true);
         } catch (error) {
@@ -105,11 +106,11 @@ function BuscarTutor() {
     const handleRegistrar = async () => {
         try {
             if (!exist) {
-                await axios.post(`${API_URL}/representante/crear`, representante, { headers: { "Content-Type": "multipart/form-data" } });
+                await axios.post(`${API_URL}/representante/crear`, representante, { headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` } });
             }
             console.log("este es el estudiante antes de guardar", estudiante)
-            await axios.post(`${API_URL}/estudiante/crear`, estudiante, { headers: { "Content-Type": "multipart/form-data" } });
-            
+            await axios.post(`${API_URL}/estudiante/crear`, estudiante, { headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` } });
+
             Swal.fire({
                 icon: "success",
                 title: `Estudiante ${estudiante.primer_nombre} ${estudiante.primer_apellido} con su representante ${representante.primer_nombre} ${representante.primer_apellido}`,
@@ -129,19 +130,21 @@ function BuscarTutor() {
 
     return (
         <div>
-            <div className='contenedor-buscar'>
-                <div className="buscar-representante">
-                    <label htmlFor="cedula">Buscar representante por cédula:</label>
-                    <input type="text" id="cedula" value={cedula} onChange={(e) => setCedula(e.target.value.replace(/\D/g, '').slice(0, 10))} />
-                    <button onClick={handleBuscarRepresentante}>Buscar</button>
+            <div className='search-container'>
+                <div className="search-input-container">
+                    <label htmlFor="cedula" className='label-search'>Buscar representante por cédula:</label>
+                    <input type="text" id="cedula" className="input-cedula" value={cedula} onChange={(e) => setCedula(e.target.value.replace(/\D/g, '').slice(0, 10))} />
+                    <button className="btn-buscar" onClick={handleBuscarRepresentante}>Buscar</button>
+                    
                 </div>
+                {!representante && (
+                        <div className="contenedor-agregar">
+                            <button className="agregar-representante" onClick={toggleModalRepresentante}>Agregar representante</button>
+                        </div>
+                    )}
             </div>
             {modalRepresentante && <CrearRepresentante onCancel={toggleModalRepresentante} onSave={handleSaveRepresentante} entityToUpdate={entityToUpdate} />}
-            {!representante && (
-                <div className="contenedor-agregar">
-                    <button className="agregar-representante" onClick={toggleModalRepresentante}>Agregar representante</button>
-                </div>
-            )}
+
             {buscado && !representante && (
                 <div>
                     <p className="no-registros">No se encontró el representante.</p>
@@ -150,24 +153,24 @@ function BuscarTutor() {
             )}
             {representante && (
                 <div>
-                    <div className='Contendor-tabla'>
+                    <div className='Contenedor-tabla'>
                         <table className="tabla_registros">
-                            <thead>
-                                <tr>
-                                    <th>Cédula</th><th>Nombre</th><th>Apellido</th><th>Email</th><th>Celular</th><th>Acciones</th>
+                            <thead >
+                                <tr >
+                                    <th className='tabla-head'>Cédula</th><th className='tabla-head'>Nombre</th><th className='tabla-head'>Apellido</th><th className='tabla-head'>Email</th><th className='tabla-head' >Celular</th><th className='tabla-head'>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>{representante.nroCedula}</td>
-                                    <td>{representante.primer_nombre}</td>
-                                    <td>{representante.primer_apellido}</td>
-                                    <td>{representante.email}</td>
-                                    <td>{representante.celular}</td>
-                                    <td>
-                                        {!exist && (<FaEdit className="icon edit-icon" onClick={() => handleEditRepresentante(representante)} />)}
+                                    <td className='tabla-celda'>{representante.nroCedula}</td>
+                                    <td className='tabla-celda'>{representante.primer_nombre}</td>
+                                    <td className='tabla-celda'>{representante.primer_apellido}</td>
+                                    <td className='tabla-celda'>{representante.email}</td>
+                                    <td className='tabla-celda'>{representante.celular}</td>
+                                    <td className='botones-icon'>
+                                        {!exist && (<FaEdit size={20} className="icon edit-icon" onClick={() => handleEditRepresentante(representante)} />)}
 
-                                        <FaTrash className="icon delete-icon" onClick={() => handleDelete('representante')} />
+                                        <FaTrash size={20} className="icon delete-icon" onClick={() => handleDelete('representante')} />
                                     </td>
                                 </tr>
                             </tbody>
@@ -181,24 +184,24 @@ function BuscarTutor() {
                     {modalEstudiante && <CrearEstudiante onCancel={toggleModalEstudiante} onSave={handleSaveEstudiante} representante={representante.nroCedula} entityToUpdate={entityToUpdate} />}
                     {estudiante && (
                         <div>
-                            <div className='Contendor-tabla'>
+                            <div className='Contenedor-tabla'>
                                 <table className="tabla_registros">
-                                    <thead>
-                                        <tr>
-                                            <th>Cédula</th><th>Nombre</th><th>Apellido</th><th>Fecha Nacimiento</th><th>Género</th><th>Jornada</th><th>Acciones</th>
+                                    <thead >
+                                        <tr >
+                                            <th className='tabla-head'>Cédula</th><th className='tabla-head'>Nombre</th><th className='tabla-head'>Apellido</th><th className='tabla-head'>Fecha Nacimiento</th><th className='tabla-head'>Género</th><th className='tabla-head'>Jornada</th><th className='tabla-head'>Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>{estudiante.nroCedula}</td>
-                                            <td>{estudiante.primer_nombre}</td>
-                                            <td>{estudiante.primer_apellido}</td>
-                                            <td>{formatDate(estudiante.fecha_nacimiento)}</td>
-                                            <td>{estudiante.genero}</td>
-                                            <td>{estudiante.jornada}</td>
-                                            <td>
-                                                <FaEdit className="icon edit-icon" onClick={() => handleEditEstudiante(estudiante)} />
-                                                <FaTrash className="icon delete-icon" onClick={() => handleDelete('estudiante')} />
+                                            <td className='tabla-celda'>{estudiante.nroCedula}</td>
+                                            <td className='tabla-celda'>{estudiante.primer_nombre}</td>
+                                            <td className='tabla-celda'>{estudiante.primer_apellido}</td>
+                                            <td className='tabla-celda'>{formatDate(estudiante.fecha_nacimiento)}</td>
+                                            <td className='tabla-celda'>{estudiante.genero}</td>
+                                            <td className='tabla-celda'>{estudiante.jornada}</td>
+                                            <td className='botones-icon'>
+                                                <FaEdit size={20} className="icon edit-icon" onClick={() => handleEditEstudiante(estudiante)} />
+                                                <FaTrash size={20} className="icon delete-icon" onClick={() => handleDelete('estudiante')} />
                                             </td>
                                         </tr>
                                     </tbody>

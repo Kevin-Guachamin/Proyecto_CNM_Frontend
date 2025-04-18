@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import Header from "../../components/Header";
-import HeaderTabla from "../../components/HeaderTabla";
-import Tabla from "../../components/Tabla";
-import Loading from "../../components/Loading";
-import { ErrorMessage } from "../../Utils/ErrorMesaje";
+import Header from "../../../components/Header";
+import HeaderTabla from "../../../components/HeaderTabla";
+import Tabla from "../../../components/Tabla";
+import Loading from "../../../components/Loading";
+import { ErrorMessage } from "../../../Utils/ErrorMesaje";
 import { exportarListadoAExcel, exportarListadoAPDF } from "./FuncionesParaListados";
 import "./Exportaciones.css";
 

@@ -261,6 +261,7 @@
   cursor: pointer;
   transition: background-color 0.3s ease; /* Transición suave */
   margin-top: 8px;
+  max-width: 250px;
 }
 
 /* Efecto al pasar el cursor por encima */
@@ -272,4 +273,15 @@
 .download-button .icon {
   margin-right: 8px; /* Espacio entre el ícono y el texto */
   font-size: 18px; /* Tamaño del ícono */
+}
+.boton-crear-solicitud{
+  display: flex;
+  justify-content: center;
+}
+
+.contenedor-detalle-estudiante {
+  max-height: 84vh; /* Altura máxima calculada para evitar recorte con header y tabs */
+  overflow-y: auto;                /* Habilita el scroll vertical */
+  padding: 1rem;
+  scroll-behavior: smooth;
 }

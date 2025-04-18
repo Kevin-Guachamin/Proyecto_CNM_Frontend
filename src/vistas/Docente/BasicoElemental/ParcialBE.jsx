@@ -8,7 +8,7 @@ import "../Parcial.css";
 
 function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, escala }) {
   // ID dinámico: pdf-parcial1-quim1, pdf-parcial2-quim1, pdf-parcial1-quim2, etc.
-  const idContenedor = `pdf-parcial${parcialSeleccionado}-quim${quimestreSeleccionado}`;
+  const idContenedor = `pdf-parcial-be${parcialSeleccionado}-quim${quimestreSeleccionado}`;
 
   const subtitulo = `NOTA DEL ${parcialSeleccionado === "1" ? "PRIMER" : "SEGUNDO"} PARCIAL - ${quimestreSeleccionado === "1" ? "PRIMER" : "SEGUNDO"} QUIMESTRE`;
 
@@ -369,10 +369,10 @@ function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatos
   };
 
   return (
-    <div id={idContenedor} className="container tabla-parciales">
+    <div id={idContenedor} className="container tabla-parciales-be">
       <HeaderTabla datosEncabezado={datosEncabezado} imagenIzquierda={"/ConservatorioNacional.png"} />
       {!isWithinRange && (
-        <div className="alert alert-warning text-center">
+        <div className="alert alert-warning text-center screen-only">
           🕒 {rangoTexto || "Este parcial aún no está disponible para edición."}
         </div>
       )}

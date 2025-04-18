@@ -1,0 +1,143 @@
+.contenedor-solicitudes {
+    max-width: 100%;
+    max-height: 90vh;
+    margin: 0 auto;
+    overflow-y: scroll;
+    background-color: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .titulo {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #1f2937;
+  }
+  
+  .botones-filtro {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: start;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .botones-filtro button {
+    background-color: #f3f4f6;
+    color: #111827;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    max-width: 12rem;
+  }
+  
+  .botones-filtro button:hover {
+    background-color: #0e3bb9;
+    color: white;
+  }
+  
+  .botones-filtro .activo {
+    background-color: #2563eb;
+    color: white;
+  }
+  
+  .contenedor-lista {
+    padding: 1rem;
+    border-top: 1px solid #e5e7eb;
+  }
+  .solicitudes-card {
+    margin: 0;
+    row-gap: 1rem;
+    column-gap: 4rem ;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .solicitudes-card-texto {
+    white-space: normal; /* ✅ Permite saltos de línea */
+    word-wrap: break-word; /* ✅ Rompe texto largo si es necesario */
+    line-height: 1.6;
+  }  
+  .solicitudes-card .card {
+    min-width: 350px;
+  }
+  
+  
+  .mensaje-vacio {
+    text-align: center;
+    color: #6b7280;
+    font-style: italic;
+  }
+  
+  .acciones-solicitud {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .btn-aceptar {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .btn-aceptar:hover {
+    background-color: #059669;
+  }
+  
+  .btn-rechazar {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .btn-rechazar:hover {
+    background-color: #dc2626;
+  }
+  .btn-eliminar {
+    background-color: #9ca3af; /* gris */
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-left: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  
+  .btn-eliminar:hover {
+    background-color: #6b7280;
+  }
+  
+  @media (max-width: 600px) {
+    .item-solicitud {
+      font-size: 0.9rem;
+    }
+  
+    .titulo {
+      font-size: 1.5rem;
+    }
+  
+    .acciones-solicitud {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }

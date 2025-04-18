@@ -33,6 +33,12 @@ function Calificaciones() {
   const [estadoFechas, setEstadoFechas] = useState({});
   const [textoRangoFechas, setTextoRangoFechas] = useState({});
   const soloLectura = usuario?.subRol?.toLowerCase() === "secretaria";
+  const [solicitudAceptada, setSolicitudAceptada] = useState(null);
+  const [solicitudEnRango, setSolicitudEnRango] = useState(false);
+
+  const getRangoValido = (clave) => {
+    return estadoFechas[clave] || (solicitudAceptada?.descripcion === clave);
+  };
   
   const obtenerParcialBE = (subtab) => {
     if (subtab.includes("parcial1")) return "P1";
@@ -117,6 +123,30 @@ function Calificaciones() {
     }
   }, []);
 
+  useEffect(() => {
+    const obtenerSolicitud = async () => {
+      try {
+        const resp = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/solicitud/ultima/obtener`);
+        const solicitud = resp.data;
+        setSolicitudAceptada(solicitud);
+    
+        // Obtener fecha actual del backend
+        const fechaResp = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/fechas_notas/fecha_actual`);
+        const hoy = parseFecha(fechaResp.data.fechaActual);
+        const fechaInicio = parseFecha(solicitud.fecha_inicio);
+        const fechaFin = parseFecha(solicitud.fecha_fin);
+        const dentroDeRango = hoy >= fechaInicio && hoy <= fechaFin;
+    
+        setSolicitudEnRango(dentroDeRango);
+      } catch (error) {
+        console.log("No hay solicitud aprobada o falló la petición");
+        setSolicitudAceptada(null);
+        setSolicitudEnRango(false);
+      }
+    };    
+    obtenerSolicitud();
+  }, []);
+  
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const storedToken = localStorage.getItem("token");
@@ -404,7 +434,9 @@ function Calificaciones() {
       forceEdit,
       setForceEdit,
       setInputsDisabled,
-      tieneDatosGuardados
+      tieneDatosGuardados,
+      solicitudAceptada,
+      solicitudEnRango
     });
   };
 
@@ -513,6 +545,7 @@ function Calificaciones() {
       handleActualizarFinal={handleActualizarFinal}
       handleEditarFila={handleEditarFila}
       soloLectura={soloLectura}
+      getRangoValido={getRangoValido}
     />
   );
 }

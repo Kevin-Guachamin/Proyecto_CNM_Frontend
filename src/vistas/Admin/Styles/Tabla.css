@@ -1,6 +1,7 @@
 /* Estilos para la tabla */
-.Contendor-tabla {
+.Contenedor-tabla {
     padding: 20px;
+    
   }
   
   .tabla_registros {
@@ -8,10 +9,21 @@
     border-collapse: collapse;
   }
   
-  .tabla_registros th, .tabla_registros td {
+  .tabla-head {
+    background-color: #00408A !important;
+    color: #ced4da !important;
+    font-weight: bold;
+    border: 1px solid #ced4da;
     padding: 10px;
-    border: 1px solid #ddd;
+    text-align: center;
   }
+  .tabla-celda{
+    border: 1px solid #90A4AE !important;
+    vertical-align: middle;
+    background-color: #CFD8DC !important;
+    text-align: center;
+  }
+
   
   .no-registros {
     text-align: center;
@@ -32,5 +44,21 @@
   }
   .view-icon{
     color: #1F7B00 ;
-    
+    cursor: pointer;
   }
+  .botones-icon{
+    padding-top: 0.8rem;
+    display: flex;
+    justify-content: space-around;
+    height: 2.85rem;
+    border: 1px solid #90A4AE;
+    vertical-align: middle;
+    background-color: #CFD8DC !important;
+  }
+
+  /* Nuevo contenedor con scroll vertical */
+.tabla-scroll {
+  max-height: 500px; /* Ajusta la altura según lo que necesites */
+  overflow-y: auto;
+  border: 1px solid #ccc;
+}

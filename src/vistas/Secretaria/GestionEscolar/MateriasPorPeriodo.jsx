@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Card, Row, Col } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
-import Header from "../../components/Header";
-import Layout from "../../layout/Layout";
-import Loading from "../../components/Loading";
+import Header from "../../../components/Header";
+import Layout from "../../../layout/Layout";
+import Loading from "../../../components/Loading";
 import Swal from "sweetalert2";
-import { ErrorMessage } from "../../Utils/ErrorMesaje";
-import { getModulos, transformModulesForLayout } from "../getModulos";
+import { ErrorMessage } from "../../../Utils/ErrorMesaje";
+import { getModulos, transformModulesForLayout } from "../../getModulos";
 import "./MateriasPorPeriodo.css";
 
 const nivelesMap = {
@@ -49,12 +49,12 @@ function MateriasPorPeriodo() {
 
         setLoading(true);
         axios
-            .get(`${import.meta.env.VITE_URL_DEL_BACKEND}/asignacion/obtener/periodo/${idPeriodo}`, {
+            .get(`${import.meta.env.VITE_URL_DEL_BACKEND}/asignacion/obtener/periodo_academico/${idPeriodo}`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
             .then((res) => {
-                setAsignaciones(res.data);
-                agruparPorNivelData(res.data);
+                setAsignaciones(res.data.data);
+                agruparPorNivelData(res.data.data);
             })
             .catch((err) => {
                 ErrorMessage(err);

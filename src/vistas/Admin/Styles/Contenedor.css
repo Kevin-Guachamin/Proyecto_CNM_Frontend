@@ -1,7 +1,10 @@
 /* Estilos para el contenedor */
 .Contenedor-general {
-    padding: 10px;
-  }
+  padding: 10px;
+  max-height: 90vh; /* Ajusta si necesitas más/menos alto */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
   
   .modal {
     position: fixed;

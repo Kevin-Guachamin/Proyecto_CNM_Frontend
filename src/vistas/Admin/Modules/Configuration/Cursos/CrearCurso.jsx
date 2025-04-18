@@ -19,7 +19,8 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const token=localStorage.getItem("token")
   useEffect(() => {
-    axios.get(`${API_URL}/docente/obtener`)
+    axios.get(`${API_URL}/docente/obtener`,{headers: { Authorization: `Bearer ${token}` },
+    })
       .then(response => {
         setDocentes(response.data);
 
@@ -28,7 +29,8 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
         ErrorMessage(error);
 
       })
-    axios.get(`${API_URL}/materia/obtener`)
+    axios.get(`${API_URL}/materia/obtener`,{headers: { Authorization: `Bearer ${token}` },
+    })
       .then(response => {
         setAsignaturas(response.data);
 
@@ -73,8 +75,8 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
       if(dia1===dia2){
         throw new Error("Los días deben ser diferentes")
       }
-
-      const newAsignacion = { paralelo, horaInicio, horaFin, dias, cupos: Number(cupos), id_periodo_academico: Number(periodo), nroCedula_docente: docente.nroCedula, id_materia: Number(asignatura.ID), cuposDisponibles: Number(cupos) };
+      console.log("esta es la asignatura",asignatura.ID)
+      const newAsignacion = { paralelo, horaInicio, horaFin, dias, cupos: Number(cupos), ID_periodo_academico: Number(periodo), nroCedula_docente: docente.nroCedula, ID_materia: asignatura.ID, cuposDisponibles: Number(cupos) };
       onSave(newAsignacion, {
         headers: { Authorization: `Bearer ${token}` },
       });

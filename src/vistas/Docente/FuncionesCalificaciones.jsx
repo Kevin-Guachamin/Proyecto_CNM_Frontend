@@ -3,7 +3,6 @@ import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Swal from "sweetalert2";
-import axios from "axios";
 import { ErrorMessage } from "../../Utils/ErrorMesaje";
 
 // ✅ Exportar Excel
@@ -46,73 +45,119 @@ export const handleExportExcel = () => {
     saveAs(blob, "Calificaciones.xlsx");
   } catch (error) {
     ErrorMessage(error);
-    
+
   }
 };
 
 // ✅ Exportar PDF
 export const handleExportPDF = async () => {
   try {
-    let contentToPrint = document.querySelector(".tab-pane.active .tab-pane.active div[id^='pdf-']")
-      || document.querySelector(".tab-pane.active div[id^='pdf-']");
+    let contentToPrint = document.querySelector(
+      ".tab-pane.active .tab-pane.active div[id^='pdf-']"
+    );
+    if (!contentToPrint) {
+      contentToPrint = document.querySelector(".tab-pane.active div[id^='pdf-']");
+    }
     if (!contentToPrint) {
       alert("No se encontró el contenido a exportar.");
       return;
     }
 
-    const isParcial = contentToPrint.id.includes("parcial");
     const clonedContent = contentToPrint.cloneNode(true);
     const tempContainer = document.createElement("div");
-    tempContainer.style.width = isParcial ? "1400px" : "1300px";
+
+    const isParcial = contentToPrint.id.includes("parcial") && !contentToPrint.id.includes("be");
+    const isParcialBE = contentToPrint.id.includes("parcial") && contentToPrint.id.includes("be");
+    const renderWidth = isParcial ? 1400 : 1250;
+    const renderScale = isParcial ? 2 : 3;
+
+    tempContainer.style.width = `${renderWidth}px`;
     tempContainer.style.position = "absolute";
     tempContainer.style.left = "-9999px";
+    tempContainer.style.top = "-9999px";
     document.body.appendChild(tempContainer);
     tempContainer.appendChild(clonedContent);
+
     clonedContent.classList.add("pdf-export");
 
     if (isParcial) {
       const tablaParciales = clonedContent.querySelector(".tabla-parciales");
       if (tablaParciales) {
-        tablaParciales.style.transform = "scale(0.829)";
+        tablaParciales.style.transform = "scale(0.798)";
         tablaParciales.style.transformOrigin = "top left";
       }
     }
 
+    if (isParcialBE) {
+      const tablaParcialesBE = clonedContent.querySelector(".tabla-parciales-be");
+      if (tablaParcialesBE) {
+        tablaParcialesBE.style.transform = "scale(0.985)";
+        tablaParcialesBE.style.transformOrigin = "top left";
+      }
+    }
     await new Promise((resolve) => setTimeout(resolve, 500));
+    clonedContent.style.width = "100%";
+    clonedContent.style.boxSizing = "border-box";
 
     const canvas = await html2canvas(clonedContent, {
-      scale: isParcial ? 2 : 3,
+      scale: renderScale,
       useCORS: true,
-      windowWidth: isParcial ? 1400 : 1300,
-      width: isParcial ? 1400 : 1150,
+      allowTaint: true,
+      logging: false,
+      windowWidth: renderWidth,
+      width: renderWidth,
       height: clonedContent.scrollHeight + 100,
+      x: 0,
+      y: 0,
       scrollY: 0,
-      scrollX: 0
+      scrollX: 0,
     });
 
     document.body.removeChild(tempContainer);
-    const imgData = canvas.toDataURL("image/png", 1.0);
-    const pdf = new jsPDF({ orientation: "l", unit: "pt", format: "a4" });
 
-    const margin = isParcial ? 30 : 40;
+    const imgData = canvas.toDataURL("image/png", 1.0);
+    const pdf = new jsPDF({
+      orientation: "p",
+      unit: "pt",
+      format: "a4",
+    });
+
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
-    let imgWidth = pageWidth - margin * 2;
-    let imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    if (imgHeight > pageHeight - margin * 2) {
-      imgHeight = pageHeight - margin * 2;
-      imgWidth = (canvas.width * imgHeight) / canvas.height;
+    if (isParcial) {
+      // Configuración personalizada para PARCIALES
+      const imgWidth = pageWidth - 10;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const xOffset = 30;
+      const yOffset = ((pageHeight - imgHeight) / 10);
+
+      pdf.addImage(imgData, "PNG", xOffset, yOffset, imgWidth, imgHeight);
+    } else {
+      // Configuración para QUIMESTRAL, FINAL u otros
+      const imgWidth = pageWidth - 10;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const xOffset = 40;
+      const yOffset = ((pageHeight - imgHeight) / 8);
+
+      pdf.addImage(imgData, "PNG", xOffset, yOffset, imgWidth, imgHeight);
     }
-
-    const xOffset = (pageWidth - imgWidth) / 2;
-    const yOffset = margin;
-    pdf.addImage(imgData, "PNG", xOffset, yOffset, imgWidth, imgHeight);
 
     let fileName = "Calificaciones.pdf";
     if (contentToPrint.id.startsWith("pdf-")) {
-      const [parcialRaw, quimRaw] = contentToPrint.id.replace("pdf-", "").split("-");
-      fileName = `Calificaciones - Parcial ${parcialRaw.replace("parcial", "")} - Quimestre ${quimRaw.replace("quim", "")}.pdf`;
+      const partialName = contentToPrint.id.replace("pdf-", "");
+      const parts = partialName.split("-");
+      if (parts.length >= 2) {
+        const parcialRaw = parts[0] || "";
+        const quimRaw = parts[1] || "";
+        const parcialNumber = parcialRaw.replace("parcial", "");
+        const quimNumber = quimRaw.replace("quim", "");
+        const parcialLabel = parcialNumber ? `Parcial ${parcialNumber}` : "";
+        const quimLabel = quimNumber ? `Quimestre ${quimNumber}` : "";
+        if (parcialLabel && quimLabel) {
+          fileName = `Calificaciones - ${parcialLabel} - ${quimLabel}.pdf`;
+        }
+      }
     }
 
     pdf.save(fileName);
@@ -120,74 +165,87 @@ export const handleExportPDF = async () => {
     Swal.fire({
       icon: "error",
       title: "Error",
-      text: "No se pudo exportar el PDF.",
-      confirmButtonText: "Aceptar",
-      confirmButtonColor: "#28a745"
+      text: "Ocurrió un error al exportar a PDF.",
+      footer: "Por favor intente nuevamente.",
     });
-    ErrorMessage(error);
   }
 };
 
 export const parseFecha = (strFecha) => {
-    if (!strFecha) return null;
-    if (strFecha.includes("-")) return new Date(strFecha);
-    const [dia, mes, anio] = strFecha.split("/");
-    return new Date(`${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`);
-  };
+  if (!strFecha) return null;
+  if (strFecha.includes("-")) return new Date(strFecha);
+  const [dia, mes, anio] = strFecha.split("/");
+  return new Date(`${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`);
+};
+
+export const handleEditar = ({
+  activeMainTab,
+  activeSubTabQuim1,
+  activeSubTabQuim2,
+  estadoFechas,
+  forceEdit,
+  setForceEdit,
+  setInputsDisabled,
+  tieneDatosGuardados,
+  solicitudAceptada,
+  solicitudEnRango
+}) => {
+  let currentSubTab = "";
+  if (activeMainTab === "quimestre1") {
+    currentSubTab = activeSubTabQuim1;
+  } else if (activeMainTab === "quimestre2") {
+    currentSubTab = activeSubTabQuim2;
+  } else if (activeMainTab === "notaFinal") {
+    currentSubTab = "notaFinal";
+  }
+
+  const isDentroRango = estadoFechas[currentSubTab] ?? false;
+  const coincideConSolicitud = solicitudAceptada?.descripcion.replaceAll("_", "-") === currentSubTab;
+  const isWithinRange = isDentroRango || (coincideConSolicitud && solicitudEnRango);
+
+  if (!isWithinRange) {
+    let mensaje = "No se pueden editar los datos fuera del rango permitido.";
   
-  export const handleEditar = ({
-    activeMainTab,
-    activeSubTabQuim1,
-    activeSubTabQuim2,
-    estadoFechas,
-    forceEdit,
-    setForceEdit,
-    setInputsDisabled,
-    tieneDatosGuardados
-  }) => {
-    let currentSubTab = "";
-    if (activeMainTab === "quimestre1") {
-      currentSubTab = activeSubTabQuim1;
-    } else if (activeMainTab === "quimestre2") {
-      currentSubTab = activeSubTabQuim2;
-    } else if (activeMainTab === "notaFinal") {
-      currentSubTab = "notaFinal";
+    if (coincideConSolicitud && !solicitudEnRango) {
+      mensaje = "La solicitud de edición ha expirado. Ya no está dentro del rango de fechas permitido.";
     }
   
-    const isWithinRange = estadoFechas[currentSubTab] ?? false;
-    if (!isWithinRange) {
-      Swal.fire({
-        icon: "warning",
-        title: "No se pueden desbloquear",
-        text: "No se pueden editar los datos fuera del rango permitido.",
-      });
-      return;
-    }
-  
-    if (forceEdit) {
-      Swal.fire({
-        icon: "info",
-        title: "Ya están desbloqueados",
-        text: "Los campos ya se encuentran disponibles para edición.",
-      });
-      return;
-    }
-  
-    if (tieneDatosGuardados()) {
-      Swal.fire({
-        icon: "warning",
-        title: "Edición no permitida",
-        text: "Las calificaciones ya fueron guardadas. Usa el ✏️ de cada fila si necesitas editar.",
-      });
-      return;
-    }
-  
-    setForceEdit(true);
-    localStorage.removeItem("inputsLocked");
-    setInputsDisabled(false);
     Swal.fire({
-      icon: "success",
-      title: "Edición habilitada",
-      text: "Los campos se han desbloqueado para edición.",
+      icon: "warning",
+      title: "Edición no permitida",
+      text: mensaje,
     });
-  };
+    return;
+  }  
+
+  if (forceEdit) {
+    Swal.fire({
+      icon: "info",
+      title: "Ya están desbloqueados",
+      text: "Los campos ya se encuentran disponibles para edición.",
+    });
+    return;
+  }
+
+  if (tieneDatosGuardados()) {
+    Swal.fire({
+      icon: "warning",
+      title: "Edición no permitida",
+      text: "Las calificaciones ya fueron guardadas. Usa el ✏️ de cada fila si necesitas editar.",
+    });
+    return;
+  }
+
+  setForceEdit(true);
+  localStorage.removeItem("inputsLocked");
+  setInputsDisabled(false);
+  const mensaje = coincideConSolicitud
+    ? "La edición fue habilitada gracias a una solicitud de permiso aprobada. Puedes ingresar las calificaciones."
+    : "Los campos se han desbloqueado para edición.";    
+  Swal.fire({
+    icon: "success",
+    title: "Edición habilitada",
+    text: mensaje,
+  });
+
+};

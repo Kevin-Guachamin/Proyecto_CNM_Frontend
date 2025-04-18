@@ -214,7 +214,7 @@ function BuscarTutor() {
 
                     <div>
                         {console.log("este es el representante", representante)}
-                        <div className='Contendor-tabla'>
+                        <div className='Contenedor-tabla'>
                             <table className="tabla_registros">
                                 <thead>
                                     <tr>
@@ -268,7 +268,7 @@ function BuscarTutor() {
 
                             <div>
 
-                                <div className='Contendor-tabla'>
+                                <div className='Contenedor-tabla'>
                                     <table className="tabla_registros">
                                         <thead>
                                             <tr>

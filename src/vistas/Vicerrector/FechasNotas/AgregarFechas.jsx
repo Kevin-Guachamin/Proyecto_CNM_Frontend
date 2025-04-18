@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../../components/Header";
-import Layout from "../../layout/Layout";
-import Loading from "../../components/Loading";
+import Header from "../../../components/Header";
+import Layout from "../../../layout/Layout";
+import Loading from "../../../components/Loading";
 import axios from "axios";
-import { ErrorMessage } from "../../Utils/ErrorMesaje";
+import { ErrorMessage } from "../../../Utils/ErrorMesaje";
 import CrearFechas from "./CrearFechas";
-import Filtro from "../Admin/Components/Filtro";
-import Tabla from "../Admin/Components/Tabla";
+import Filtro from "../../Admin/Components/Filtro";
+import Tabla from "../../Admin/Components/Tabla";
 import Swal from "sweetalert2";
-import { getModulos, transformModulesForLayout } from "../getModulos";
-import { Eliminar } from '../../Utils/CRUD/Eliminar';
+import { getModulos, transformModulesForLayout } from "../../getModulos";
+import { Eliminar } from '../../../Utils/CRUD/Eliminar';
 
 function AgregarFechas() {
   const navigate = useNavigate();
@@ -51,25 +51,40 @@ function AgregarFechas() {
     return `${day}/${month}/${year}`;
   };  
 
+  const ordenDescripcion = [
+    "parcial1_quim1",
+    "parcial2_quim1",
+    "quimestre1",
+    "parcial1_quim2",
+    "parcial2_quim2",
+    "quimestre2",
+    "nota_final"
+  ];
+  
   const fetchFechas = async () => {
     try {
       setLoading(true);
       const response = await axios.get(
         `${import.meta.env.VITE_URL_DEL_BACKEND}/fechas_notas/obtener_todo`
       );
-      // Transformar los datos para que las fechas se muestren en formato DD/MM/YYYY
+  
       const transformedData = response.data.map(item => ({
         ...item,
         fecha_inicio: parseFecha(item.fecha_inicio),
-        fecha_fin: parseFecha(item.fecha_fin)
+        fecha_fin: parseFecha(item.fecha_fin),
+        descripcion: item.descripcion, 
+        descripcion_legible: descripcionLegible[item.descripcion] 
       }));
+      transformedData.sort((a, b) => {
+        return ordenDescripcion.indexOf(a.descripcion) - ordenDescripcion.indexOf(b.descripcion);
+      });  
       setFechas(transformedData);
     } catch (error) {
       ErrorMessage(error);
     } finally {
       setLoading(false);
     }
-  };      
+  };        
 
   const handleAddFecha = () => {
     setFechaToUpdate(null);
@@ -125,12 +140,22 @@ function AgregarFechas() {
   };
 
   const filteredFechas = fechas.filter(fecha =>
-    fecha.descripcion.toLowerCase().includes(search.toLowerCase())
-  );
+    fecha.descripcion_legible.toLowerCase().includes(search.toLowerCase())
+  );  
   
   if (loading) {
     return <Loading />;
   }
+
+  const descripcionLegible = {
+    parcial1_quim1: "Parcial 1 - Quimestre 1",
+    parcial2_quim1: "Parcial 2 - Quimestre 1",
+    quimestre1: "Quimestre 1",
+    parcial1_quim2: "Parcial 1 - Quimestre 2",
+    parcial2_quim2: "Parcial 2 - Quimestre 2",
+    quimestre2: "Quimestre 2",
+    nota_final: "Nota Final"
+  };
   
   return (
     <>
@@ -151,9 +176,8 @@ function AgregarFechas() {
             key={fechas.length} // Forzar re-render
             filteredData={filteredFechas}
             OnEdit={handleEditFecha}
-            OnDelete={handleDeleteFecha}
             headers={["Descripción", "Fecha Inicio", "Fecha Fin", "Acciones"]}
-            columnsToShow={["descripcion", "fecha_inicio", "fecha_fin"]}
+            columnsToShow={["descripcion_legible", "fecha_inicio", "fecha_fin"]}
           />
         </div>
       </Layout>
@@ -163,6 +187,7 @@ function AgregarFechas() {
           onCancel={handleCancelModal}
           entityToUpdate={fechaToUpdate}
           onSave={handleSaveFecha}
+          fechas={fechas}
         />
       )}
     </>

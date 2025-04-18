@@ -3,6 +3,7 @@ import Boton from '../../../../../components/Boton';
 import DatePicker from 'react-datepicker';
 import '../../../Styles/CrearEntidad.css';
 import "react-datepicker/dist/react-datepicker.css";
+import { convertirFecha } from '../../../../../Utils/Funciones';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 //import { faDownload } from '@fortawesome/free-solid-svg-icons';
 //import axios from 'axios';
@@ -25,11 +26,7 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
   const [canton, setCanton] = useState("")
   const [nacionalidad,setNacionalidad]=useState("")
   const token=localStorage.getItem("token")
-  const convertirFecha = (fecha) => {
-    if (!fecha) return null;
-    const [dia, mes, año] = fecha.split('/');
-    return new Date(`${año}-${mes}-${dia}`); // Convertir a formato ISO (yyyy-mm-dd)
-  };
+  
   useEffect(() => {
     if (entityToUpdate) {
       setNroCedula(entityToUpdate.nroCedula || "");

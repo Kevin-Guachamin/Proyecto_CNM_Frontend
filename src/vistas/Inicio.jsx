@@ -18,7 +18,7 @@ const Inicio = () => {
 
     if (storedUser && storedToken) {
       const parsedUser = JSON.parse(storedUser);
-      if (!["Profesor", "Vicerrector", "Secretaria"].includes(parsedUser.subRol)) {
+      if (!["Profesor", "Vicerrector", "Secretaria","Administrador"].includes(parsedUser.subRol)) {
         navigate("/");
         return;
       }
