@@ -11,7 +11,7 @@ function SolicitudesDocente({ usuario, solicitudes, setSolicitudes }) {
     const [solicitudesPendientes, setSolicitudesPendientes] = useState([])
     const [solicitudesAceptadas, setSolicitudesAceptadas] = useState([])
     const [solicitudesRechazadas, setSolicitudesRechazadas] = useState([])
-    const [vistaActual, setVistaActual] = useState();
+    const [vistaActual, setVistaActual] = useState("pendientes");
     const [isModalOpen, setIsModalOpen] = useState(false)
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
     const token = localStorage.getItem("token")
@@ -20,16 +20,14 @@ function SolicitudesDocente({ usuario, solicitudes, setSolicitudes }) {
         filtrarSolicitudes();
     }, [solicitudes]);
     function formatearFechaLegible(fechaISO) {
-        const fecha = new Date(fechaISO);
+        const [año, mes, dia] = fechaISO.split("-");
+        const fecha = new Date(año, mes - 1, dia); // construye fecha en local sin zona horaria UTC
 
-        return fecha.toLocaleString("es-EC", {
-            weekday: "long",     // sábado
-            year: "numeric",     // 2025
-            month: "long",       // abril
-            day: "numeric",      // 12
-            hour: "2-digit",     // 14
-            minute: "2-digit",   // 58
-            hour12: false,       // formato 24h
+        return fecha.toLocaleDateString("es-EC", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric"
         });
     }
     const toggleModal = () => {
@@ -49,6 +47,15 @@ function SolicitudesDocente({ usuario, solicitudes, setSolicitudes }) {
                     iconColor: "#218838",
                     confirmButtonText: "Entendido",
                     confirmButtonColor: "#003F89",
+                }).then(() => {
+                    Swal.fire({
+                        icon: "info",
+                        title: "¡Importante!",
+                        text: "🔔 Importante: envía la justificación al correo del Vicerrector para completar el proceso de aprobación de la solicitud.",
+                        iconColor: "#0d6efd",
+                        confirmButtonText: "Entendido",
+                        confirmButtonColor: "#003F89",
+                    });
                 });
             }))
             .catch(err => {
@@ -126,6 +133,7 @@ function SolicitudesDocente({ usuario, solicitudes, setSolicitudes }) {
                             <Card>
                                 <Card.Body>
                                     <Card.Title>{`${s.Docente.primer_nombre} ${s.Docente.primer_apellido}`}</Card.Title>
+
                                     <Card.Text className='solicitudes-card-texto'>
                                         <strong>Fecha:</strong> {formatearFechaLegible(s.fechaSolicitud)} <br />
                                         <strong>Motivo:</strong> {s.motivo} <br />
@@ -138,12 +146,12 @@ function SolicitudesDocente({ usuario, solicitudes, setSolicitudes }) {
                                                 <strong>Fecha fin:</strong> {s.fecha_fin} <br />
                                             </>
                                         )}
-
-                                        <div className="acciones-solicitud">
-                                            <button onClick={() => handleEliminarSolicitud(s.ID)} className="btn-eliminar">Eliminar</button>
-                                        </div>
-
                                     </Card.Text>
+
+                                    {/* ✅ Ahora este div ya no está dentro de un <p> */}
+                                    <div className="acciones-solicitud">
+                                        <button onClick={() => handleEliminarSolicitud(s.ID)} className="btn-eliminar">Eliminar</button>
+                                    </div>
                                 </Card.Body>
                             </Card>
                         </Col>

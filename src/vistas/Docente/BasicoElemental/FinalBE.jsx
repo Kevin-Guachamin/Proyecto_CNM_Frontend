@@ -287,7 +287,7 @@ const FinalBE = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inpu
         imagenDerecha={"/Ministerio.png"}
       />
       {!isWithinRange && (
-        <div className="alert alert-warning text-center">
+        <div className="alert alert-warning text-center screen-only">
           🕒 {rangoTexto || "Este parcial aún no está disponible para edición."}
         </div>
       )}

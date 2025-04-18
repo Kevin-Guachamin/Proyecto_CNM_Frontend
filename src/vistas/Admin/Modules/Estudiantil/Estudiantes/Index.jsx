@@ -3,10 +3,9 @@ import Header from "../../../../../components/Header";
 import Layout from '../../../../../layout/Layout'
 import Loading from "../../../../../components/Loading";
 import ContenedorEstudiante from "./ContenedorEstudiante";
-import { modulesEstudiates } from "../../../Components/Modulos"
+import { moduloInicio, modulesEstudiantesBase, construirModulosConPrefijo } from "../../../Components/Modulos";
 import axios from 'axios'
 import CrearEstudiante from "./CrearEstudiante";
-
 import { ErrorMessage } from "../../../../../Utils/ErrorMesaje";
 import Paginación from '../../../Components/Paginación';
 import { useNavigate } from "react-router-dom";
@@ -22,14 +21,13 @@ function Index() {
   const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate()
   const [estudiante,setEstudiante]=useState({})
-
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const headers = ["Cédula", "Nombre", "Apellido", "Jornada", "Especialidad", "Nivel", "Acciones"];
   const colums = ["nroCedula", "primer_nombre", "primer_apellido", "jornada", "especialidad", "nivel"]
   const filterKey = "primer_nombre"
   const PK = "ID"
   const token=localStorage.getItem("token")
-  
+  const [modulos, setModulos] = useState([]);
 
   const DatosEstudiante =(estudiante)=>{
     setActiveTabId("tab2")
@@ -87,12 +85,18 @@ function Index() {
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = JSON.parse(storedUser);
-    if (!parsedUser || parsedUser.subRol !== "Administrador" && parsedUser.subRol !=="Secretaria") {
+    if (!parsedUser || (parsedUser.subRol !== "Administrador" && parsedUser.subRol !== "Secretaria")) {
       navigate("/");
     } else {
       setUsuario(parsedUser);
+      const modulosDinamicos = [
+        moduloInicio,
+        ...construirModulosConPrefijo(parsedUser.subRol, modulesEstudiantesBase)
+      ];
+      setModulos(modulosDinamicos);
     }
   }, [navigate]);
+  
   useEffect(() => {
     setLoading(true);
     axios.get(`${API_URL}/estudiante/obtener?page=${page}`,{headers: { Authorization: `Bearer ${token}` },
@@ -114,7 +118,7 @@ function Index() {
       <div className="container-fluid p-0">
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
-      <Layout modules={modulesEstudiates}>
+      <Layout modules={modulos}>
         <TabSwitcher tabs={tabs} activeTabId={activeTabId} setActiveTabId={setActiveTabId} activeTabs={activeTabs} setActiveTabs={setActiveTabs}/>
       </Layout>
     </div>

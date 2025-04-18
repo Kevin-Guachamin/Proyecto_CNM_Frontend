@@ -24,16 +24,13 @@ function Solicitudes({ solicitudes }) {
 
   };
   function formatearFechaLegible(fechaISO) {
-    const fecha = new Date(fechaISO);
-
-    return fecha.toLocaleString("es-EC", {
-      weekday: "long",     // sábado
-      year: "numeric",     // 2025
-      month: "long",       // abril
-      day: "numeric",      // 12
-      hour: "2-digit",     // 14
-      minute: "2-digit",   // 58
-      hour12: false,       // formato 24h
+    const [año, mes, dia] = fechaISO.split("-");
+    const fecha = new Date(año, mes - 1, dia); // construye fecha en local sin zona horaria UTC
+    return fecha.toLocaleDateString("es-EC", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric"
     });
   }
   const handlePlazos = (id, estado) => {
@@ -143,6 +140,7 @@ function Solicitudes({ solicitudes }) {
               <Card>
                 <Card.Body>
                   <Card.Title>{`${s.Docente.primer_nombre} ${s.Docente.primer_apellido}`}</Card.Title>
+
                   <Card.Text className='solicitudes-card-texto'>
                     <strong>Fecha:</strong> {formatearFechaLegible(s.fechaSolicitud)} <br />
                     <strong>Motivo:</strong> {s.motivo} <br />
@@ -154,18 +152,19 @@ function Solicitudes({ solicitudes }) {
                         <strong>Fecha fin:</strong> {s.fecha_fin} <br />
                       </>
                     )}
+                  </Card.Text>
+
+                  {/* ✅ Este bloque ya no está dentro de un <p> */}
+                  <div className="acciones-solicitud">
                     {vistaActual === "pendientes" ? (
-                      <div className="acciones-solicitud">
+                      <>
                         <button onClick={() => handlePlazos(s.ID, "Aceptada")} className="btn-aceptar">Aceptar</button>
                         <button onClick={() => handleActualizarEstado(s.ID, "Rechazada")} className="btn-rechazar">Rechazar</button>
-                      </div>
+                      </>
                     ) : (
-                      <div className="acciones-solicitud">
-
-                        <button onClick={() => handleEliminarSolicitud(s.ID)} className="btn-eliminar">Eliminar</button>
-                      </div>
+                      <button onClick={() => handleEliminarSolicitud(s.ID)} className="btn-eliminar">Eliminar</button>
                     )}
-                  </Card.Text>
+                  </div>
                 </Card.Body>
               </Card>
             </Col>
