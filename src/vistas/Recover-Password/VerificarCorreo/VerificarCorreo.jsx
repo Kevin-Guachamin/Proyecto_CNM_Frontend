@@ -23,7 +23,7 @@ function VerificarCorreo() {
       setTimeout(() => {
         console.log("Redirigiendo...");
         window.location.href = "/";
-      }, 2500);
+      }, 4500);
     })
     .catch(error=>{
       setError(error.response.data.message)

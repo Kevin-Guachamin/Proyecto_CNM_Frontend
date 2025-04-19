@@ -1,7 +1,7 @@
 import { FaEdit, FaTrash } from 'react-icons/fa'; // Importar íconos
 import "../../../Styles/Tabla.css"
 
-function Tabla({ filteredData, OnDelete, OnEdit, extraIcon }) {
+function Tabla({ filteredData, OnDelete, OnEdit}) {
 
     return (
         <div className="Contenedor-tabla">
