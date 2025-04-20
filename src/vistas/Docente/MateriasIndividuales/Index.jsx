@@ -10,10 +10,27 @@ function Index() {
     const [usuario, setUsuario] = useState(null);
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
     const navigate = useNavigate()
-
+    const [periodo,setPeriodo]=useState("")
     const token = localStorage.getItem("token")
     const [inscripciones, setInscripciones] = useState([])
+    const [limit, setLimit] = useState("")
+    const [page, setPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(1);
+    
+    const [width, setWidth] = useState(window.innerWidth);
+    // ✅ Detectar cambio de tamaño de pantalla
+    useEffect(() => {
+        const handleResize = () => setWidth(window.innerWidth);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
+    // ✅ Establecer límite de resultados según resolución
+    useEffect(() => {
+
+        const isLaptop = width <= 1822;
+        setLimit(isLaptop ? 13 : 21);
+    }, [width]);
     useEffect(() => {
         const storedUser = localStorage.getItem("usuario");
         const parsedUser = JSON.parse(storedUser);
@@ -27,18 +44,32 @@ function Index() {
         }
     }, [API_URL, navigate]);
     useEffect(() => {
-        if (usuario) {
-          axios.get(`${API_URL}/inscripcion/obtener/docente/${usuario.nroCedula}`, {
+  
+      axios.get(`${API_URL}/periodo_academico/activo`, {
+          headers: { Authorization: `Bearer ${token}` },
+      })
+          .then(response => {
+              setPeriodo(response.data);
+          })
+          .catch(error => {
+              ErrorMessage(error)
+
+          });
+  }, [API_URL, token]);
+    useEffect(() => {
+        if (usuario && periodo) {
+          
+          axios.get(`${API_URL}/inscripcion/obtener/docente/${usuario.nroCedula}/${periodo.ID}?page=${page}&limit=${limit}`, {
             headers: { Authorization: `Bearer ${token}` },
           })
           .then(res => {
-            setInscripciones(res.data);
+            setInscripciones(res.data.data);
           })
           .catch(err => {
             ErrorMessage(err);
           });
         }
-      }, [usuario]); // 👈 impo
+      }, [usuario,periodo]); 
 
 
 
@@ -51,7 +82,7 @@ function Index() {
             <Layout modules={transformModulesForLayout(getModulos("Profesor", true))}>
                 {console.log("asqui va el usuario", usuario)}
                 {usuario && (
-                    <Materias docente={usuario} inscripciones={inscripciones} setInscripciones={setInscripciones}/>
+                    <Materias docente={usuario} inscripciones={inscripciones} setInscripciones={setInscripciones} periodo={periodo} page={page} totalPages={totalPages} setPage={setPage}/>
                 )}
             </Layout>
         </div>
