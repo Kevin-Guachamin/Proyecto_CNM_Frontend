@@ -51,7 +51,7 @@ function Index() {
             <Layout modules={transformModulesForLayout(getModulos("Profesor", true))}>
                 {console.log("asqui va el usuario", usuario)}
                 {usuario && (
-                    <Materias docente={usuario} inscripciones={inscripciones} />
+                    <Materias docente={usuario} inscripciones={inscripciones} setInscripciones={setInscripciones}/>
                 )}
             </Layout>
         </div>

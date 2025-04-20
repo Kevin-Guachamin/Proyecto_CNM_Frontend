@@ -4,7 +4,7 @@ import axios from 'axios';
 import { ErrorMessage } from '../../../Utils/ErrorMesaje';
 import AutoCompleteInput from '../../Admin/Modules/Configuration/Cursos/AutoCompleteInput';
 import Boton from '../../../components/Boton';
-import { CupSoda } from 'lucide-react';
+
 
 
 function MatriculaIndividual({ onCancel, entityToUpdate, onSave, periodo,docente }) {
@@ -34,11 +34,11 @@ function MatriculaIndividual({ onCancel, entityToUpdate, onSave, periodo,docente
   useEffect(() => {
     if (entityToUpdate) {
 
-      setAsignatura(entityToUpdate.Asignacion.Materia || "");
-      setDia1(entityToUpdate.Asignacion.dias[0] || "")
-      setDia2(entityToUpdate.Asignacion.dias[1] || "")
-      setHoraInicio(entityToUpdate.Asignacion.horaInicio || "")
-      setHoraFin(entityToUpdate.Asignacion.horaFin || "")
+      setAsignatura(entityToUpdate.Materia || "");
+      setDia1(entityToUpdate.dias[0] || "")
+      setDia2(entityToUpdate.dias[1] || "")
+      setHoraInicio(entityToUpdate.horaInicio || "")
+      setHoraFin(entityToUpdate.horaFin || "")
       
     }
   }, [entityToUpdate]);

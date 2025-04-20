@@ -14,7 +14,7 @@ function Busqueda({ docente }) {
     const token = localStorage.getItem("token")
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [idAsignacion, setIdAsignacion] = useState("")
-    console.log("este es el docente", docente)
+    
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
     useEffect(() => {
 
@@ -91,7 +91,7 @@ function Busqueda({ docente }) {
                     <div>
                         <InfoEstudiante estudiante={estudiante} />
                         <button className="btn-buscar" onClick={toggleModal}>
-                            Empezar matrícula
+                            Crear matrícula
                         </button>
                     </div>
 
