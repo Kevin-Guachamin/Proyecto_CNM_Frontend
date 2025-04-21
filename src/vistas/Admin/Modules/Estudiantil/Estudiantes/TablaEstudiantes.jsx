@@ -26,9 +26,9 @@ function TablaEstudiantes({ filteredData, OnDelete, OnEdit, headers, columnsToSh
                     <td className="tabla-celda" key={subIndex}>{item[col]}</td>
                   ))}
                   <td className='botones-icon'>
-                    <FaEdit size={20} className="icon edit-icon" onClick={() => OnEdit(item)} />
-                    <FaTrash size={20} className="icon delete-icon" onClick={() => OnDelete(item)} />
-                    <IoEyeOutline size={20} className='view-icon' onClick={() => OnView(item)} />
+                    <FaEdit size={20} title='editar' className="icon edit-icon" onClick={() => OnEdit(item)} />
+                    <FaTrash size={20} title='eliminar' className="icon delete-icon" onClick={() => OnDelete(item)} />
+                    <IoEyeOutline size={20} title='ver información' className='view-icon' onClick={() => OnView(item)} />
                   </td>
                 </tr>
               ))}

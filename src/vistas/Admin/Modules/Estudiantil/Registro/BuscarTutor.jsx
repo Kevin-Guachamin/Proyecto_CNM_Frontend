@@ -168,9 +168,9 @@ function BuscarTutor() {
                                     <td className='tabla-celda'>{representante.email}</td>
                                     <td className='tabla-celda'>{representante.celular}</td>
                                     <td className='botones-icon'>
-                                        {!exist && (<FaEdit size={20} className="icon edit-icon" onClick={() => handleEditRepresentante(representante)} />)}
+                                        {!exist && (<FaEdit size={20} title='editar' className="icon edit-icon" onClick={() => handleEditRepresentante(representante)} />)}
 
-                                        <FaTrash size={20} className="icon delete-icon" onClick={() => handleDelete('representante')} />
+                                        <FaTrash size={20} title='eliminar' className="icon delete-icon" onClick={() => handleDelete('representante')} />
                                     </td>
                                 </tr>
                             </tbody>

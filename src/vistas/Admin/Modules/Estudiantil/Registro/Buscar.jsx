@@ -237,10 +237,12 @@ function BuscarTutor() {
                                             <FaEdit
                                                 className="icon edit-icon"
                                                 onClick={() => handleEditRepresentante(representante)}
+                                                title='editar'
                                             />
                                             <FaTrash
                                                 className="icon delete-icon"
                                                 onClick={() => handleDeleteRepresentante(representante)}
+                                                title='eliminar'
                                             />
                                         </td>
 
