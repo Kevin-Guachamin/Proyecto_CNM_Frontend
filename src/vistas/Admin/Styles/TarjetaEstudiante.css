@@ -5,6 +5,7 @@
     padding: 10px;
     transition: box-shadow 0.2s ease-in-out;
     background-color: #CFD8DC !important;
+    margin-bottom: 1rem;
   }
   
   .student-card:hover {
