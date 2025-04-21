@@ -7,7 +7,9 @@ export const getModulos = (subRol, includeInicio = false) => {
         baseModules = [
           { id: 1, titulo: "Calificaciones", icono: "📊", link: "/profesor/panelcursos" },
           { id: 2, titulo: "Cambiar contraseña", icono: "🔐", link: "/profesor/password"},
-          { id: 3, titulo: "Solicitudes", icono: "📨", link: "/profesor/solicitudes"}
+          { id: 3, titulo: "Solicitudes", icono: "📨", link: "/profesor/solicitudes"},
+          { id: 4, titulo: "Matriculación", icono: "✏️", link: "/profesor/matricula"},
+          { id: 5, titulo: "Materias Individuales", icono: "👥", link: "/profesor/materias"}
         ];
         break;
       case "Vicerrector":
@@ -15,7 +17,8 @@ export const getModulos = (subRol, includeInicio = false) => {
           { id: 1, titulo: "Distributivo de Docentes", icono: "🧑‍🏫", link: "/vicerrector/distributivo" },
           { id: 2, titulo: "Fechas para notas", icono: "📅", link: "/vicerrector/reportes" },
           { id: 3, titulo: "Agenda solicitudes", icono: "📝", link: "/vicerrector/solicitudes"},
-          { id: 4, titulo: "Cambiar contraseña", icono: "🔐", link: "/vicerrector/password"}
+          { id: 4, titulo: "Cambiar contraseña", icono: "🔐", link: "/vicerrector/password"},
+         
         ];
         break;
       case "Secretaria":

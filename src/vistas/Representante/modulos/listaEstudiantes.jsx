@@ -8,22 +8,58 @@ import VerCalificacionesEstudiante from "./VerCalificacionesEstudiante";
 
 function ListaEstudiantes() {
   // Estado para almacenar la información del usuario conectado
-  const [usuario, setUsuario] = useState(null);
+  const [usuario, setUsuario] = useState([]);  
   const [datosEstudiante, setDatosEstudiante] = useState([]);
-  const [estudianteSeleccionado, setEstudianteSeleccionado] = useState(null);
+  const [estudianteSeleccionado, setEstudianteSeleccionado] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCalificacionesOpen, setIsCalificacionesOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  let periodosMatriculados = [];
+  //let periodosDatos = [];
+  const [periodosDatos, setPeriodosDatos] = useState([]);
 
-  const handleVerCalificaciones = async (estudianteId) => {
-    console.log("ver calificaciones de: ", estudianteId);
+  const handleVerCalificaciones = async (estudianteCedula) => {
+    console.log("ver calificaciones de: ", estudianteCedula);
+     
     try {
-      const respuesta = await axios.get(`http://localhost:8000/estudiante/obtener/${estudianteId}`);
-      setEstudianteSeleccionado(respuesta.data);
+      const token = localStorage.getItem("token");
+      const baseURL = import.meta.env.VITE_URL_DEL_BACKEND;
+      const headers = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
       
+      // Solicitud para obtener los datos de un estudiante en caso
+      // de que se haga click en su correspondiente boton
+      // de Ver calificaciones
+      const { data: estudiante } = await axios.get(
+        `${baseURL}/estudiante/obtener/${estudianteCedula}`, 
+        headers
+      );
+      setEstudianteSeleccionado(estudiante);
+      
+      // Solicitud para ver todos los periodos academicos en los que un estudiante se matriculo 
+      const { data: periodosMatriculados } = await axios.get(
+        `${baseURL}/matricula/estudiante/${estudiante.ID}`, 
+        headers
+      ); 
+      // Devuelve un array con objetos. 
+      // Formato de objetos {ID de la matricula:, ID periodo academico:} 
+      // Ejemplo [{ID: 21, ID_periodo_academico: "Periodo academico 2024-2025"}]
 
-      // Obtener las notas del estudiante 
-      
+      // Solicitud par obtener datos de los periodos academicos en los que se matriculo el estudiante
+      const respuestaPeriodosDatos = await Promise.all(
+        periodosMatriculados.map(matricula => 
+          axios.get(`${baseURL}/periodo_academico/obtener/${matricula.ID_periodo_academico}`, headers)
+            .then(response => ({
+              ...matricula,
+              descripcion: response.data.descripcion
+            }))
+        )
+      );
+  
+      setPeriodosDatos(respuestaPeriodosDatos);
       setIsCalificacionesOpen(true);
 
     } catch (error) {
@@ -35,7 +71,13 @@ function ListaEstudiantes() {
 
   const handleVerDatosEstudiante = async (estudianteCedula) => {
    try {
-    const respuesta = await axios.get(`http://localhost:8000/estudiante/obtener/${estudianteCedula}`);
+
+    const token = localStorage.getItem("token");
+    const respuesta = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/estudiante/obtener/${estudianteCedula}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
     setEstudianteSeleccionado(respuesta.data);
     setIsModalOpen(true);
 
@@ -47,47 +89,50 @@ function ListaEstudiantes() {
  
   }
 
-  // Mientras no se conecte al backend, dejamos un usuario de prueba
-  const cargarDatos = async () => {
-    try {
-      setIsLoading(true);
-
-      // Peticion para obtener datos del representante logeado
-      const representante = await axios.get('http://localhost:8000/representante/obtener/0102030405');
-
-      // Peticion para obtener los estudiantes a cargo del representante logeado
-      const respuesta = await axios.get('http://localhost:8000/api/representantes/0102030405/estudiantes');
-
-      setUsuario({ primer_nombre: representante.data.primer_nombre,
-                    primer_apellido: representante.data.primer_apellido, 
-                    rol: "Representante" 
-      });
-      setDatosEstudiante(respuesta.data);
-      
-      
-    } catch (error) {
-      console.error("Error al cargar datos: ", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }
   
-  // Simulación de usuario ficticio mientras se conecta con el backend
+  //  Obtener los datos del representante guardados en localStorage
   useEffect(() => {
-    // Aquí se realizará la petición al backend cuando esté disponible
-    // axios.get("URL_DEL_BACKEND/usuarioConectado", { headers: { Authorization: `Bearer ${TOKEN}` } })
-    //   .then(response => {
-    //     setUsuario(response.data); // Guardar la información del usuario en el estado
-    //   })
-    //   .catch(error => {
-    //     console.error("Error al obtener los datos del usuario:", error);
-    //   });
-
-    
-    
-    cargarDatos();  
-    
+    const cargarDatos = async () => {
+      setIsLoading(true);
+      try {
+        // Obtener datos del representante logeado
+        const usuarioGuardado = JSON.parse(localStorage.getItem("usuario"));
+        if (usuarioGuardado) {
+          setUsuario(usuarioGuardado);
+        } else {
+          return console.log('El usuario es NULL');
+        }
+      } catch (error) {
+        console.error("Error al cargar datos: ", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    cargarDatos();
   }, []);
+
+  // Obtener los estudiantes a cargo de un representante
+  useEffect(() => {
+    const cargarDatosEstudiantes = async () => {
+      if(!usuario || usuario.length ==- 0) {
+        return;
+      }
+      try {
+        // Peticion para obtener los estudiantes a cargo del representante logeado
+        const token = localStorage.getItem("token");
+        const respuesta = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/api/representantes/${usuario.nroCedula}/estudiantes`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+      setDatosEstudiante(respuesta.data);
+
+      } catch (error) {
+       console.error("Error al cargar datos del estudiante: ", error); 
+      }  
+    }
+    cargarDatosEstudiantes();
+  }, [usuario]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -120,7 +165,9 @@ function ListaEstudiantes() {
         {isCalificacionesOpen && (
           <VerCalificacionesEstudiante
             onCancel={handleCloseModal} 
-            // notas
+            estudiante={estudianteSeleccionado}
+            periodosMatriculados={periodosDatos}
+            
           />
         )}
 
