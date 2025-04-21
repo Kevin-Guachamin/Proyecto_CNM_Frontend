@@ -13,13 +13,14 @@
     display: flex;
     align-items: center; /* Alinea los elementos verticalmente */
     margin-bottom: 0px;
+    width: auto;
 }
 
 .search-input {
     padding: 5px 10px;
     border-radius: 5px;
     border: 1px solid #ccc;
-    width: auto; /* El ancho se ajustará automáticamente al contenido */
+    width: 30ch; /* El ancho se ajustará automáticamente al contenido */
     margin-right: 10px; /* Espacio entre el input y el botón */
 }
 

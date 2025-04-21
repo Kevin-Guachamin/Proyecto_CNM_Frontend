@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { ErrorMessage } from '../../../../Utils/ErrorMesaje';
-import Horarios from './Horarios';
-import Swal from 'sweetalert2';
 import BuscarEstudiante from '../../../components/BuscarEstudiante';
 import InfoEstudiante from '../Estudiantil/Estudiantes/InfoEstudiante';
 import '../../../components/BuscarEstudiante.css'
@@ -13,8 +11,6 @@ function Busqueda() {
     const [cedula, setCedula] = useState("")
     const [estudiante, setEstudiante] = useState("")
     const [buscado, setBuscado] = useState(false); // Estado para saber si ya se buscó
-    
-    
     const [matricula, setMatricula] = useState("")
    
     
@@ -79,7 +75,7 @@ function Busqueda() {
                     <div>
                         <InfoEstudiante estudiante={estudiante} />
                         <button className="btn-buscar" onClick={HandleMatricular}>
-                            Empezar matrícula
+                            Empezar o modificar matrícula
                         </button>
                     </div>
 

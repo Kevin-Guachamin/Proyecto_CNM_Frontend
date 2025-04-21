@@ -23,8 +23,8 @@ function Index() {
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const token = localStorage.getItem("token");
 
-  const headers = ["ID", "Nivel", "Nombre", "Edad mínima", "Acciones"];
-  const colums = ["ID", "nivel", "nombre", "edadMin"];
+  const headers = ["ID", "Nivel", "Nombre","Tipo", "Edad mínima", "Acciones"];
+  const colums = ["ID", "nivel", "nombre","tipo", "edadMin"];
   const filterKey = "nombre";
   const PK = "ID";
 

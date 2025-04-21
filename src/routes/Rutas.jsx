@@ -36,6 +36,9 @@ import InformacionRepresentantes from '../vistas/Secretaria/InformacionEstudiant
 import FechasProcesos from '../vistas/Secretaria/FechasProcesos/FechasProcesos.jsx';
 import VerificarCorreo from '../vistas/Recover-Password/VerificarCorreo/Index.jsx';
 import ResetPassword from '../vistas/Recover-Password/ResetPassword/Index.jsx';
+import MatriculaIndividual from '../vistas/Docente/Matriculacion/Index.jsx';
+import MateriasIndividuales from '../vistas/Docente/MateriasIndividuales/Index.jsx'
+import DistributivoIndividual from '../vistas/Admin/Modules/Matriculacion/MateriasIndividuales/Index.jsx'
 
 //import InformacionEstudiantes from '../vistas/Secretaria/InformacionEstudiantil/Estudiantes/Index.jsx';
 
@@ -59,12 +62,15 @@ function Rutas() {
       <Route path='/admin/representantes' element={<Representantes />} />
       <Route path="/admin/password" element={<ChangePassword_Admin />} />
       <Route path="/admin/buscar_materias" element={<BuscarMaterias />} />
+      <Route path="/admin/asignacionesIndividuales" element={<DistributivoIndividual />} />
 
       {/*RUTAS DEL DOCENTE-Profesor*/}
       <Route path="/profesor/panelcursos/calificaciones" element={<Calificaciones />} />
       <Route path="/profesor/panelcursos" element={<PanelCursos />} />
       <Route path="/profesor/password" element={<ChangePassword_Profesor />} />
       <Route path='/profesor/solicitudes' element={<SolicitudesDocente />} />
+      <Route path='/profesor/matricula' element={<MatriculaIndividual />} />
+      <Route path='/profesor/materias' element={<MateriasIndividuales />} />
 
       {/*Rutas DEL REPRESENTANTE*/}
       <Route path="/representante" element={<Representante />} />

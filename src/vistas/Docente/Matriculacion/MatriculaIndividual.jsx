@@ -1,38 +1,26 @@
 import React from 'react'
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ErrorMessage } from '../../../../../Utils/ErrorMesaje';
-import AutoCompleteInput from './AutoCompleteInput';
-import Boton from '../../../../../components/Boton';
+import { ErrorMessage } from '../../../Utils/ErrorMesaje';
+import AutoCompleteInput from '../../Admin/Modules/Configuration/Cursos/AutoCompleteInput';
+import Boton from '../../../components/Boton';
 
-function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
-  const [paralelo, setParalelo] = useState("");
-  const [docente, setDocente] = useState("");
+
+
+function MatriculaIndividual({ onCancel, entityToUpdate, onSave, periodo,docente }) {
   const [asignatura, setAsignatura] = useState("");
   const [asignaturas, setAsignaturas] = useState([])
   const [dia1, setDia1] = useState("")
   const [dia2, setDia2] = useState("")
   const [horaInicio, setHoraInicio] = useState("")
   const [horaFin, setHoraFin] = useState("")
-  const [cupos, setCupos] = useState("")
-  const [docentes, setDocentes] = useState([])
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const token=localStorage.getItem("token")
   useEffect(() => {
-    axios.get(`${API_URL}/docente/obtener`,{headers: { Authorization: `Bearer ${token}` },
+    
+    axios.get(`${API_URL}/materia/individual`,{headers: { Authorization: `Bearer ${token}` },
     })
       .then(response => {
-        setDocentes(response.data);
-
-      })
-      .catch(error => {
-        ErrorMessage(error);
-
-      })
-    axios.get(`${API_URL}/materia/obtener`,{headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(response => {
-        console.log("esto se recibio", response.data)
         setAsignaturas(response.data);
 
       })
@@ -42,18 +30,16 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
       })
 
 
-  }, [API_URL, setDocentes])
+  }, [API_URL])
   useEffect(() => {
     if (entityToUpdate) {
 
-      setParalelo(entityToUpdate.paralelo || "");
-      setDocente(entityToUpdate.Docente || "");
       setAsignatura(entityToUpdate.Materia || "");
       setDia1(entityToUpdate.dias[0] || "")
       setDia2(entityToUpdate.dias[1] || "")
       setHoraInicio(entityToUpdate.horaInicio || "")
       setHoraFin(entityToUpdate.horaFin || "")
-      setCupos(entityToUpdate.cupos || "")
+      
     }
   }, [entityToUpdate]);
 
@@ -76,13 +62,14 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
       if(dia1===dia2){
         throw new Error("Los días deben ser diferentes")
       }
-      console.log("esta es la asignatura",asignatura.ID)
-      const newAsignacion = { paralelo, horaInicio, horaFin, dias, cupos: Number(cupos), ID_periodo_academico: Number(periodo), nroCedula_docente: docente.nroCedula, ID_materia: asignatura.ID, cuposDisponibles: Number(cupos) };
-      onSave(newAsignacion, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      console.log("esta es la asignatura",docente)
+      const newAsignacion = { horaInicio, horaFin, dias, ID_periodo_academico: Number(periodo), nroCedula_docente: docente.nroCedula, ID_materia: asignatura.ID, cupos:1, cuposDisponibles: 1 };
+      onSave(newAsignacion)
+        
+      ;
     } catch (error) {
       ErrorMessage(error)
+      console.log(error)
     }
 
   };
@@ -98,18 +85,10 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
               <label htmlFor="asignaturas">Asignatura:</label>
               <AutoCompleteInput inputValue={asignatura} setInputValue={setAsignatura} opciones={asignaturas} key1="nombre" key2="nivel" />
             </div>
-
-            <div className="form-group">
-              <label htmlFor="docentes">Docente:</label>
-              <AutoCompleteInput inputValue={docente} setInputValue={setDocente} opciones={docentes} key1="primer_nombre" key2="primer_apellido" />
-            </div>
           </div>
           <div className='rows'>
 
-            <div className='form-group'>
-              <label htmlFor="">Paralelo:</label>
-              <input type="text" value={paralelo} onChange={(e) => setParalelo(e.target.value)} />
-            </div>
+            
             <div className="form-group">
               <label htmlFor="Dia1">Día 1:</label>
               <select id="Dia1" value={dia1} onChange={(e) => setDia1(e.target.value)}>
@@ -136,18 +115,7 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
             </div>
           </div>
           <div className='rows'>
-            <div className="form-group">
-              <label htmlFor="cupos">Cupos:</label>
-              <input
-                id="cupos"
-                type="number"
-                min="0"
-                max="120"
-                value={cupos}
-                onChange={(e) => setCupos(e.target.value)}
-                className="form-control"
-              />
-            </div>
+    
             <div className="form-group">
               <label htmlFor="Dia2">Día 2:</label>
               <select id="Dia2" value={dia2} onChange={(e) => setDia2(e.target.value)}>
@@ -186,4 +154,4 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
   );
 }
 
-export default CrearCurso
+export default MatriculaIndividual
