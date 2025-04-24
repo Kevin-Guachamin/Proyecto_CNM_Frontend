@@ -38,11 +38,13 @@ function Tabla({ filteredData, OnDelete, OnEdit}) {
                                     size={20}
                                         className="icon edit-icon"
                                         onClick={() => OnEdit(item)}
+                                        title='editar'
                                     />
                                     <FaTrash
                                     size={20}
                                         className="icon delete-icon"
                                         onClick={() => OnDelete(item)}
+                                        title='eliminar'
                                     />
                                    
                                 </td>

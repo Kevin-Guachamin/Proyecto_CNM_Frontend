@@ -62,16 +62,7 @@ function Login() {
       }
     } catch (error) {
       setLoading(false);
-      if (error.response && error.response.status === 401) {
-        Swal.fire({
-          icon: "error",
-          title: "Error de autenticación",
-          text: "Cédula o contraseña incorrectos",
-          confirmButtonText: "Intentar de nuevo",
-        });
-      } else {
-        ErrorMessage(error);
-      }
+      ErrorMessage(error)
     }
   };
 

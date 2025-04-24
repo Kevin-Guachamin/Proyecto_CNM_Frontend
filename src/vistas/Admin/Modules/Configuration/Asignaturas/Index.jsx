@@ -39,7 +39,7 @@ function Index() {
   useEffect(() => {
 
     const isLaptop = width <= 1822;
-    setLimit(isLaptop ? 13 : 21);
+    setLimit(isLaptop ? 15 : 21);
   }, [width]);
 
   // ✅ Verificar usuario autenticado
