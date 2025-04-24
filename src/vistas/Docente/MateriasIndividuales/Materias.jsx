@@ -96,6 +96,7 @@ function Materias({ docente, inscripciones, setInscripciones, periodo,page,total
                                             size={20}
                                             className="icon edit-icon"
                                             onClick={() => toggleModal(item.Asignacion)}
+                                            title='editar'
                                         />
 
                                     </td>

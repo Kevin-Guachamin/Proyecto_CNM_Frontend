@@ -29,11 +29,13 @@ function Tabla({ filteredData, OnDelete, OnEdit, headers, columnsToShow }) {
                     size={20}
                     className="icon edit-icon"
                     onClick={() => OnEdit(item)}
+                    title='editar'
                   />
                   {OnDelete && (
                     <FaTrash
                       className="icon delete-icon"
                       onClick={() => OnDelete(item)}
+                      title='eliminar'
                     />
                   )}
                 </td>
