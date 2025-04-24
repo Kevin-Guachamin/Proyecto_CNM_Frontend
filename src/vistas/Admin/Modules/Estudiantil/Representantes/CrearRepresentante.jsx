@@ -122,24 +122,24 @@ function CrearRepresentante({ onCancel, entityToUpdate, onSave }) {
           </div>
           <div className='file-upload-container'>
             <div className='file-upload'>
-
+              <label className='custom-file-label'>
+                Copia de Cédula:
+              </label>
+              <input
+                type="file"
+                name="copiaCedula"
+                className='custom-file-input'
+                onChange={handleFileChange}
+                accept="application/pdf"
+              />
             </div>
-            <label>
-              Copia de Cédula:
-            </label>
-            <input
-              type="file"
-              name="copiaCedula"
 
-              onChange={handleFileChange}
-              accept="application/pdf"
-            />
             <div className='file-upload'>
-              <label>
+              <label className='custom-file-label'>
                 Croquis:
               </label>
               <input
-
+                className='custom-file-input'
                 type="file"
                 name="croquis"
                 onChange={handleFileChange}
