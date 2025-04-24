@@ -63,10 +63,11 @@ function Login() {
     } catch (error) {
       setLoading(false);
       if (error.response && error.response.status === 401) {
+        console.log("este es el error",error)
         Swal.fire({
           icon: "error",
           title: "Error de autenticación",
-          text: "Cédula o contraseña incorrectos",
+          text: `${error.response.message}`,
           confirmButtonText: "Intentar de nuevo",
         });
       } else {
