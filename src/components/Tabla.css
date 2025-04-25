@@ -165,7 +165,7 @@
   display: none;
 }
 .screen-only {
-  display: inline-block;
+  display: block; /* o flex, según el caso */
 }
 .pdf-export .pdf-only {
   display: inline-block !important;
