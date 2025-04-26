@@ -43,6 +43,7 @@ function Index() {
             axios.get(`${API_URL}/asignacion/obtener/docente/${usuario.noCedula}/${periodo.ID}`,{headers: { Authorization: `Bearer ${token}` },
             })
                 .then(res => {
+                    console.log("esto llega de la base",res.data)
                     setAsignaciones(res.data)
                 })
                 .catch(err => {

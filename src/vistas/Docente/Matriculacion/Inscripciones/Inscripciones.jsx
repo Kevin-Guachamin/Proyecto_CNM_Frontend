@@ -89,13 +89,13 @@ function Inscripciones({asignaciones,docente, periodo,setAsignaciones}) {
     }
     return (
         <div className='Contenedor-general'>
-            <div>
-                <button onClick={toggleModal}>Crear Curso</button>
+            <div className='container_btn-finalizar'>
+                <button className='boton-add' onClick={toggleModal}>Crear Curso</button>
             </div>
             {isModalOpen && <CrearCursoIndividual onCancel={toggleModal} onSave={handleCrearAsignacion} docente={docente} periodo={periodo.ID}/>}
             <div className="Contenedor-tabla">
                 {asignaciones.length === 0 ? (
-                <p className="no-registros">No existen registros</p>
+                <p className="no-registros">No existen cursos libres para este docente</p>
                 ) : (
                 <Row xs={1} md={2} lg={5} className="g-2">
                     {asignaciones.map((asig) => {
@@ -131,7 +131,7 @@ function Inscripciones({asignaciones,docente, periodo,setAsignaciones}) {
 
                 </div>
             )}
-            <div className='container btn-finalizar'>
+            <div className='container_btn-finalizar'>
                 <button className="btn-finalizar" onClick={FinalizarMatriculas}>Finalizar</button>
             </div>
         </div>

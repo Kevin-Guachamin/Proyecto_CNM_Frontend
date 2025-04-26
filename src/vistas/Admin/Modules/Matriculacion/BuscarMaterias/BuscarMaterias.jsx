@@ -128,7 +128,7 @@ function BuscarMaterias() {
 
                 </div>
             )}
-            <div className='container btn-finalizar'>
+            <div className='container_btn-finalizar'>
                 <button className="btn-finalizar" onClick={FinalizarMatriculas}>Finalizar</button>
             </div>
         </div>
