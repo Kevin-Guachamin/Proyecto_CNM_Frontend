@@ -12,10 +12,6 @@ const VerCalificacionesEstudiante = ({onCancel, estudiante, periodosMatriculados
   //let inscripciones = [];
 
   const handleCalificaciones = async (matriculaID) => {
-    console.log('Este es el id de la matricula: ', matriculaID);
-
-    console.log("Datos de periodos:", periodosMatriculados);
-    
     // Obtener las inscripciones de un estudiante por ID de matricula
     try {
       const token = localStorage.getItem("token");
@@ -31,7 +27,6 @@ const VerCalificacionesEstudiante = ({onCancel, estudiante, periodosMatriculados
         `${baseURL}/inscripcion/obtener/matricula/${matriculaID}`, 
         headers
       ); 
-      console.log("Inscripciones de la matricula: ", respuestaInscripciones);
 
       // Obtener los datos necesarios de inscripciones
       const inscripciones = respuestaInscripciones.map(inscripcion => {
@@ -42,7 +37,6 @@ const VerCalificacionesEstudiante = ({onCancel, estudiante, periodosMatriculados
           nivel: inscripcion.Asignacion.Materia.nivel
         };
       })
-      console.log("Datos de inscripciones formateados: ", inscripciones);
       
       // Obtener calificaciones parciales de una materia con el ID_asignacion
       // mediante peticiones a endpoints
@@ -84,22 +78,10 @@ const VerCalificacionesEstudiante = ({onCancel, estudiante, periodosMatriculados
       const resultadosCompletos = notas.filter(nota => !nota.error);
       const resultadosConError = notas.filter(nota => nota.error);
 
-      console.log('Resultados completos:', resultadosCompletos);
       if (resultadosConError.length > 0) {
         console.log('Materias con error:', resultadosConError);
       }
 
-      // Datos recuperadas 
-      // return resultadosCompletos;
-
-      // Campos de notas necesarios
-      /* const datos = resultadosCompletos.map(notasMaterias => ({
-        nombreMateria: notasMaterias.nombreMateria,
-        ID_asignacion: notasMaterias.ID_asignacion,
-        nivel: notasMaterias.nivel,
-        calificaciones: notasMaterias.calificaciones
-      }));
- */
       setNotasEstudiante(resultadosCompletos);
       
     } catch (error) {
