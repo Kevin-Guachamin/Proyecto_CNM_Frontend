@@ -14,7 +14,7 @@ import VerDatosRepresentante from '../vistas/Representante/modulos/VerDatosRepre
 import VerDatosEstudiante from '../vistas/Representante/modulos/VerDatosEstudiante.jsx';
 import Cursos from '../vistas/Admin/Modules/Configuration/Cursos/Index.jsx'
 import Matriculacion from '../vistas/Admin/Modules/Matriculacion/Index.jsx';
-import Horarios from '../vistas/Admin/Modules/Matriculacion/Horarios.jsx'
+import Horarios from '../vistas/Admin/Modules/Matriculacion/Horario.jsx'
 import Inscripcion from '../vistas/Admin/Modules/Estudiantil/Registro/Index.jsx'
 import Representantes from '../vistas/Admin/Modules/Estudiantil/Representantes/Index.jsx'
 import AgregarFechas from '../vistas/Vicerrector/FechasNotas/AgregarFechas.jsx';
@@ -39,6 +39,7 @@ import ResetPassword from '../vistas/Recover-Password/ResetPassword/Index.jsx';
 import MatriculaIndividual from '../vistas/Docente/Matriculacion/Index.jsx';
 import MateriasIndividuales from '../vistas/Docente/MateriasIndividuales/Index.jsx'
 import DistributivoIndividual from '../vistas/Admin/Modules/Matriculacion/MateriasIndividuales/Index.jsx'
+import InscripcionesIndividuales from '../vistas/Docente/Matriculacion/Inscripciones/Index.jsx';
 
 //import InformacionEstudiantes from '../vistas/Secretaria/InformacionEstudiantil/Estudiantes/Index.jsx';
 
@@ -71,6 +72,7 @@ function Rutas() {
       <Route path='/profesor/solicitudes' element={<SolicitudesDocente />} />
       <Route path='/profesor/matricula' element={<MatriculaIndividual />} />
       <Route path='/profesor/materias' element={<MateriasIndividuales />} />
+      <Route path='/profesor/inscripciones' element={<InscripcionesIndividuales />} />
 
       {/*Rutas DEL REPRESENTANTE*/}
       <Route path="/representante" element={<Representante />} />
@@ -79,7 +81,7 @@ function Rutas() {
       <Route path="/representante/password" element={<ChangePassword_Representante />} />
       <Route path="/estudiante/perfil" element={<VerDatosEstudiante />} />
       <Route path="/representante/inscripcion" element={<InscripcionRepresentante />} />
-      
+
       {/*RUTAS DEL DOCENTE-Vicerrector*/}
       <Route path="/vicerrector/reportes" element={<AgregarFechas />} />
       <Route path="/vicerrector/password" element={<ChangePassword_Vicerrector />} />

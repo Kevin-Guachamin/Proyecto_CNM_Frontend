@@ -35,7 +35,7 @@ const Horario = ({ materiasSeleccionadas, setMateriasSeleccionadas, jornada }) =
     const eliminarMateria = (inscripcion) => {
         Swal.fire({
             title: '¿Estás seguro?',
-            text: `Va a eliminar una inscripción individual`,
+            text: `Va a eliminar una inscripción`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
@@ -53,27 +53,8 @@ const Horario = ({ materiasSeleccionadas, setMateriasSeleccionadas, jornada }) =
                         prevData.filter((d) => d.Asignacion && d.Asignacion.ID !== inscripcion.Asignacion.ID)
                       );
                 })
-                // Eliminar usuario por PK
-                axios.delete(`${API_URL}/asignacion/eliminar/${inscripcion.Asignacion.ID}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                })
-                    .then(() => {
-
-                        
-
-                        Swal.fire({
-                            icon: "success",
-                            title: "Eliminado!",
-                            text: `La inscripción ha sido eliminada.`,
-                            iconColor: "#218838",
-                            confirmButtonText: "Entendido",
-                            confirmButtonColor: "#003F89",
-                        }
-                        );
-                    })
-                    .catch((error) => {
-                        ErrorMessage(error)
-                    });
+                
+              
             }
         });
     };

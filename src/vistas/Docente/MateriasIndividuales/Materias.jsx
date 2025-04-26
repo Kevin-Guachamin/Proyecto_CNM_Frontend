@@ -1,5 +1,5 @@
 import React, { useState} from 'react'
-import MatriculaIndividual from '../Matriculacion/MatriculaIndividual'
+import MatriculaIndividual from '../Matriculacion/CrearCursoIndividual'
 import { FaEdit } from 'react-icons/fa'; // Importar íconos
 import axios from 'axios';
 import { ErrorMessage } from '../../../Utils/ErrorMesaje';

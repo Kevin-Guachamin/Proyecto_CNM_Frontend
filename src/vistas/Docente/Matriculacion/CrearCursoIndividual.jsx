@@ -7,7 +7,7 @@ import Boton from '../../../components/Boton';
 
 
 
-function MatriculaIndividual({ onCancel, entityToUpdate, onSave, periodo,docente }) {
+function CrearCursoIndividual({ onCancel, onSave, periodo,docente }) {
   const [asignatura, setAsignatura] = useState("");
   const [asignaturas, setAsignaturas] = useState([])
   const [dia1, setDia1] = useState("")
@@ -30,18 +30,8 @@ function MatriculaIndividual({ onCancel, entityToUpdate, onSave, periodo,docente
       })
 
 
-  }, [API_URL])
-  useEffect(() => {
-    if (entityToUpdate) {
-
-      setAsignatura(entityToUpdate.Materia || "");
-      setDia1(entityToUpdate.dias[0] || "")
-      setDia2(entityToUpdate.dias[1] || "")
-      setHoraInicio(entityToUpdate.horaInicio || "")
-      setHoraFin(entityToUpdate.horaFin || "")
-      
-    }
-  }, [entityToUpdate]);
+  }, [])
+ 
 
   const handleSubmit = () => {
 
@@ -63,7 +53,7 @@ function MatriculaIndividual({ onCancel, entityToUpdate, onSave, periodo,docente
         throw new Error("Los días deben ser diferentes")
       }
       console.log("esta es la asignatura",docente)
-      const newAsignacion = { horaInicio, horaFin, dias, ID_periodo_academico: Number(periodo), nroCedula_docente: docente.nroCedula, ID_materia: asignatura.ID, cupos:1, cuposDisponibles: 1 };
+      const newAsignacion = { horaInicio, horaFin, dias, ID_periodo_academico: Number(periodo), nroCedula_docente: docente.nroCedula, ID_materia: asignatura.ID, cupos: 1 };
       onSave(newAsignacion)
         
       ;
@@ -77,7 +67,7 @@ function MatriculaIndividual({ onCancel, entityToUpdate, onSave, periodo,docente
   return (
     <div className="modal-overlay">
       <div className='modal-container'>
-        <h2 className='modal-title'>{entityToUpdate ? 'Editar curso' : 'Agregar curso'}</h2>
+        <h2 className='modal-title'>Agregar curso</h2>
         <div className="modal-form">
           <div className='rows'>
 
@@ -154,4 +144,4 @@ function MatriculaIndividual({ onCancel, entityToUpdate, onSave, periodo,docente
   );
 }
 
-export default MatriculaIndividual
+export default CrearCursoIndividual
