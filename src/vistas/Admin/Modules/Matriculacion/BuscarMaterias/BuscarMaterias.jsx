@@ -76,6 +76,13 @@ function BuscarMaterias() {
         }
     }
     const FinalizarMatriculas = () => {
+        Swal.fire({
+                    icon: "success",
+                    title: `Registro exitoso`,
+                    iconColor: "#218838",
+                    confirmButtonText: "Entendido",
+                    confirmButtonColor: "#003F89",
+                });
         navigate("/admin/matriculacion")
     }
     return (

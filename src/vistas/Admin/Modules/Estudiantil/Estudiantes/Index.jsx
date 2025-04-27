@@ -11,7 +11,7 @@ import Paginación from '../../../Components/Paginación';
 import { useNavigate } from "react-router-dom";
 import TabSwitcher from "./Tabulador";
 import ViewData from "./ViewData";
-import { HandHelping } from "lucide-react";
+
 
 function Index() {
 

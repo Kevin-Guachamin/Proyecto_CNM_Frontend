@@ -63,6 +63,13 @@ function Inscripciones({asignaciones,docente, periodo,setAsignaciones}) {
         }
     }
     const FinalizarMatriculas = () => {
+        Swal.fire({
+                    icon: "success",
+                    title: `Matricula con exitosa`,
+                    iconColor: "#218838",
+                    confirmButtonText: "Entendido",
+                    confirmButtonColor: "#003F89",
+                });
         navigate("/admin/matriculacion")
     }
     const handleCrearAsignacion =(asignacion)=>{
