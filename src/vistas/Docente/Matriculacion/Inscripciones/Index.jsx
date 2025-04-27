@@ -23,7 +23,7 @@ function Index() {
             navigate("/")
         }
         setUsuario(parsedUser)
-        console.log("este es el subRol", parsedUser.subRol)
+        
        setModulos(transformModulesForLayout( getModulos(parsedUser.subRol)))
         
     }, [API_URL, navigate]);
@@ -32,6 +32,7 @@ function Index() {
             headers: { Authorization: `Bearer ${token}` },
         })
             .then(res => {
+                console.log("este es el periodo", res)
                 setPeriodo(res.data)
             })
             .catch(err => {
@@ -40,7 +41,7 @@ function Index() {
     }, [])
     useEffect(() => {
         if (usuario && periodo)
-            axios.get(`${API_URL}/asignacion/obtener/docente/${usuario.noCedula}/${periodo.ID}`,{headers: { Authorization: `Bearer ${token}` },
+            axios.get(`${API_URL}/asignacion/obtener/docente/${usuario.nroCedula}/${periodo.ID}`,{headers: { Authorization: `Bearer ${token}` },
             })
                 .then(res => {
                     console.log("esto llega de la base",res.data)

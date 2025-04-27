@@ -40,6 +40,8 @@ import MatriculaIndividual from '../vistas/Docente/Matriculacion/Index.jsx';
 import MateriasIndividuales from '../vistas/Docente/MateriasIndividuales/Index.jsx'
 import DistributivoIndividual from '../vistas/Admin/Modules/Matriculacion/MateriasIndividuales/Index.jsx'
 import InscripcionesIndividuales from '../vistas/Docente/Matriculacion/Inscripciones/Index.jsx';
+import CursosVacios from '../vistas/Admin/Modules/Configuration/CursosSinMatricula/Index.jsx'
+
 
 //import InformacionEstudiantes from '../vistas/Secretaria/InformacionEstudiantil/Estudiantes/Index.jsx';
 
@@ -64,6 +66,7 @@ function Rutas() {
       <Route path="/admin/password" element={<ChangePassword_Admin />} />
       <Route path="/admin/buscar_materias" element={<BuscarMaterias />} />
       <Route path="/admin/asignacionesIndividuales" element={<DistributivoIndividual />} />
+      <Route path="/admin/cursos_vacios" element={<CursosVacios />} />
 
       {/*RUTAS DEL DOCENTE-Profesor*/}
       <Route path="/profesor/panelcursos/calificaciones" element={<Calificaciones />} />

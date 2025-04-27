@@ -105,7 +105,7 @@ function BuscarTutor() {
 
     const handleRegistrar = async () => {
         try {
-            if (!exist) {
+            if (!representante) {
                 await axios.post(`${API_URL}/representante/crear`, representante, { headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` } });
             }
             console.log("este es el estudiante antes de guardar", estudiante)

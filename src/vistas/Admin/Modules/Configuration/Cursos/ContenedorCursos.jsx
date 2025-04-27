@@ -22,7 +22,7 @@ function ContenedorCursos({ apiEndpoint, PK}) {
     const [page,setPage]=useState(1)
     const [totalPages, setTotalPages] = useState(1);
     const [width, setWidth] = useState(window.innerWidth);
-      const [limit, setLimit] = useState(0);
+    const [limit, setLimit] = useState(0);
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
     
     const token = localStorage.getItem("token")
