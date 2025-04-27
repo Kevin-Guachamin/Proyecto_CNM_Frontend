@@ -54,10 +54,19 @@ function BuscarTutor() {
         }
     };
 
-    const handleSaveRepresentante = (formData) => {
+    const handleSaveRepresentante = async (formData) => {
         const formObject = Object.fromEntries(formData.entries());
-        setRepresentante(formObject);
+         const newRepresentante= await axios.post(`${API_URL}/representante/crear`, formObject, { headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` } });
+        setRepresentante(newRepresentante.data);
         setModalRepresentante(false);
+        Swal.fire({
+            icon: "success",
+            title: `${newRepresentante.data.primer_nombre} ${newRepresentante.data.primer_apellido} registrado con éxito`,
+            iconColor: "#218838",
+            confirmButtonText: "Entendido",
+            confirmButtonColor: "#003F89",
+        });
+
     };
 
     const handleSaveEstudiante = (formData) => {
@@ -105,10 +114,6 @@ function BuscarTutor() {
 
     const handleRegistrar = async () => {
         try {
-            if (!representante) {
-                await axios.post(`${API_URL}/representante/crear`, representante, { headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` } });
-            }
-            console.log("este es el estudiante antes de guardar", estudiante)
             await axios.post(`${API_URL}/estudiante/crear`, estudiante, { headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` } });
 
             Swal.fire({
