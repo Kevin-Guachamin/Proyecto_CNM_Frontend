@@ -11,7 +11,7 @@ import Paginación from '../../../Components/Paginación';
 import { useNavigate } from "react-router-dom";
 import TabSwitcher from "./Tabulador";
 import ViewData from "./ViewData";
-import { HandHelping } from "lucide-react";
+
 
 function Index() {
 
@@ -156,6 +156,7 @@ function Index() {
         const response = await axios.get(`${API_URL}/estudiante/obtener?page=${page}&limit=${limit}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        //console.log("estos son los estudiantes",response)
         setEstudiantes(response.data.data);
         setTotalPages(response.data.totalPages);
       } catch (error) {
@@ -166,7 +167,7 @@ function Index() {
     };
   
     fetchEstudiantes();
-  }, [page]);
+  }, [page,limit]);
   
 
 

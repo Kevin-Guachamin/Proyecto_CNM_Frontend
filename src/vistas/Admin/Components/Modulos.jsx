@@ -3,6 +3,7 @@ import { FaBuilding } from "react-icons/fa";
 import { LuUsers } from "react-icons/lu";
 import { ImUserTie } from "react-icons/im";
 import { FaUsersLine } from "react-icons/fa6";
+import { FiBox } from 'react-icons/fi';
 
 // Modules base sin prefijo
 export const modulesEstudiantesBase = [
@@ -21,7 +22,8 @@ export const modulesSettingsBase = [
   { name: "Periodos académicos", icon: <GraduationCap size={20} />, route: "periodos" },
   { name: "Asignaturas", icon: <Book size={20} />, route: "asignaturas" },
   { name: "Docentes", icon: <ImUserTie size={20} />, route: "docentes" },
-  { name: "Distributivo", icon: <FaBuilding size={20} />, route: "cursos" }
+  { name: "Distributivo", icon: <FaBuilding size={20} />, route: "cursos" },
+  {name: "Cursos vacíos", icon: <FiBox size={20} />, route: "cursos_vacios"}
   
 ];
 

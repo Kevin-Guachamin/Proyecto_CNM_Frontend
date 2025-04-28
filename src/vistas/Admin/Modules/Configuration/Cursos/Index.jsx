@@ -11,7 +11,7 @@ function Index() {
   const [usuario, setUsuario] = useState(null);
   const [cursos, setCursos] = useState([])
   const [modulos, setModulos] = useState([])
-  const [page, setPage] = useState(1);
+  
 
 
 

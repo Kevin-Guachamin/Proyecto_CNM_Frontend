@@ -77,7 +77,7 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
         throw new Error("Los días deben ser diferentes")
       }
       console.log("esta es la asignatura",asignatura.ID)
-      const newAsignacion = { paralelo, horaInicio, horaFin, dias, cupos: Number(cupos), ID_periodo_academico: Number(periodo), nroCedula_docente: docente.nroCedula, ID_materia: asignatura.ID, cuposDisponibles: Number(cupos) };
+      const newAsignacion = { paralelo, horaInicio, horaFin, dias, cupos: Number(cupos), ID_periodo_academico: Number(periodo), nroCedula_docente: docente.nroCedula, ID_materia: asignatura.ID };
       onSave(newAsignacion, {
         headers: { Authorization: `Bearer ${token}` },
       });

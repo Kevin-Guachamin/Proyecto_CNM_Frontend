@@ -3,7 +3,7 @@ import { IoEyeOutline } from "react-icons/io5";
 import "../../../Styles/Tabla.css";
 
 
-function TablaEstudiantes({ filteredData, OnDelete, OnEdit, headers, columnsToShow, OnView }) {
+function TablaEstudiantil({ filteredData, OnDelete, OnEdit, headers, columnsToShow, OnView }) {
 
   return (
     <div className="Contenedor-tabla">
@@ -40,4 +40,4 @@ function TablaEstudiantes({ filteredData, OnDelete, OnEdit, headers, columnsToSh
   );
 }
 
-export default TablaEstudiantes;
+export default TablaEstudiantil;

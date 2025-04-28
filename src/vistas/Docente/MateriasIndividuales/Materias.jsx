@@ -1,71 +1,31 @@
-import React, { useState} from 'react'
-import MatriculaIndividual from '../Matriculacion/MatriculaIndividual'
-import { FaEdit } from 'react-icons/fa'; // Importar íconos
-import axios from 'axios';
-import { ErrorMessage } from '../../../Utils/ErrorMesaje';
-import Swal from 'sweetalert2';
+import React,{useState} from 'react'
+
+    ;
 import Paginación from '../../Admin/Components/Paginación';
 
-function Materias({ docente, inscripciones, setInscripciones, periodo,page,totalPages, setPage }) {
-    console.log("estas son las inscripciones", inscripciones)
-    const [isModalOpoen, setIsModalOpen] = useState(false)
-    const [asignacion, setAsignacion] = useState("")
-    
-    
+function Materias({ docente, inscripciones, page, totalPages, setPage }) {
 
-    const token = localStorage.getItem("token")
-    const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
- 
+ const [search, setSearch] = useState('');
 
-
-    const toggleModal = (item) => {
-        console.log("este es el item", item)
-        setIsModalOpen((prev) => !prev);
-        setAsignacion(item)
-    };
-    console.log("este es el docente", docente)
-
-
-    const EditarInscripcion = (newAsignacion) => {
-        console.log("esta es la asignación", asignacion)
-        axios.put(`${API_URL}/asignacion/editar/${asignacion.ID}`, newAsignacion, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then(res => {
-                setIsModalOpen(false)
-                setInscripciones((prevData) => {
-                    return prevData.map((inscripcion) => {
-                        console.log("este es el primer ID", inscripcion.Asignacion.ID)
-
-                        if (inscripcion.Asignacion.ID === asignacion.ID) {
-                            console.log("esta fue la", inscripcion)
-                            return {
-                                ...inscripcion,
-                                Asignacion: res.data, // actualiza solo el atributo Asignacion
-                            };
-                        }
-                        return inscripcion; // si no coincide, devuelve la inscripción tal cual
-                    });
-                });
-                Swal.fire({
-                    icon: "success",
-                    title: "Edición exitosa",
-                    iconColor: "#218838",
-                    confirmButtonText: "Entendido",
-                    confirmButtonColor: "#003F89",
-                });
-            })
-            .catch(err => {
-                ErrorMessage(err)
-            })
-
-    }
+ const filteredData = inscripciones.filter((item) =>
+    `${item.Matricula.Estudiante.primer_nombre} ${item.Matricula.Estudiante.primer_apellido}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
     return (
         <div className='Contenedor-general'>
-            <h1>{`Materias individuales de ${docente.primer_nombre} ${docente.primer_apellido}`}</h1>
-            {isModalOpoen && <MatriculaIndividual entityToUpdate={asignacion} onCancel={toggleModal} docente={docente} periodo={periodo.ID} onSave={EditarInscripcion} />}
+            <h1 className='periodo-title'>{`Materias individuales de ${docente.primer_nombre} ${docente.primer_apellido}`}</h1>
+            <div className="filter-container">
+                <input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="search-input"
+                    placeholder={`Filtrar por estudiante`}
+                />
+                
+            </div>
             <div className="Contenedor-tabla">
-                {inscripciones.length === 0 ? (
+                {filteredData.length === 0 ? (
                     <p className="no-registros">No hay registros disponibles.</p>
                 ) : (
                     <table className="tabla_registros">
@@ -78,11 +38,11 @@ function Materias({ docente, inscripciones, setInscripciones, periodo,page,total
                                 <th className='tabla-head'>Días</th>
                                 <th className='tabla-head'>Hora inicio</th>
                                 <th className='tabla-head'>Hora fin</th>
-                                <th className='tabla-head'>Acciones</th>
+
                             </tr>
                         </thead>
                         <tbody>
-                            {inscripciones.map((item, index) => (
+                            {filteredData.map((item, index) => (
                                 <tr key={index}>
                                     <td className='tabla-celda'>{`${item.Matricula.Estudiante.primer_nombre} ${item.Matricula.Estudiante.primer_apellido}`}</td>
                                     <td className='tabla-celda'>{item.Matricula.Estudiante.nivel}</td>
@@ -91,15 +51,7 @@ function Materias({ docente, inscripciones, setInscripciones, periodo,page,total
                                     <td className='tabla-celda'>{`${item.Asignacion.dias[0]}${item.Asignacion.dias[1] ? `-${item.Asignacion.dias[1]}` : ''}`}</td>
                                     <td className='tabla-celda'>{item.Asignacion.horaInicio}</td>
                                     <td className='tabla-celda'>{item.Asignacion.horaFin}</td>
-                                    <td className='botones-icon'>
-                                        <FaEdit
-                                            size={20}
-                                            className="icon edit-icon"
-                                            onClick={() => toggleModal(item.Asignacion)}
-                                            title='editar'
-                                        />
 
-                                    </td>
                                 </tr>
                             ))}
                         </tbody>
