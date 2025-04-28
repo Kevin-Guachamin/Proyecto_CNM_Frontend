@@ -53,8 +53,6 @@ function ContenedorRepresentantes({ data, setData, headers, columnsToShow, filte
           placeholder={`Filtrar por ${filterKey}`}
         />
        
-        <button className="boton-download" onClick={()=>toggleModal("download")}><FontAwesomeIcon icon={faDownload} className="icon" />
-                Descargar archivos</button>
         
       </div>
 
