@@ -5,18 +5,11 @@ import ContenedorCursos from "./ContenedorCursos";
 import { moduloInicio, modulesSettingsBase, construirModulosConPrefijo } from "../../../Components/Modulos";
 import { useNavigate } from "react-router-dom";
 
-import Paginación from "../../../Components/Paginación";
+
 
 function Index() {
   const [usuario, setUsuario] = useState(null);
-  const [cursos, setCursos] = useState([])
   const [modulos, setModulos] = useState([])
-  
-
-
-
-
-  const PK = "ID"
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -44,7 +37,7 @@ function Index() {
       <Layout modules={modulos}>
 
 
-        <ContenedorCursos apiEndpoint={"asignacion"} PK={PK} data={cursos} setData={setCursos} />
+        <ContenedorCursos  />
 
 
       </Layout>

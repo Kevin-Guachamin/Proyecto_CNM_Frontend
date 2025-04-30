@@ -19,6 +19,8 @@ function Index() {
   const [limit, setLimit] = useState(0);
   const [width, setWidth] = useState(window.innerWidth);
   const [modulos, setModulos] = useState([]);
+  
+  
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const token = localStorage.getItem("token");
@@ -61,26 +63,34 @@ function Index() {
 
   // ✅ Obtener asignaturas
   useEffect(() => {
-    if (!limit) return; // ⚠️ Esperar a que el limit se actualice
-
-    const fetchAsignaturas = async () => {
-      try {
-        setLoading(true);
-        console.log("este es el limite", limit)
-        const { data } = await axios.get(`${API_URL}/materia/obtener?page=${page}&limit=${limit}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setAsignaturas(data.data);
-        setTotalPages(data.totalPages);
-      } catch (error) {
-        ErrorMessage(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAsignaturas();
-  }, [page, limit, API_URL, token]);
+    if (!limit) return; // ⚠️ Esperar a que limit se actualice
+  
+    const delayDebounceFn = setTimeout(() => {
+      const fetchAsignaturas = async () => {
+        try {
+          setLoading(true);
+          const { data } = await axios.get(
+            `${API_URL}/materia/obtener?page=${page}&limit=${limit}`,
+            {
+              headers: { Authorization: `Bearer ${token}` }
+            }
+          );
+          setAsignaturas(data.data);
+          setTotalPages(data.totalPages);
+        } catch (error) {
+          ErrorMessage(error);
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchAsignaturas();
+    }, 350); // ⏳ Espera 500ms después de dejar de escribir para llamar
+  
+    return () => clearTimeout(delayDebounceFn); 
+    // ✅ Limpia el timeout si el usuario sigue escribiendo antes de los 500ms
+  }, [page, limit]);
+  
 
   return (
     <div className="section-container">
@@ -103,6 +113,9 @@ function Index() {
             Paginación={
               <Paginación totalPages={totalPages} page={page} setPage={setPage} />
             }
+            page={page}
+            limit={limit}
+            setTotalPages={setTotalPages}
           />
         )}
       </Layout>

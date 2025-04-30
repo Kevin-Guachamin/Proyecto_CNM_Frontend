@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { faDownload } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TablaEstudiantil from '../Estudiantes/TablaEstudiantes';
 import { Eliminar } from '../../../../../Utils/CRUD/Eliminar';
 import { Editar } from '../../../../../Utils/CRUD/Editar';
 import "../../../Styles/Contenedor.css"
 
 
-function ContenedorRepresentantes({ data, setData, headers, columnsToShow, filterKey, apiEndpoint, CrearEntidad, PK, OnView, Paginación}) {
-  const [search, setSearch] = useState('');
+function ContenedorRepresentantes({ search,filtrar,data, setData, headers, columnsToShow, filterKey, apiEndpoint, CrearEntidad, PK, OnView, Paginación}) {
+  
   const [entityToUpdate, setEntityToUpdate] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
@@ -16,9 +14,7 @@ function ContenedorRepresentantes({ data, setData, headers, columnsToShow, filte
  const token= localStorage.getItem("token")
 
 
-  const filteredData = data.filter((item) =>
-    item[filterKey]?.toLowerCase().includes(search.toLowerCase())
-  );
+  
 
   const toggleModal = (modal) => {
     if(modal==="download") return setDownload((prev)=>!prev)
@@ -48,7 +44,7 @@ function ContenedorRepresentantes({ data, setData, headers, columnsToShow, filte
       <div className="filter-container">
         <input
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => filtrar(e)}
           className="search-input"
           placeholder={`Filtrar por ${filterKey}`}
         />

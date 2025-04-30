@@ -8,17 +8,13 @@ import DownloadFiles from './DownloadFiles';
 import "../../../Styles/Contenedor.css"
 
 
-function ContenedorEstudiante({ data, setData, headers, columnsToShow, filterKey, apiEndpoint, CrearEntidad, PK, OnView, Paginación,handleCursos }) {
-  const [search, setSearch] = useState('');
+function ContenedorEstudiante({ search, filtrar,data, setData, headers, columnsToShow, filterKey, apiEndpoint, CrearEntidad, PK, OnView, Paginación,handleCursos }) {
+  
   const [entityToUpdate, setEntityToUpdate] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
  const [isDownloadOpen,setDownload]=useState(false)
 
-
-  const filteredData = data.filter((item) =>
-    item[filterKey]?.toLowerCase().includes(search.toLowerCase())
-  );
 
   const toggleModal = (modal) => {
     if(modal==="download") return setDownload((prev)=>!prev)
@@ -48,7 +44,7 @@ function ContenedorEstudiante({ data, setData, headers, columnsToShow, filterKey
       <div className="filter-container">
         <input
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => filtrar(e)}
           className="search-input"
           placeholder={`Filtrar por ${filterKey}`}
         />
@@ -90,7 +86,7 @@ function ContenedorEstudiante({ data, setData, headers, columnsToShow, filterKey
             />
       )}
       <TablaEstudiantil
-        filteredData={filteredData}
+        filteredData={data}
         OnEdit={handleEdit}
         OnDelete={handleDelete}
         OnView={OnView}
