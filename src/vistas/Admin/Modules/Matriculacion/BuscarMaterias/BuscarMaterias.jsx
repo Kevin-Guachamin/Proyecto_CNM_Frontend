@@ -76,6 +76,9 @@ function BuscarMaterias() {
         }
     }
     const FinalizarMatriculas = () => {
+        const storedUser = JSON.parse(localStorage.getItem("usuario"));
+const subRol = storedUser?.subRol;
+const rutaFinal = subRol === "Secretaria" ? "/secretaria/matriculacion" : "/admin/matriculacion";
         Swal.fire({
                     icon: "success",
                     title: `Registro exitoso`,
@@ -83,7 +86,7 @@ function BuscarMaterias() {
                     confirmButtonText: "Entendido",
                     confirmButtonColor: "#003F89",
                 });
-        navigate("/admin/matriculacion")
+        navigate(rutaFinal)
     }
     return (
         <div className='Contenedor-general'>

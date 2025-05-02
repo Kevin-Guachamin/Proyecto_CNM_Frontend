@@ -35,7 +35,7 @@ function Index() {
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
       <Layout modules={modulos}>
-        <Busqueda />
+        <Busqueda subRol={usuario?.subRol} />
       </Layout>
     </div>
   )
