@@ -76,8 +76,12 @@ function BuscarMaterias() {
         }
     }
     const FinalizarMatriculas = () => {
-        navigate("/admin/matriculacion")
-    }
+        const storedUser = JSON.parse(localStorage.getItem("usuario"));
+        const subRol = storedUser?.subRol;
+    
+        const ruta = subRol === "Secretaria" ? "/secretaria/matriculacion" : "/admin/matriculacion";
+        navigate(ruta);
+    }    
     return (
         <div className='Contenedor-general'>
             <div className="search-container">
