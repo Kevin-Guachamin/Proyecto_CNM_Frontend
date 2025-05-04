@@ -7,6 +7,7 @@ import { Dropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from "axios";
 import { useLocation } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const VerCalificacionesEstudiante = () => {
   const [notasEstudiante, setNotasEstudiante] = useState([]);
@@ -14,10 +15,12 @@ const VerCalificacionesEstudiante = () => {
   const {estudiante, respuestaPeriodosDatos: periodosMatriculados} = state || {};
 	const raw = localStorage.getItem('usuario');
 	const usuario = raw ? JSON.parse(raw) : null;
+	const navigate = useNavigate();
 
   // Estado para el periodo elegido
   const [periodoSel, setPeriodoSel] = useState(null);
 	console.log("Datos usuario localStorage: ", usuario)
+	console.log("Datos estudiante que llegan en state: ", estudiante)
   const handleCalificaciones = async (matriculaID) => {
     // Obtener las inscripciones de un estudiante por ID de matricula
     try {
@@ -103,6 +106,10 @@ const VerCalificacionesEstudiante = () => {
     
   }
 
+	const handleOnClick = () => {
+		navigate('/representante/estudiantes'); // Usa el navigate ya definido
+	}
+
 
   return (
     <div>
@@ -112,7 +119,7 @@ const VerCalificacionesEstudiante = () => {
       {/* Se despliega lista para que se seleccione un periodo matriculado del cual ver las notas */}
       <Dropdown>
         <Dropdown.Toggle variant="secondary" id="dropdown-basic" size="sm">
-          Selecciona una opción
+          Seleccione un periodo academico 
         </Dropdown.Toggle>
 
         <Dropdown.Menu>
@@ -123,19 +130,21 @@ const VerCalificacionesEstudiante = () => {
           )}
         </Dropdown.Menu>
       </Dropdown>
+	
+	{/* Boton para volver a lista de estudiantes */}
+	<div className="d-flex justify-content-center mt-3">
+		<Boton texto="Volver a lista" onClick={() => handleOnClick()} estilo="boton-crear" />
+	</div>
 
       {/* Renderizado condicional */}
       {periodoSel && (
         <div /* className="modal-form" */>
-          <TablaEstudianteCalificaciones datos={notasEstudiante} periodosMatriculados={periodosMatriculados}></TablaEstudianteCalificaciones>
+          <TablaEstudianteCalificaciones datos={notasEstudiante} estudiante={estudiante} periodosMatriculados={periodosMatriculados}></TablaEstudianteCalificaciones>
         </div>
       )}
       
 
-      <div className="botones">
-        <Boton texto="Guardar" onClick={() => handleSubmit()} estilo="boton-crear" />
-        <Boton texto="Cancelar" estilo="boton-cancelar" />
-      </div>
+      
     </div>
   );
 }
