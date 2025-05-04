@@ -23,6 +23,7 @@ const VerDatosRepresentante = () => {
   const [convencional, setConvencional] = useState("");
   const [emergencia, setEmergencia] = useState(""); 
   const [email, setEmail] = useState("");
+  // Falta cedulaPDF y croquisPDF
 
   /* 
     OJO FALTA COMPROBAR EL FUNCIONAMIENTO CON LOS ARCHIVOS PDFS SUBIDOS
@@ -43,6 +44,7 @@ const VerDatosRepresentante = () => {
       setConvencional(representante.convencional || "");
       setEmergencia(representante.emergencia || "");
       setEmail(representante.email || "");
+      // Falta cedulaPDF y croquisPDF
     } 
   }, [representante]);
 
@@ -52,7 +54,10 @@ const VerDatosRepresentante = () => {
       const usuarioGuardado = localStorage.getItem("usuario");
       if (usuarioGuardado) {
         setRepresentante(JSON.parse(usuarioGuardado));
-      } 
+      }
+
+      // Obtener las fechas rango de la API para la actualizacion
+      
     } catch (error) {
       setIsLoading(false);
       console.error('Error al obtener datos de representante: ', error);
@@ -63,6 +68,92 @@ const VerDatosRepresentante = () => {
     setMostrarModal(false); // Oculta el modal
     navigate(-1); // regresa a la pagina anterior
   }
+
+  const handleSubmit = () => {
+    // Se deben actualizar datos si es que la fecha lo permite
+    // Comprobar si la fecha actual esta dentro de las fechas limite para actualizar datos
+
+    // Comprobar que en la logica del servidor tambien verifique la hora para rechazar o validar la
+    // peticion de actualizacion
+  }
+
+  const handleConfirmacion = () => {
+
+  }
+
+ /*  
+////////////////////////////////////////////////////////
+
+function MyComponent({ startDate, endDate }) {
+  // startDate y endDate vienen del servidor, por ejemplo:
+  // startDate = "2025-04-15T08:00:00Z"
+  // endDate   = "2025-04-20T18:00:00Z"
+
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+
+  const nowLocal = new Date();
+
+  // Para UX: bloqueo si el dispositivo está fuera de rango
+  const withinLocalRange =
+    nowLocal >= new Date(startDate) &&
+    nowLocal <= new Date(endDate);
+
+  async function handleSubmit(formData) {
+    setError(null);
+    setSubmitting(true);
+
+    try {
+      // Llamada al servidor: es él quien valida de verdad
+      const resp = await fetch('/api/submit-modal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!resp.ok) {
+        const body = await resp.json();
+        throw new Error(body.message || 'Error en servidor');
+      }
+
+      // Éxito
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div>
+      {!withinLocalRange && (
+        <p className="warning">
+          Atención: tu reloj local ({nowLocal.toLocaleString()})
+          está fuera del periodo permitido.
+        </p>
+      )}
+
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          handleSubmit({  });
+        }}
+        >
+          
+          <button type="submit" disabled={!withinLocalRange || submitting}>
+            Enviar
+          </button>
+        </form>
+  
+        {error && <p className="error">{error}</p>}
+      </div>
+    );
+  }
+  
+
+///////////////////////////////////////////////////////
+ */
+
 
   useEffect(() => {
     cargarDatosRepresentante();
