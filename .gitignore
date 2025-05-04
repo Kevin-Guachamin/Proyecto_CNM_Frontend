@@ -25,3 +25,20 @@ dist-ssr
 
 # archivos
 .env
+
+# ── Vim ──────────────────────────────
+# Archivos swap
+*.swp
+*.swo
+*.swn
+.*.swp
+.*.swo
+.*.swn
+
+# Archivos backup (~)
+*~
+.*~
+
+# Archivos de undo persistente
+*.un~
+.*.un~
