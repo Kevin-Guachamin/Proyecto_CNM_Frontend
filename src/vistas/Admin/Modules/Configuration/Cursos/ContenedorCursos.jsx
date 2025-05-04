@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import Loading from '../../../../../components/Loading';
 import Paginación from '../../../Components/Paginación';
 
-function ContenedorCursos({ apiEndpoint, PK}) {
+function ContenedorCursos() {
     const [data,setData]=useState([])
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('')
@@ -26,8 +26,7 @@ function ContenedorCursos({ apiEndpoint, PK}) {
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
     
     const token = localStorage.getItem("token")
-    const key1 = "Materia"
-    const key2 = "nombre"
+    
     // ✅ Detectar cambio de tamaño de pantalla
       useEffect(() => {
         const handleResize = () => setWidth(window.innerWidth);
@@ -79,12 +78,28 @@ function ContenedorCursos({ apiEndpoint, PK}) {
             });
     };
 
+    const filtrar = (e)=>{
+        e.preventDefault()
+        setSearch(e.target.value)
+        axios.get(`${API_URL}/asignacion/obtener/periodo/${periodo}?page=${page}&limit=${limit}&search=${e.target.value}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        })
+            .then(response => {
+                console.log(response.data)
+                setData(response.data.data);
+                setTotalPages(response.data.totalPages);
+            })
+            .catch(error => {
+                ErrorMessage(error);
+            });
+    }
+
     const obtenerAsignaciones = async (tipo) => {
         try {
             if (!periodo) {
                 throw new Error("No se ha seleccionado un periodo");
             }
-            const response = await axios.get(`${API_URL}/${apiEndpoint}/nivel/${tipo}/${periodo}`, {
+            const response = await axios.get(`${API_URL}/asignacion/nivel/${tipo}/${periodo}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setLoading(false);
@@ -139,19 +154,7 @@ function ContenedorCursos({ apiEndpoint, PK}) {
         console.log("Esta es la data", data);
     };
 
-    const filteredData = Array.isArray(data)
-        ? data.filter((item) => {
-            
-
-            const value = item?.[key1]?.[key2];
-
-           
-
-            return typeof value === "string"
-                ? value.toLowerCase().includes(search.toLowerCase())
-                : false;
-        })
-        : [];
+    
 
     const toggleModal = () => {
         setIsModalOpen((prev) => !prev);
@@ -159,7 +162,7 @@ function ContenedorCursos({ apiEndpoint, PK}) {
     };
 
     const handleSaveEntity = (newEntity, headers) => {
-        Editar(entityToUpdate, newEntity, `${API_URL}/${apiEndpoint}`, setData, setIsModalOpen, PK, headers);
+        Editar(entityToUpdate, newEntity, `${API_URL}/asignacion`, setData, setIsModalOpen, "ID", headers);
         console.log("esta es la data despues de editar,", data)
     };
 
@@ -169,7 +172,7 @@ function ContenedorCursos({ apiEndpoint, PK}) {
     };
 
     const handleDelete = (entity) => {
-        Eliminar(entity, `${API_URL}/${apiEndpoint}/eliminar`, "esta asignación", setData, PK);
+        Eliminar(entity, `${API_URL}/asignacion/eliminar`, "esta asignación", setData, "ID");
     };
 
     return (
@@ -211,7 +214,8 @@ function ContenedorCursos({ apiEndpoint, PK}) {
 
                     </select>
                 </div>
-                <Filtro search={search} setSearch={setSearch} toggleModal={toggleModal} filterKey={key1} />
+                <Filtro search={search} filtrar={filtrar} toggleModal={toggleModal} filterKey=
+                "Nombre materia" />
             </div>
             {isModalOpen && (
                 <CrearCurso
@@ -222,7 +226,7 @@ function ContenedorCursos({ apiEndpoint, PK}) {
                 />
             )}
             {loading ? <Loading /> : <Tabla
-                filteredData={filteredData}
+                filteredData={data}
                 OnEdit={handleEdit}
                 OnDelete={handleDelete}
                 headers={Headers}

@@ -31,7 +31,7 @@ function Index() {
   const [modulos, setModulos] = useState([]);
   const [limit, setLimit] = useState(0);
   const [width, setWidth] = useState(window.innerWidth);
-
+  const [search, setSearch] = useState('');
   // ✅ Detectar cambio de tamaño de pantalla
   useEffect(() => {
     const handleResize = () => setWidth(window.innerWidth);
@@ -79,6 +79,8 @@ function Index() {
              
             />
           }
+          search={search}
+          filtrar={filtrar}
         
         />
       ),
@@ -139,7 +141,19 @@ function Index() {
     fetchRepresentantes();
   }, [page,limit]);
   
-
+const filtrar= async (e) => {
+  e.preventDefault()
+  setSearch(e.target.value)
+  try {
+    const response = await axios.get(`${API_URL}/representante/obtener?page=${page}&limit=${limit}&search=${e.target.value}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    console.log("estos son los respresentates", response)
+    setRepresentantes(response.data.representantes);
+    setTotalPages(response.data.totalPages);
+  } catch (error) {
+    ErrorMessage(error);
+  } }
 
   return (
     <div className="section-container">
