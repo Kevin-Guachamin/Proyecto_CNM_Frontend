@@ -62,7 +62,7 @@ function ListaEstudiantes() {
   
       navigate(
         `/representante/calificaciones`,
-        { state: { estudianteSeleccionado, respuestaPeriodosDatos } }
+        { state: { estudiante, respuestaPeriodosDatos } }
       );
 
 
