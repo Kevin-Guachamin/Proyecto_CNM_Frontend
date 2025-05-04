@@ -4,7 +4,7 @@ import { Table, Tabs, Tab, Container } from "react-bootstrap";
 import Header from "../../../components/Header";
 
 
-const TablaEstudianteCalificaciones = ({datos, periodosMatriculados}) => {
+const TablaEstudianteCalificaciones = ({datos, estudiante, periodosMatriculados}) => {
     const [finalData, setFinalData] = useState([]);
 
     const [materiasTabla, setMateriasTabla] =useState([]);
@@ -12,6 +12,8 @@ const TablaEstudianteCalificaciones = ({datos, periodosMatriculados}) => {
     const [isLoading, setIsLoading] = useState(true);
 
    console.log("Datos que llegan a tabla: ", datos); 
+   console.log("Datos del estudiante que llegan a tabla: ", estudiante); 
+   console.log("Datos del periodo que llegan a tabla: ", periodosMatriculados); 
     const calcularNotasBE = (notasBEMateria) => {
         let notasP1Q1 = 0.0;
         let notasP2Q1 = 0.0;
@@ -202,25 +204,32 @@ const TablaEstudianteCalificaciones = ({datos, periodosMatriculados}) => {
         );
     }
    
-    
-
 
    return(
        <div className="content-container">
            
            <Container className="mt-4">
-               <div className="d-flex justify-content-between align-items-center mb-4">
-                   <h2 className="mb-0">Exportar a PDF</h2>
-                   <div>
-                       <button
-                           className="btn btn-danger me-2"
-                           //onClick={handleExportPDF}
-                           title="Exportar a PDF"
-                       >
-                           <i className="bi bi-file-earmark-pdf-fill"></i>
-                       </button>
-                   </div>
-               </div>
+		   <div className="d-flex justify-content-center align-items-center mb-4">
+			   <h2 className="mb-0"> Reporte de Calificaciones </h2>
+		   </div>
+		   <div className="d-flex justify-content-center align-items-center mb-4">
+			   <h3 className="mb-0"> {periodosMatriculados[0].descripcion} </h3>
+		   </div>
+	   <div className="d-flex justify-content-between align-items-center mb-4">
+		<div>
+		   <p className="mb-0"> <strong> Estudiante: </strong>   {estudiante.primer_nombre} {estudiante.segundo_nombre} {estudiante.primer_apellido} {estudiante.segundo_apellido}</p>
+		   <p className="mb-0"> <strong> Nivel: </strong>  {periodosMatriculados[0].nivel}</p>
+	   	</div> 
+		   <div>
+			   <button
+				   className="btn btn-danger me-2"
+				   //onClick={handleExportPDF}
+				   title="Exportar a PDF"
+				   >
+				   <i className="bi bi-file-earmark-pdf-fill"></i>
+			   </button>
+		   </div>
+           </div>
 
 
                {/* TABS PRINCIPALES */}
