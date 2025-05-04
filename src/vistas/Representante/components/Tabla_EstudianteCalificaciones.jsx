@@ -1,15 +1,17 @@
 // Tabla para ver reporte de calificaciones de un estudiante
 import { useEffect, useState } from "react";
 import { Table, Tabs, Tab, Container } from "react-bootstrap";
+import Header from "../../../components/Header";
 
 
-const TablaEstudianteCalificaciones = (datos) => {
+const TablaEstudianteCalificaciones = ({datos, periodosMatriculados}) => {
     const [finalData, setFinalData] = useState([]);
 
     const [materiasTabla, setMateriasTabla] =useState([]);
     const [activeTab, setActiveTab] = useState('quimestre1');
     const [isLoading, setIsLoading] = useState(true);
-    
+
+   console.log("Datos que llegan a tabla: ", datos); 
     const calcularNotasBE = (notasBEMateria) => {
         let notasP1Q1 = 0.0;
         let notasP2Q1 = 0.0;
@@ -142,14 +144,14 @@ const TablaEstudianteCalificaciones = (datos) => {
 
         setIsLoading(true);
 
-        if (!datos || !datos.notasEstudiante || !Array.isArray(datos.notasEstudiante)) {
+        if (!Array.isArray(datos) || datos.length === 0) {
             console.error('No hay datos válidos para procesar');
             return;
         }
 
         console.log('Notas estudiante en tablaEstudiante: ', datos);
         try {
-            const notasMateria = datos.notasEstudiante.map(materias => {
+            const notasMateria = datos.map(materias => {
                 if (materias.nivel && (materias.nivel.includes('Básico elemental') || materias.nivel.includes('BE'))) {
                     if (materias.calificaciones && Array.isArray(materias.calificaciones)) {
                         const [notaQ1, notaQ2] = calcularNotasBE(materias);
@@ -188,25 +190,11 @@ const TablaEstudianteCalificaciones = (datos) => {
     }
 
     useEffect(() => {
-        if (datos && datos.notasEstudiante) {
-            cargarDatos();
-        }
+    	cargarDatos();
     }, [datos]);
 
-    // Renderizado condicional
-    if (isLoading) {
-        return (
-            <div className="d-flex justify-content-center align-items-center" style={{ height: '200px' }}>
-                <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Cargando...</span>
-                </div>
-                <p className="ms-3">Cargando calificaciones...</p>
-            </div>
-        );
-    }
-
     // Si no hay datos para mostrar después de la carga
-    if (!datos || !datos.notasEstudiante || materiasTabla.length === 0) {
+    if (!datos  || materiasTabla.length === 0) {
         return (
             <div className="alert alert-info">
                 No hay calificaciones disponibles para mostrar.
@@ -219,6 +207,7 @@ const TablaEstudianteCalificaciones = (datos) => {
 
    return(
        <div className="content-container">
+           
            <Container className="mt-4">
                <div className="d-flex justify-content-between align-items-center mb-4">
                    <h2 className="mb-0">Exportar a PDF</h2>
