@@ -112,25 +112,29 @@ const VerCalificacionesEstudiante = () => {
 
 
   return (
-    <div>
+    <div >
 	  <div className="container-fluid p-0">
 	  	{usuario && <Header isAuthenticated={true} usuario={usuario} />}
 	  </div>
       {/* Se despliega lista para que se seleccione un periodo matriculado del cual ver las notas */}
-      <Dropdown>
-        <Dropdown.Toggle variant="secondary" id="dropdown-basic" size="sm">
-          Seleccione un periodo academico 
-        </Dropdown.Toggle>
+	  <div></div>
+	<div className="d-inline-block">
+	  <Dropdown>
+		  <Dropdown.Toggle variant="secondary" id="dropdown-basic" size="sm">
+			  Seleccione un periodo academico 
+		  </Dropdown.Toggle>
 
-        <Dropdown.Menu>
-          {periodosMatriculados.length > 0 ? (
-            periodosMatriculados.map((periodo, i) => <Dropdown.Item key={i} onClick={() => handleCalificaciones(periodo.ID)}> {periodo.descripcion} </Dropdown.Item>)
-          ) : (
-            <Dropdown.Item href="#"> No hay periodos matriculados </Dropdown.Item>
-          )}
-        </Dropdown.Menu>
-      </Dropdown>
-	
+		  <Dropdown.Menu>
+			  {periodosMatriculados.length > 0 ? (
+				  periodosMatriculados.map((periodo, i) => <Dropdown.Item key={i} onClick={() => handleCalificaciones(periodo.ID)}> {periodo.descripcion} </Dropdown.Item>)
+			  ) : (
+				  <Dropdown.Item href="#"> No hay periodos matriculados </Dropdown.Item>
+			  )}
+		  </Dropdown.Menu>
+	  </Dropdown>
+
+	</div> 
+		
 	{/* Boton para volver a lista de estudiantes */}
 	<div className="d-flex justify-content-center mt-3">
 		<Boton texto="Volver a lista" onClick={() => handleOnClick()} estilo="boton-crear" />
