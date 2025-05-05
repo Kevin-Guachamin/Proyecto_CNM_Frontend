@@ -8,24 +8,29 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const VerDatosRepresentante = () => {
-  const [representante, setRepresentante] = useState([]);
-  const location = useLocation();
-  const [mostrarModal, setMostrarModal] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+	const [representante, setRepresentante] = useState([]);
+	const location = useLocation();
+	const [mostrarModal, setMostrarModal] = useState(true);
+	const [isLoading, setIsLoading] = useState(false);
+	const navigate = useNavigate();
 
-  const [nroCedula, setNroCedula] = useState(""); // Inicializar con cadena vacia si es que hay valores undefined en entity
-  const [primer_nombre, setPrimerNombre] = useState("");
-  const [celular, setCelular] = useState("");
-  const [primer_apellido, setPrimerApellido] = useState("");
-  const [segundo_nombre, setSegundoNombre] =  useState("");
-  const [segundo_apellido, setSegundoApellido] = useState("");
-  const [convencional, setConvencional] = useState("");
-  const [emergencia, setEmergencia] = useState(""); 
-  const [email, setEmail] = useState("");
-  // Falta cedulaPDF y croquisPDF
+	const [nroCedula, setNroCedula] = useState(""); // Inicializar con cadena vacia si es que hay valores undefined 
+	const [primer_nombre, setPrimerNombre] = useState("");
+	const [celular, setCelular] = useState("");
+	const [primer_apellido, setPrimerApellido] = useState("");
+	const [segundo_nombre, setSegundoNombre] =  useState("");
+	const [segundo_apellido, setSegundoApellido] = useState("");
+	const [convencional, setConvencional] = useState("");
+	const [emergencia, setEmergencia] = useState(""); 
+	const [email, setEmail] = useState("");
+	// Falta cedulaPDF y croquisPDF
+	
+	// Variables para habilitar o deshabilitar la actualizacion de datos
+	const [fechaInicio, setFechaInicio] = useState("");
+	const [fechaFin, setFechaFIn] = useState("");
+	const [dentroDeRango, setDentroDeRango] = useState("");
 
-  /* 
+  /*
     OJO FALTA COMPROBAR EL FUNCIONAMIENTO CON LOS ARCHIVOS PDFS SUBIDOS
   */
 
@@ -55,9 +60,28 @@ const VerDatosRepresentante = () => {
       if (usuarioGuardado) {
         setRepresentante(JSON.parse(usuarioGuardado));
       }
+	    const token = localStorage.getItem("token");
+	    const baseURL = import.meta.env.VITE_URL_DEL_BACKEND;
+	    const headers = {
+		    headers: {
+			    Authorization: `Bearer ${token}`
+		    }
+	    }
+	
 
+	    // Obtener la fecha actual del servidor
+	    const fechaActual = await axios.get(
+		    `${baseURL}/fechas_procesos/fecha_actual`,
+		    headers
+	    );
       // Obtener las fechas rango de la API para la actualizacion
-      
+	const fechaActualizacionDatos = await axios.get(
+		`${baseURL}/fechas_procesos/actualizacion`,
+		headers
+	);
+	    console.log(fechaActualizacionDatos);
+	    console.log('Fecha actual: ', fechaActual);
+
     } catch (error) {
       setIsLoading(false);
       console.error('Error al obtener datos de representante: ', error);
