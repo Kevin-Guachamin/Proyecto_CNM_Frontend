@@ -27,8 +27,9 @@ const VerDatosRepresentante = () => {
 	
 	// Variables para habilitar o deshabilitar la actualizacion de datos
 	const [fechaInicio, setFechaInicio] = useState("");
-	const [fechaFin, setFechaFIn] = useState("");
-	const [dentroDeRango, setDentroDeRango] = useState("");
+	const [fechaFin, setFechaFin] = useState("");
+	const [dentroDeRango, setDentroDeRango] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
   /*
     OJO FALTA COMPROBAR EL FUNCIONAMIENTO CON LOS ARCHIVOS PDFS SUBIDOS
@@ -53,6 +54,7 @@ const VerDatosRepresentante = () => {
     } 
   }, [representante]);
 
+
   const cargarDatosRepresentante = async () => {
     try {
       setIsLoading(true);
@@ -75,12 +77,24 @@ const VerDatosRepresentante = () => {
 		    headers
 	    );
       // Obtener las fechas rango de la API para la actualizacion
-	const fechaActualizacionDatos = await axios.get(
+	const {data: fechaActualizacionDatos} = await axios.get(
 		`${baseURL}/fechas_procesos/actualizacion`,
 		headers
 	);
-	    console.log(fechaActualizacionDatos);
-	    console.log('Fecha actual: ', fechaActual);
+
+    // Comprueba que haya datos en fechaActualizacionDatos
+    if(fechaActualizacionDatos) {
+       setFechaInicio(fechaActualizacionDatos.fechaInicioProceso); 
+       setFechaFin(fechaActualizacionDatos.fechaFinProceso); 
+    }
+    
+    // Establece si la fecha actual esta dentro del rango de la
+    // fecha del proceso 
+    if (fechaActual >= fechaInicio && fechaActual <= fechaFin) {
+        setDentroDeRango(true);
+    }else {
+        setDentroDeRango(false);
+    }
 
     } catch (error) {
       setIsLoading(false);
@@ -96,7 +110,8 @@ const VerDatosRepresentante = () => {
   const handleSubmit = () => {
     // Se deben actualizar datos si es que la fecha lo permite
     // Comprobar si la fecha actual esta dentro de las fechas limite para actualizar datos
-
+    console.log('Se actualizan datos del formulario');
+    console.log('Dentro de rango: ', dentroDeRango);
     // Comprobar que en la logica del servidor tambien verifique la hora para rechazar o validar la
     // peticion de actualizacion
   }
@@ -269,7 +284,17 @@ function MyComponent({ startDate, endDate }) {
           </div>
   
           <div className="botones">
-            <Boton texto="Guardar" onClick={() => handleSubmit()} estilo="boton-crear" />
+            {!dentroDeRango && (
+               <div>
+                    <p style={{ color: 'red', marginTop: '10px' }}>
+                        No se pueden actualizar datos fuera de fecha. 
+                    </p>
+                    <p style={{ color: 'red', marginTop: '10px' }}>
+                        Fecha: {fechaInicio} al {fechaFin} 
+                    </p>
+                </div> 
+            )}
+            <Boton texto="Guardar" onClick={() => handleSubmit()} disabled={!dentroDeRango} estilo="boton-crear" />
             <Boton texto="Cancelar" onClick={() => OnCancel()} estilo="boton-cancelar" />
           </div>
         </div>
