@@ -26,11 +26,11 @@ const VerDatosRepresentante = () => {
 	// Falta cedulaPDF y croquisPDF
 	
 	// Variables para habilitar o deshabilitar la actualizacion de datos
-	const [fechaInicio, setFechaInicio] = useState("");
-	const [fechaFin, setFechaFin] = useState("");
 	const [dentroDeRango, setDentroDeRango] = useState(false);
     const [submitting, setSubmitting] = useState(false);
-
+    const [fechaInicio, setFechaInicio] = useState('');
+    const [fechaFin, setFechaFin] = useState('');
+    
   /*
     OJO FALTA COMPROBAR EL FUNCIONAMIENTO CON LOS ARCHIVOS PDFS SUBIDOS
   */
@@ -57,44 +57,55 @@ const VerDatosRepresentante = () => {
 
   const cargarDatosRepresentante = async () => {
     try {
-      setIsLoading(true);
-      const usuarioGuardado = localStorage.getItem("usuario");
-      if (usuarioGuardado) {
-        setRepresentante(JSON.parse(usuarioGuardado));
-      }
-	    const token = localStorage.getItem("token");
-	    const baseURL = import.meta.env.VITE_URL_DEL_BACKEND;
-	    const headers = {
-		    headers: {
-			    Authorization: `Bearer ${token}`
-		    }
-	    }
-	
+        setIsLoading(true);
+        const usuarioGuardado = localStorage.getItem("usuario");
+        if (usuarioGuardado) {
+            setRepresentante(JSON.parse(usuarioGuardado));
+        }
+        const token = localStorage.getItem("token");
+        const baseURL = import.meta.env.VITE_URL_DEL_BACKEND;
+        const headers = {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
 
-	    // Obtener la fecha actual del servidor
-	    const fechaActual = await axios.get(
-		    `${baseURL}/fechas_procesos/fecha_actual`,
-		    headers
-	    );
-      // Obtener las fechas rango de la API para la actualizacion
-	const {data: fechaActualizacionDatos} = await axios.get(
-		`${baseURL}/fechas_procesos/actualizacion`,
-		headers
-	);
 
-    // Comprueba que haya datos en fechaActualizacionDatos
-    if(fechaActualizacionDatos) {
-       setFechaInicio(fechaActualizacionDatos.fechaInicioProceso); 
-       setFechaFin(fechaActualizacionDatos.fechaFinProceso); 
-    }
-    
-    // Establece si la fecha actual esta dentro del rango de la
-    // fecha del proceso 
-    if (fechaActual >= fechaInicio && fechaActual <= fechaFin) {
-        setDentroDeRango(true);
-    }else {
-        setDentroDeRango(false);
-    }
+        // Obtener la fecha actual del servidor
+        const {data: response} = await axios.get(
+            `${baseURL}/fechas_procesos/fecha_actual`,
+            headers
+        );
+        const fechaActual = response.fechaActual;
+
+        // Obtener las fechas rango de la API para la actualizacion
+        const {data: fechaActualizacionDatos} = await axios.get(
+            `${baseURL}/fechas_procesos/actualizacion`,
+            headers
+        );
+
+        console.log('FechaActualizacionDatos: ', fechaActualizacionDatos);
+
+        // Comprueba que haya datos en fechaActualizacionDatos
+        if(fechaActualizacionDatos) {
+            setFechaInicio(fechaActualizacionDatos.fechaInicioProceso);
+            setFechaFin(fechaActualizacionDatos.fechaFinProceso);
+        }
+
+        const inicio = fechaActualizacionDatos.fechaInicioProceso;
+        const fin = fechaActualizacionDatos.fechaFinProceso;
+        
+        // Establece si la fecha actual esta dentro del rango de la
+        // fecha del proceso 
+        if (fechaActual >= inicio && fechaActual <= fin) {
+            setDentroDeRango(true);
+            console.log('Dentro de rango: ', inicio, fin);
+            console.log('Fecha actual: ', fechaActual);
+        }else {
+            setDentroDeRango(false);
+            console.log('Fuera de rango', inicio, fin);
+            console.log('Fecha actual: ', fechaActual);
+        }
 
     } catch (error) {
       setIsLoading(false);
