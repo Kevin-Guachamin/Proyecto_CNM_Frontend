@@ -84,8 +84,6 @@ const VerDatosRepresentante = () => {
             headers
         );
 
-        console.log('FechaActualizacionDatos: ', fechaActualizacionDatos);
-
         // Comprueba que haya datos en fechaActualizacionDatos
         if(fechaActualizacionDatos) {
             setFechaInicio(fechaActualizacionDatos.fechaInicioProceso);
@@ -99,12 +97,9 @@ const VerDatosRepresentante = () => {
         // fecha del proceso 
         if (fechaActual >= inicio && fechaActual <= fin) {
             setDentroDeRango(true);
-            console.log('Dentro de rango: ', inicio, fin);
-            console.log('Fecha actual: ', fechaActual);
+
         }else {
             setDentroDeRango(false);
-            console.log('Fuera de rango', inicio, fin);
-            console.log('Fecha actual: ', fechaActual);
         }
 
     } catch (error) {
@@ -131,79 +126,10 @@ const VerDatosRepresentante = () => {
 
   }
 
- /*  
-////////////////////////////////////////////////////////
 
-function MyComponent({ startDate, endDate }) {
-  // startDate y endDate vienen del servidor, por ejemplo:
-  // startDate = "2025-04-15T08:00:00Z"
-  // endDate   = "2025-04-20T18:00:00Z"
-
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(null);
-
-  const nowLocal = new Date();
-
-  // Para UX: bloqueo si el dispositivo está fuera de rango
-  const withinLocalRange =
-    nowLocal >= new Date(startDate) &&
-    nowLocal <= new Date(endDate);
-
-  async function handleSubmit(formData) {
-    setError(null);
-    setSubmitting(true);
-
-    try {
-      // Llamada al servidor: es él quien valida de verdad
-      const resp = await fetch('/api/submit-modal', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (!resp.ok) {
-        const body = await resp.json();
-        throw new Error(body.message || 'Error en servidor');
-      }
-
-      // Éxito
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setSubmitting(false);
+    const formatearFecha = (fechaIso) => {
+        return new Date(fechaIso).toLocaleDateString('es-EC');
     }
-  }
-
-  return (
-    <div>
-      {!withinLocalRange && (
-        <p className="warning">
-          Atención: tu reloj local ({nowLocal.toLocaleString()})
-          está fuera del periodo permitido.
-        </p>
-      )}
-
-      <form
-        onSubmit={e => {
-          e.preventDefault();
-          handleSubmit({  });
-        }}
-        >
-          
-          <button type="submit" disabled={!withinLocalRange || submitting}>
-            Enviar
-          </button>
-        </form>
-  
-        {error && <p className="error">{error}</p>}
-      </div>
-    );
-  }
-  
-
-///////////////////////////////////////////////////////
- */
-
 
   useEffect(() => {
     cargarDatosRepresentante();
@@ -301,7 +227,7 @@ function MyComponent({ startDate, endDate }) {
                         No se pueden actualizar datos fuera de fecha. 
                     </p>
                     <p style={{ color: 'red', marginTop: '10px' }}>
-                        Fecha: {fechaInicio} al {fechaFin} 
+                        Fecha: {formatearFecha(fechaInicio)} al {formatearFecha(fechaFin)} 
                     </p>
                 </div> 
             )}
