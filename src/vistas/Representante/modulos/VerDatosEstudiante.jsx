@@ -72,13 +72,9 @@ function ViewDataEstudiante({onCancel, isLoading, entity }) {
             // fecha del proceso 
             if (fechaActual >= inicio && fechaActual <= fin) {
                 setDentroDeRango(true);
-                console.log('Dentro de rango: ', inicio, fin);
-                console.log('Fecha actual: ', fechaActual);
 
             }else {
                 setDentroDeRango(false);
-                console.log('Dentro de rango: ', inicio, fin);
-                console.log('Fecha actual: ', fechaActual);
 
             }
 
@@ -119,6 +115,10 @@ function ViewDataEstudiante({onCancel, isLoading, entity }) {
 
     // Comprobar que la actualizacion de datos este habilitada en la fecha establecida
   }
+
+    const formatearFecha = (fechaIso) => {
+        return new Date(fechaIso).toLocaleDateString('es-EC');
+    }
 
     return (
       <div className="modal-overlay">
@@ -247,7 +247,7 @@ function ViewDataEstudiante({onCancel, isLoading, entity }) {
                 No se pueden actualizar datos fuera de fecha. 
                 </p>
                 <p style={{ color: 'red', marginTop: '10px' }}>
-                Fecha: {fechaInicio} al {fechaFin} 
+                Fecha: {formatearFecha(fechaInicio)} al {formatearFecha(fechaFin)} 
                 </p>
                 </div> 
             )}
