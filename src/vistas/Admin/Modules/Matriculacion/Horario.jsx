@@ -1,13 +1,16 @@
 import React from "react";
 import { Table, Button } from "react-bootstrap";
-import { Eliminar } from "../../../../Utils/CRUD/Eliminar";
+import Swal from "sweetalert2";
+import axios from "axios";
 import '../../Styles/Horario.css'
+import { ErrorMessage } from "../../../../Utils/ErrorMesaje";
 
 const diasSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
 
 const Horario = ({ materiasSeleccionadas, setMateriasSeleccionadas, jornada }) => {
 
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
+    const token=localStorage.getItem("token")
     const horasMatutina = [
         "07:00 - 07:45",
         "07:45 - 08:30",
@@ -30,7 +33,30 @@ const Horario = ({ materiasSeleccionadas, setMateriasSeleccionadas, jornada }) =
     const horas = jornada === "Matutina" ? horasMatutina : horasVespertina;
 
     const eliminarMateria = (inscripcion) => {
-        Eliminar(inscripcion, `${API_URL}/inscripcion/eliminar`, `${inscripcion.Asignacion.Materia.nombre}`, setMateriasSeleccionadas, "ID")
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: `Va a eliminar una inscripción`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.delete(`${API_URL}/inscripcion/eliminar/${inscripcion.ID}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                }).then(()=>{
+                    console.log("este no tiene ID",inscripcion.Asignacion)
+                    
+                    setMateriasSeleccionadas((prevData) => 
+                        prevData.filter((d) => d.Asignacion && d.Asignacion.ID !== inscripcion.Asignacion.ID)
+                      );
+                })
+                
+              
+            }
+        });
     };
 
     const obtenerMateria = (dia, hora) => {

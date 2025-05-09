@@ -4,7 +4,7 @@ import Swal from 'sweetalert2';
 import { ErrorMessage } from '../../../../../Utils/ErrorMesaje';
 import { useLocation } from 'react-router-dom';
 import { Card, Row, Col } from "react-bootstrap";
-import Horario from '../Horarios';
+import Horario from '../Horario';
 import { useNavigate } from 'react-router-dom';
 
 function BuscarMaterias() {
@@ -76,7 +76,17 @@ function BuscarMaterias() {
         }
     }
     const FinalizarMatriculas = () => {
-        navigate("/admin/matriculacion")
+        const storedUser = JSON.parse(localStorage.getItem("usuario"));
+const subRol = storedUser?.subRol;
+const rutaFinal = subRol === "Secretaria" ? "/secretaria/matriculacion" : "/admin/matriculacion";
+        Swal.fire({
+                    icon: "success",
+                    title: `Registro exitoso`,
+                    iconColor: "#218838",
+                    confirmButtonText: "Entendido",
+                    confirmButtonColor: "#003F89",
+                });
+        navigate(rutaFinal)
     }
     return (
         <div className='Contenedor-general'>
@@ -103,7 +113,7 @@ function BuscarMaterias() {
                                             <Card.Body>
                                                 <Card.Title>{asig.Materia?.nombre}</Card.Title>
                                                 <Card.Subtitle className="mb-2 text-muted">
-                                                    Paralelo:  {asig.paralelo} || Cupos: {asig.cuposDisponibles}<br />
+                                                    Paralelo:  {asig.paralelo} || Cupos: {asig.cupos}<br />
                                                 </Card.Subtitle>
                                                 <Card.Text>
                                                     <strong>Nivel:</strong> {asig.Materia.nivel} <br />
@@ -128,7 +138,7 @@ function BuscarMaterias() {
 
                 </div>
             )}
-            <div className='container btn-finalizar'>
+            <div className='container_btn-finalizar'>
                 <button className="btn-finalizar" onClick={FinalizarMatriculas}>Finalizar</button>
             </div>
         </div>

@@ -55,7 +55,8 @@
   display: flex;
   flex-direction: row;
   gap: 15px;
-  width: 700px;
+  width: auto;
+  justify-content: space-around;
 }
 .rows label{
   font-size: 14px;
@@ -91,7 +92,7 @@
 .form-group {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: space-around;
     gap: 5px;
     
 }
@@ -101,6 +102,7 @@
     font-size: 14px;
     font-weight: 500;
     color: #555;
+    white-space: nowrap;
 }
 
 /* Estilos de los inputs */
@@ -112,6 +114,9 @@
     font-size: 14px;
     transition: all 0.2s ease-in-out;
     
+}
+.form-control{
+  max-width: 80px;
 }
 .selected{
   display: flex;
@@ -144,7 +149,7 @@
 
 /* Contenedor de botones */
 .react-datepicker-wrapper {
-    width: 100% important;
+    width: 100% !important;
   }
   
   .react-datepicker__input-container input {

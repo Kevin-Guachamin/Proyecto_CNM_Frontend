@@ -4,6 +4,7 @@ import { ErrorMessage } from '../ErrorMesaje';
 
 export function Eliminar(data, URL, descripcion, setData, PK) {
     const token = localStorage.getItem("token")
+    
     Swal.fire({
         title: '¿Estás seguro?',
         text: `¿Quieres eliminar a ${descripcion}?`,
@@ -16,13 +17,14 @@ export function Eliminar(data, URL, descripcion, setData, PK) {
     }).then((result) => {
         if (result.isConfirmed) {
             // Eliminar usuario por PK
+            
             axios
                 .delete(`${URL}/${data[PK]}`,
                     {
                         headers: { Authorization: `Bearer ${token}` },
                     })
                 .then(() => {
-
+                    console.log("no yo me ejecute primero")
                     setData((prevData) => prevData.filter((d) => d[PK] !== data[PK]));
                     
                     Swal.fire({

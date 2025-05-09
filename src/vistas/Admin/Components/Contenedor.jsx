@@ -4,19 +4,37 @@ import Tabla from './Tabla';
 import { Eliminar } from '../../../Utils/CRUD/Eliminar';
 import { Editar } from '../../../Utils/CRUD/Editar';
 import "../Styles/Contenedor.css"
+import axios from 'axios';
+import { ErrorMessage } from '../../../Utils/ErrorMesaje';
 
 
-function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpoint,CrearEntidad, PK,extraIcon, Paginación}) {
-  const [search, setSearch] = useState('');
+function Contenedor({ setTotalPages,data, setData, headers, columnsToShow, filterKey, apiEndpoint,CrearEntidad, PK,extraIcon, Paginación, page,limit}) {
+  
   const [entityToUpdate, setEntityToUpdate] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
- 
+  const token=localStorage.getItem("token")
+  const [search,setSearch]=useState("")
 
+  const fetchAsignaturas = async (e) => {
+    e.preventDefault()
+    setSearch(e.target.value)
+    try {
+      
+      const { data } = await axios.get(
+        `${API_URL}/materia/obtener?page=${page}&limit=${limit}&search=${e.target.value}`,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      console.log("esta es la data",data)
+      setData(data.data);
+      setTotalPages(data.totalPages);
+    } catch (error) {
+      ErrorMessage(error);
+    } 
+  };
   
-  const filteredData = data.filter((item) =>
-    item[filterKey]?.toLowerCase().includes(search.toLowerCase())
-  );
 
   const toggleModal = () => {
     setIsModalOpen((prev) => !prev);
@@ -40,7 +58,7 @@ function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpo
   return (
     <div className='Contenedor-general'>
       
-      <Filtro search={search} setSearch={setSearch} toggleModal={toggleModal} filterKey={filterKey}/>
+      <Filtro search={search} toggleModal={toggleModal} filterKey={filterKey} filtrar={fetchAsignaturas} />
       {isModalOpen && (
             <CrearEntidad
               onCancel={toggleModal}
@@ -49,7 +67,7 @@ function Contenedor({ data, setData, headers, columnsToShow, filterKey, apiEndpo
             />
       )}
       <Tabla
-        filteredData={filteredData}
+        filteredData={data}
         OnEdit={handleEdit}
         OnDelete={handleDelete}
         headers={headers}

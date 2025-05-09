@@ -294,7 +294,7 @@ function Busqueda({usuario}) {
                                             <td>{`${item.dias[0]}${item.dias[1] ? `-${item.dias[1]}` : ''}`}</td>
                                             <td>{item.horaInicio}</td>
                                             <td>{item.horaFin}</td>
-                                            <td>{item.cuposDisponibles}</td>
+                                            <td>{item.cupos}</td>
                                             <td><button onClick={() => Inscribir(item)}>Inscribir</button></td>
                                         </tr>
                                     ))}

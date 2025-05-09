@@ -5,24 +5,11 @@ import { Card, Row, Col } from "react-bootstrap";
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-function InfoRepresentante({nroCedula}) {
-    const [representante,setRepresentante]=useState("")
+function InfoRepresentante({representante}) {
+    
     const token=localStorage.getItem("token")
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
-    useEffect(() => {
-        const obtenerRepresentante = async () => {
-            try {
-                const response = await axios.get(`${API_URL}/representante/obtener/${nroCedula}`,{
-                    headers: { Authorization: `Bearer ${token}` },
-                  });
-                setRepresentante(response.data)
-            } catch (error) {
-                ErrorMessage(error);
-            }
-        };
     
-        obtenerRepresentante();
-    }, []);
     const handleDownload = async (filePath) => {
         const parts = filePath.split("\\");
         const folder = parts[1]; // Subcarpeta (ej: "Estudiantes")

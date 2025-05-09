@@ -14,7 +14,7 @@ import VerDatosRepresentante from '../vistas/Representante/modulos/VerDatosRepre
 import VerDatosEstudiante from '../vistas/Representante/modulos/VerDatosEstudiante.jsx';
 import Cursos from '../vistas/Admin/Modules/Configuration/Cursos/Index.jsx'
 import Matriculacion from '../vistas/Admin/Modules/Matriculacion/Index.jsx';
-import Horarios from '../vistas/Admin/Modules/Matriculacion/Horarios.jsx'
+import Horarios from '../vistas/Admin/Modules/Matriculacion/Horario.jsx'
 import Inscripcion from '../vistas/Admin/Modules/Estudiantil/Registro/Index.jsx'
 import Representantes from '../vistas/Admin/Modules/Estudiantil/Representantes/Index.jsx'
 import AgregarFechas from '../vistas/Vicerrector/FechasNotas/AgregarFechas.jsx';
@@ -37,6 +37,11 @@ import FechasProcesos from '../vistas/Secretaria/FechasProcesos/FechasProcesos.j
 import VerificarCorreo from '../vistas/Recover-Password/VerificarCorreo/Index.jsx';
 import ResetPassword from '../vistas/Recover-Password/ResetPassword/Index.jsx';
 import VerCalificacionesEstudiante from '../vistas/Representante/modulos/VerCalificacionesEstudiante.jsx';
+import MatriculaIndividual from '../vistas/Docente/Matriculacion/Index.jsx';
+import MateriasIndividuales from '../vistas/Docente/MateriasIndividuales/Index.jsx'
+import DistributivoIndividual from '../vistas/Admin/Modules/Matriculacion/MateriasIndividuales/Index.jsx'
+import InscripcionesIndividuales from '../vistas/Docente/Matriculacion/Inscripciones/Index.jsx';
+import CursosVacios from '../vistas/Admin/Modules/Configuration/CursosSinMatricula/Index.jsx'
 
 //import InformacionEstudiantes from '../vistas/Secretaria/InformacionEstudiantil/Estudiantes/Index.jsx';
 
@@ -60,12 +65,17 @@ function Rutas() {
       <Route path='/admin/representantes' element={<Representantes />} />
       <Route path="/admin/password" element={<ChangePassword_Admin />} />
       <Route path="/admin/buscar_materias" element={<BuscarMaterias />} />
+      <Route path="/admin/asignacionesIndividuales" element={<DistributivoIndividual />} />
+      <Route path="/admin/cursos_vacios" element={<CursosVacios />} />
 
       {/*RUTAS DEL DOCENTE-Profesor*/}
       <Route path="/profesor/panelcursos/calificaciones" element={<Calificaciones />} />
       <Route path="/profesor/panelcursos" element={<PanelCursos />} />
       <Route path="/profesor/password" element={<ChangePassword_Profesor />} />
       <Route path='/profesor/solicitudes' element={<SolicitudesDocente />} />
+      <Route path='/profesor/matricula' element={<MatriculaIndividual />} />
+      <Route path='/profesor/materias' element={<MateriasIndividuales />} />
+      <Route path='/profesor/inscripciones' element={<InscripcionesIndividuales />} />
 
       {/*Rutas DEL REPRESENTANTE*/}
       <Route path="/representante" element={<Representante />} />
@@ -76,7 +86,6 @@ function Rutas() {
       <Route path="/representante/inscripcion" element={<InscripcionRepresentante />} />
       <Route path="/representante/calificaciones" element={<VerCalificacionesEstudiante />} />
 
-      
       {/*RUTAS DEL DOCENTE-Vicerrector*/}
       <Route path="/vicerrector/reportes" element={<AgregarFechas />} />
       <Route path="/vicerrector/password" element={<ChangePassword_Vicerrector />} />

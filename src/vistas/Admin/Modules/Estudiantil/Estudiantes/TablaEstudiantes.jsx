@@ -3,7 +3,7 @@ import { IoEyeOutline } from "react-icons/io5";
 import "../../../Styles/Tabla.css";
 
 
-function TablaEstudiantes({ filteredData, OnDelete, OnEdit, headers, columnsToShow, OnView }) {
+function TablaEstudiantil({ filteredData, OnDelete, OnEdit, headers, columnsToShow, OnView }) {
 
   return (
     <div className="Contenedor-tabla">
@@ -26,9 +26,9 @@ function TablaEstudiantes({ filteredData, OnDelete, OnEdit, headers, columnsToSh
                     <td className="tabla-celda" key={subIndex}>{item[col]}</td>
                   ))}
                   <td className='botones-icon'>
-                    <FaEdit size={20} className="icon edit-icon" onClick={() => OnEdit(item)} />
-                    <FaTrash size={20} className="icon delete-icon" onClick={() => OnDelete(item)} />
-                    <IoEyeOutline size={20} className='view-icon' onClick={() => OnView(item)} />
+                    <FaEdit size={20} title='editar' className="icon edit-icon" onClick={() => OnEdit(item)} />
+                    <FaTrash size={20} title='eliminar' className="icon delete-icon" onClick={() => OnDelete(item)} />
+                    <IoEyeOutline size={20} title='ver información' className='view-icon' onClick={() => OnView(item)} />
                   </td>
                 </tr>
               ))}
@@ -40,4 +40,4 @@ function TablaEstudiantes({ filteredData, OnDelete, OnEdit, headers, columnsToSh
   );
 }
 
-export default TablaEstudiantes;
+export default TablaEstudiantil;

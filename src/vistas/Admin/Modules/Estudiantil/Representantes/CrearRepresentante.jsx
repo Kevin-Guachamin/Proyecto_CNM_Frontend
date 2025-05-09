@@ -32,7 +32,7 @@ function CrearRepresentante({ onCancel, entityToUpdate, onSave }) {
     croquis: entityToUpdate ? entityToUpdate.croquis : null,
     copiaCedula: entityToUpdate ? entityToUpdate.copiaCedula : null
   }));
-  
+
   const handleFileChange = (event) => {
     const { name, files } = event.target;
     setFiles((prevState) => ({
@@ -120,29 +120,32 @@ function CrearRepresentante({ onCancel, entityToUpdate, onSave }) {
 
             </div>
           </div>
-          <div className='rows'>
-
-            <label>
-              Copia de Cédula:
+          <div className='file-upload-container'>
+            <div className='file-upload'>
+              <label className='custom-file-label'>
+                Copia de Cédula:
+              </label>
               <input
                 type="file"
                 name="copiaCedula"
-                
+                className='custom-file-input'
                 onChange={handleFileChange}
                 accept="application/pdf"
               />
-            </label>
-            <label>
-              Croquis:
+            </div>
+
+            <div className='file-upload'>
+              <label className='custom-file-label'>
+                Croquis:
+              </label>
               <input
-                
+                className='custom-file-input'
                 type="file"
                 name="croquis"
                 onChange={handleFileChange}
                 accept="application/pdf"
               />
-            </label>
-
+            </div>
           </div>
           <div className='rows-botones'>
             <div className="botones">
