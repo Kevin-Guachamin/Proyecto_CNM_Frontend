@@ -25,3 +25,19 @@ dist-ssr
 
 # archivos
 .env
+
+# Archivos swap
+*.swp
+*.swo
+*.swn
+.*.swp
+.*.swo
+.*.swn
+
+# Archivos backup (~)
+*~
+.*~
+
+# Archivos de undo persistente
+*.un~
+.*.un~

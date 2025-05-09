@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import Boton from '../../../components/Boton';
 import Loading from '../../../components/Loading';
 import { useState } from 'react';
+import axios from 'axios';
 
 function ViewDataEstudiante({onCancel, isLoading, entity }) {
   const [nroCedula,setNroCedula] = useState(""); // Inicializar con cadena vacia si es que hay valores undefined en entity
@@ -21,6 +22,11 @@ function ViewDataEstudiante({onCancel, isLoading, entity }) {
   // matricula IER PDF --->
   const [nroCedula_representante, setNroCedulaRepresentante] = useState("");
   const [direccion, setDireccion] = useState("");
+
+    // Variables para la actualizacion de datos segun las fechas establecidas 
+    const [ fechaInicio, setFechaInicio] = useState('');
+    const [ fechaFin, setFechaFin] = useState('');
+    const [dentroDeRango, setDentroDeRango] = useState('');
   
   /* 
     OJO FALTA COMPROBAR EL FUNCIONAMIENTO CON LOS ARCHIVOS PDFS SUBIDOS
@@ -29,6 +35,58 @@ function ViewDataEstudiante({onCancel, isLoading, entity }) {
   if (isLoading) { 
     <Loading></Loading>
   }
+
+    const cargarFechasActualizacionDatos = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const baseURL = import.meta.env.VITE_URL_DEL_BACKEND;
+            const headers = {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+
+            // Obtener la fecha actual del servidor
+            const {data: response} = await axios.get(
+                `${baseURL}/fechas_procesos/fecha_actual`, 
+                headers
+            );
+            const fechaActual = response.fechaActual;
+
+            // Obtener las fechas rango de la API para la actualizacion
+            const {data: fechaActualizacionDatos} = await axios.get(
+                `${baseURL}/fechas_procesos/actualizacion`,
+                headers
+            );
+
+            // Comprueba que haya datos en fechaActualizacionDatos
+            if(fechaActualizacionDatos) {
+                setFechaInicio(fechaActualizacionDatos.fechaInicioProceso); 
+                setFechaFin(fechaActualizacionDatos.fechaFinProceso); 
+            }
+
+            const inicio = fechaActualizacionDatos.fechaInicioProceso;
+            const fin = fechaActualizacionDatos.fechaFinProceso;
+            
+            // Establece si la fecha actual esta dentro del rango de la
+            // fecha del proceso 
+            if (fechaActual >= inicio && fechaActual <= fin) {
+                setDentroDeRango(true);
+
+            }else {
+                setDentroDeRango(false);
+
+            }
+
+            
+        } catch (error) {
+            console.log('Error al obtener las fechas de actualizacion de datos', error);
+        }
+    }
+
+    useEffect(() => {
+        cargarFechasActualizacionDatos();
+    }, []);
 
   useEffect(() => {
    if (entity) {
@@ -57,6 +115,10 @@ function ViewDataEstudiante({onCancel, isLoading, entity }) {
 
     // Comprobar que la actualizacion de datos este habilitada en la fecha establecida
   }
+
+    const formatearFecha = (fechaIso) => {
+        return new Date(fechaIso).toLocaleDateString('es-EC');
+    }
 
     return (
       <div className="modal-overlay">
@@ -179,8 +241,18 @@ function ViewDataEstudiante({onCancel, isLoading, entity }) {
           </div>
   
           <div className="botones">
-            <Boton texto="Guardar" onClick={() => handleSubmit()} estilo="boton-crear" />
-            <Boton texto="Cancelar" onClick={onCancel} estilo="boton-cancelar" />
+            {!dentroDeRango && (
+                <div>
+                <p style={{ color: 'red', marginTop: '10px' }}>
+                No se pueden actualizar datos fuera de fecha. 
+                </p>
+                <p style={{ color: 'red', marginTop: '10px' }}>
+                Fecha: {formatearFecha(fechaInicio)} al {formatearFecha(fechaFin)} 
+                </p>
+                </div> 
+            )}
+            <Boton texto="Guardar" onClick={() => handleSubmit()} disabled={!dentroDeRango} estilo="boton-crear" />
+        <Boton texto="Cancelar" onClick={onCancel} estilo="boton-cancelar" />
           </div>
         </div>
       </div>

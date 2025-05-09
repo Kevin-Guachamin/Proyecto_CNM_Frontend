@@ -36,12 +36,12 @@ import InformacionRepresentantes from '../vistas/Secretaria/InformacionEstudiant
 import FechasProcesos from '../vistas/Secretaria/FechasProcesos/FechasProcesos.jsx';
 import VerificarCorreo from '../vistas/Recover-Password/VerificarCorreo/Index.jsx';
 import ResetPassword from '../vistas/Recover-Password/ResetPassword/Index.jsx';
+import VerCalificacionesEstudiante from '../vistas/Representante/modulos/VerCalificacionesEstudiante.jsx';
 import MatriculaIndividual from '../vistas/Docente/Matriculacion/Index.jsx';
 import MateriasIndividuales from '../vistas/Docente/MateriasIndividuales/Index.jsx'
 import DistributivoIndividual from '../vistas/Admin/Modules/Matriculacion/MateriasIndividuales/Index.jsx'
 import InscripcionesIndividuales from '../vistas/Docente/Matriculacion/Inscripciones/Index.jsx';
 import CursosVacios from '../vistas/Admin/Modules/Configuration/CursosSinMatricula/Index.jsx'
-
 
 //import InformacionEstudiantes from '../vistas/Secretaria/InformacionEstudiantil/Estudiantes/Index.jsx';
 
@@ -84,6 +84,7 @@ function Rutas() {
       <Route path="/representante/password" element={<ChangePassword_Representante />} />
       <Route path="/estudiante/perfil" element={<VerDatosEstudiante />} />
       <Route path="/representante/inscripcion" element={<InscripcionRepresentante />} />
+      <Route path="/representante/calificaciones" element={<VerCalificacionesEstudiante />} />
 
       {/*RUTAS DEL DOCENTE-Vicerrector*/}
       <Route path="/vicerrector/reportes" element={<AgregarFechas />} />

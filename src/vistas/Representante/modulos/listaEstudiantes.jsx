@@ -3,8 +3,7 @@ import axios from 'axios';
 import Tabla from '../../Representante/components/Tabla_Representante';
 import Header from "../../../components/Header";
 import VerDatosEstudiante from '../../Representante/modulos/VerDatosEstudiante';
-import { useNavigate } from "react-router-dom";
-import VerCalificacionesEstudiante from "./VerCalificacionesEstudiante";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function ListaEstudiantes() {
   // Estado para almacenar la información del usuario conectado
@@ -17,6 +16,8 @@ function ListaEstudiantes() {
   let periodosMatriculados = [];
   //let periodosDatos = [];
   const [periodosDatos, setPeriodosDatos] = useState([]);
+  const navigate = useNavigate();
+  
 
   const handleVerCalificaciones = async (estudianteCedula) => {
     console.log("ver calificaciones de: ", estudianteCedula);
@@ -59,8 +60,11 @@ function ListaEstudiantes() {
         )
       );
   
-      setPeriodosDatos(respuestaPeriodosDatos);
-      setIsCalificacionesOpen(true);
+      navigate(
+        `/representante/calificaciones`,
+        { state: { estudiante, respuestaPeriodosDatos } }
+      );
+
 
     } catch (error) {
       console.log('Error al obtener las calificaciones del estudiante para el modal', error);
@@ -161,16 +165,6 @@ function ListaEstudiantes() {
           />
         )}
         
-        {/* Modal de calificaciones */}
-        {isCalificacionesOpen && (
-          <VerCalificacionesEstudiante
-            onCancel={handleCloseModal} 
-            estudiante={estudianteSeleccionado}
-            periodosMatriculados={periodosDatos}
-            
-          />
-        )}
-
       </div>
     )
 }
