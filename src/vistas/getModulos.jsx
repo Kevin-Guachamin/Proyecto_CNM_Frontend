@@ -27,8 +27,8 @@ export const getModulos = (subRol, includeInicio = false) => {
           { id: 2, titulo: "Matriculación", icono: "✏️", link: "/secretaria/matriculacion" },
           { id: 3, titulo: "Información Estudiantil", icono: "📄", link: "/secretaria/informacion" },
           { id: 4, titulo: "Fechas Procesos", icono: "📅", link: "/secretaria/procesos" },
-          { id: 5, titulo: "Cambiar contraseña", icono: "🔐", link: "/secretaria/password"}
-
+          { id: 5, titulo: "Reportes", icono: "📊", link: "/secretaria/reportes"},
+          { id: 6, titulo: "Cambiar contraseña", icono: "🔐", link: "/secretaria/password"}
         ];
         break;
         case "Administrador":
