@@ -8,23 +8,30 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const VerDatosRepresentante = () => {
-  const [representante, setRepresentante] = useState([]);
-  const location = useLocation();
-  const [mostrarModal, setMostrarModal] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+	const [representante, setRepresentante] = useState([]);
+	const location = useLocation();
+	const [mostrarModal, setMostrarModal] = useState(true);
+	const [isLoading, setIsLoading] = useState(false);
+	const navigate = useNavigate();
 
-  const [nroCedula, setNroCedula] = useState(""); // Inicializar con cadena vacia si es que hay valores undefined en entity
-  const [primer_nombre, setPrimerNombre] = useState("");
-  const [celular, setCelular] = useState("");
-  const [primer_apellido, setPrimerApellido] = useState("");
-  const [segundo_nombre, setSegundoNombre] =  useState("");
-  const [segundo_apellido, setSegundoApellido] = useState("");
-  const [convencional, setConvencional] = useState("");
-  const [emergencia, setEmergencia] = useState(""); 
-  const [email, setEmail] = useState("");
-
-  /* 
+	const [nroCedula, setNroCedula] = useState(""); // Inicializar con cadena vacia si es que hay valores undefined 
+	const [primer_nombre, setPrimerNombre] = useState("");
+	const [celular, setCelular] = useState("");
+	const [primer_apellido, setPrimerApellido] = useState("");
+	const [segundo_nombre, setSegundoNombre] =  useState("");
+	const [segundo_apellido, setSegundoApellido] = useState("");
+	const [convencional, setConvencional] = useState("");
+	const [emergencia, setEmergencia] = useState(""); 
+	const [email, setEmail] = useState("");
+	// Falta cedulaPDF y croquisPDF
+	
+	// Variables para habilitar o deshabilitar la actualizacion de datos
+	const [dentroDeRango, setDentroDeRango] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [fechaInicio, setFechaInicio] = useState('');
+    const [fechaFin, setFechaFin] = useState('');
+    
+  /*
     OJO FALTA COMPROBAR EL FUNCIONAMIENTO CON LOS ARCHIVOS PDFS SUBIDOS
   */
 
@@ -43,16 +50,58 @@ const VerDatosRepresentante = () => {
       setConvencional(representante.convencional || "");
       setEmergencia(representante.emergencia || "");
       setEmail(representante.email || "");
+      // Falta cedulaPDF y croquisPDF
     } 
   }, [representante]);
 
+
   const cargarDatosRepresentante = async () => {
     try {
-      setIsLoading(true);
-      const usuarioGuardado = localStorage.getItem("usuario");
-      if (usuarioGuardado) {
-        setRepresentante(JSON.parse(usuarioGuardado));
-      } 
+        setIsLoading(true);
+        const usuarioGuardado = localStorage.getItem("usuario");
+        if (usuarioGuardado) {
+            setRepresentante(JSON.parse(usuarioGuardado));
+        }
+        const token = localStorage.getItem("token");
+        const baseURL = import.meta.env.VITE_URL_DEL_BACKEND;
+        const headers = {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+
+
+        // Obtener la fecha actual del servidor
+        const {data: response} = await axios.get(
+            `${baseURL}/fechas_procesos/fecha_actual`,
+            headers
+        );
+        const fechaActual = response.fechaActual;
+
+        // Obtener las fechas rango de la API para la actualizacion
+        const {data: fechaActualizacionDatos} = await axios.get(
+            `${baseURL}/fechas_procesos/actualizacion`,
+            headers
+        );
+
+        // Comprueba que haya datos en fechaActualizacionDatos
+        if(fechaActualizacionDatos) {
+            setFechaInicio(fechaActualizacionDatos.fechaInicioProceso);
+            setFechaFin(fechaActualizacionDatos.fechaFinProceso);
+        }
+
+        const inicio = fechaActualizacionDatos.fechaInicioProceso;
+        const fin = fechaActualizacionDatos.fechaFinProceso;
+        
+        // Establece si la fecha actual esta dentro del rango de la
+        // fecha del proceso 
+        if (fechaActual >= inicio && fechaActual <= fin) {
+            setDentroDeRango(true);
+
+        }else {
+            setDentroDeRango(false);
+        }
+
     } catch (error) {
       setIsLoading(false);
       console.error('Error al obtener datos de representante: ', error);
@@ -63,6 +112,24 @@ const VerDatosRepresentante = () => {
     setMostrarModal(false); // Oculta el modal
     navigate(-1); // regresa a la pagina anterior
   }
+
+  const handleSubmit = () => {
+    // Se deben actualizar datos si es que la fecha lo permite
+    // Comprobar si la fecha actual esta dentro de las fechas limite para actualizar datos
+    console.log('Se actualizan datos del formulario');
+    console.log('Dentro de rango: ', dentroDeRango);
+    // Comprobar que en la logica del servidor tambien verifique la hora para rechazar o validar la
+    // peticion de actualizacion
+  }
+
+  const handleConfirmacion = () => {
+
+  }
+
+
+    const formatearFecha = (fechaIso) => {
+        return new Date(fechaIso).toLocaleDateString('es-EC');
+    }
 
   useEffect(() => {
     cargarDatosRepresentante();
@@ -154,7 +221,17 @@ const VerDatosRepresentante = () => {
           </div>
   
           <div className="botones">
-            <Boton texto="Guardar" onClick={() => handleSubmit()} estilo="boton-crear" />
+            {!dentroDeRango && (
+               <div>
+                    <p style={{ color: 'red', marginTop: '10px' }}>
+                        No se pueden actualizar datos fuera de fecha. 
+                    </p>
+                    <p style={{ color: 'red', marginTop: '10px' }}>
+                        Fecha: {formatearFecha(fechaInicio)} al {formatearFecha(fechaFin)} 
+                    </p>
+                </div> 
+            )}
+            <Boton texto="Guardar" onClick={() => handleSubmit()} disabled={!dentroDeRango} estilo="boton-crear" />
             <Boton texto="Cancelar" onClick={() => OnCancel()} estilo="boton-cancelar" />
           </div>
         </div>

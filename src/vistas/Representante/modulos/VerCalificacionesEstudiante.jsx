@@ -1,21 +1,27 @@
 // Modal para desplegar calificaciobes de un estudiante
 import TablaEstudianteCalificaciones from "../components/Tabla_EstudianteCalificaciones";
 import Boton from "../../../components/Boton";
-import { useState } from "react";
+import Header from "../../../components/Header";
+import { useEffect, useState } from "react";
 import { Dropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from "axios";
+import { useLocation } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
-const VerCalificacionesEstudiante = ({onCancel, estudiante, periodosMatriculados}) => {
+const VerCalificacionesEstudiante = () => {
   const [notasEstudiante, setNotasEstudiante] = useState([]);
+  const { state } = useLocation();
+  const {estudiante, respuestaPeriodosDatos: periodosMatriculados} = state || {};
+	const raw = localStorage.getItem('usuario');
+	const usuario = raw ? JSON.parse(raw) : null;
+	const navigate = useNavigate();
 
-  //let inscripciones = [];
-
+  // Estado para el periodo elegido
+  const [periodoSel, setPeriodoSel] = useState(null);
+	console.log("Datos usuario localStorage: ", usuario)
+	console.log("Datos estudiante que llegan en state: ", estudiante)
   const handleCalificaciones = async (matriculaID) => {
-    console.log('Este es el id de la matricula: ', matriculaID);
-
-    console.log("Datos de periodos:", periodosMatriculados);
-    
     // Obtener las inscripciones de un estudiante por ID de matricula
     try {
       const token = localStorage.getItem("token");
@@ -31,7 +37,6 @@ const VerCalificacionesEstudiante = ({onCancel, estudiante, periodosMatriculados
         `${baseURL}/inscripcion/obtener/matricula/${matriculaID}`, 
         headers
       ); 
-      console.log("Inscripciones de la matricula: ", respuestaInscripciones);
 
       // Obtener los datos necesarios de inscripciones
       const inscripciones = respuestaInscripciones.map(inscripcion => {
@@ -42,7 +47,6 @@ const VerCalificacionesEstudiante = ({onCancel, estudiante, periodosMatriculados
           nivel: inscripcion.Asignacion.Materia.nivel
         };
       })
-      console.log("Datos de inscripciones formateados: ", inscripciones);
       
       // Obtener calificaciones parciales de una materia con el ID_asignacion
       // mediante peticiones a endpoints
@@ -58,6 +62,8 @@ const VerCalificacionesEstudiante = ({onCancel, estudiante, periodosMatriculados
               : `/parciales/inscripcion/${inscripcion.ID_inscripcion}`;
   
             const { data } = await axios.get(`${baseURL}${endpoint}`, headers);
+
+            setPeriodoSel(true);
             
             // Devolver un objeto con información completa
             return {
@@ -84,23 +90,13 @@ const VerCalificacionesEstudiante = ({onCancel, estudiante, periodosMatriculados
       const resultadosCompletos = notas.filter(nota => !nota.error);
       const resultadosConError = notas.filter(nota => nota.error);
 
-      console.log('Resultados completos:', resultadosCompletos);
       if (resultadosConError.length > 0) {
         console.log('Materias con error:', resultadosConError);
       }
 
-      // Datos recuperadas 
-      // return resultadosCompletos;
-
-      // Campos de notas necesarios
-      /* const datos = resultadosCompletos.map(notasMaterias => ({
-        nombreMateria: notasMaterias.nombreMateria,
-        ID_asignacion: notasMaterias.ID_asignacion,
-        nivel: notasMaterias.nivel,
-        calificaciones: notasMaterias.calificaciones
-      }));
- */
       setNotasEstudiante(resultadosCompletos);
+
+
       
     } catch (error) {
       console.log("Error al obtener las calificaciones del estudiante: ", error);
@@ -110,37 +106,49 @@ const VerCalificacionesEstudiante = ({onCancel, estudiante, periodosMatriculados
     
   }
 
+	const handleOnClick = () => {
+		navigate('/representante/estudiantes'); // Usa el navigate ya definido
+	}
+
+
   return (
-    <div className="modal-overlay">
-      <div className="modal-container">
-        <h2 className="modal-title"> Reporte de calificaciones de {`${estudiante.primer_nombre} ${estudiante.primer_apellido}`}</h2>
-        
-        {/* Se despliega lista para que se seleccione un periodo matriculado del cual ver las notas */}
-        <Dropdown>
-          <Dropdown.Toggle variant="secondary" id="dropdown-basic" size="sm">
-            Selecciona una opción
-          </Dropdown.Toggle>
+    <div >
+	  <div className="container-fluid p-0">
+	  	{usuario && <Header isAuthenticated={true} usuario={usuario} />}
+	  </div>
+      {/* Se despliega lista para que se seleccione un periodo matriculado del cual ver las notas */}
+	  <div></div>
+	<div className="d-inline-block">
+	  <Dropdown>
+		  <Dropdown.Toggle variant="secondary" id="dropdown-basic" size="sm">
+			  Seleccione un periodo academico 
+		  </Dropdown.Toggle>
 
-          <Dropdown.Menu>
-            {periodosMatriculados.length > 0 ? (
-              periodosMatriculados.map((periodo, i) =><Dropdown.Item key={i} onClick={() => handleCalificaciones(periodo.ID)}> {periodo.descripcion} </Dropdown.Item> )
-            ) : (
-                <Dropdown.Item href="#"> No hay periodos matriculados </Dropdown.Item>
-            )}
-          </Dropdown.Menu>
-        </Dropdown>
-        
-        <div>
-        </div>
+		  <Dropdown.Menu>
+			  {periodosMatriculados.length > 0 ? (
+				  periodosMatriculados.map((periodo, i) => <Dropdown.Item key={i} onClick={() => handleCalificaciones(periodo.ID)}> {periodo.descripcion} </Dropdown.Item>)
+			  ) : (
+				  <Dropdown.Item href="#"> No hay periodos matriculados </Dropdown.Item>
+			  )}
+		  </Dropdown.Menu>
+	  </Dropdown>
+
+	</div> 
+		
+	{/* Boton para volver a lista de estudiantes */}
+	<div className="d-flex justify-content-center mt-3">
+		<Boton texto="Volver a lista" onClick={() => handleOnClick()} estilo="boton-crear" />
+	</div>
+
+      {/* Renderizado condicional */}
+      {periodoSel && (
         <div /* className="modal-form" */>
-          <TablaEstudianteCalificaciones notasEstudiante={notasEstudiante}></TablaEstudianteCalificaciones>
+          <TablaEstudianteCalificaciones datos={notasEstudiante} estudiante={estudiante} periodosMatriculados={periodosMatriculados}></TablaEstudianteCalificaciones>
         </div>
+      )}
+      
 
-        <div className="botones">
-          <Boton texto="Guardar" onClick={() => handleSubmit()} estilo="boton-crear" />
-          <Boton texto="Cancelar" onClick={onCancel} estilo="boton-cancelar" />
-        </div>
-      </div>
+      
     </div>
   );
 }
