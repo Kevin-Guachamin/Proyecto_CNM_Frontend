@@ -5,6 +5,7 @@ import axios from "axios";
 import { ErrorMessage } from "../../Utils/ErrorMesaje";
 import Swal from 'sweetalert2';
 import "./Parcial.css";
+import { calcularPromedioParcial, calcularSumaComportamiento, calcularValoracionComportamiento, abreviarNivel } from "./Promedios"
 
 function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura }) {
   // ID dinámico: pdf-parcial1-quim1, pdf-parcial2-quim1, pdf-parcial1-quim2, etc.
@@ -72,34 +73,6 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
     "PRESENTACION PERSONAL (LIMPIEZA Y UNIFORME)", "PARTICIPACION COMUNITARIA", "RESPONSABILIDAD "
   ];
 
-  const abreviarNivel = (nivel) => {
-    if (!nivel || typeof nivel !== "string") return "";
-
-    const partes = nivel.split(" ");
-    if (partes.length < 2) return "";
-
-    const grado = partes[0][0]; // Ej. "1ro" => "1"
-
-    if (nivel.includes("Bachillerato")) return `${grado}BCH`;
-    if (nivel.includes("Básico Elemental")) return `${grado}BE`;
-    if (nivel.includes("Básico Medio")) return `${grado}BM`;
-    if (nivel.includes("Básico Superior")) return `${grado}BS`;
-
-    return ""; // Por defecto si no matchea nada
-  };
-
-  // Función para calcular la valoración según la suma total de comportamiento
-  const calcularValoracion = (valor) => {
-    // 1) Truncar el valor (9.4 => 9)
-    const truncado = Math.floor(valor);
-    // 2) Asignar la letra en función del entero
-    if (truncado === 10) return "A";
-    if (truncado === 9) return "B";
-    if (truncado >= 7) return "C"; // Esto abarca 7 y 8
-    if (truncado >= 5) return "D"; // Esto abarca 5 y 6
-    return "E";                     // Menos de 5
-  };
-
   function parseCampoNumerico(valor) {
     if (typeof valor === "string" && valor.trim() === "") {
       return null; // vacío
@@ -164,7 +137,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
         text: 'Este parcial ya se bloqueó o se guardó definitivamente.',
       });
       return;
-    }    
+    }
     const nuevosDatos = datos.map((fila, i) => {
       if (i === rowIndex) {
         let nuevaFila = { ...fila };
@@ -204,19 +177,12 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
         }
 
         // Cálculo de suma de comportamiento
-        const sumaComportamiento = columnasComportamiento.reduce(
-          (acc, col) => acc + (parseInt(nuevaFila[col]) || 0),
-          0
+        const sumaComportamiento = calcularSumaComportamiento(nuevaFila, columnasComportamiento);
+        const { ponderacion70, ponderacion30, promedioParcial } = calcularPromedioParcial(
+          nuevaFila["INSUMO 1"],
+          nuevaFila["INSUMO 2"],
+          nuevaFila["EVALUACIÓN SUMATIVA"]
         );
-
-        // Cálculo automático de los promedios académicos
-        const insumo1 = parseFloat(nuevaFila["INSUMO 1"]) || 0;
-        const insumo2 = parseFloat(nuevaFila["INSUMO 2"]) || 0;
-        const evaluacion = parseFloat(nuevaFila["EVALUACIÓN SUMATIVA"]) || 0;
-
-        const ponderacion70 = ((insumo1 + insumo2) / 2) * 0.7;
-        const ponderacion30 = evaluacion * 0.3;
-        const promedioParcial = ponderacion70 + ponderacion30;
 
         // Actualizar los valores en la fila
         return {
@@ -225,7 +191,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
           "PONDERACIÓN 30%": ponderacion30.toFixed(2),
           "PROMEDIO PARCIAL": promedioParcial.toFixed(2),
           "PROMEDIO COMPORTAMIENTO": sumaComportamiento, // Para la sección de comportamiento
-          "VALORACION": calcularValoracion(sumaComportamiento),
+          "VALORACION": calcularValoracionComportamiento(sumaComportamiento),
         };
       }
       return fila;
@@ -237,17 +203,11 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
   const safe = (val) => (val === 0 || val === "0") ? "0" : (val !== undefined && val !== null ? val : "");
 
   const calcularDatosFila = (fila) => {
-    const insumo1 = parseFloat(fila["INSUMO 1"]) || 0;
-    const insumo2 = parseFloat(fila["INSUMO 2"]) || 0;
-    const evaluacion = parseFloat(fila["EVALUACIÓN SUMATIVA"]) || 0;
-
-    const ponderacion70 = ((insumo1 + insumo2) / 2) * 0.7;
-    const ponderacion30 = evaluacion * 0.3;
-    const promedioParcial = ponderacion70 + ponderacion30;
-
-    const sumaComportamiento = columnasComportamiento.reduce(
-      (acc, col) => acc + (parseInt(fila[col]) || 0),
-      0
+    const sumaComportamiento = calcularSumaComportamiento(fila, columnasComportamiento);
+    const { ponderacion70, ponderacion30, promedioParcial } = calcularPromedioParcial(
+      fila["INSUMO 1"],
+      fila["INSUMO 2"],
+      fila["EVALUACIÓN SUMATIVA"]
     );
 
     return {
@@ -256,7 +216,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
       "PONDERACIÓN 30%": ponderacion30.toFixed(2),
       "PROMEDIO PARCIAL": promedioParcial.toFixed(2),
       "PROMEDIO COMPORTAMIENTO": sumaComportamiento,
-      "VALORACION": calcularValoracion(sumaComportamiento),
+      "VALORACION": calcularValoracionComportamiento(sumaComportamiento),
     };
   };
 

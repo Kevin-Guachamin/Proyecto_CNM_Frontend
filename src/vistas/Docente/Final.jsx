@@ -4,41 +4,13 @@ import Tabla from "../../components/Tabla";
 import Swal from 'sweetalert2';
 import axios from "axios";
 import { ErrorMessage } from "../../Utils/ErrorMesaje";
+import { calcularPromedioAnual, calcularPromedioComportamientoFinal, calcularPromedioFinalConSupletorio, determinarEstado, calcularValoracionComportamiento, abreviarNivel } from "./Promedios";
 import "./Parcial.css";
 
 const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura }) => {
   const [datos, setDatos] = useState([]);
 
   const idContenedor = `pdf-final`;
-
-  // Función para convertir el promedio de comportamiento en letra
-  const calcularValoracion = (valor) => {
-    // 1) Truncar el valor (9.4 => 9)
-    const truncado = Math.floor(valor);
-
-    // 2) Asignar la letra en función del entero
-    if (truncado === 10) return "A";
-    if (truncado === 9) return "B";
-    if (truncado >= 7) return "C"; // Esto abarca 7 y 8
-    if (truncado >= 5) return "D"; // Esto abarca 5 y 6
-    return "E";                     // Menos de 5
-  };
-
-  const abreviarNivel = (nivel) => {
-    if (!nivel || typeof nivel !== "string") return "";
-
-    const partes = nivel.split(" ");
-    if (partes.length < 2) return "";
-
-    const grado = partes[0][0]; // Ej. "1ro" => "1"
-
-    if (nivel.includes("Bachillerato")) return `${grado}BCH`;
-    if (nivel.includes("Básico Elemental")) return `${grado}BE`;
-    if (nivel.includes("Básico Medio")) return `${grado}BM`;
-    if (nivel.includes("Básico Superior")) return `${grado}BS`;
-
-    return ""; // Por defecto si no matchea nada
-  };
 
   const transformarDatosFinalParaGuardar = (datos) => {
     return datos.map((fila) => {
@@ -86,23 +58,16 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
           // Tomar los promedios finales (numéricos) de Q1 y Q2
           const q1PF = parseFloat(quim1["Promedio Completo"]) || 0;
           const q2PF = parseFloat(quim2["Promedio Completo"]) || 0;
-          const promedioAnual = (q1PF + q2PF) / 2;
-          // Tomar los promedios de comportamiento (numéricos)
+          const promedioAnual = calcularPromedioAnual(q1PF, q2PF);
           const q1PC = parseFloat(quim1["Promedio Comportamiento Completo"]) || 0;
           const q2PC = parseFloat(quim2["Promedio Comportamiento Completo"]) || 0;
-          const promedioComportamiento = (q1PC + q2PC) / 2;
-          const comportamiento = calcularValoracion(promedioComportamiento);
 
-          // Examen supletorio guardado (si existe)
-          const examenSupletorio = finalGuardado.examen_recuperacion ?? "";
+          const promedioComportamiento = calcularPromedioComportamientoFinal(q1PC, q2PC);
+          const comportamiento = calcularValoracionComportamiento(promedioComportamiento);
 
-          // Cálculo del promedio final según la lógica
-          let pFinal = promedioAnual;
-          if (promedioAnual < 7 && examenSupletorio !== "") {
-            const examenVal = parseFloat(examenSupletorio) || 0;
-            pFinal = examenVal > promedioAnual ? examenVal : promedioAnual;
-          }
-          const estado = pFinal >= 7 ? "Aprobado" : pFinal >= 4 && pFinal < 7 ? "Supletorio" : "Reprobado";
+          const examenSupletorio = finalGuardado.examen_recuperacion ?? ""; // ← esta línea es necesaria
+          const pFinal = calcularPromedioFinalConSupletorio(promedioAnual, examenSupletorio);
+          const estado = determinarEstado(pFinal);
 
           // Nota que guardamos en propiedades "numéricas" (prefijo _)
           // y también en las llaves visibles si quieres un valor inicial
@@ -145,10 +110,6 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
   useEffect(() => {
     if (datos.length === 0) return;
 
-    // Filtrar filas válidas si hace falta
-    // const datosCompletos = datos.filter(...);
-
-    // Aquí no definiste "datosCompletos", así que puedes usar "datos" directamente
     if (typeof actualizarDatosFinal === "function") {
       const datosTransformados = transformarDatosFinalParaGuardar(datos);
       actualizarDatosFinal(datosTransformados);
@@ -196,15 +157,11 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
           let newRow = { ...row, [columnName]: value };
           if (columnName === "Examen Supletorio") {
             const pAnualNum = row._promedioAnual || 0;
-            let pFinal = pAnualNum;
-            if (pAnualNum < 7 && value !== "") {
-              const examenVal = parseFloat(value) || 0;
-              pFinal = examenVal > pAnualNum ? examenVal : pAnualNum;
-            }
+            const pFinal = calcularPromedioFinalConSupletorio(pAnualNum, value);
             newRow._promedioFinal = pFinal;
             newRow["Promedio Final"] = pFinal;
-            newRow["Estado"] = pFinal >= 7 ? "Aprobado" : pFinal >= 4 && pFinal < 7 ? "Supletorio" : "Reprobado";
-            newRow.promedioFinalInsuficiente = pFinal < 7;
+            newRow["Estado"] = determinarEstado(pFinal);
+
           }
           return newRow;
         }
@@ -290,9 +247,10 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
   const realmenteDeshabilitado = soloLectura || inputsDisabled || (!isWithinRange && !forceEdit);
 
   const handleGuardar = (rowIndex, rowData) => {
-    // Aquí asumimos que ya existe el registro (como en los otros componentes)
-    const original = datos[rowIndex];
-    const haCambiado = JSON.stringify(rowData) !== JSON.stringify(original);
+    const original = datosOriginales[rowIndex];
+    const haCambiado =
+      parseFloat(rowData["Examen Supletorio"] || 0).toFixed(2) !==
+      parseFloat(original["Examen Supletorio"] || 0).toFixed(2);
 
     if (!haCambiado) {
       Swal.fire({
@@ -319,16 +277,37 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
     };
 
     axios
-      .put(`${import.meta.env.VITE_URL_DEL_BACKEND}/finales/${rowData.idInscripcion}`, body)
+      .put(`${import.meta.env.VITE_URL_DEL_BACKEND}/finales/${rowData.idFinal}`, body)
       .then(() => {
         Swal.fire({
           icon: "success",
           title: "Actualizado",
           text: "La nota del examen supletorio se actualizó correctamente.",
         });
+
+        // 👉 Recalcular estado y promedio
+        const promedioFinalRecalculado = calcularPromedioFinalConSupletorio(rowData._promedioAnual, examen);
+        const estadoFinal = determinarEstado(promedioFinalRecalculado);
+
         const nuevaCopia = [...datos];
-        nuevaCopia[rowIndex] = JSON.parse(JSON.stringify(rowData));
+        nuevaCopia[rowIndex] = {
+          ...rowData,
+          "Examen Supletorio": examen.toFixed(2),
+          _promedioFinal: promedioFinalRecalculado,
+          "Promedio Final": promedioFinalRecalculado.toFixed(2),
+          "Estado": estadoFinal,
+        };
         setDatos(nuevaCopia);
+
+        const nuevosOriginales = [...datosOriginales];
+        nuevosOriginales[rowIndex] = {
+          ...rowData,
+          "Examen Supletorio": examen.toFixed(2),
+          _promedioFinal: promedioFinalRecalculado,
+          "Promedio Final": promedioFinalRecalculado.toFixed(2),
+          "Estado": estadoFinal,
+        };
+        setDatosOriginales(nuevosOriginales);
       })
       .catch((error) => {
         Swal.fire({
