@@ -1,60 +1,33 @@
-import axios from "axios";
+export const calcularPromedioFinalNormal = (parciales, quimestrales, finales, idInscripcion) => {
+  const getPromParcial = (p1, p2, evaluacion) => {
+    const insumoAvg = (parseFloat(p1) + parseFloat(p2)) / 2;
+    return insumoAvg * 0.7 + parseFloat(evaluacion) * 0.3;
+  };
 
-export async function obtenerPromediosPorAsignatura(idMatricula, esBE) {
-  try {
-    const endpointInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/obtener/matricula/${idMatricula}`;
-    const endpointQuimestres = `${import.meta.env.VITE_URL_DEL_BACKEND}/${esBE ? "quimestralesbe" : "quimestrales"}/asignacion/${idMatricula}`;
-    const endpointFinales = `${import.meta.env.VITE_URL_DEL_BACKEND}/${esBE ? "finalesbe" : "finales"}/asignacion/${idMatricula}`;
+  const parc1 = parciales.find(p => p.idInscripcion === idInscripcion && p.parcial === "P1" && p.quimestre === "Q1");
+  const parc2 = parciales.find(p => p.idInscripcion === idInscripcion && p.parcial === "P2" && p.quimestre === "Q1");
+  const parc3 = parciales.find(p => p.idInscripcion === idInscripcion && p.parcial === "P1" && p.quimestre === "Q2");
+  const parc4 = parciales.find(p => p.idInscripcion === idInscripcion && p.parcial === "P2" && p.quimestre === "Q2");
 
-    const [resInscripciones, resQuimestres, resFinales] = await Promise.all([
-      axios.get(endpointInscripciones),
-      axios.get(endpointQuimestres),
-      axios.get(endpointFinales)
-    ]);
+  const promQ1 = (getPromParcial(parc1?.insumo1, parc1?.insumo2, parc1?.evaluacion) + getPromParcial(parc2?.insumo1, parc2?.insumo2, parc2?.evaluacion)) / 2;
+  const promQ2 = (getPromParcial(parc3?.insumo1, parc3?.insumo2, parc3?.evaluacion) + getPromParcial(parc4?.insumo1, parc4?.insumo2, parc4?.evaluacion)) / 2;
 
-    const inscripciones = resInscripciones.data || [];
-    const quimestres = resQuimestres.data || [];
-    const finales = resFinales.data || [];
+  const examenQ1 = parseFloat(quimestrales.find(q => q.idInscripcion === idInscripcion && q.quimestre === "Q1")?.examen || 0);
+  const examenQ2 = parseFloat(quimestrales.find(q => q.idInscripcion === idInscripcion && q.quimestre === "Q2")?.examen || 0);
 
-    const resultado = inscripciones.map((insc) => {
-      const q1 = quimestres.find(q => q.idInscripcion === insc.ID && q.quimestre === "Q1") || {};
-      const q2 = quimestres.find(q => q.idInscripcion === insc.ID && q.quimestre === "Q2") || {};
+  const finalQ1 = promQ1 * 0.7 + examenQ1 * 0.3;
+  const finalQ2 = promQ2 * 0.7 + examenQ2 * 0.3;
 
-      const q1Prom = parseFloat(q1.examen || 0); // usa promedio quimestral si lo tienes
-      const q2Prom = parseFloat(q2.examen || 0);
+  let promedioAnual = (finalQ1 + finalQ2) / 2;
+  const examenRecup = parseFloat(finales.find(f => f.idInscripcion === idInscripcion)?.examen_recuperacion || 0);
 
-      const promedioAnual = (q1Prom + q2Prom) / 2;
-
-      const final = finales.find(f => f.idInscripcion === insc.ID);
-      const examenSupletorio = final?.examen_recuperacion ?? null;
-
-      let promedioFinal = promedioAnual;
-      if (promedioAnual < 7 && examenSupletorio !== null) {
-        const examenVal = parseFloat(examenSupletorio);
-        if (!isNaN(examenVal)) {
-          promedioFinal = Math.max(promedioFinal, examenVal);
-        }
-      }
-
-      const calificacion = obtenerCualitativa(promedioFinal);
-
-      return {
-        asignatura: insc.Asignacion?.Materia?.nombre || "Sin nombre",
-        promedio: promedioFinal.toFixed(2),
-        cualitativa: calificacion
-      };
-    });
-
-    return resultado;
-
-  } catch (error) {
-    throw error;
+  let promedioFinal = promedioAnual;
+  if (promedioAnual < 7 && examenRecup) {
+    promedioFinal = Math.max(promedioAnual, examenRecup);
   }
-}
 
-function obtenerCualitativa(n) {
-  if (n >= 9) return "Domina los aprendizajes requeridos";
-  if (n >= 7) return "Alcanza los aprendizajes requeridos";
-  if (n > 4) return "Está próximo a alcanzar los aprendizajes requeridos";
-  return "No alcanza los aprendizajes requeridos";
-}
+  return {
+    promedioFinal,
+    detalle: { promQ1, promQ2, examenQ1, examenQ2, examenRecup, finalQ1, finalQ2, promedioAnual }
+  };
+};

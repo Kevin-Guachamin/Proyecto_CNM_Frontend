@@ -91,35 +91,39 @@ function ListadoEstudiantes() {
     const handleVerNotas = async (est) => {
         const token = localStorage.getItem("token");
         try {
-          const resMatriculas = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/matricula/estudiante/${est.ID}`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-      
-          const periodoActual = parseInt(idPeriodo);
-          const ultimaMatricula = resMatriculas.data.find(m => m.ID_periodo_academico === periodoActual);
-      
-          if (!ultimaMatricula) {
-            Swal.fire("Error", "No se encontró la matrícula del estudiante para este período.", "error");
-            return;
-          }
-      
-    
-          navigate(`/secretaria/reportes/estudiante/${est.ID}`, {
-            state: {
-              estudiante: {
-                idEstudiante: est.ID,
-                nombre: `${est.primer_apellido} ${est.segundo_apellido || ""} ${est.primer_nombre} ${est.segundo_nombre || ""}`,
-                cedula: est.nroCedula,
-                idMatricula: ultimaMatricula.ID,
-                nivel: est.nivel,
-                anioLectivo: descripcionPeriodoFromState,
-              },
-            },
-          });
+            const resMatriculas = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/matricula/estudiante/${est.ID}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            const periodoActual = parseInt(idPeriodo);
+            const ultimaMatricula = resMatriculas.data.find(m => m.ID_periodo_academico === periodoActual);
+
+            if (!ultimaMatricula) {
+                Swal.fire("Error", "No se encontró la matrícula del estudiante para este período.", "error");
+                return;
+            }
+
+
+            const esBE = est.nivel?.toLowerCase().includes("elemental");
+
+            navigate(`/secretaria/reportes/estudiante/${est.ID}`, {
+                state: {
+                    estudiante: {
+                        idEstudiante: est.ID,
+                        nombre: `${est.primer_apellido} ${est.segundo_apellido || ""} ${est.primer_nombre} ${est.segundo_nombre || ""}`,
+                        cedula: est.nroCedula,
+                        idMatricula: ultimaMatricula.ID,
+                        nivel: est.nivel,
+                        anioLectivo: descripcionPeriodoFromState,
+                    },
+                    esBE,
+                },
+            });
+
         } catch (error) {
-          ErrorMessage(error);
+            ErrorMessage(error);
         }
-      };      
+    };
 
     const handleResumenGeneral = () => {
         navigate(`/secretaria/reportes/resumen/${nivel}`, {

@@ -4,6 +4,7 @@ import Tabla from "../../components/Tabla";
 import Swal from 'sweetalert2';
 import axios from "axios";
 import { ErrorMessage } from "../../Utils/ErrorMesaje";
+import { calcularPromedioQuimestral, calcularPromedioComportamiento, calcularValoracionComportamiento, abreviarNivel } from "./Promedios";
 import "./Parcial.css";
 
 const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actualizarDatosQuim, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura }) => {
@@ -13,35 +14,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
   // Estado que contendrá los datos combinados (por estudiante) provenientes de los parciales
   const [datos, setDatos] = useState([]);
 
-  // Función para calcular la valoración (para comportamiento) según la suma total
-  const calcularValoracion = (valor) => {
-    // 1) Truncar el valor (9.4 => 9)
-    const truncado = Math.floor(valor);
-
-    // 2) Asignar la letra en función del entero
-    if (truncado === 10) return "A";
-    if (truncado === 9) return "B";
-    if (truncado >= 7) return "C"; // Esto abarca 7 y 8
-    if (truncado >= 5) return "D"; // Esto abarca 5 y 6
-    return "E";                     // Menos de 5
-  };
-
-  const abreviarNivel = (nivel) => {
-    if (!nivel || typeof nivel !== "string") return "";
-
-    const partes = nivel.split(" ");
-    if (partes.length < 2) return "";
-
-    const grado = partes[0][0]; // Ej. "1ro" => "1"
-
-    if (nivel.includes("Bachillerato")) return `${grado}BCH`;
-    if (nivel.includes("Básico Elemental")) return `${grado}BE`;
-    if (nivel.includes("Básico Medio")) return `${grado}BM`;
-    if (nivel.includes("Básico Superior")) return `${grado}BS`;
-
-    return ""; // Por defecto si no matchea nada
-  };
-
+  
   const obtenerEtiquetaQuimestre = () => {
     return quimestreSeleccionado === "1" ? "Q1" : "Q2";
   };
@@ -95,17 +68,14 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
 
           const parcial1 = parseFloat(p1["Promedio Final"] || 0);
           const parcial2 = parseFloat(p2["Promedio Final"] || 0);
-          const promedioAcademico = (parcial1 + parcial2) / 2;
-          const ponderacion70 = promedioAcademico * 0.7;
           const notaExamen = saved.examen ?? "";
-          const ponderacion30 = parseFloat(notaExamen || 0) * 0.3;
-          const promedioFinal = ponderacion70 + ponderacion30;
 
-          const comportamientoP1 = parseFloat(p1["Promedio Comportamiento"] || 0);
-          const comportamientoP2 = parseFloat(p2["Promedio Comportamiento"] || 0);
+          const { ponderacion70, ponderacion30, promedioFinal } = calcularPromedioQuimestral(parcial1, parcial2, notaExamen);
 
-          const comportamientoTotal = (comportamientoP1 + comportamientoP2) / 2;
-          const comportamientoFinal = calcularValoracion(comportamientoTotal);
+          const comportamientoP1 = p1["Promedio Comportamiento"];
+          const comportamientoP2 = p2["Promedio Comportamiento"];
+          const comportamientoTotal = calcularPromedioComportamiento(comportamientoP1, comportamientoP2);
+          const comportamientoFinal = calcularValoracionComportamiento(comportamientoTotal);
 
           return {
             idInscripcion: est.idInscripcion,
@@ -118,14 +88,14 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
             "Examen": notaExamen,
             "Ponderación 30%": ponderacion30.toFixed(2),
             "Promedio Final": promedioFinal.toFixed(2),
-            "Promedio Comportamiento": comportamientoTotal,
+            "Promedio Comportamiento": comportamientoTotal.toFixed(2),
             "Nivel": abreviarNivel(est.nivel),
             "Comportamiento Final": comportamientoFinal,
           };
         });
         setDatos(nuevosDatos);
         setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
-        actualizarDatosQuim(nuevosDatos);        
+        actualizarDatosQuim(nuevosDatos);
       })
       .catch(err => {
         ErrorMessage(err);
@@ -156,7 +126,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
       });
       return;
     }
-    
+
     if (inputsDisabled) {
       Swal.fire({
         icon: 'info',
@@ -165,7 +135,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
       });
       return;
     }
-    
+
     const nuevosDatos = datos.map((fila, i) => {
       if (i === rowIndex) {
         let nuevaFila = { ...fila };
@@ -187,10 +157,9 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
         }
 
         // Recalcular la ponderación del examen y el promedio final
-        const notaExamen = parseFloat(nuevaFila["Examen"]) || 0;
-        const ponderacion30 = notaExamen * 0.3;
-        const ponderacion70 = parseFloat(nuevaFila["Ponderación 70%"]) || 0;
-        const promedioFinal = ponderacion70 + ponderacion30;
+        const parcial1 = nuevaFila["Primer Parcial"];
+        const parcial2 = nuevaFila["Segundo Parcial"];
+        const { ponderacion30, promedioFinal } = calcularPromedioQuimestral(parcial1, parcial2, nuevaFila["Examen"]);
 
         nuevaFila["Ponderación 30%"] = ponderacion30.toFixed(2);
         nuevaFila["Promedio Final"] = promedioFinal.toFixed(2);
@@ -247,10 +216,10 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
       });
       return;
     }
-  
+
     const original = datosOriginales[rowIndex];
     const haCambiado = JSON.stringify(rowData) !== JSON.stringify(original);
-  
+
     if (!haCambiado) {
       Swal.fire({
         icon: "info",
@@ -259,7 +228,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
       });
       return;
     }
-  
+
     const examen = parseFloat(rowData["Examen"]);
     if (isNaN(examen) || examen < 0 || examen > 10) {
       Swal.fire({
@@ -269,13 +238,13 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
       });
       return;
     }
-  
+
     const body = {
       id_inscripcion: rowData.idInscripcion,
       quimestre: quimestreSeleccionado === "1" ? "Q1" : "Q2",
       examen,
     };
-  
+
     axios
       .put(`${import.meta.env.VITE_URL_DEL_BACKEND}/quimestrales/${rowData.idQuimestral}`, body)
       .then(() => {
@@ -297,7 +266,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
         ErrorMessage(error);
       });
   };
-  
+
   return (
     <div id={idContenedor} className="container tabla-quimestral">
       <HeaderTabla
