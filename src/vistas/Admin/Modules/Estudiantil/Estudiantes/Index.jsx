@@ -33,6 +33,7 @@ function Index() {
   const [width, setWidth] = useState(window.innerWidth);
   const [search, setSearch] = useState('');
 
+
   // ✅ Detectar cambio de tamaño de pantalla
   useEffect(() => {
     const handleResize = () => setWidth(window.innerWidth);
@@ -66,6 +67,20 @@ function Index() {
       setLoading(false);
     }
   };
+  const filtrar = async (e) => {
+    e.preventDefault()
+    setSearch(e.target.value)
+    try {
+      const response = await axios.get(`${API_URL}/estudiante/obtener?page=${page}&limit=${limit}&search=${e.target.value}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      //console.log("estos son los estudiantes",response)
+      setEstudiantes(response.data.data);
+      setTotalPages(response.data.totalPages);
+    } catch (error) {
+      ErrorMessage(error);
+    }
+  }
   const handleCursos = (nivel) => {
     console.log("este es el nivel", nivel)
     if (!nivel) {
@@ -159,8 +174,9 @@ function Index() {
         const response = await axios.get(`${API_URL}/estudiante/obtener?page=${page}&limit=${limit}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        console.log("este es el response",response)
         //console.log("estos son los estudiantes",response)
-        setEstudiantes(response.data.data);
+        setEstudiantes(response.data.estudiantes);
         setTotalPages(response.data.totalPages);
       } catch (error) {
         ErrorMessage(error);
@@ -172,20 +188,7 @@ function Index() {
     fetchEstudiantes();
   }, [page, limit]);
 
-  const filtrar = async (e) => {
-    e.preventDefault()
-    setSearch(e.target.value)
-    try {
-      const response = await axios.get(`${API_URL}/estudiante/obtener?page=${page}&limit=${limit}&search=${e.target.value}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      //console.log("estos son los estudiantes",response)
-      setEstudiantes(response.data.data);
-      setTotalPages(response.data.totalPages);
-    } catch (error) {
-      ErrorMessage(error);
-    }
-  }
+  
 
   return (
     <div className="section-container">

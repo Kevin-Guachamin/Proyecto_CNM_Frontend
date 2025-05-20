@@ -52,7 +52,19 @@ function Index() {
     setRepresentante(representante)
   }
   
-
+  const filtrar= async (e) => {
+    e.preventDefault()
+    setSearch(e.target.value)
+    try {
+      const response = await axios.get(`${API_URL}/representante/obtener?page=${page}&limit=${limit}&search=${e.target.value}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log("estos son los respresentates", response)
+      setRepresentantes(response.data.representantes);
+      setTotalPages(response.data.totalPages);
+    } catch (error) {
+      ErrorMessage(error);
+    } }
 
   const tabs = [
     {
@@ -141,19 +153,7 @@ function Index() {
     fetchRepresentantes();
   }, [page,limit]);
   
-const filtrar= async (e) => {
-  e.preventDefault()
-  setSearch(e.target.value)
-  try {
-    const response = await axios.get(`${API_URL}/representante/obtener?page=${page}&limit=${limit}&search=${e.target.value}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    console.log("estos son los respresentates", response)
-    setRepresentantes(response.data.representantes);
-    setTotalPages(response.data.totalPages);
-  } catch (error) {
-    ErrorMessage(error);
-  } }
+
 
   return (
     <div className="section-container">

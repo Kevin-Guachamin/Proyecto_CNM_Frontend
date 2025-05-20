@@ -93,7 +93,7 @@ function ContenedorEstudiante({ search, filtrar,data, setData, headers, columnsT
         headers={headers}
         columnsToShow={columnsToShow}
       />
-      {Paginación && data.length > 0 && <div className='Paginación'>{Paginación}</div>}
+      {Paginación && data.lenght > 0 && <div className='Paginación'>{Paginación}</div>}
     </div>
   );
 }

@@ -66,7 +66,7 @@ function ContenedorRepresentantes({ search,filtrar,data, setData, headers, colum
             />
       )}
       <TablaEstudiantil
-        filteredData={filteredData}
+        filteredData={data}
         OnEdit={handleEdit}
         OnDelete={handleDelete}
         OnView={OnView}
