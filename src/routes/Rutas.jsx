@@ -42,7 +42,9 @@ import MateriasIndividuales from '../vistas/Docente/MateriasIndividuales/Index.j
 import DistributivoIndividual from '../vistas/Admin/Modules/Matriculacion/MateriasIndividuales/Index.jsx'
 import InscripcionesIndividuales from '../vistas/Docente/Matriculacion/Inscripciones/Index.jsx';
 import CursosVacios from '../vistas/Admin/Modules/Configuration/CursosSinMatricula/Index.jsx'
-
+import Reportes from '../vistas/Secretaria/Reportes/Reportes.jsx';
+import ListadoEstudiantes from '../vistas/Secretaria/Reportes/ListadoEstudiantes.jsx';
+import ReporteEstudiante from '../vistas/Secretaria/Reportes/ReporteEstudiante.jsx';
 //import InformacionEstudiantes from '../vistas/Secretaria/InformacionEstudiantil/Estudiantes/Index.jsx';
 
 function Rutas() {
@@ -106,7 +108,9 @@ function Rutas() {
       <Route path='/secretaria/matriculacion' element={<Matriculacion />} />
       <Route path='/secretaria/horarios' element={<Horarios />} />
       <Route path="/secretaria/buscar_materias" element={<BuscarMaterias />} />
-
+      <Route path="/secretaria/reportes" element={<Reportes />} />
+      <Route path="/secretaria/reportes/nivel/:nivel" element={<ListadoEstudiantes />} />
+      <Route path="/secretaria/reportes/estudiante/:idEstudiante" element={<ReporteEstudiante />} />
     </Routes>
   )
 }
