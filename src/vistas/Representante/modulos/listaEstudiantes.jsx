@@ -118,7 +118,7 @@ function ListaEstudiantes() {
   // Obtener los estudiantes a cargo de un representante
   useEffect(() => {
     const cargarDatosEstudiantes = async () => {
-      if(!usuario || usuario.length ==- 0) {
+      if(!usuario || usuario.length == 0) {
         return;
       }
       try {

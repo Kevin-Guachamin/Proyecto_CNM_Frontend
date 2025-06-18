@@ -23,7 +23,7 @@ function Index() {
   const navigate = useNavigate()
   const [estudiante, setEstudiante] = useState({})
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
-  const headers = ["Cédula", "Nombre", "Apellido", "Jornada", "Especialidad", "Nivel", "Acciones"];
+  const headers = ["Cédula/Pasaporte", "Nombre", "Apellido", "Jornada", "Especialidad", "Nivel", "Acciones"];
   const colums = ["nroCedula", "primer_nombre", "primer_apellido", "jornada", "especialidad", "nivel"]
   const filterKey = "primer_nombre"
   const PK = "ID"

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { ErrorMessage } from '../../../../../Utils/ErrorMesaje';
 import AutoCompleteInput from './AutoCompleteInput';
 import Boton from '../../../../../components/Boton';
+import SelectorHoraMinuto from './SelectorHoraMinuto';
 
 function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
   const [paralelo, setParalelo] = useState("");
@@ -17,19 +18,22 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
   const [cupos, setCupos] = useState("")
   const [docentes, setDocentes] = useState([])
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
-  const token=localStorage.getItem("token")
+  const token = localStorage.getItem("token")
   useEffect(() => {
-    axios.get(`${API_URL}/docente/obtener`,{headers: { Authorization: `Bearer ${token}` },
+    axios.get(`${API_URL}/docente/obtener`, {
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then(response => {
-        setDocentes(response.data);
+        console.log("estos son los docentes", response)
+        setDocentes(response.data.data);
 
       })
       .catch(error => {
         ErrorMessage(error);
 
       })
-    axios.get(`${API_URL}/materia/obtener`,{headers: { Authorization: `Bearer ${token}` },
+    axios.get(`${API_URL}/materia/obtener`, {
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then(response => {
         console.log("esto se recibio", response.data)
@@ -73,10 +77,10 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
       else {
         dias = [dia1, dia2]
       }
-      if(dia1===dia2){
+      if (dia1 === dia2) {
         throw new Error("Los días deben ser diferentes")
       }
-      console.log("esta es la asignatura",asignatura.ID)
+      console.log("esta es la asignatura", asignatura.ID)
       const newAsignacion = { paralelo, horaInicio, horaFin, dias, cupos: Number(cupos), ID_periodo_academico: Number(periodo), nroCedula_docente: docente.nroCedula, ID_materia: asignatura.ID };
       onSave(newAsignacion, {
         headers: { Authorization: `Bearer ${token}` },
@@ -123,15 +127,13 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
             </div>
             <div className='form-group'>
               <label htmlFor="">Horar inicio:</label>
-              <input
-                type="time"
+              <SelectorHoraMinuto
                 value={horaInicio}
-                onChange={(e) => {
-                  setHoraInicio(e.target.value); // Guardar solo la hora y los minutos
-                }}
-                min="07:00" // Inicio a las 7:00 AM
-                max="19:00" // Fin a las 19:00 PM
+                onChange={(e) => setHoraInicio(e.target.value)}
+                min="07:00"
+                max="19:00"
               />
+
 
             </div>
           </div>
@@ -161,14 +163,11 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
             </div>
             <div className='form-group'>
               <label htmlFor="">Horar fin:</label>
-              <input
-                type="time"
+              <SelectorHoraMinuto
                 value={horaFin}
-                onChange={(e) => {
-                  setHoraFin(e.target.value); // Guardar solo la hora y los minutos
-                }}
-                min="07:00" // Inicio a las 7:00 AM
-                max="19:00" // Fin a las 19:00 PM
+                onChange={(e) => setHoraFin(e.target.value)}
+                min="07:00"
+                max="19:00"
               />
 
             </div>

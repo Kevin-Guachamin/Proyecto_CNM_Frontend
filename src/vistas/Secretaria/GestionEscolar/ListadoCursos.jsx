@@ -6,7 +6,7 @@ import HeaderTabla from "../../../components/HeaderTabla";
 import Tabla from "../../../components/Tabla";
 import Loading from "../../../components/Loading";
 import { ErrorMessage } from "../../../Utils/ErrorMesaje";
-import { exportarListadoAExcel, exportarListadoAPDF } from "./FuncionesParaListados";
+import {  exportarListadoAPDF } from "./FuncionesParaListados";
 import "./Exportaciones.css";
 
 function ListadoCursos() {
@@ -89,7 +89,7 @@ function ListadoCursos() {
         <div className="d-flex justify-content-end mb-3 no-print">
           <div className="d-flex align-items-center gap-2">
             <span className="label-text">Exportaciones:</span>
-            <button
+            {/* <button
               className="btn btn-success btn-sm"
               onClick={() => {
                 const datosModuloConJornada = {
@@ -101,7 +101,7 @@ function ListadoCursos() {
               title="Exportar a Excel"
             >
               <i className="bi bi-file-earmark-excel-fill"></i>
-            </button>
+            </button> */}
             <button
               className="btn btn-danger btn-sm"
               onClick={() =>

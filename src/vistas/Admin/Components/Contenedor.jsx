@@ -16,13 +16,14 @@ function Contenedor({ setTotalPages,data, setData, headers, columnsToShow, filte
   const token=localStorage.getItem("token")
   const [search,setSearch]=useState("")
 
-  const fetchAsignaturas = async (e) => {
+  const fetchEntidades = async (e) => {
     e.preventDefault()
     setSearch(e.target.value)
     try {
-      
+      console.log("este es el valor de limit que se manda del front",limit)
+      console.log("este es el valor del page que se manda del front", page)
       const { data } = await axios.get(
-        `${API_URL}/materia/obtener?page=${page}&limit=${limit}&search=${e.target.value}`,
+        `${API_URL}/${apiEndpoint}/obtener?page=${page}&limit=${limit}&search=${e.target.value}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -58,7 +59,7 @@ function Contenedor({ setTotalPages,data, setData, headers, columnsToShow, filte
   return (
     <div className='Contenedor-general'>
       
-      <Filtro search={search} toggleModal={toggleModal} filterKey={filterKey} filtrar={fetchAsignaturas} />
+      <Filtro search={search} toggleModal={toggleModal} filterKey={filterKey} filtrar={fetchEntidades} />
       {isModalOpen && (
             <CrearEntidad
               onCancel={toggleModal}

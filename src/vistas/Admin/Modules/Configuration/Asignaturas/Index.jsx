@@ -116,6 +116,7 @@ function Index() {
             page={page}
             limit={limit}
             setTotalPages={setTotalPages}
+            
           />
         )}
       </Layout>

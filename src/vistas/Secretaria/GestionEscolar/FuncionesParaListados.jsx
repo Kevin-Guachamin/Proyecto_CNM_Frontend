@@ -1,42 +1,42 @@
 // funcionesListas.jsx
-import XlsxPopulate from "xlsx-populate";
-import { saveAs } from "file-saver";
+//import XlsxPopulate from "xlsx-populate";
+//import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Swal from "sweetalert2";
 
 // Exportar a Excel
-export const exportarListadoAExcel = async (datosEstudiantes, datosModulo) => {
-    try {
-      const response = await fetch("/Plantillas/Plantilla_Listados.xlsx");
-      const arrayBuffer = await response.arrayBuffer();
+// export const exportarListadoAExcel = async (datosEstudiantes, datosModulo) => {
+//     try {
+//       const response = await fetch("/Plantillas/Plantilla_Listados.xlsx");
+//       const arrayBuffer = await response.arrayBuffer();
   
-      const workbook = await XlsxPopulate.fromDataAsync(arrayBuffer);
-      const hoja = workbook.sheet(0);
+//       const workbook = await XlsxPopulate.fromDataAsync(arrayBuffer);
+//       const hoja = workbook.sheet(0);
   
-      // Reemplaza campos del encabezado
-      hoja.cell("B7").value(`${datosModulo.docente}`);
-      hoja.cell("F7").value(`${datosModulo.materia}`);
-      hoja.cell("B9").value(`${datosModulo.descripcionPeriodo}`);
-      hoja.cell("F9").value(`${datosModulo.paralelo}`);
-      hoja.cell("B11").value(`${datosModulo.jornada}`);
+//       // Reemplaza campos del encabezado
+//       hoja.cell("B7").value(`${datosModulo.docente}`);
+//       hoja.cell("F7").value(`${datosModulo.materia}`);
+//       hoja.cell("B9").value(`${datosModulo.descripcionPeriodo}`);
+//       hoja.cell("F9").value(`${datosModulo.paralelo}`);
+//       hoja.cell("B11").value(`${datosModulo.jornada}`);
   
-      // Insertar estudiantes con bordes
-      let filaInicio = 16;
-      datosEstudiantes.forEach((est, i) => {
-        const fila = filaInicio + i;
-        hoja.cell(`A${fila}`).value(i + 1);
-        hoja.cell(`D${fila}`).value(est["Nómina de Estudiantes"]);
-        hoja.range(`A${fila}:H${fila}`).style("border", true);
-      });
+//       // Insertar estudiantes con bordes
+//       let filaInicio = 16;
+//       datosEstudiantes.forEach((est, i) => {
+//         const fila = filaInicio + i;
+//         hoja.cell(`A${fila}`).value(i + 1);
+//         hoja.cell(`D${fila}`).value(est["Nómina de Estudiantes"]);
+//         hoja.range(`A${fila}:H${fila}`).style("border", true);
+//       });
   
-      const blob = await workbook.outputAsync();
-      const nombreArchivo = `ListadoEstudiantes_${datosModulo.materia}_${datosModulo.paralelo}.xlsx`;
-      saveAs(blob, nombreArchivo);
-    } catch (error) {
-      console.error("Error al exportar desde plantilla:", error);
-    }
-  };
+//       const blob = await workbook.outputAsync();
+//       const nombreArchivo = `ListadoEstudiantes_${datosModulo.materia}_${datosModulo.paralelo}.xlsx`;
+//       saveAs(blob, nombreArchivo);
+//     } catch (error) {
+//       console.error("Error al exportar desde plantilla:", error);
+//     }
+//   };
   
 // Exportar a PDF
 export const exportarListadoAPDF = async (elementoId, nombreArchivo = "ListadoEstudiantes.pdf") => {

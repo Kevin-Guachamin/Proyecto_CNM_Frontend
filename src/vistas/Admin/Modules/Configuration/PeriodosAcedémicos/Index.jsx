@@ -57,10 +57,11 @@ function Index() {
   useEffect(() => {
     if (!limit) return; // ⚠️ Esperar a que el limit se actualice
 
-    const fetchAsignaturas = async () => {
+    const fetchPeriodos = async () => {
       try {
         setLoading(true);
         console.log("este es el limite", limit)
+        console.log("este es el valor de page", page)
         const { data } = await axios.get(`${API_URL}/periodo_academico/obtener?page=${page}&limit=${limit}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -73,7 +74,7 @@ function Index() {
       }
     };
 
-    fetchAsignaturas();
+    fetchPeriodos();
   }, [page, limit, API_URL, token]);
 
   return (
@@ -83,9 +84,9 @@ function Index() {
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
       <Layout modules={modulos}>
-        {loading ? <Loading /> : <Contenedor data={periodos} setData={setPeriodos} headers={headers} columnsToShow={colums} filterKey={filterKey} apiEndpoint={"periodo_academico"} CrearEntidad={CrearPeriodo} PK={PK} Paginación={
-          <Paginación totalPages={totalPages} page={page} setPage={setPage} />
-        } />}
+        {loading ? <Loading /> : <Contenedor  data={periodos} setData={setPeriodos} headers={headers} columnsToShow={colums} filterKey={filterKey} apiEndpoint={"periodo_academico"} CrearEntidad={CrearPeriodo} PK={PK} Paginación={
+          <Paginación totalPages={totalPages} page={page} setPage={setPage} />  
+        } limit={limit} page={page} setTotalPages={setTotalPages}/>}
 
       </Layout>
     </div>

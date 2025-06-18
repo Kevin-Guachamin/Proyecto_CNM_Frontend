@@ -217,7 +217,7 @@ function ContenedorCursos() {
                 <Filtro search={search} filtrar={filtrar} toggleModal={toggleModal} filterKey=
                 "Nombre materia" />
             </div>
-            {isModalOpen && (
+            {isModalOpen && periodo &&(
                 <CrearCurso
                     onCancel={toggleModal}
                     entityToUpdate={entityToUpdate}

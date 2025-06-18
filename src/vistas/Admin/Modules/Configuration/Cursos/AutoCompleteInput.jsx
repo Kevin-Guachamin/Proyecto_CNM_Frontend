@@ -22,7 +22,7 @@ const AutoCompleteInput = ({ opciones, inputValue, setInputValue, key1, key2 }) 
       setShowSuggestions(false);
       return;
     }
-
+    console.log("este son las opciones",opciones)
     // Filtramos las opciones basándonos en los dos atributos proporcionados (key1, key2)
     const matches = opciones.filter((opcion) =>
       `${opcion[key1]} ${opcion[key2]}`.toLowerCase().includes(value.toLowerCase())

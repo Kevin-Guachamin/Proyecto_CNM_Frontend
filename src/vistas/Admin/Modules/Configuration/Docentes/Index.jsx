@@ -22,7 +22,7 @@ function Index() {
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const token = localStorage.getItem("token")
   const [modulos, setModulos] = useState([])
-  const headers = ["Cédula", "Primer nombre", "Primer Apellido", "Segundo Nombre", "Segundo Apellido", "Email", "Celular", "Rol", "Acciones"];
+  const headers = ["Cédula/Pasaporte", "Primer nombre", "Primer Apellido", "Segundo Nombre", "Segundo Apellido", "Email", "Celular", "Rol", "Acciones"];
   const colums = ["nroCedula", "primer_nombre", "primer_apellido", "segundo_nombre", "segundo_apellido", "email", "celular", "rol"]
   const filterKey = "primer_nombre"
   const PK = "nroCedula"
@@ -83,7 +83,7 @@ function Index() {
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
       <Layout modules={modulos}>
-        {loading ? <Loading /> : <Contenedor data={docentes} setData={setDocentes} headers={headers} columnsToShow={colums} filterKey={filterKey} apiEndpoint={"docente"} CrearEntidad={CrearDocente} PK={PK} Paginación={
+        {loading ? <Loading /> : <Contenedor  limit={limit} page={page} data={docentes} setData={setDocentes} headers={headers} columnsToShow={colums} filterKey={filterKey} apiEndpoint={"docente"} CrearEntidad={CrearDocente} PK={PK} Paginación={
           <Paginación totalPages={totalPages} page={page} setPage={setPage} />
         } />}
 
