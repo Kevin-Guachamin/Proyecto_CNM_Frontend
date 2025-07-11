@@ -96,8 +96,8 @@ const rutaFinal = subRol === "Secretaria" ? "/secretaria/matriculacion" : "/admi
                     <input className="input-cedula" type="text" value={asignatura} onChange={(e) => setAsignatura(e.target.value)} />
                     <button className="btn-buscar" onClick={HandleBuscarAsignaturas}>Buscar</button>
                 </div>
-
-
+    
+                <a href="/public/Malla.pdf" download>Descargar MALLA AQUÍ</a>
             </div>
             <div className="Contenedor-tabla">
                 {buscarAsignacion ? (
