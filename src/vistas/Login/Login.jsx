@@ -98,7 +98,7 @@ function Login() {
               <h3 className="login-form-title">Iniciar Sesión</h3>
               <form onSubmit={handleLogin}>
                 <div className="login-field">
-                  <label htmlFor="nroCedula">Cédula</label>
+                  <label htmlFor="nroCedula">Cédula o Pasaporte</label>
                   <Input
                     fondo="Cédula"
                     tipo="text"
