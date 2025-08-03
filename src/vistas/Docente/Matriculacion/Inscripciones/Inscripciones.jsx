@@ -70,7 +70,7 @@ function Inscripciones({asignaciones,docente, periodo,setAsignaciones}) {
                     confirmButtonText: "Entendido",
                     confirmButtonColor: "#003F89",
                 });
-        navigate("/admin/matriculacion")
+        navigate("/profesor/matricula")
     }
     const handleCrearAsignacion =(asignacion)=>{
         axios.post(`${API_URL}/asignacion/crear`,asignacion,{
