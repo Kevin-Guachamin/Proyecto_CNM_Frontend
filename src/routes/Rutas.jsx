@@ -108,6 +108,7 @@ function Rutas() {
       <Route path='/secretaria/matriculacion' element={<Matriculacion />} />
       <Route path='/secretaria/horarios' element={<Horarios />} />
       <Route path="/secretaria/buscar_materias" element={<BuscarMaterias />} />
+      <Route path="/secretaria/asignacionesIndividuales" element={<DistributivoIndividual />} />
       <Route path="/secretaria/reportes" element={<Reportes />} />
       <Route path="/secretaria/reportes/nivel/:nivel" element={<ListadoEstudiantes />} />
       <Route path="/secretaria/reportes/estudiante/:idEstudiante" element={<ReporteEstudiante />} />
