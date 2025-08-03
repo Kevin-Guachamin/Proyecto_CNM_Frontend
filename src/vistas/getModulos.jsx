@@ -6,10 +6,10 @@ export const getModulos = (subRol, includeInicio = false) => {
       case "Profesor":
         baseModules = [
           { id: 1, titulo: "Calificaciones", icono: "📊", link: "/profesor/panelcursos" },
-          { id: 2, titulo: "Cambiar contraseña", icono: "🔐", link: "/profesor/password"},
-          { id: 3, titulo: "Solicitudes", icono: "📨", link: "/profesor/solicitudes"},
-          { id: 4, titulo: "Matriculación", icono: "✏️", link: "/profesor/matricula"},
-          { id: 5, titulo: "Materias Individuales", icono: "👥", link: "/profesor/materias"}
+          { id: 2, titulo: "Solicitudes", icono: "📨", link: "/profesor/solicitudes"},
+          { id: 3, titulo: "Matriculación", icono: "✏️", link: "/profesor/matricula"},
+          { id: 4, titulo: "Materias Individuales", icono: "👥", link: "/profesor/materias"},
+          { id: 5, titulo: "Cambiar contraseña", icono: "🔐", link: "/profesor/password"}
         ];
         break;
       case "Vicerrector":
