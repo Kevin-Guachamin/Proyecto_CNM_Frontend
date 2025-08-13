@@ -3,6 +3,7 @@
     justify-content: center;
     flex-wrap: wrap;
     gap: 20px;
+    padding: 1%;
   }
   
   .modulo-card {
@@ -40,5 +41,120 @@
     text-align: center;
     padding: 0 10px;
     white-space: pre-wrap;
+  }
+
+  /* ===== RESPONSIVE DESIGN ===== */
+
+  /* Tablets (hasta 1024px) */
+  @media (max-width: 1024px) {
+    .contenedor-modulos {
+      gap: 15px;
+      padding: 0 20px;
+    }
+
+    .modulo-card {
+      width: 220px;
+      height: 180px;
+    }
+
+    .modulo-icono {
+      font-size: 35px;
+    }
+
+    .modulo-titulo {
+      font-size: 15px;
+    }
+
+    .modulo-descripcion {
+      font-size: 13px;
+    }
+  }
+
+  /* Tablets pequeñas (hasta 768px) */
+  @media (max-width: 768px) {
+    .contenedor-modulos {
+      gap: 12px;
+      padding: 0 15px;
+    }
+
+    .modulo-card {
+      width: calc(50% - 6px); /* 2 cards por fila */
+      height: 160px;
+      min-width: 160px;
+    }
+
+    .modulo-icono {
+      font-size: 32px;
+    }
+
+    .modulo-titulo {
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .modulo-descripcion {
+      font-size: 12px;
+      padding: 0 8px;
+    }
+  }
+
+  /* Móviles (hasta 480px) */
+  @media (max-width: 480px) {
+    .contenedor-modulos {
+      gap: 10px;
+      padding: 0 10px;
+    }
+
+    .modulo-card {
+      width: calc(50% - 5px); /* 2 cards por fila en móviles */
+      height: 140px;
+      min-width: 140px;
+    }
+
+    .modulo-icono {
+      font-size: 28px;
+    }
+
+    .modulo-titulo {
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    .modulo-descripcion {
+      font-size: 11px;
+      padding: 0 5px;
+    }
+  }
+
+  /* Móviles muy pequeños (hasta 360px) */
+  @media (max-width: 360px) {
+    .contenedor-modulos {
+      gap: 8px;
+      padding: 0 8px;
+    }
+
+    .modulo-card {
+      width: calc(50% - 4px);
+      height: 120px;
+      min-width: 120px;
+    }
+
+    .modulo-card:hover {
+      transform: scale(1.02); /* Menos zoom en móviles pequeños */
+    }
+
+    .modulo-icono {
+      font-size: 24px;
+    }
+
+    .modulo-titulo {
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .modulo-descripcion {
+      font-size: 10px;
+      padding: 0 4px;
+    }
   }
   

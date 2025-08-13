@@ -38,7 +38,7 @@ function CrearPeriodo({ onCancel, entityToUpdate, onSave }) {
 
     return (
         <div className="modal-overlay">
-            <div className='modal-container'>
+            <div className='modal-container modal-periodo'>
                 <h2 className='modal-title'>{entityToUpdate ? 'Editar periodo' : 'Agregar periodo'}</h2>
                 <div className="modal-form">
                     <div className='rows'>
@@ -64,6 +64,7 @@ function CrearPeriodo({ onCancel, entityToUpdate, onSave }) {
                                 }} // Establecer directamente como Date
                                 dateFormat="dd/MM/yyyy"
                                 className="input-field"
+                                onChangeRaw={(e) => e.preventDefault()} // evita escribir
                             />
                         </div>
 
@@ -74,6 +75,7 @@ function CrearPeriodo({ onCancel, entityToUpdate, onSave }) {
                                 onChange={(date) => setFecha_fin(date)} // Establecer directamente como Date
                                 dateFormat="dd/MM/yyyy"
                                 className="input-field"
+                                onChangeRaw={(e) => e.preventDefault()} // evita escribir
                             />
                         </div>
 

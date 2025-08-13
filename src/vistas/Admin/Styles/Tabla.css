@@ -1,64 +1,133 @@
-/* Estilos para la tabla */
-.Contenedor-tabla {
-    padding: 20px;
-    
-  }
-  
-  .tabla_registros {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .tabla-head {
-    background-color: #00408A !important;
-    color: #ced4da !important;
-    font-weight: bold;
-    border: 1px solid #ced4da;
-    padding: 10px;
-    text-align: center;
-  }
-  .tabla-celda{
-    border: 1px solid #90A4AE !important;
-    vertical-align: middle;
-    background-color: #CFD8DC !important;
-    text-align: center;
-  }
+/* Panel que ocupa el alto visible de la pantalla para hacer scroll dentro */
+.tabla-panel {
+  /* Suma aproximada del header de la app + filtros + márgenes */
+  height: calc(100vh - 220px); /* ajusta 220px a tu layout real */
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
 
-  
-  .no-registros {
-    text-align: center;
-    font-size: 1.2rem;
-    color: #888;
-  }
-  .icon {
-    cursor: pointer;
-    margin: 0 5px;
-  }
-  
-  .edit-icon {
-    color: #007bff;
-  }
-  
-  .delete-icon {
-    color: #dc3545;
-  }
-  .view-icon{
-    color: #1F7B00 ;
-    cursor: pointer;
-  }
-  .botones-icon{
-    padding-top: 0.8rem;
-    display: flex;
-    justify-content: space-around;
-    height: 2.85rem;
-    border: 1px solid #90A4AE;
-    vertical-align: middle;
-    background-color: #CFD8DC !important;
-  }
-
-  /* Nuevo contenedor con scroll vertical */
+/* Scroll propio (vertical y horizontal) para la tabla */
 .tabla-scroll {
-  max-height: 500px; /* Ajusta la altura según lo que necesites */
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;   /* scroll vertical */
+  overflow-x: auto;   /* scroll horizontal */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+/* La tabla puede ser más ancha que el contenedor -> aparece scroll-x */
+.tabla_registros {
+  width: 100%;
+  min-width: 900px;        /* fuerza scroll-x en pantallas pequeñas */
+  border-collapse: collapse;
+  table-layout: auto;      /* usa 'fixed' si prefieres columnas de ancho fijo */
+}
+
+/* Head sticky mientras scrollea el cuerpo */
+.tabla_registros thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #00408A; /* consistente con .tabla-head */
+  color: #ced4da;
+}
+
+/* Evita quiebres de línea: habilita scroll horizontal */
+.tabla_registros th,
+.tabla_registros td {
+  white-space: nowrap;
+}
+
+/* Contenedor de la tabla: sin scroll vertical aquí */
+.Contenedor-tabla {
+  padding: 20px;
+  height: 100%;
+  min-width: 0; /* permite scroll-x en ancestros/hijos */
+}
+
+/* Wrapper para scroll horizontal */
+.tabla-scroll-x {
+  width: 100%;
+  overflow-x: auto;    /* <- scroll horizontal cuando no quepa */
+  overflow-y: visible; /* el vertical lo maneja el contenedor padre */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+/* La tabla puede ser más ancha que el contenedor */
+.tabla_registros {
+  width: 100%;
+  min-width: 900px;        /* fuerza scroll-x en pantallas pequeñas */
+  border-collapse: collapse;
+  table-layout: auto;      /* usa 'fixed' si prefieres anchos fijos */
+}
+
+/* Head pegado arriba durante el scroll vertical */
+.tabla_registros thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #00408A; /* mantén consistencia con .tabla-head */
+  color: #ced4da;
+}
+
+/* Estilos existentes */
+.tabla-head {
+  background-color: #00408A !important;
+  color: #ced4da !important;
+  font-weight: bold;
+  border: 1px solid #ced4da;
+  padding: 10px;
+  text-align: center;
+}
+
+.tabla-celda {
+  border: 1px solid #90A4AE !important;
+  vertical-align: middle;
+  background-color: #CFD8DC !important;
+  text-align: center;
+}
+
+/* No partir texto -> habilita scroll horizontal */
+.tabla_registros th,
+.tabla_registros td {
+  white-space: nowrap;
+}
+
+/* Si alguna columna debe partirse, crea una clase específica:
+.col-wrap { white-space: normal; } */
+
+/* Vacío */
+.no-registros {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #888;
+}
+
+/* Iconos */
+.icon {
+  cursor: pointer;
+  margin: 0 5px;
+}
+.edit-icon { color: #007bff; }
+.delete-icon { color: #dc3545; }
+.view-icon { color: #1F7B00; cursor: pointer; }
+
+.botones-icon {
+  padding-top: 0.8rem;
+  display: flex;
+  justify-content: space-around;
+  height: 2.85rem;
+  border: 1px solid #90A4AE;
+  vertical-align: middle;
+  background-color: #CFD8DC !important;
+}
+
+/* (Opcional) Si alguna vez quieres scroll vertical local:
+.tabla-scroll {
+  max-height: 500px;
   overflow-y: auto;
   border: 1px solid #ccc;
-}
+} */

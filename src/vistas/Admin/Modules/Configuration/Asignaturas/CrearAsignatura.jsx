@@ -31,7 +31,7 @@ function CrearAsignatura({ onCancel, entityToUpdate, onSave }) {
 
     return (
         <div className="modal-overlay">
-            <div className='modal-container'>
+            <div className='modal-container modal-asignatura'>
                 <h2>{entityToUpdate ? 'Editar asignatura' : 'Agregar asignatura'}</h2>
                 <form onSubmit={(e) => handleSubmit(e)} className="modal-form">
                     <div className='rows'>

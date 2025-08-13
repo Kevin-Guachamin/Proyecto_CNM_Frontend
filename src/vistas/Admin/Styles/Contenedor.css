@@ -1,47 +1,99 @@
-/* Estilos para el contenedor */
+/* ===== Contenedor general ===== */
 .Contenedor-general {
   padding: 10px;
-  max-height: 90vh; /* Ajusta si necesitas más/menos alto */
-  overflow-y: auto;
-  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
+
+/* ===== Filtros ===== */
+.filtros {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+/*Si la pantalla es pequeña, apilar los filtros verticalmente */
+@media (max-width: 768px) {
+  .filtros {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== Tabla + paginación (sin scroll vertical interno) ===== */
+.tabla-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;                /* permite overflow-x en la tabla */
+}
+
+/*Media para el tabla-layout*/
+@media (max-width: 768px) {
+  .tabla-layout {
+    flex-direction: column;
+    padding-bottom: 100px;
+  }
+}
+
+/* SOLO scroll horizontal si la tabla es ancha; SIN scroll vertical interno */
+.tabla-wrapper {
+  overflow-x: auto;
+  overflow-y: visible;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   
-  .modal {
+}
+
+/* Si tu <table> usa otra clase, cámbiala aquí */
+.tabla_registros {
+  min-width: 760px;
+}
+@media (max-width: 768px) {
+  .tabla_registros { min-width: 680px; }
+}
+
+/* Paginación visible SIEMPRE */
+/* En escritorio/tablet: sticky al fondo del contenido */
+.pagination-bar {
+  position: sticky;
+  bottom: 0;
+  
+  padding: 10px 0;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+}
+
+/* En móviles: fija al viewport (no se pierde jamás) */
+@media (max-width: 768px) {
+  .pagination-bar {
     position: fixed;
-    top: 0;
     left: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex !important;
-    justify-content: center;
-    align-items: center;
+    right: 0;
+    bottom: max(0px, env(safe-area-inset-bottom));
+    padding: 0;
+    background: #e5e7eb;
+    box-shadow: 0 -6px 12px rgba(0,0,0,.06);
+    height: 90px;
   }
-  
-  .modal .modal-content {
-    background: white;
-    padding-left: 0px;
-    border-radius: 5px;
-    width: 60%;
-    
+  /* Deja espacio al final para que la barra de paginación no tape las últimas filas */
+  .tabla-wrapper {
+    padding-bottom: 88px; /* alto aprox de la barra fija */
   }
-  .label-error {
-    color: red;
-    font-size: 14px;
-    font-weight: bold;
-    margin-top: 4px;
-    display: block;
-    animation: fadeIn 0.3s ease-in-out;
 }
 
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+@media (min-width: 769px) {
+  .pagination-bar {
+    height: 0px;
+  }
   
- 
+}
+
+/* Mensaje de error */
+.label-error {
+  color: #c53030;
+  margin-bottom: 8px;
+}
