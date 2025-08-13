@@ -10,7 +10,7 @@ function Filtro({search, toggleModal, filterKey,filtrar }) {
   
 
   return (
-    <div className="filter-container">
+    <div className="form-group">
       <input
         
         value={search}

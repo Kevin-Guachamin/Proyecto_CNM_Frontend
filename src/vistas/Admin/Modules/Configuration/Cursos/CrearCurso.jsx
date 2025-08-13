@@ -93,7 +93,7 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
 
   return (
     <div className="modal-overlay">
-      <div className='modal-container'>
+      <div className='modal-container modal-curso'>
         <h2 className='modal-title'>{entityToUpdate ? 'Editar curso' : 'Agregar curso'}</h2>
         <div className="modal-form">
           <div className='rows'>
