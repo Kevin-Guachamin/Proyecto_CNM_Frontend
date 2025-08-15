@@ -95,7 +95,7 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-container">
+      <div className="modal-container modal-estudiante">
         <h2 className="modal-title">{entityToUpdate ? 'Editar estudiante' : 'Agregar estudiante'}</h2>
 
         <form onSubmit={(e) => handleSubmit(e)} className="modal-form">

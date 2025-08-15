@@ -6,8 +6,6 @@
   .tab-content-tabulador {
     padding: 0;
     background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s ease;
     overflow-y: auto;
     max-height: 100%; /* Ajusta según el tamaño que prefieras */

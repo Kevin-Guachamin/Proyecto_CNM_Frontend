@@ -4,6 +4,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  background-color: #f3f4f6;
 }
 
 /* ===== Filtros ===== */
@@ -41,9 +42,6 @@
 .tabla-wrapper {
   overflow-x: auto;
   overflow-y: visible;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  
 }
 
 /* Si tu <table> usa otra clase, cámbiala aquí */
@@ -61,7 +59,6 @@
   bottom: 0;
   
   padding: 10px 0;
-  border-top: 1px solid #e5e7eb;
   display: flex;
   justify-content: center;
   z-index: 10;
@@ -76,7 +73,6 @@
     bottom: max(0px, env(safe-area-inset-bottom));
     padding: 0;
     background: #e5e7eb;
-    box-shadow: 0 -6px 12px rgba(0,0,0,.06);
     height: 90px;
   }
   /* Deja espacio al final para que la barra de paginación no tape las últimas filas */
@@ -96,4 +92,126 @@
 .label-error {
   color: #c53030;
   margin-bottom: 8px;
+}
+
+/* ===========================
+   Layout responsive Estudiantes
+   =========================== */
+.estud-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;            /* permite overflow-x en hijos */
+  background-color: #f3f4f6;
+}
+
+/* Contenedor que envuelve filtros + tabla (renderizados por ContenedorEstudiante) */
+.estud-wrapper {
+  overflow-x: auto;        /* solo horizontal si la tabla es ancha */
+  overflow-y: auto;     /* sin scroll vertical interno */  
+  -webkit-overflow-scrolling: touch;
+  background-color: #f3f4f6;
+}
+
+/* Barra de paginación: sticky en desktop/tablet */
+.estud-pagination {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+  z-index: 10;
+  background-color: #f3f4f6;
+}
+
+/* En móviles la paginación queda fija para que nunca se pierda */
+@media (max-width: 968px) {
+  .estud-pagination {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: max(0px, env(safe-area-inset-bottom));
+    height: 15%;
+    padding: 0px;
+    box-shadow: 0 -6px 12px rgba(0,0,0,.06);
+    align-items: center;
+  }
+  /* deja espacio para que la barra fija no tape las últimas filas */
+  .estud-wrapper { padding-bottom: var(--pager-h, 96px); 
+    
+  }
+}
+
+/* (Opcional) Si tu ContenedorEstudiante usa una clase para filtros,
+   puedes añadir también .estud-filtros y reutilizar esta grilla: */
+.estud-filtros {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+@media (max-width: 768px) {
+  .estud-filtros { grid-template-columns: 1fr; }
+}
+
+/* ===========================
+   Layout responsive Representantes
+   =========================== */
+.repre-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;            /* permite overflow-x en hijos */
+  background-color: #f3f4f6;
+}
+
+/* Contenedor que envuelve filtros + tabla (renderizados por ContenedorRepresentantes) */
+.repre-wrapper {
+  overflow-x: auto;        /* solo horizontal si la tabla es ancha */
+  overflow-y: visible;     /* sin scroll vertical interno */
+  -webkit-overflow-scrolling: touch;
+  background-color: #f3f4f6;
+}
+
+/* Barra de paginación: sticky en desktop/tablet */
+.repre-pagination {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+  z-index: 10;
+  background: transparent;
+  background-color: #f3f4f6;
+}
+
+/* En móviles la paginación queda fija para que nunca se pierda */
+@media (max-width: 968px) {
+  .repre-pagination {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: max(0px, env(safe-area-inset-bottom));
+    height: 15%;
+    padding: 0px;
+    background: #f3f4f6;
+    box-shadow: 0 -6px 12px rgba(0,0,0,.06);
+    align-items: center;
+  }
+  /* deja espacio para que la barra fija no tape las últimas filas */
+  .repre-wrapper { padding-bottom: var(--pager-h, 96px); 
+      
+  }
+}
+
+/* (Opcional) Si tu ContenedorRepresentantes usa una clase para filtros,
+   puedes añadir también .repre-filtros y reutilizar esta grilla: */
+.repre-filtros {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+@media (max-width: 768px) {
+  .repre-filtros { grid-template-columns: 1fr; }
 }

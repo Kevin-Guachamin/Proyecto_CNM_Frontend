@@ -1,206 +1,244 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "../../../../../components/Header";
-import Layout from '../../../../../layout/Layout'
+import Layout from "../../../../../layout/Layout";
 import Loading from "../../../../../components/Loading";
 import ContenedorEstudiante from "./ContenedorEstudiante";
-import { moduloInicio, modulesEstudiantesBase, construirModulosConPrefijo } from "../../../Components/Modulos";
-import axios from 'axios'
+import {
+  moduloInicio,
+  modulesEstudiantesBase,
+  construirModulosConPrefijo,
+} from "../../../Components/Modulos";
+import axios from "axios";
 import CrearEstudiante from "./CrearEstudiante";
 import { ErrorMessage } from "../../../../../Utils/ErrorMesaje";
-import Paginación from '../../../Components/Paginación';
+import Paginación from "../../../Components/Paginación";
 import { useNavigate } from "react-router-dom";
 import TabSwitcher from "./Tabulador";
 import ViewData from "./ViewData";
 
-
 function Index() {
-
-  const [loading, setLoading] = useState(true); // Estado para mostrar la carga
+  const [loading, setLoading] = useState(true);
   const [usuario, setUsuario] = useState(null);
-  const [estudiantes, setEstudiantes] = useState([])
+
+  const [estudiantes, setEstudiantes] = useState([]);
+  const [estudiante, setEstudiante] = useState({});
+
+  // paginación y filtros
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const navigate = useNavigate()
-  const [estudiante, setEstudiante] = useState({})
-  const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
-  const headers = ["Cédula/Pasaporte", "Nombre", "Apellido", "Jornada", "Especialidad", "Nivel", "Acciones"];
-  const colums = ["nroCedula", "primer_nombre", "primer_apellido", "jornada", "especialidad", "nivel"]
-  const filterKey = "primer_nombre"
-  const PK = "ID"
-  const token = localStorage.getItem("token")
-  const [modulos, setModulos] = useState([]);
   const [limit, setLimit] = useState(0);
-  const [width, setWidth] = useState(window.innerWidth);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
+  const [nivel, setNivel] = useState("");
 
+  const [modulos, setModulos] = useState([]);
 
-  // ✅ Detectar cambio de tamaño de pantalla
-  useEffect(() => {
-    const handleResize = () => setWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
+  const token = localStorage.getItem("token");
 
-  // ✅ Establecer límite de resultados según resolución
-  useEffect(() => {
+  // refs
+  const wrapperRef = useRef(null);
+  const pagerRef = useRef(null);
+  const [pagerH, setPagerH] = useState(70);
 
-    const isLaptop = width <= 1822;
-    setLimit(isLaptop ? 15 : 21);
-  }, [width]);
-
-  const DatosEstudiante = (estudiante) => {
-    setActiveTabId("tab2")
-    openTab("tab2")
-    setEstudiante(estudiante)
-  }
-  const Estudiantes = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`${API_URL}/estudiante/obtener?page=${page}&limit=${limit}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setEstudiantes(response.data.data);
-      setTotalPages(response.data.totalPages);
-    } catch (error) {
-      ErrorMessage(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  const filtrar = async (e) => {
-    e.preventDefault()
-    setSearch(e.target.value)
-    try {
-      const response = await axios.get(`${API_URL}/estudiante/obtener?page=${page}&limit=${limit}&search=${e.target.value}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      //console.log("estos son los estudiantes",response)
-      setEstudiantes(response.data.data);
-      setTotalPages(response.data.totalPages);
-    } catch (error) {
-      ErrorMessage(error);
-    }
-  }
-  const handleCursos = (nivel) => {
-    console.log("este es el nivel", nivel)
-    if (!nivel) {
-      console.log("entre")
-      Estudiantes()
-      return
-    }
-    axios.get(`${API_URL}/estudiante/nivel/${nivel}?page=${page}&limit=${limit}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res => {
-        console.log("esto se recibe", res)
-        setEstudiantes(res.data.data)
-      }))
-      .catch(err => {
-        ErrorMessage(err)
-      })
-  }
-
-  const tabs = [
-    {
-      id: 'tab1',
-      label: 'Estudiantes',
-      component: loading ? (
-        <Loading />
-      ) : (
-        <ContenedorEstudiante
-          data={estudiantes}
-          setData={setEstudiantes}
-          headers={headers}
-          columnsToShow={colums}
-          filterKey={filterKey}
-          apiEndpoint={"estudiante"}
-          CrearEntidad={CrearEstudiante}
-          OnView={DatosEstudiante}
-          PK={PK}
-          Paginación={
-            <Paginación
-              totalPages={totalPages}
-              page={page}
-              setPage={setPage}
-
-            />
-          }
-          handleCursos={handleCursos}
-          filtrar={filtrar}
-          search={search}
-        />
-      ),
-    },
-    {
-      id: 'tab2',
-      label: `${estudiante.primer_nombre} ${estudiante.primer_apellido} `,
-      component: <ViewData estudiante={estudiante} />,
-    },
-    {
-      id: 'tab1',
-      label: 'Pestaña 1',
-      component: <div>Contenido dinámico de la pestaña 1</div>,
-    },
-  ];
-  const firstTabId = tabs[0]?.id;
-  const [activeTabId, setActiveTabId] = useState(tabs[0].id);
-  const [activeTabs, setActiveTabs] = useState([firstTabId]);
-  const openTab = (id) => {
-    if (!activeTabs.includes(id)) {
-      setActiveTabs([...activeTabs, id]);
-    }
-    setActiveTabId(id);
-  };
-
+  // ======= Auth + módulos =======
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
-    const parsedUser = JSON.parse(storedUser);
-    if (!parsedUser || (parsedUser.subRol !== "Administrador" && parsedUser.subRol !== "Secretaria")) {
+    const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+
+    if (
+      !parsedUser ||
+      (parsedUser.subRol !== "Administrador" && parsedUser.subRol !== "Secretaria")
+    ) {
       navigate("/");
-    } else {
-      setUsuario(parsedUser);
-      const modulosDinamicos = [
-        moduloInicio,
-        ...construirModulosConPrefijo(parsedUser.subRol, modulesEstudiantesBase)
-      ];
-      setModulos(modulosDinamicos);
+      return;
     }
+
+    setUsuario(parsedUser);
+    const modulosDinamicos = [
+      moduloInicio,
+      ...construirModulosConPrefijo(parsedUser.subRol, modulesEstudiantesBase),
+    ];
+    setModulos(modulosDinamicos);
   }, [navigate]);
 
+  // ======= Medir altura de la paginación y exponer --pager-h =======
   useEffect(() => {
-    const fetchEstudiantes = async () => {
-      setLoading(true);
+    const updatePagerH = () => {
+      const h = pagerRef.current ? pagerRef.current.offsetHeight : 70;
+      const padded = h + 16;
+      setPagerH(padded);
+      document.documentElement.style.setProperty("--pager-h", `${padded}px`);
+    };
+    updatePagerH();
+
+    const ro = new ResizeObserver(updatePagerH);
+    if (pagerRef.current) ro.observe(pagerRef.current);
+    window.addEventListener("resize", updatePagerH);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", updatePagerH);
+    };
+  }, []);
+
+  // ======= Calcular limit según alto visible =======
+  useEffect(() => {
+    const calcRows = () => {
+      const ROW_H = 89; // alto aprox de fila
+      const GAP = 24;
+
+      const top = wrapperRef.current
+        ? wrapperRef.current.getBoundingClientRect().top
+        : 0;
+
+      const available = window.innerHeight - top - pagerH - GAP;
+      const rows = Math.max(1, Math.floor(available / ROW_H));
+      setLimit(rows);
+    };
+
+    calcRows();
+    const onResize = () => requestAnimationFrame(calcRows);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [pagerH]);
+
+  // ======= Reset a página 1 =======
+  useEffect(() => { if (limit) setPage(1); }, [limit]);
+  useEffect(() => { setPage(1); }, [search, nivel]);
+
+  // ======= Fetch =======
+  useEffect(() => {
+    if (!limit) return;
+
+    let mounted = true;
+    const fetchData = async () => {
       try {
-        const response = await axios.get(`${API_URL}/estudiante/obtener?page=${page}&limit=${limit}`, {
+        setLoading(true);
+
+        const baseUrl = nivel
+          ? `${API_URL}/estudiante/nivel/${encodeURIComponent(nivel)}`
+          : `${API_URL}/estudiante/obtener`;
+
+        const { data } = await axios.get(baseUrl, {
+          params: { page, limit, search },
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("este es el response",response)
-        //console.log("estos son los estudiantes",response)
-        setEstudiantes(response.data.estudiantes);
-        setTotalPages(response.data.totalPages);
+
+        if (!mounted) return;
+        const list = data?.data ?? data?.estudiantes ?? [];
+        setEstudiantes(Array.isArray(list) ? list : []);
+        setTotalPages(data?.totalPages ?? 1);
       } catch (error) {
         ErrorMessage(error);
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
 
-    fetchEstudiantes();
-  }, [page, limit]);
+    const t = setTimeout(fetchData, 300); // debounce
+    return () => { mounted = false; clearTimeout(t); };
+  }, [API_URL, token, page, limit, search, nivel]);
 
-  
+  // ======= Handlers =======
+  const filtrar = (e) => setSearch(e?.target?.value ?? "");
+  const handleCursos = (nuevoNivel) => setNivel(nuevoNivel || "");
+  const DatosEstudiante = (estu) => {
+    setEstudiante(estu);
+    setActiveTabId("tab2");
+    openTab("tab2");
+  };
+
+  // ======= Tabs =======
+  const tabs = [
+    {
+      id: "tab1",
+      label: "Estudiantes",
+      component: loading ? (
+        <Loading />
+      ) : (
+        <div className="estud-layout">
+          <div className="estud-wrapper" ref={wrapperRef}>
+            <ContenedorEstudiante
+              data={estudiantes}
+              setData={setEstudiantes}
+              headers={[
+                "Cédula/Pasaporte",
+                "Nombre",
+                "Apellido",
+                "Jornada",
+                "Especialidad",
+                "Nivel",
+                "Acciones",
+              ]}
+              columnsToShow={[
+                "nroCedula",
+                "primer_nombre",
+                "primer_apellido",
+                "jornada",
+                "especialidad",
+                "nivel",
+              ]}
+              filterKey="primer_nombre"
+              apiEndpoint={"estudiante"}
+              CrearEntidad={CrearEstudiante}
+              OnView={DatosEstudiante}
+              PK="ID"
+              handleCursos={handleCursos}
+              filtrar={filtrar}
+              search={search}
+            />
+          </div>
+
+          <div
+            className="estud-pagination"
+            ref={pagerRef}
+            role="navigation"
+            aria-label="Paginación de estudiantes"
+          >
+            {estudiantes.length > 0 && (
+              <Paginación totalPages={totalPages} page={page} setPage={setPage} />
+            )}
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "tab2",
+      label: `${estudiante.primer_nombre ?? ""} ${estudiante.primer_apellido ?? ""}`,
+      component: <ViewData estudiante={estudiante} />,
+    },
+    {
+      id: "tab3",
+      label: "Pestaña 1",
+      component: <div>Contenido dinámico de la pestaña 1</div>,
+    },
+  ];
+
+  const firstTabId = tabs[0]?.id;
+  const [activeTabId, setActiveTabId] = useState(firstTabId);
+  const [activeTabs, setActiveTabs] = useState([firstTabId]);
+  const openTab = (id) => {
+    if (!activeTabs.includes(id)) setActiveTabs((arr) => [...arr, id]);
+    setActiveTabId(id);
+  };
 
   return (
     <div className="section-container">
-      {/* Encabezado */}
       <div className="container-fluid p-0">
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
+
       <Layout modules={modulos}>
-        <TabSwitcher tabs={tabs} activeTabId={activeTabId} setActiveTabId={setActiveTabId} activeTabs={activeTabs} setActiveTabs={setActiveTabs} />
+        <TabSwitcher
+          tabs={tabs}
+          activeTabId={activeTabId}
+          setActiveTabId={setActiveTabId}
+          activeTabs={activeTabs}
+          setActiveTabs={setActiveTabs}
+        />
       </Layout>
     </div>
-  )
+  );
 }
 
-export default Index
+export default Index;

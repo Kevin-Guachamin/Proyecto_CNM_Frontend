@@ -205,3 +205,27 @@
   .login-title{ font-size: 24px; }
   .login-form-container{ padding: 22px; }
 }
+
+/* === Login: forzar scrollbar en pantallas pequeñas === */
+@media (max-width: 900px), (max-height: 720px) {
+  .page.page-login {
+    max-height: 100dvh;           /* limita al alto del viewport */
+    overflow-y: auto;             /* fuerza scroll vertical */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Que el contenido empiece arriba y se pueda recorrer */
+  .login-main {
+    align-items: flex-start;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  /* “Aire” al fondo para que el scroll llegue al final */
+  .page.page-login::after {
+    content: "";
+    display: block;
+    height: 16px;
+  }
+}

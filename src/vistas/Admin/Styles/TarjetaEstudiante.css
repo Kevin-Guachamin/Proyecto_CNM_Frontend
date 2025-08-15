@@ -1,41 +1,83 @@
-/* ==== TARJETA DE ESTUDIANTE (estilo similar a materias) ==== */
+/* ==== TARJETA DE ESTUDIANTE ==== */
 .student-card {
-    border: 1px solid #e7f1ff;
-    border-radius: 10px;
-    padding: 10px;
-    transition: box-shadow 0.2s ease-in-out;
-    background-color: #CFD8DC !important;
-    margin-bottom: 1rem;
-  }
+  border: 1px solid #e7f1ff;
+  border-radius: 10px;
+  padding: 14px;
+  transition: box-shadow 0.2s ease-in-out;
+  background-color: #CFD8DC !important;
+  margin-bottom: 1rem;
+  max-height: calc(100vh - 120px); /* Ajusta restando el header/menú */
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 8px; /* para que no corte el contenido con el scroll */
+}
+
+.student-card:hover {
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.12);
+  transform: scale(1.00) !important;
+  border-color: #ffffff !important;
+}
+
+.student-card h5 {
+  font-size: 22px;
+  color: #0d6efd;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Etiquetas / valores */
+.info-label {
+  color: #052c65;
+  font-size: 18px;
+}
+
+.info {
+  font-size: 18px;
+}
+
+/* Evita desbordes de textos largos (IER, Dirección, etc.) */
+.info-wrap {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* Botón de descarga */
+.download-button {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .5rem .9rem;
+  border: none;
+  border-radius: .5rem;
+  background: #16a34a;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter .15s ease-in-out, transform .05s ease-in-out;
+}
+
+.download-button .icon {
+  font-size: 14px;
+}
+
+.download-button:hover {
+  filter: brightness(1.05);
+}
+
+.download-button:active {
+  transform: scale(0.99);
+}
+
+/* ==== RESPONSIVE ==== */
+/* Tablet hacia abajo: tipografías un poco menores */
+@media (max-width: 991.98px) {
   
-  .student-card:hover {
-    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.12);
-    transform: scale(1.00) !important;
-    border-color: #ffffff !important;
-  }
+ 
+}
+
+/* Móvil: una sola columna y botones a ancho completo */
+@media (max-width: 767.98px) {
+  .student-card { padding: 12px; }
   
-  .student-card h5 {
-    font-size: 22px;
-    color: #0d6efd;
-    text-align: center;
-  }
-  
-  .info-label {
-    color: #052c65;
-    font-size: 18px;
-  }
-  .info{
-    font-size: 18px;
-  }
-  
-  /* ==== RESPONSIVE ==== */
-  @media (max-width: 768px) {
-    .student-card h5 {
-      font-size: 16px;
-    }
-  
-    .student-card .info-label,
-    .student-card .row {
-      font-size: 13px;
-    }
-  }
+  .download-button { width: 100%; justify-content: center; }
+}
