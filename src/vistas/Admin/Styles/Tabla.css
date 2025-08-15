@@ -45,6 +45,7 @@
   padding: 20px;
   height: 100%;
   min-width: 0; /* permite scroll-x en ancestros/hijos */
+    background-color: #f4f4f4 !important;
 }
 
 /* Wrapper para scroll horizontal */
@@ -80,7 +81,7 @@
   font-weight: bold;
   border: 1px solid #ced4da;
   padding: 10px;
-  text-align: center;
+  text-align:  center !important;
 }
 
 .tabla-celda {

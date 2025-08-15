@@ -29,7 +29,7 @@
 
   .input-field,
   .search-input{
-    width: 100%;
+    width: 20vh;
     min-width: 0;                    /* NO fuerces 260px aquí */
   }
 
@@ -701,3 +701,247 @@
 .modal-curso .rows .form-group input[type="number"]{
   width: 100%;
 }
+
+/* ==========================================================
+   Responsive del modal "Representante" (solo afecta a este)
+   ========================================================== */
+.modal-container.modal-representante{
+  box-sizing: border-box;
+  width: min(720px, 92vw); /* tamaño cómodo y no se sale en móvil */
+  max-height: 90vh;        /* evita recorte vertical */
+  overflow: auto;          /* scroll interno si el contenido crece */
+}
+
+/* Base del formulario */
+.modal-representante .modal-form{ width: 100%; }
+
+/* Filas: que puedan saltar si no cabe */
+.modal-representante .rows{
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;   /* ¡permite salto a nueva línea! */
+  gap: 12px;
+}
+
+/* Cada campo ocupa una "columna" flexible */
+.modal-representante .rows .form-group{
+  flex: 1 1 280px;  /* base 280px; se adapta */
+  min-width: 0;
+}
+
+/* Inputs/selects a ancho completo del grupo */
+.modal-representante .rows .form-group input,
+.modal-representante .rows .form-group select{
+  width: 100%;
+  max-width: none;
+}
+
+/* Subida de archivos: que también sea adaptable */
+.modal-representante .file-upload-container{
+  flex-wrap: wrap;             /* permite bajar a otra línea */
+  width: 100%;
+  justify-content: flex-start; /* mantiene la disposición original */
+}
+.modal-representante .file-upload{
+  flex: 1 1 260px;             /* dos columnas cómodas en pantallas medianas */
+  min-width: 0;
+}
+
+/* Botonera: quitar ancho fijo heredado y centrar si hace falta */
+.modal-representante .rows-botones{
+  width: 100% !important;
+}
+.modal-representante .botones{
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* --------- MÓVIL (≤640px): 1 columna, etiquetas arriba --------- */
+@media (max-width: 640px){
+  .modal-container.modal-representante{
+    width: 100%;
+    max-width: 100%;
+    border-radius: 10px;
+  }
+  .modal-representante .rows .form-group{
+    flex: 1 1 100%;
+    align-items: stretch;
+    flex-direction: column; /* label arriba, input abajo */
+    gap: 6px;
+  }
+  .modal-representante .file-upload-container{
+    flex-direction: column;
+    gap: 10px;
+  }
+  .modal-representante .botones{
+    justify-content: center;  /* botones centrados en móvil */
+  }
+}
+
+/* --------- TABLET (641–1024px): 2 columnas cómodas --------- */
+@media (min-width: 641px) and (max-width: 1024px){
+  .modal-representante .rows .form-group{
+    flex: 1 1 45%;
+  }
+}
+
+/* --------- DESKTOP (≥1025px): tamaño contenido --------- */
+@media (min-width: 1025px){
+  .modal-container.modal-representante{
+    max-width: 700px;
+  }
+}
+
+/* ===== Parche anti-desborde SOLO para el modal de representante ===== */
+.modal-container.modal-representante{
+  overflow-x: hidden;              /* evita scroll horizontal del modal */
+}
+
+/* Asegura que la fila de botones no fuerce ancho fijo */
+.modal-representante .rows-botones{
+  width: 100% !important;          /* sobreescribe el width:700px */
+}
+
+/* File uploads: que puedan encoger y no empujen el layout */
+.modal-representante .file-upload-container{
+  flex-wrap: wrap;                  /* ya lo tenías, reafirmamos */
+  max-width: 100%;
+}
+
+.modal-representante .file-upload{
+  flex: 1 1 280px;                  /* columnas flexibles */
+  min-width: 0;                     /* clave: permite encoger dentro de flex */
+  max-width: 100%;
+}
+
+/* El input de archivo ocupa el ancho disponible y no desborda */
+.modal-representante .custom-file-input{
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;                 /* por si el navegador pinta texto largo */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* En móviles, todo a una columna y botones centrados */
+@media (max-width: 640px){
+  .modal-representante .file-upload{
+    flex: 1 1 100%;
+  }
+  .modal-representante .botones{
+    justify-content: center;
+  }
+}
+
+/* ==========================================================
+   Responsive del modal "Estudiante" (solo afecta a este)
+   ========================================================== */
+.modal-container.modal-estudiante{
+  box-sizing: border-box;
+  width: min(820px, 92vw);   /* un poco más ancho: más campos */
+  max-height: 90vh;          /* evita recortes */
+  overflow: auto;            /* scroll interno vertical */
+  overflow-x: hidden;        /* sin scroll horizontal */
+}
+
+/* Base del form */
+.modal-estudiante .modal-form{ width: 100%; }
+
+/* Filas: permitir salto cuando no cabe */
+.modal-estudiante .rows{
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;           /* ¡clave! evita desbordes */
+  gap: 12px;
+}
+
+/* Cada form-group como columna flexible */
+.modal-estudiante .rows .form-group{
+  flex: 1 1 280px;           /* base 280px, se adapta */
+  min-width: 0;
+}
+
+/* Dirección (3 campos): también flexibles */
+.modal-estudiante .form-group-direccion{
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+/* Inputs/selects/datepicker a 100% del contenedor */
+.modal-estudiante .rows .form-group input,
+.modal-estudiante .rows .form-group select,
+.modal-estudiante .rows .form-group .input-field{
+  width: 100%;
+  max-width: none;
+}
+.modal-estudiante .react-datepicker-wrapper{
+  flex: 1 1 auto !important;
+  width: 100% !important;
+}
+.modal-estudiante .react-datepicker__input-container{
+  justify-content: stretch;
+}
+
+/* Contenedor de archivos: que no empuje el layout */
+.modal-estudiante .file-upload-container{
+  flex-wrap: wrap;           /* permite bajar a otra línea */
+  width: 100%;
+  justify-content: flex-start;
+}
+.modal-estudiante .file-upload{
+  flex: 1 1 260px;
+  min-width: 0;              /* evita desborde del texto del file input */
+  max-width: 100%;
+}
+.modal-estudiante .custom-file-input{
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Botonera: quitar anchos fijos heredados */
+.modal-estudiante .rows-botones{ width: 100% !important; }
+.modal-estudiante .botones{
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* --------- MÓVIL (≤640px): 1 columna --------- */
+@media (max-width: 640px){
+  .modal-container.modal-estudiante{
+    width: 100%; max-width: 100%; border-radius: 10px;
+  }
+  .modal-estudiante .rows .form-group,
+  .modal-estudiante .form-group-direccion{
+    flex: 1 1 100%;
+  }
+  .modal-estudiante .rows .form-group{
+    flex-direction: column;  /* label arriba, input abajo */
+    align-items: stretch;
+    gap: 6px;
+  }
+  .modal-estudiante .file-upload{ flex: 1 1 100%; }
+  .modal-estudiante .botones{ justify-content: center; }
+}
+
+/* --------- TABLET (641–1024px): 2 columnas --------- */
+@media (min-width: 641px) and (max-width: 1024px){
+  .modal-estudiante .rows .form-group,
+  .modal-estudiante .form-group-direccion{
+    flex: 1 1 45%;
+  }
+}
+
+/* --------- DESKTOP (≥1025px): tamaño contenido --------- */
+@media (min-width: 1025px){
+  .modal-container.modal-estudiante{ max-width: 780px; }
+}
+
