@@ -70,11 +70,13 @@ function Index() {
       setPagerH(padded);
       document.documentElement.style.setProperty("--pager-h", `${padded}px`);
     };
+
     updatePagerH();
 
     const ro = new ResizeObserver(updatePagerH);
     if (pagerRef.current) ro.observe(pagerRef.current);
     window.addEventListener("resize", updatePagerH);
+    
     return () => {
       ro.disconnect();
       window.removeEventListener("resize", updatePagerH);
@@ -89,22 +91,39 @@ function Index() {
 
       const top = wrapperRef.current
         ? wrapperRef.current.getBoundingClientRect().top
-        : 0;
+        : 100; // valor por defecto si no está disponible
 
       const available = window.innerHeight - top - pagerH - GAP;
-      const rows = Math.max(1, Math.floor(available / ROW_H));
+      const rows = Math.max(3, Math.floor(available / ROW_H)); // mínimo 3 filas
       setLimit(rows);
     };
 
-    calcRows();
+    // Pequeño delay para asegurar que el DOM esté renderizado
+    const timeout = setTimeout(calcRows, 100);
+    
     const onResize = () => requestAnimationFrame(calcRows);
     window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener("resize", onResize);
+    };
   }, [pagerH]);
 
   // ======= Reset a página 1 =======
   useEffect(() => { if (limit) setPage(1); }, [limit]);
   useEffect(() => { setPage(1); }, [search, nivel]);
+
+  // ======= Forzar recálculo cuando el componente se monte =======
+  useEffect(() => {
+    const forceRecalc = () => {
+      window.dispatchEvent(new Event('resize'));
+    };
+
+    const timeout = setTimeout(forceRecalc, 200);
+    
+    return () => clearTimeout(timeout);
+  }, []);
 
   // ======= Fetch =======
   useEffect(() => {

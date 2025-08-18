@@ -1,0 +1,911 @@
+/* ===========================================
+   Estilos para VerDatosRepresentante
+   (Basado en CrearEntidad.css)
+   =========================================== */
+
+/* Fondo del modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+/* Contenedor del modal */
+.modal-container {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    width: auto;
+    height: auto;
+    max-width: 90vw; /* No sobrepasa el 90% del viewport */
+    max-height: 95vh; /* Limita la altura máxima */
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Título */
+.modal-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Contenedor del formulario */
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    align-items:center;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.rows{
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  width: auto;
+  justify-content: space-around;
+}
+
+.rows label{
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+}
+
+.rows .form-group { /* Aplica a todos los hijos directos */
+  flex: 1; /* Hace que cada hijo crezca y ocupe el espacio disponible */
+}
+
+.rows .form-group-direccion{
+  display: flex;
+  flex: 6;
+  gap: 5px;
+  flex-direction: column;
+}
+
+.form-group-direccion label{
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+}
+
+.form-group-direccion input{
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Grupo de input */
+.form-group {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 5px;
+}
+
+/* Etiquetas */
+.form-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+    white-space: nowrap;
+}
+
+/* Estilos de los inputs */
+.form-group input,
+.form-group select{
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s ease-in-out;
+}
+
+.form-control{
+  max-width: 80px;
+}
+
+.selected{
+  display: flex;
+  flex-direction: column;
+}
+
+.react-datepicker__input-container{
+  display: flex;
+  justify-content: end;
+}
+
+.react-datepicker-wrapper{
+  width: 50% !important;
+}
+
+/* Efecto al enfocar */
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+}
+
+.form-group-direccion input:focus,
+.form-group-direccion select:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+}
+
+/* Contenedor de botones */
+.react-datepicker-wrapper {
+    width: 100% !important;
+}
+  
+.react-datepicker__input-container input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.rows-botones{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 15px;
+    width: 700px;
+}
+
+.botones {
+    display: flex;
+    justify-content: flex-end; /* Alinea los botones hacia la derecha */
+    gap: 10px; /* Espacio entre los botones */
+    margin-top: 20px; /* Espacio entre el formulario y los botones */
+}
+
+/* Botón guardar */
+.boton-crear {
+    background-color: #007bff;
+    color: white;
+    width: auto; /* El ancho debe ser automático, no debe ocupar todo el espacio */
+    border-radius: 10%;
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Botón cancelar */
+.boton-cancelar {
+    background-color: #dc3545;
+    color: white;
+    width: auto; /* El ancho debe ser automático, no debe ocupar todo el espacio */
+    border-radius: 10%;
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.boton-crear:hover {
+    background-color: #0056b3; /* Azul más oscuro en hover */
+    color: white; /* Color del texto cuando se hace hover */
+}
+
+.boton-cancelar:hover {
+    background-color: #c82333; /* Rojo más oscuro en hover */
+    color: white; /* Color del texto cuando se hace hover */
+}
+
+.file-upload-container {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    margin: auto;
+    justify-content: start;
+}
+
+.file-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    background: #f9f9f9;
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px dashed #007bff;
+    transition: border-color 0.3s ease-in-out;
+}
+
+.file-upload:hover {
+    border-color: #0056b3;
+}
+
+.custom-file-label {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.custom-file-input {
+    cursor: pointer;
+    padding: 8px;
+    border: none;
+    background: #007bff;
+    color: white;
+    font-size: 14px;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}
+
+.custom-file-input:hover {
+    background: #0056b3;
+}
+
+.custom-file-input::file-selector-button {
+    padding: 8px 12px;
+    background: white;
+    border: 1px solid #007bff;
+    color: #007bff;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-right: 8px;
+    transition: all 0.3s ease-in-out;
+}
+
+.custom-file-input::file-selector-button:hover {
+    background: #007bff;
+    color: white;
+}
+
+/* Estilos para el botón de descarga */
+.download-button {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #21c745; /* Color de fondo verde */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Transición suave */
+  margin-top: 8px;
+  max-width: 250px;
+}
+
+/* Efecto al pasar el cursor por encima */
+.download-button:hover {
+  background-color: #09662a; /* Color de fondo más oscuro */
+}
+
+/* Estilos para el ícono */
+.download-button .icon {
+  margin-right: 8px; /* Espacio entre el ícono y el texto */
+  font-size: 18px; /* Tamaño del ícono */
+}
+
+.boton-crear-solicitud{
+  display: flex;
+  justify-content: center;
+}
+
+.contenedor-detalle-estudiante {
+  max-height: 84vh; /* Altura máxima calculada para evitar recorte con header y tabs */
+  overflow-y: auto;                /* Habilita el scroll vertical */
+  padding: 1rem;
+  scroll-behavior: smooth;
+}
+
+/* Contenedor de alertas */
+.alert-container {
+    background-color: #ffe6e6;
+    border: 1px solid #ff9999;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+}
+
+.alert-text {
+    color: #cc0000;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0;
+    text-align: center;
+}
+
+/* ===============================
+   RESPONSIVE DESIGN
+   =============================== */
+
+/* Breakpoint intermedio: laptops/tablets apaisado */
+@media (max-width: 1280px){
+  .filtros{
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .filtros .form-group{
+    flex: 1 1 320px;
+  }
+
+  .filtros .form-group:last-child{
+    flex: 2 1 480px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .search-input{
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .boton-add{
+    flex: 0 0 auto;
+  }
+
+  .input-field,
+  .search-input{
+    width: 20vh;
+    min-width: 0;
+  }
+
+  .react-datepicker-wrapper{
+    width: 100% !important;
+  }
+}
+
+/* Breakpoint "tablet" para apilar todo a una columna si hace falta */
+@media (max-width: 1024px){
+  .filtros .form-group{
+    flex: 1 1 100%;
+  }
+  .filtros .form-group:last-child{
+    flex: 1 1 100%;
+  }
+  
+  .rows-botones{
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Tablets (768px y menores) */
+@media (max-width: 768px){
+  .modal-container {
+    padding: 15px;
+    max-width: 95vw;
+    margin: 5px;
+  }
+  
+  .modal-title {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+  
+  .rows {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .rows .form-group {
+    flex: 1 1 100%;
+  }
+  
+  .file-upload-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .file-upload {
+    padding: 12px;
+  }
+  
+  .custom-file-label {
+    font-size: 14px;
+  }
+  
+  .botones {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    align-items: center;
+  }
+  
+  .boton-crear,
+  .boton-cancelar {
+    width: 100%;
+    max-width: 200px;
+    padding: 12px;
+    font-size: 16px;
+  }
+  
+  .rows-botones{
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .alert-container {
+    padding: 10px 12px;
+    margin: 12px 0;
+  }
+  
+  .alert-text {
+    font-size: 13px;
+  }
+  
+  .filtros{
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .filtros .form-group{
+    flex: 1 1 100%;
+  }
+  .input-field,
+  .search-input{
+    width: 100%;
+    min-width: 0;
+  }
+  .react-datepicker-wrapper{
+    width: 100% !important;
+  }
+}
+
+/* Móviles pequeños (480px y menores) */
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 5px;
+  }
+  
+  .modal-container {
+    padding: 12px;
+    max-width: 98vw;
+    border-radius: 8px;
+  }
+  
+  .modal-title {
+    font-size: 16px;
+    line-height: 1.3;
+    margin-bottom: 10px;
+  }
+  
+  .modal-form {
+    gap: 8px;
+  }
+  
+  .form-group {
+    margin-bottom: 8px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .form-group label {
+    font-size: 13px;
+    margin-bottom: 4px;
+    white-space: normal;
+  }
+  
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  
+  .file-upload {
+    padding: 10px;
+  }
+  
+  .custom-file-label {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+  
+  .custom-file-input {
+    font-size: 12px;
+    padding: 4px;
+  }
+  
+  .alert-container {
+    padding: 8px 10px;
+    margin: 8px 0;
+  }
+  
+  .alert-text {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  
+  .boton-crear,
+  .boton-cancelar {
+    padding: 10px;
+    font-size: 14px;
+    min-width: auto;
+  }
+}
+
+/* Landscape en móviles */
+@media (max-width: 768px) and (orientation: landscape) {
+  .modal-container {
+    max-height: 90vh;
+  }
+  
+  .rows {
+    flex-direction: row;
+    gap: 10px;
+  }
+  
+  .rows .form-group {
+    flex: 1 1 45%;
+  }
+  
+  .botones {
+    flex-direction: row;
+    gap: 15px;
+  }
+  
+  .boton-crear,
+  .boton-cancelar {
+    width: auto;
+    min-width: 120px;
+  }
+}
+
+/* Desktop grande (1200px y mayores) */
+@media (min-width: 1200px) {
+  .modal-container {
+    max-width: 800px;
+    padding: 30px;
+  }
+  
+  .modal-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .rows {
+    gap: 20px;
+  }
+  
+  .form-group input,
+  .form-group select {
+    padding: 10px 14px;
+    font-size: 15px;
+  }
+  
+  .file-upload {
+    padding: 20px;
+  }
+  
+  .boton-crear,
+  .boton-cancelar {
+    padding: 12px 24px;
+    font-size: 15px;
+  }
+}
+
+/* ===========================================
+   Estilos para la vista de información
+   (no modal)
+   =========================================== */
+
+/* Vista principal de información */
+.info-representante-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  height: calc(100vh - 120px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Card de información */
+.info-representante-container .card-representante {
+  border: 1px solid #dee2e6;
+  height: 100%;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: none; /* Quitar transiciones */
+  width: 100%;
+  max-width: none;
+}
+
+/* Quitar efecto hover del card */
+.info-representante-container .card-representante:hover {
+  transform: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Header del card */
+.info-representante-container .card-header-representante {
+  background: linear-gradient(135deg, #003F89, #0056b3);
+  color: white;
+  border-radius: 12px 12px 0 0 !important;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.info-representante-container .card-header-representante h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Botón de actualizar */
+.info-representante-container .btn-primary {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.info-representante-container .btn-primary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-1px);
+}
+
+.info-representante-container .btn-primary:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  opacity: 0.7;
+}
+
+/* Body del card */
+.info-representante-container .card-body-representante {
+  padding: 20px;
+  background: #fafbfc;
+  overflow: visible;
+}
+
+/* Asegurar que las filas no se desborden */
+.info-representante-container .row {
+  margin: 0;
+  width: 100%;
+}
+
+.info-representante-container .col-md-6 {
+  padding: 0 15px;
+}
+
+/* Campos de información */
+.info-representante-container .campo-info {
+  margin-bottom: 15px;
+}
+
+.info-representante-container .campo-info strong {
+  color: #003F89;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: block;
+  margin-bottom: 3px;
+}
+
+.info-representante-container .campo-info p {
+  color: #495057;
+  margin: 0;
+  font-size: 1rem;
+  padding: 0;
+  background: none;
+  border: none;
+  transition: none; /* Quitar transiciones */
+}
+
+/* Quitar efecto hover de los campos */
+.info-representante-container .campo-info p:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  border-color: #e9ecef !important;
+}
+
+/* Alert de restricción */
+.info-representante-container .alert {
+  border-radius: 10px;
+  border: none;
+  padding: 15px 20px;
+}
+
+.info-representante-container .alert-warning {
+  background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+  color: #856404;
+}
+
+/* === RESPONSIVE DESIGN === */
+
+/* Tablets (768px - 991px) */
+@media (max-width: 991px) {
+  .info-representante-container {
+    padding: 15px;
+    height: calc(100vh - 100px);
+    max-width: 90%;
+  }
+  
+  .info-representante-container .card-header-representante {
+    padding: 15px;
+    flex-direction: column;
+    text-align: center;
+    gap: 15px;
+  }
+  
+  .info-representante-container .card-header-representante h3 {
+    font-size: 1.3rem;
+    margin: 0;
+  }
+  
+  .info-representante-container .card-body-representante {
+    padding: 18px;
+  }
+  
+  .info-representante-container .btn-primary {
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  .info-representante-container .campo-info {
+    margin-bottom: 12px;
+  }
+}
+
+/* Móviles (menos de 768px) */
+@media (max-width: 767px) {
+  .info-representante-container {
+    padding: 10px;
+    height: calc(100vh - 80px);
+    max-width: 95%;
+  }
+  
+  .info-representante-container .card-representante {
+    margin: 0;
+    border-radius: 8px;
+  }
+  
+  .info-representante-container .card-header-representante {
+    padding: 12px;
+    border-radius: 8px 8px 0 0 !important;
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+  
+  .info-representante-container .card-header-representante h3 {
+    font-size: 1.1rem;
+    line-height: 1.3;
+    margin: 0;
+  }
+  
+  .info-representante-container .card-body-representante {
+    padding: 15px;
+  }
+  
+  .info-representante-container .campo-info {
+    margin-bottom: 10px;
+  }
+  
+  .info-representante-container .campo-info strong {
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+  }
+  
+  .info-representante-container .campo-info p {
+    font-size: 0.95rem;
+  }
+  
+  .info-representante-container .btn-primary {
+    width: 100%;
+    margin-top: 8px;
+    font-size: 0.9rem;
+  }
+  
+  /* Stack columns en móviles */
+  .info-representante-container .row .col-md-6 {
+    margin-bottom: 0;
+    padding: 0 5px;
+  }
+  
+  .info-representante-container .row {
+    margin: 0 -5px;
+  }
+}
+
+/* Móviles pequeños (menos de 480px) */
+@media (max-width: 479px) {
+  .info-representante-container {
+    padding: 8px;
+    height: calc(100vh - 70px);
+    max-width: 98%;
+  }
+  
+  .info-representante-container .card-header-representante {
+    padding: 10px;
+  }
+  
+  .info-representante-container .card-header-representante h3 {
+    font-size: 1rem;
+    margin: 0;
+  }
+  
+  .info-representante-container .card-body-representante {
+    padding: 12px;
+  }
+  
+  .info-representante-container .campo-info {
+    margin-bottom: 8px;
+  }
+  
+  .info-representante-container .campo-info strong {
+    font-size: 0.85rem;
+    margin-bottom: 1px;
+  }
+  
+  .info-representante-container .campo-info p {
+    font-size: 0.9rem;
+  }
+  
+  .info-representante-container .col-md-6 {
+    padding: 0 3px;
+  }
+  
+  .info-representante-container .row {
+    margin: 0 -3px;
+  }
+}
+
+/* Pantallas muy grandes (más de 1400px) */
+@media (min-width: 1400px) {
+  .info-representante-container {
+    max-width: 900px;
+    padding: 30px;
+    margin: 0 auto;
+  }
+  
+  .info-representante-container .card-header-representante h3 {
+    font-size: 1.6rem;
+  }
+  
+  .info-representante-container .card-body-representante {
+    padding: 25px;
+  }
+}
+
+/* Asegurar que no hay efectos hover no deseados en elementos globales */
+.info-representante-container * {
+  transition: none !important;
+}
+
+.info-representante-container .card-representante:hover,
+.info-representante-container .campo-info:hover,
+.info-representante-container p:hover {
+  transform: none !important;
+  scale: none !important;
+  zoom: none !important;
+}

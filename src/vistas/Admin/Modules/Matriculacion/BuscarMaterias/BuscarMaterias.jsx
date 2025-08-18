@@ -20,6 +20,7 @@ function BuscarMaterias() {
 
   // ▶ contenedor con scroll interno
   const wrapRef = useRef(null);
+  const footerRef = useRef(null);
 
   // Calcula la altura disponible para el contenedor con scroll interno
   useEffect(() => {
@@ -28,22 +29,76 @@ function BuscarMaterias() {
       // distancia del wrapper al borde superior del viewport
       const top = wrapRef.current.getBoundingClientRect().top;
       // alto visible disponible desde ese punto
-      const h = Math.max(360, window.innerHeight - top - 8); // 8px de respiro
+      const availableHeight = window.innerHeight - top - 8; // 8px de respiro
+      
+      // Asegurar una altura mínima razonable en pantallas pequeñas
+      const minHeight = window.innerWidth <= 768 ? 400 : 360;
+      const h = Math.max(minHeight, availableHeight);
+      
       document.documentElement.style.setProperty('--matric-h', `${h}px`);
     };
 
-    const onResize = () => requestAnimationFrame(updateHeight);
-
+    // Múltiples intentos para asegurar cálculo correcto
     updateHeight();
+    const timeout1 = setTimeout(updateHeight, 100);
+    const timeout2 = setTimeout(updateHeight, 300);
+
+    const onResize = () => {
+      clearTimeout(window.matricResizeTimeout);
+      window.matricResizeTimeout = setTimeout(() => {
+        requestAnimationFrame(updateHeight);
+      }, 100);
+    };
+
     window.addEventListener('resize', onResize);
     // si tu layout cambia alturas al hacer scroll del body, re-calcula
     window.addEventListener('scroll', onResize, { passive: true });
 
     return () => {
+      clearTimeout(timeout1);
+      clearTimeout(timeout2);
+      clearTimeout(window.matricResizeTimeout);
       window.removeEventListener('resize', onResize);
       window.removeEventListener('scroll', onResize);
     };
-  }, []);
+  }, [asignaciones, inscripciones]); // Recalcular cuando cambie el contenido
+
+  // Calcular altura del footer para reservar espacio
+  useEffect(() => {
+    const setFooterHeight = () => {
+      const h = footerRef.current ? footerRef.current.offsetHeight : 0;
+      const paddedHeight = h > 0 ? h + 16 : 0;
+      document.documentElement.style.setProperty('--footer-h', `${paddedHeight}px`);
+    };
+    
+    const timeout = setTimeout(setFooterHeight, 50);
+
+    const ro = new ResizeObserver(() => {
+      clearTimeout(window.footerResizeTimeout);
+      window.footerResizeTimeout = setTimeout(setFooterHeight, 100);
+    });
+    
+    if (footerRef.current) ro.observe(footerRef.current);
+
+    return () => {
+      clearTimeout(timeout);
+      clearTimeout(window.footerResizeTimeout);
+      ro.disconnect();
+    };
+  }, [inscripciones]); // Recalcular cuando cambien las inscripciones
+
+  // Asegurar que el botón sea visible cuando haya contenido
+  useEffect(() => {
+    if (inscripciones.length > 0 && footerRef.current && wrapRef.current) {
+      setTimeout(() => {
+        const wrapper = wrapRef.current;
+        if (wrapper) {
+          // Hacer scroll hacia abajo para mostrar el botón
+          wrapper.scrollTop = wrapper.scrollHeight;
+        }
+      }, 200);
+    }
+  }, [inscripciones]);
 
   const obtenerInscripciones = async () => {
     try {
@@ -172,12 +227,14 @@ function BuscarMaterias() {
             />
           )}
         </div>
+      </div>
 
-        {/* Botón final */}
-        <div className='matric-footer'>
+      {/* Botón final - ahora sticky */}
+      {inscripciones.length > 0 && (
+        <div ref={footerRef} className='matric-footer'>
           <button className="btn-finalizar" onClick={FinalizarMatriculas}>Finalizar</button>
         </div>
-      </div>
+      )}
     </div>
   );
 }

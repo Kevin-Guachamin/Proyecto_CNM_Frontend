@@ -2,26 +2,51 @@
 import TablaEstudianteCalificaciones from "../components/Tabla_EstudianteCalificaciones";
 import Boton from "../../../components/Boton";
 import Header from "../../../components/Header";
+import Layout from "../../../layout/Layout";
+import Loading from "../../../components/Loading";
 import { useEffect, useState } from "react";
 import { Dropdown } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from "axios";
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
+import { modulosRepresentante } from "../components/ModulosRepresentante";
+import './VerCalificacionesEstudiante.css';
 
 const VerCalificacionesEstudiante = () => {
   const [notasEstudiante, setNotasEstudiante] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { state } = useLocation();
   const {estudiante, respuestaPeriodosDatos: periodosMatriculados} = state || {};
-	const raw = localStorage.getItem('usuario');
-	const usuario = raw ? JSON.parse(raw) : null;
-	const navigate = useNavigate();
-
+  const navigate = useNavigate();
+  
   // Estado para el periodo elegido
   const [periodoSel, setPeriodoSel] = useState(null);
-	console.log("Datos usuario localStorage: ", usuario)
-	console.log("Datos estudiante que llegan en state: ", estudiante)
+  const [periodoSeleccionado, setPeriodoSeleccionado] = useState(null);
+  
+  // ✅ Verificación de autenticación
+  const [usuario, setUsuario] = useState(null);
+  
+  useEffect(() => {
+    const storedUser = localStorage.getItem("usuario");
+    const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+
+    if (!parsedUser) {
+      navigate("/login");
+      return;
+    }
+    
+    setUsuario(parsedUser);
+    setLoading(false);
+  }, [navigate]);
+
+  console.log("Datos usuario localStorage: ", usuario);
+  console.log("Datos estudiante que llegan en state: ", estudiante);
   const handleCalificaciones = async (matriculaID) => {
+    // Encontrar el período seleccionado por su ID
+    const periodoEncontrado = periodosMatriculados.find(periodo => periodo.ID === matriculaID);
+    setPeriodoSeleccionado(periodoEncontrado);
+    
     // Obtener las inscripciones de un estudiante por ID de matricula
     try {
       const token = localStorage.getItem("token");
@@ -112,43 +137,78 @@ const VerCalificacionesEstudiante = () => {
 
 
   return (
-    <div >
-	  <div className="container-fluid p-0">
-	  	{usuario && <Header isAuthenticated={true} usuario={usuario} />}
-	  </div>
-      {/* Se despliega lista para que se seleccione un periodo matriculado del cual ver las notas */}
-	  <div></div>
-	<div className="d-inline-block">
-	  <Dropdown>
-		  <Dropdown.Toggle variant="secondary" id="dropdown-basic" size="sm">
-			  Seleccione un periodo academico 
-		  </Dropdown.Toggle>
+    <div className="section-container">
+      <div className="container-fluid p-0">
+        {usuario && <Header isAuthenticated={true} usuario={usuario} />}
+      </div>
 
-		  <Dropdown.Menu>
-			  {periodosMatriculados.length > 0 ? (
-				  periodosMatriculados.map((periodo, i) => <Dropdown.Item key={i} onClick={() => handleCalificaciones(periodo.ID)}> {periodo.descripcion} </Dropdown.Item>)
-			  ) : (
-				  <Dropdown.Item href="#"> No hay periodos matriculados </Dropdown.Item>
-			  )}
-		  </Dropdown.Menu>
-	  </Dropdown>
+      <Layout modules={modulosRepresentante} activeModule={2}>
+        <div className="vista-calificaciones">
+          {loading ? (
+            <Loading />
+          ) : (
+            <>
+              {/* Título, selector y botón en la misma línea */}
+              <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap" style={{ gap: '15px' }}>
+                <h3 className="mb-0">Calificaciones de {estudiante?.primer_nombre} {estudiante?.primer_apellido}</h3>
+                
+                <div className="d-flex align-items-center" style={{ gap: '15px' }}>
+                  {/* Selector de periodo académico */}
+                  <Dropdown>
+                    <Dropdown.Toggle variant="secondary" id="dropdown-basic" size="sm">
+                      {periodoSeleccionado ? periodoSeleccionado.descripcion : "Seleccione un periodo académico"}
+                    </Dropdown.Toggle>
 
-	</div> 
-		
-	{/* Boton para volver a lista de estudiantes */}
-	<div className="d-flex justify-content-center mt-3">
-		<Boton texto="Volver a lista" onClick={() => handleOnClick()} estilo="boton-crear" />
-	</div>
+                    <Dropdown.Menu>
+                      {periodosMatriculados && periodosMatriculados.length > 0 ? (
+                        periodosMatriculados.map((periodo, i) => (
+                          <Dropdown.Item 
+                            key={i} 
+                            onClick={() => handleCalificaciones(periodo.ID)}
+                          > 
+                            {periodo.descripcion} 
+                          </Dropdown.Item>
+                        ))
+                      ) : (
+                        <Dropdown.Item href="#"> No hay períodos matriculados </Dropdown.Item>
+                      )}
+                    </Dropdown.Menu>
+                  </Dropdown>
+                  
+                  {/* Botón para volver a lista de estudiantes */}
+                  <Boton 
+                    texto="Volver a lista" 
+                    onClick={() => handleOnClick()} 
+                    estilo="boton-crear" 
+                  />
+                </div>
+              </div>
 
-      {/* Renderizado condicional */}
-      {periodoSel && (
-        <div /* className="modal-form" */>
-          <TablaEstudianteCalificaciones datos={notasEstudiante} estudiante={estudiante} periodosMatriculados={periodosMatriculados}></TablaEstudianteCalificaciones>
+              {/* Renderizado condicional de la tabla de calificaciones o mensaje inicial */}
+              {periodoSel ? (
+                <div className="tabla-calificaciones">
+                  <TablaEstudianteCalificaciones 
+                    datos={notasEstudiante} 
+                    estudiante={estudiante} 
+                    periodosMatriculados={periodosMatriculados}
+                  />
+                </div>
+              ) : (
+                <div className="mensaje-inicial">
+                  <div className="alert alert-info text-center">
+                    <i className="bi bi-info-circle me-2" style={{ fontSize: '1.2rem' }}></i>
+                    <strong>Seleccione un período académico</strong>
+                    <p className="mb-0 mt-2">
+                      Para visualizar las calificaciones de <strong>{estudiante?.primer_nombre} {estudiante?.primer_apellido}</strong>, 
+                      por favor seleccione un período académico del menú desplegable superior.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
-      )}
-      
-
-      
+      </Layout>
     </div>
   );
 }

@@ -2,12 +2,15 @@ import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import Tabla from '../../Representante/components/Tabla_Representante';
 import Header from "../../../components/Header";
+import Layout from "../../../layout/Layout";
+import Loading from "../../../components/Loading";
 import VerDatosEstudiante from '../../Representante/modulos/VerDatosEstudiante';
 import { useLocation, useNavigate } from "react-router-dom";
+import { modulosRepresentante } from "../components/ModulosRepresentante";
 
 function ListaEstudiantes() {
   // Estado para almacenar la información del usuario conectado
-  const [usuario, setUsuario] = useState([]);  
+  const [usuario, setUsuario] = useState(null);  
   const [datosEstudiante, setDatosEstudiante] = useState([]);
   const [estudianteSeleccionado, setEstudianteSeleccionado] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,6 +20,18 @@ function ListaEstudiantes() {
   //let periodosDatos = [];
   const [periodosDatos, setPeriodosDatos] = useState([]);
   const navigate = useNavigate();
+
+  // ✅ Verificación de autenticación
+  useEffect(() => {
+    const storedUser = localStorage.getItem("usuario");
+    const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+
+    if (!parsedUser) {
+      navigate("/login");
+      return;
+    }
+    setUsuario(parsedUser);
+  }, [navigate]);
   
 
   const handleVerCalificaciones = async (estudianteCedula) => {
@@ -145,26 +160,34 @@ function ListaEstudiantes() {
   }
      
     return(
-      <div> 
+      <div className="section-container">
         <div className="container-fluid p-0">
           {usuario && <Header isAuthenticated={true} usuario={usuario} />}
         </div>
-        <Tabla 
-          datos={datosEstudiante} 
-          isLoading={isLoading}
-          handleVerCalificaciones={handleVerCalificaciones}
-          handleVerDatosEstudiante={handleVerDatosEstudiante}
-        ></Tabla> 
 
-        {/* Modal de datos del estudiante */}
-        {isModalOpen && (
-          <VerDatosEstudiante
-            onCancel={handleCloseModal}
-            isLoading={isLoading}
-            entity={estudianteSeleccionado}
-          />
-        )}
-        
+        <Layout modules={modulosRepresentante}>
+          <div className="vista-estudiantes">
+            {isLoading ? (
+              <Loading />
+            ) : (
+              <Tabla 
+                datos={datosEstudiante} 
+                isLoading={isLoading}
+                handleVerCalificaciones={handleVerCalificaciones}
+                handleVerDatosEstudiante={handleVerDatosEstudiante}
+              />
+            )}
+
+            {/* Modal de datos del estudiante */}
+            {isModalOpen && (
+              <VerDatosEstudiante
+                onCancel={handleCloseModal}
+                isLoading={isLoading}
+                entity={estudianteSeleccionado}
+              />
+            )}
+          </div>
+        </Layout>
       </div>
     )
 }

@@ -28,62 +28,51 @@ const Tabla = ({datos, isLoading, handleVerCalificaciones, handleVerDatosEstudia
         navigate('/representante'); // Usa el navigate ya definido
     }
     
-
-    // Tabla de los estudiantes a cargo del REPRESENTANTE
+    // Tabla de los estudiantes a cargo del REPRESENTANTE con estilo de administración
    return(
-    <div>
-        <div className="tableresponsive mt-3">
-            <table className="table table-bordered table-striped estudiante-table">
-                <thead>
-                    <tr className="bg-primary-subtle">
-                        <th scope="col" className="text-center bg-primary-subtle"> Estudiante </th>
-                        <th scope="col" className="text-center bg-primary-subtle"> Nivel </th>
-                        <th scope="col" className="text-center bg-primary-subtle"> Especialidad</th>
-                        <th scope="col" className="text-center bg-primary-subtle"> Accion </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {datos.length > 0 ?
-                        (
-                            datos.map((estudiante, i) => (
-                                <tr key={i}>
-                                    <td className="text-center">
-                                        {estudiante.primer_nombre ?? '-'}{' '}
-                                        {estudiante.segundo_nombre ?? '-'}{' '}
-                                        {estudiante.primer_apellido ?? '-'}{' '}
-                                        {estudiante.segundo_apellido ?? '-'}{' '}
-                                    </td>
-                                    <td className="text-center"> {estudiante.nivel} </td>
-                                    <td className="text-center"> {estudiante.especialidad} </td>
-                                    <td className="text-center">
-                                        <i
-                                            className="bi bi-card-checklist text-primary mx-2 fs-3"
-                                            onClick={() => handleVerCalificaciones(estudiante.nroCedula)}
-                                            title="Ver calificaciones"
-                                            style={{ cursor: 'pointer' }}
-                                        ></i>
-                                        <i
-                                            className="bi bi-info-circle text-info mx-2 fs-3"
-                                            onClick={() => handleVerDatosEstudiante(estudiante.nroCedula)}
-                                            title="Ver información"
-                                            style={{ cursor: 'pointer' }}
-                                        ></i>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td className="text-center"> No hay datos disponibles </td>
+    <div className="contenedor-tabla-representante">
+        {datos.length === 0 ? (
+            <p className="sin-registros-representante">No hay estudiantes disponibles.</p>
+        ) : (
+            <div className="scroll-tabla-representante">
+                <table className="tabla-estudiantes-representante">
+                    <thead>
+                        <tr>
+                            <th className="encabezado-tabla-representante">Estudiante</th>
+                            <th className="encabezado-tabla-representante">Nivel</th>
+                            <th className="encabezado-tabla-representante">Especialidad</th>
+                            <th className="encabezado-tabla-representante">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {datos.map((estudiante, i) => (
+                            <tr key={i}>
+                                <td className="celda-tabla-representante">
+                                    {estudiante.primer_nombre ?? '-'}{' '}
+                                    {estudiante.segundo_nombre ?? '-'}{' '}
+                                    {estudiante.primer_apellido ?? '-'}{' '}
+                                    {estudiante.segundo_apellido ?? '-'}
+                                </td>
+                                <td className="celda-tabla-representante">{estudiante.nivel}</td>
+                                <td className="celda-tabla-representante">{estudiante.especialidad}</td>
+                                <td className="acciones-tabla-representante">
+                                    <i
+                                        className="bi bi-card-checklist icono-accion-representante"
+                                        onClick={() => handleVerCalificaciones(estudiante.nroCedula)}
+                                        title="Ver calificaciones"
+                                    ></i>
+                                    <i
+                                        className="bi bi-info-circle icono-accion-representante"
+                                        onClick={() => handleVerDatosEstudiante(estudiante.nroCedula)}
+                                        title="Ver información"
+                                    ></i>
+                                </td>
                             </tr>
-                        )}
-                </tbody>
-            </table>  
-        </div>
-        <div className="d-flex justify-content-center mt-3">
-            <button className="btn btn-primary btn-sm mt-3 mx-3" style={{ width: 'fit-content' }} onClick={() => handleOnClick()}>
-                Volver a modulos
-            </button>
-        </div> 
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        )}
     </div> 
    ); 
 }
