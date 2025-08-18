@@ -32,7 +32,6 @@ import Solicitudes from '../vistas/Vicerrector/AgendaSolicitudes/Index.jsx'
 import SolicitudesDocente from '../vistas/Docente/Solicitudes/Index.jsx';
 import Distributivo from '../vistas/Vicerrector/Distributivo/Index.jsx'
 import InformacionEstudiantil from '../vistas/Secretaria/InformacionEstudiantil/InformacionEstudiantil.jsx';
-import InformacionRepresentantes from '../vistas/Secretaria/InformacionEstudiantil/InformacionRepresentantes.jsx';
 import FechasProcesos from '../vistas/Secretaria/FechasProcesos/FechasProcesos.jsx';
 import VerificarCorreo from '../vistas/Recover-Password/VerificarCorreo/Index.jsx';
 import ResetPassword from '../vistas/Recover-Password/ResetPassword/Index.jsx';
@@ -45,6 +44,7 @@ import CursosVacios from '../vistas/Admin/Modules/Configuration/CursosSinMatricu
 import Reportes from '../vistas/Secretaria/Reportes/Reportes.jsx';
 import ListadoEstudiantes from '../vistas/Secretaria/Reportes/ListadoEstudiantes.jsx';
 import ReporteEstudiante from '../vistas/Secretaria/Reportes/ReporteEstudiante.jsx';
+import ReporteGeneral from '../vistas/Secretaria/Reportes/ReporteGeneral.jsx';
 //import InformacionEstudiantes from '../vistas/Secretaria/InformacionEstudiantil/Estudiantes/Index.jsx';
 
 function Rutas() {
@@ -101,7 +101,7 @@ function Rutas() {
       <Route path="/secretaria/calificaciones/asignacion/:asigId" element={<Calificaciones />} />
       <Route path="/secretaria/password" element={<ChangePassword_Secretaria />} />
       <Route path="/secretaria/informacion" element={<InformacionEstudiantil />} />
-      <Route path="/secretaria/informacion/representantes" element={<InformacionRepresentantes />} />
+      <Route path="/secretaria/informacion/representantes" element={<Representantes />} />
       <Route path="/secretaria/informacion/estudiantes" element={<Estudiantes />} />
       <Route path="/secretaria/informacion/inscripcion" element={<Inscripcion />} />
       <Route path="/secretaria/procesos" element={<FechasProcesos />} />
@@ -112,6 +112,7 @@ function Rutas() {
       <Route path="/secretaria/reportes" element={<Reportes />} />
       <Route path="/secretaria/reportes/nivel/:nivel" element={<ListadoEstudiantes />} />
       <Route path="/secretaria/reportes/estudiante/:idEstudiante" element={<ReporteEstudiante />} />
+      <Route path="/secretaria/reportes/resumen/:nivel" element={<ReporteGeneral />} />
     </Routes>
   )
 }

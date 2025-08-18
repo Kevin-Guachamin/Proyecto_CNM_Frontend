@@ -45,6 +45,17 @@ function InformacionEstudiantil() {
   // 📦 Datos estáticos para módulos
   const modulosData = [
     {
+      id: "registro",
+      titulo: (
+        <>
+          <i className="bi bi-journal-plus me-2"></i>Registro
+        </>
+      ),
+      descripcion: "Registro de nuevos estudiantes",
+      link: "/secretaria/informacion/inscripcion",
+      icono: <i className="bi bi-journal-plus" style={{ fontSize: 40 }}></i>,
+    },
+    {
       id: "representante",
       titulo: (
         <>
