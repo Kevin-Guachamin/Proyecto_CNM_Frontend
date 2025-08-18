@@ -5,11 +5,11 @@ import { useState } from 'react';
 import axios from 'axios';
 import "../Styles/VerDatosRepresentante.css";
 
-function ViewDataEstudiante({onCancel, isLoading, entity }) {
-  const [nroCedula,setNroCedula] = useState(""); // Inicializar con cadena vacia si es que hay valores undefined en entity
+function ViewDataEstudiante({ onCancel, isLoading, entity }) {
+  const [nroCedula, setNroCedula] = useState(""); // Inicializar con cadena vacia si es que hay valores undefined en entity
   const [primer_nombre, setPrimerNombre] = useState("");
   const [primer_apellido, setPrimerApellido] = useState("");
-  const [segundo_nombre, setSegundoNombre] =  useState("");
+  const [segundo_nombre, setSegundoNombre] = useState("");
   const [segundo_apellido, setSegundoApellido] = useState("");
   const [nivel, setNivel] = useState("");
   const [genero, setGenero] = useState("");
@@ -24,73 +24,73 @@ function ViewDataEstudiante({onCancel, isLoading, entity }) {
   const [nroCedula_representante, setNroCedulaRepresentante] = useState("");
   const [direccion, setDireccion] = useState("");
 
-    // Variables para la actualizacion de datos segun las fechas establecidas 
-    const [ fechaInicio, setFechaInicio] = useState('');
-    const [ fechaFin, setFechaFin] = useState('');
-    const [dentroDeRango, setDentroDeRango] = useState('');
-  
+  // Variables para la actualizacion de datos segun las fechas establecidas 
+  const [fechaInicio, setFechaInicio] = useState('');
+  const [fechaFin, setFechaFin] = useState('');
+  const [dentroDeRango, setDentroDeRango] = useState('');
+
   /* 
     OJO FALTA COMPROBAR EL FUNCIONAMIENTO CON LOS ARCHIVOS PDFS SUBIDOS
   */
 
-  if (isLoading) { 
+  if (isLoading) {
     <Loading></Loading>
   }
 
-    const cargarFechasActualizacionDatos = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const baseURL = import.meta.env.VITE_URL_DEL_BACKEND;
-            const headers = {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }
-
-            // Obtener la fecha actual del servidor
-            const {data: response} = await axios.get(
-                `${baseURL}/fechas_procesos/fecha_actual`, 
-                headers
-            );
-            const fechaActual = response.fechaActual;
-
-            // Obtener las fechas rango de la API para la actualizacion
-            const {data: fechaActualizacionDatos} = await axios.get(
-                `${baseURL}/fechas_procesos/actualizacion`,
-                headers
-            );
-
-            // Comprueba que haya datos en fechaActualizacionDatos
-            if(fechaActualizacionDatos) {
-                setFechaInicio(fechaActualizacionDatos.fechaInicioProceso); 
-                setFechaFin(fechaActualizacionDatos.fechaFinProceso); 
-            }
-
-            const inicio = fechaActualizacionDatos.fechaInicioProceso;
-            const fin = fechaActualizacionDatos.fechaFinProceso;
-            
-            // Establece si la fecha actual esta dentro del rango de la
-            // fecha del proceso 
-            if (fechaActual >= inicio && fechaActual <= fin) {
-                setDentroDeRango(true);
-
-            }else {
-                setDentroDeRango(false);
-
-            }
-
-            
-        } catch (error) {
-            console.log('Error al obtener las fechas de actualizacion de datos', error);
+  const cargarFechasActualizacionDatos = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const baseURL = import.meta.env.VITE_URL_DEL_BACKEND;
+      const headers = {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-    }
+      }
 
-    useEffect(() => {
-        cargarFechasActualizacionDatos();
-    }, []);
+      // Obtener la fecha actual del servidor
+      const { data: response } = await axios.get(
+        `${baseURL}/fechas_procesos/fecha_actual`,
+        headers
+      );
+      const fechaActual = response.fechaActual;
+
+      // Obtener las fechas rango de la API para la actualizacion
+      const { data: fechaActualizacionDatos } = await axios.get(
+        `${baseURL}/fechas_procesos/actualizacion`,
+        headers
+      );
+
+      // Comprueba que haya datos en fechaActualizacionDatos
+      if (fechaActualizacionDatos) {
+        setFechaInicio(fechaActualizacionDatos.fechaInicioProceso);
+        setFechaFin(fechaActualizacionDatos.fechaFinProceso);
+      }
+
+      const inicio = fechaActualizacionDatos.fechaInicioProceso;
+      const fin = fechaActualizacionDatos.fechaFinProceso;
+
+      // Establece si la fecha actual esta dentro del rango de la
+      // fecha del proceso 
+      if (fechaActual >= inicio && fechaActual <= fin) {
+        setDentroDeRango(true);
+
+      } else {
+        setDentroDeRango(false);
+
+      }
+
+
+    } catch (error) {
+      console.log('Error al obtener las fechas de actualizacion de datos', error);
+    }
+  }
 
   useEffect(() => {
-   if (entity) {
+    cargarFechasActualizacionDatos();
+  }, []);
+
+  useEffect(() => {
+    if (entity) {
       setNroCedula(entity.nroCedula || ""); // Set cadena vacia en caso de que haya un dato undefined
       setPrimerNombre(entity.primer_nombre || "");
       setPrimerApellido(entity.primer_apellido || "");
@@ -108,7 +108,7 @@ function ViewDataEstudiante({onCancel, isLoading, entity }) {
       setNroCedulaRepresentante(entity.nroCedula_representante || "");
       setDireccion(entity.direccion || "");
 
-    } 
+    }
   }, [entity]);
 
   const handleSubmit = () => {
@@ -117,171 +117,178 @@ function ViewDataEstudiante({onCancel, isLoading, entity }) {
     // Comprobar que la actualizacion de datos este habilitada en la fecha establecida
   }
 
-    const formatearFecha = (fechaIso) => {
-        return new Date(fechaIso).toLocaleDateString('es-EC');
-    }
+  const formatearFecha = (fechaIso) => {
+    if (!fechaIso) return '';
+    const fecha = new Date(`${fechaIso}T00:00:00`); // evita desfase por zona horaria
+    return fecha.toLocaleDateString('es-EC', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  };
 
-    return (
-      <div className="modal-overlay">
-        <div className="modal-container modal-representante">
-          <h2 className="modal-title">Información completa de {`${primer_nombre} ${primer_apellido}`}</h2>
-  
-          <form onSubmit={(e) => {e.preventDefault(); handleSubmit();}} className="modal-form">
-            <div className='rows'>
-              <div className="form-group">
-                <label htmlFor="nroCedula">Número de cédula:</label>
-                <input id="nroCedula" value={nroCedula} onChange={(e) => setNroCedula(e.target.value)} placeholder="Ingrese un número de cédula" />
-              </div>  
-              <div className="form-group">
-                <label htmlFor="nivel">Nivel:</label>
-                <input id="nivel" value={nivel} onChange={(e) => setNroCedula(e.target.value)} placeholder="Ingrese el nivel" />
-              </div>
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-container modal-representante">
+        <h2 className="modal-title">Información completa de {`${primer_nombre} ${primer_apellido}`}</h2>
+
+        <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="modal-form">
+          <div className='rows'>
+            <div className="form-group">
+              <label htmlFor="nroCedula">Número de cédula:</label>
+              <input id="nroCedula" value={nroCedula} onChange={(e) => setNroCedula(e.target.value)} placeholder="Ingrese un número de cédula" />
             </div>
-            
-            <div className='rows'>
-              <div className="form-group">
-                <label htmlFor="primer_nombre">Primer nombre:</label>
-                <input id="primer_nombre" value={primer_nombre} onChange={(e) => setPrimerNombre(e.target.value)} placeholder="Ingrese un nombre" />
-              </div>
-  
-              <div className="form-group">
-                <label htmlFor="primer_apellido">Primer apellido:</label>
-                <input id="primer_apellido" value={primer_apellido} onChange={(e) => setPrimerApellido(e.target.value)} placeholder="Ingrese un apellido" />
-              </div>
+            <div className="form-group">
+              <label htmlFor="nivel">Nivel:</label>
+              <input id="nivel" value={nivel} onChange={(e) => setNroCedula(e.target.value)} placeholder="Ingrese el nivel" />
             </div>
-  
-            <div className='rows'>
-              <div className="form-group">
-                <label htmlFor="segundo_nombre">Segundo nombre:</label>
-                <input id="segundo_nombre" value={segundo_nombre} onChange={(e) => setSegundoNombre(e.target.value)} placeholder="Ingrese un nombre" />
-              </div> 
-              <div className="form-group">
-                <label htmlFor="segundo_apellido">Segundo apellido:</label>
-                <input id="segundo_apellido" value={segundo_apellido} onChange={(e) => setSegundoApellido(e.target.value)} placeholder="Ingrese un apellido" />
-              </div>
-            </div>
-            
-            <div className='rows'>
-              <div className="form-group">
-                <label htmlFor="fecha_nacimiento">Fecha de nacimiento :</label>
-                <input id="fecha_nacimiento" value={fecha_nacimiento} onChange={(e) => setFechaNacimiento(e.target.value)} placeholder="Ingrese fecha de nacimiento" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="genero">Genero :</label>
-                <input id="genero" value={genero} onChange={(e) => setGenero(e.target.value)} placeholder="Ingrese el genero" />
-              </div>
-            </div>
-            
-            <div className='rows'>
-              <div className="form-group">
-                <label htmlFor="grupo_etnico">Grupo étnico :</label>
-                <input id="grupo_etnico" value={grupo_etnico} onChange={(e) => setGrupoEtnico(e.target.value)} placeholder="Ingrese el grupo étnico" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="direccion">Dirección :</label>
-                <input id="direccion" value={direccion} onChange={(e) => setDireccion(e.target.value)} placeholder="Ingrese la dirección" />
-              </div>
+          </div>
+
+          <div className='rows'>
+            <div className="form-group">
+              <label htmlFor="primer_nombre">Primer nombre:</label>
+              <input id="primer_nombre" value={primer_nombre} onChange={(e) => setPrimerNombre(e.target.value)} placeholder="Ingrese un nombre" />
             </div>
 
-            <div className='rows'>
-              <div className="form-group">
-                <label htmlFor="especialidad">Especialidad :</label>
-                <input id="especialidad" value={especialidad} onChange={(e) => setEspecialidad(e.target.value)} placeholder="" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="jornada">Jornada :</label>
-                <input id="jornada" value={jornada} onChange={(e) => setJornada(e.target.value)} placeholder="" />
-              </div>
+            <div className="form-group">
+              <label htmlFor="primer_apellido">Primer apellido:</label>
+              <input id="primer_apellido" value={primer_apellido} onChange={(e) => setPrimerApellido(e.target.value)} placeholder="Ingrese un apellido" />
+            </div>
+          </div>
+
+          <div className='rows'>
+            <div className="form-group">
+              <label htmlFor="segundo_nombre">Segundo nombre:</label>
+              <input id="segundo_nombre" value={segundo_nombre} onChange={(e) => setSegundoNombre(e.target.value)} placeholder="Ingrese un nombre" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="segundo_apellido">Segundo apellido:</label>
+              <input id="segundo_apellido" value={segundo_apellido} onChange={(e) => setSegundoApellido(e.target.value)} placeholder="Ingrese un apellido" />
+            </div>
+          </div>
+
+          <div className='rows'>
+            <div className="form-group">
+              <label htmlFor="fecha_nacimiento">Fecha de nacimiento :</label>
+              <input id="fecha_nacimiento" value={fecha_nacimiento} onChange={(e) => setFechaNacimiento(e.target.value)} placeholder="Ingrese fecha de nacimiento" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="genero">Genero :</label>
+              <input id="genero" value={genero} onChange={(e) => setGenero(e.target.value)} placeholder="Ingrese el genero" />
+            </div>
+          </div>
+
+          <div className='rows'>
+            <div className="form-group">
+              <label htmlFor="grupo_etnico">Grupo étnico :</label>
+              <input id="grupo_etnico" value={grupo_etnico} onChange={(e) => setGrupoEtnico(e.target.value)} placeholder="Ingrese el grupo étnico" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="direccion">Dirección :</label>
+              <input id="direccion" value={direccion} onChange={(e) => setDireccion(e.target.value)} placeholder="Ingrese la dirección" />
+            </div>
+          </div>
+
+          <div className='rows'>
+            <div className="form-group">
+              <label htmlFor="especialidad">Especialidad :</label>
+              <input id="especialidad" value={especialidad} onChange={(e) => setEspecialidad(e.target.value)} placeholder="" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="jornada">Jornada :</label>
+              <input id="jornada" value={jornada} onChange={(e) => setJornada(e.target.value)} placeholder="" />
+            </div>
+          </div>
+
+          <div className='rows'>
+            <div className="form-group">
+              <label htmlFor="nroMatricula">#Matrícula :</label>
+              <input id="nroMatricula" value={nroMatricula} onChange={(e) => setNroMatricula(e.target.value)} placeholder="" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="anioMatricula">Año de matrícula :</label>
+              <input id="anioMatricula" value={anioMatricula} onChange={(e) => setAnioMatricula(e.target.value)} placeholder="" />
+            </div>
+          </div>
+
+          <div className='rows'>
+            <div className="form-group">
+              <label htmlFor="IER">IER :</label>
+              <input id="IER" value={IER} onChange={(e) => setIER(e.target.value)} placeholder="Ingrese el IER" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="nroCedula_representante"># de cédula representante :</label>
+              <input id="nroCedula_representante" value={nroCedula_representante} onChange={(e) => setNroCedulaRepresentante(e.target.value)} placeholder="Ingrese el nro de cédula del representante" />
+            </div>
+          </div>
+
+          <div className='file-upload-container'>
+            <div className='file-upload'>
+              <label className='custom-file-label'>
+                Copia de Cédula:
+              </label>
+              <input
+                type="file"
+                name="copiaCedula"
+                className='custom-file-input'
+                //onChange={handleFileChange}
+                accept="application/pdf"
+              />
             </div>
 
-            <div className='rows'>
-              <div className="form-group">
-                <label htmlFor="nroMatricula">#Matrícula :</label>
-                <input id="nroMatricula" value={nroMatricula} onChange={(e) => setNroMatricula(e.target.value)} placeholder="" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="anioMatricula">Año de matrícula :</label>
-                <input id="anioMatricula" value={anioMatricula} onChange={(e) => setAnioMatricula(e.target.value)} placeholder="" />
-              </div>
+            <div className='file-upload'>
+              <label className='custom-file-label'>
+                Croquis:
+              </label>
+              <input
+                className='custom-file-input'
+                type="file"
+                name="croquis"
+                //onChange={handleFileChange}
+                accept="application/pdf"
+              />
             </div>
+          </div>
 
-            <div className='rows'>
-              <div className="form-group">
-                <label htmlFor="IER">IER :</label>
-                <input id="IER" value={IER} onChange={(e) => setIER(e.target.value)} placeholder="Ingrese el IER" />
-              </div>
-              <div className="form-group">
-                <label htmlFor="nroCedula_representante"># de cédula representante :</label>
-                <input id="nroCedula_representante" value={nroCedula_representante} onChange={(e) => setNroCedulaRepresentante(e.target.value)} placeholder="Ingrese el nro de cédula del representante" />
-              </div>
+          {!dentroDeRango && (
+            <div className="alert-container">
+              <p className="alert-text">
+                No se pueden actualizar datos fuera de fecha.
+              </p>
+              <p className="alert-text">
+                Fecha: {formatearFecha(fechaInicio)} al {formatearFecha(fechaFin)}
+              </p>
             </div>
- 
-            <div className='file-upload-container'>
-              <div className='file-upload'>
-                <label className='custom-file-label'>
-                  Copia de Cédula:
-                </label>
-                <input
-                  type="file"
-                  name="copiaCedula"
-                  className='custom-file-input'
-                  //onChange={handleFileChange}
-                  accept="application/pdf"
-                />
-              </div>
+          )}
 
-              <div className='file-upload'>
-                <label className='custom-file-label'>
-                  Croquis:
-                </label>
-                <input
-                  className='custom-file-input'
-                  type="file"
-                  name="croquis"
-                  //onChange={handleFileChange}
-                  accept="application/pdf"
-                />
-              </div>
+          <div className='rows-botones'>
+            <div className="botones">
+              <button
+                type='submit'
+                className='boton-crear'
+                disabled={!dentroDeRango}
+              >
+                Guardar
+              </button>
+              <button
+                type="button"
+                className="boton-cancelar"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onCancel();
+                }}
+              >
+                Cancelar
+              </button>
             </div>
-
-            {!dentroDeRango && (
-              <div className="alert-container">
-                <p className="alert-text">
-                  No se pueden actualizar datos fuera de fecha.
-                </p>
-                <p className="alert-text">
-                  Fecha: {formatearFecha(fechaInicio)} al {formatearFecha(fechaFin)}
-                </p>
-              </div>
-            )}
-
-            <div className='rows-botones'>
-              <div className="botones">
-                <button 
-                  type='submit' 
-                  className='boton-crear' 
-                  disabled={!dentroDeRango}
-                >
-                  Guardar
-                </button>
-                <button
-                  type="button"
-                  className="boton-cancelar"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    onCancel();
-                  }}
-                >
-                  Cancelar
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
-    )
-  
+    </div>
+  )
+
 }
 
 export default ViewDataEstudiante;
