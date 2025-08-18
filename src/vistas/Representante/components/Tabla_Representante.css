@@ -1,65 +1,139 @@
-/* Estilos básicos de la tabla */
-.estudiante-table {
-    width: 100%;
-    table-layout: fixed;  /* Importante para que respete los anchos */
-    margin-bottom: 1rem;
-    border-collapse: collapse;
+/* Estilos de tabla específicos para representante */
+
+/* Contenedor principal de la tabla */
+.contenedor-tabla-representante {
+  padding: 20px;
+  height: 100%;
+  min-width: 0;
 }
 
-/* Estilos para las celdas y cabeceras */
-.estudiante-table th,
-.estudiante-table td {
-    padding: 8px;
-    text-align: center;
-    vertical-align: middle;
-    border: 1px solid var(--bs-border-color);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+/* Wrapper para scroll horizontal y vertical */
+.scroll-tabla-representante {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  max-height: 60vh;
 }
 
-/* Anchos específicos para cada columna */
-.estudiante-table th:nth-child(1),
-.estudiante-table td:nth-child(1) {
-    width: 40%;  /* Columna de Estudiante */
+/* La tabla principal */
+.tabla-estudiantes-representante {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse;
+  table-layout: auto;
 }
 
-.estudiante-table th:nth-child(2),
-.estudiante-table td:nth-child(2) {
-    width: 20%;  /* Columna de Curso */
+/* Head sticky mientras scrollea el cuerpo */
+.tabla-estudiantes-representante thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
-.estudiante-table th:nth-child(3),
-.estudiante-table td:nth-child(3) {
-    width: 20%;  /* Columna de Especialidad */
+/* Estilo del encabezado */
+.encabezado-tabla-representante {
+  background-color: #00408A !important;
+  color: #ced4da !important;
+  font-weight: bold;
+  border: 1px solid #ced4da;
+  padding: 10px;
+  text-align: center !important;
 }
 
-.estudiante-table th:nth-child(4),
-.estudiante-table td:nth-child(4) {
-    width: 20%;  /* Columna de Acción */
+/* Estilo de las celdas */
+.celda-tabla-representante {
+  border: 1px solid #90A4AE !important;
+  vertical-align: middle;
+  background-color: #CFD8DC !important;
+  text-align: center;
+  padding: 8px;
+  white-space: nowrap;
 }
 
-/* Estilos para el thead */
-.estudiante-table thead th {
-    height: auto;
+/* Contenedor de botones/iconos */
+.acciones-tabla-representante {
+  padding-top: 0.8rem;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 2.85rem;
+  border: 1px solid #90A4AE;
+  vertical-align: middle;
+  background-color: #CFD8DC !important;
+}
+
+/* Estilos para los iconos */
+.icono-accion-representante {
+  color: #1F7B00;
+  cursor: pointer;
+  font-size: 1.3rem;
+  transition: color 0.2s ease;
+}
+
+.icono-accion-representante:hover {
+  color: #0d5200;
+}
+
+/* Mensaje cuando no hay registros */
+.sin-registros-representante {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #888;
+  padding: 2rem;
+  margin: 0;
+}
+
+/* Evita quiebres de línea para habilitar scroll horizontal */
+.tabla-estudiantes-representante th,
+.tabla-estudiantes-representante td {
+  white-space: nowrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .contenedor-tabla-representante {
     padding: 10px;
-    background-color: var(--bs-primary-bg-subtle);
-    font-weight: bold;
-    border: 1px solid var(--bs-border-color);
+  }
+  
+  .tabla-estudiantes-representante {
+    min-width: 600px;
+  }
+  
+  .encabezado-tabla-representante,
+  .celda-tabla-representante {
+    padding: 6px;
+    font-size: 0.9rem;
+  }
+  
+  .acciones-tabla-representante {
+    padding-top: 0.5rem;
+    height: 2.5rem;
+  }
+  
+  .icono-accion-representante {
+    font-size: 1rem;
+  }
 }
 
-/* Estilos para las filas alternas */
-.estudiante-table tbody tr:nth-of-type(odd) {
-    background-color: rgba(0, 0, 0, 0.05);
-}
-
-/* Estilos para el botón */
-.estudiante-table .btn-primary {
-    padding: 4px 8px;
-    font-size: 0.875rem;
-}
-
-/* Estilos para el icono del botón */
-.estudiante-table .bi {
-    margin-right: 4px;
+@media (max-width: 480px) {
+  .tabla-estudiantes-representante {
+    min-width: 500px;
+  }
+  
+  .encabezado-tabla-representante,
+  .celda-tabla-representante {
+    padding: 4px;
+    font-size: 0.8rem;
+  }
+  
+  .acciones-tabla-representante {
+    padding-top: 0.3rem;
+    height: 2.2rem;
+  }
+  
+  .icono-accion-representante {
+    font-size: 0.9rem;
+  }
 } 

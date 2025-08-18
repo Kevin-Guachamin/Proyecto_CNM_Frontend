@@ -1,0 +1,219 @@
+/* Estilos para VerCalificacionesEstudiante */
+
+/* Contenedor principal con altura definida */
+.vista-calificaciones {
+  height: calc(90vw - 120px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px;
+  position: relative;
+}
+
+/* Asegurar que el contenedor de la tabla tenga altura limitada */
+.tabla-calificaciones {
+  max-height: calc(100vw - 250px);
+  overflow-y: auto;
+  margin-top: 20px;
+}
+
+/* Contenedor del reporte dentro de la tabla */
+.tabla-calificaciones .content-container {
+  height: 100%;
+  overflow: visible;
+}
+
+/* Contenedor Bootstrap dentro del reporte */
+.tabla-calificaciones .container {
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+/* Asegurar que las tabs no tengan altura fija */
+.tabla-calificaciones .tab-content {
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+/* Scroll personalizado para vista principal */
+.vista-calificaciones::-webkit-scrollbar {
+  width: 8px;
+}
+
+.vista-calificaciones::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.vista-calificaciones::-webkit-scrollbar-thumb {
+  background: #003F89;
+  border-radius: 4px;
+}
+
+.vista-calificaciones::-webkit-scrollbar-thumb:hover {
+  background: #002f65;
+}
+
+/* Scroll personalizado para tabla */
+.tabla-calificaciones::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.tabla-calificaciones::-webkit-scrollbar-track {
+  background: #f8f9fa;
+  border-radius: 3px;
+}
+
+.tabla-calificaciones::-webkit-scrollbar-thumb {
+  background: #dee2e6;
+  border-radius: 3px;
+}
+
+.tabla-calificaciones::-webkit-scrollbar-thumb:hover {
+  background: #adb5bd;
+}
+
+/* Mensaje inicial */
+.mensaje-inicial {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  padding: 20px;
+}
+
+.mensaje-inicial .alert {
+  max-width: 600px;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+  background: linear-gradient(135deg, #e7f3ff, #f8fdff);
+  border-left: 4px solid #007bff;
+  padding: 30px;
+}
+
+.mensaje-inicial .alert i {
+  color: #007bff;
+}
+
+.mensaje-inicial .alert strong {
+  color: #0056b3;
+  font-size: 1.1rem;
+}
+
+.mensaje-inicial .alert p {
+  color: #495057;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* === RESPONSIVE DESIGN === */
+
+/* Tablets y pantallas medianas */
+@media (max-width: 992px) {
+  .vista-calificaciones {
+    height: calc(100vh - 100px);
+    padding: 15px;
+  }
+
+  .tabla-calificaciones {
+    max-height: calc(100vh - 220px);
+  }
+}
+
+/* Móviles */
+@media (max-width: 768px) {
+  .vista-calificaciones {
+    height: calc(100vh - 80px);
+    padding: 10px;
+  }
+
+  .tabla-calificaciones {
+    max-height: calc(100vh - 200px);
+    margin-top: 15px;
+  }
+
+  /* Asegurar que el header se ajuste en móviles */
+  .d-flex.justify-content-between {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 15px;
+  }
+
+  .d-flex.align-items-center {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Mensaje inicial responsive */
+  .mensaje-inicial {
+    min-height: 200px;
+    padding: 15px;
+  }
+
+  .mensaje-inicial .alert {
+    padding: 20px;
+    max-width: 100%;
+  }
+
+  .mensaje-inicial .alert strong {
+    font-size: 1rem;
+  }
+
+  .mensaje-inicial .alert p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+  .vista-calificaciones {
+    height: calc(100vh - 70px);
+    padding: 8px;
+  }
+
+  .tabla-calificaciones {
+    max-height: calc(100vh - 180px);
+    margin-top: 10px;
+  }
+
+  /* Mensaje inicial para móviles pequeños */
+  .mensaje-inicial {
+    min-height: 180px;
+    padding: 10px;
+  }
+
+  .mensaje-inicial .alert {
+    padding: 15px;
+  }
+
+  .mensaje-inicial .alert i {
+    font-size: 1rem !important;
+  }
+
+  .mensaje-inicial .alert strong {
+    font-size: 0.95rem;
+  }
+
+  .mensaje-inicial .alert p {
+    font-size: 0.85rem;
+  }
+}
+
+/* Asegurar que no hay conflictos con Bootstrap */
+.vista-calificaciones .container-fluid {
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* Para debugging - remover en producción */
+/* 
+.vista-calificaciones {
+  border: 2px solid red;
+}
+
+.tabla-calificaciones {
+  border: 2px solid blue;
+}
+*/

@@ -4,6 +4,9 @@ import axios from 'axios'
 import { ErrorMessage } from '../../../../Utils/ErrorMesaje';
 import Horarios from './Horarios';
 import Swal from 'sweetalert2';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import './Busqueda.css';
+import { IoEyeOutline } from "react-icons/io5";
 
 function Busqueda({usuario}) {
     const [periodo, setPeriodo] = useState("")
@@ -213,45 +216,44 @@ function Busqueda({usuario}) {
 
 
     return (
-        <div>
-            <h1>{`Periodo académico activo ${periodo.descripcion}`}</h1>
-            <div className="d-flex justify-content-center mt-3">
-                <button className="btn btn-primary btn-sm mt-3 mx-3" style={{ width: 'fit-content' }} onClick={() => handleVolverModulos()}>
-                    Volver a modulos
-                </button>
-            </div>
-            <div className="Contendor-tabla">
+        <div className='contenedor-busqueda'>
+            <h1 className='periodo-title'>{`Periodo académico activo ${periodo.descripcion}`}</h1>
+            <div className="contenedor-tabla-matricula-estudiantes">
                 {!estudiantesRepresentante && (
-                    <p className="no-registros">No se encontraron estudiantes.</p>
+                    <p className="sin-registros-matricula">No se encontraron estudiantes.</p>
                 )}
 
                 {estudiantesRepresentante && (
-                    <div className="tableresponsive mt-3">
-                        <table className="table table-bordered table-striped">
+                    <div className="scroll-tabla-matricula-estudiantes">
+                        <table className="tabla-matricula-estudiantes">
                             <thead>
                                 <tr>
-                                    <th>Cédula</th>
-                                    <th>Primer nombre</th>
-                                    <th>Primer apellido</th>
-                                    <th>Edad</th>
-                                    <th>Género</th>
-                                    <th>Jornada</th>
-                                    <th>Nivel</th>
-                                    <th>Accion</th>
+                                    <th className="encabezado-tabla-matricula-estudiantes">Cédula</th>
+                                    <th className="encabezado-tabla-matricula-estudiantes">Primer nombre</th>
+                                    <th className="encabezado-tabla-matricula-estudiantes">Primer apellido</th>
+                                    <th className="encabezado-tabla-matricula-estudiantes">Edad</th>
+                                    <th className="encabezado-tabla-matricula-estudiantes">Género</th>
+                                    <th className="encabezado-tabla-matricula-estudiantes">Jornada</th>
+                                    <th className="encabezado-tabla-matricula-estudiantes">Nivel</th>
+                                    <th className="encabezado-tabla-matricula-estudiantes">Acción</th>
                                 </tr>
                             </thead>
                             <tbody>
                                {estudiantesRepresentante.map((estudiante, index) => (
                                     <tr key={index}>
-                                    <td>{estudiante.nroCedula}</td>
-                                    <td>{estudiante.primer_nombre}</td>
-                                    <td>{estudiante.primer_apellido}</td>
-                                    <td>{calcularEdad(convertirFecha(estudiante.fecha_nacimiento))}</td>
-                                    <td>{estudiante.genero}</td>
-                                    <td>{estudiante.jornada}</td>
-                                    <td>{estudiante.nivel}</td>
-                                    <td>
-                                        <button onClick={() => handleEstudianteSeleccionado(estudiante)}>Empezar matrícula</button>
+                                    <td className="celda-tabla-matricula-estudiantes">{estudiante.nroCedula}</td>
+                                    <td className="celda-tabla-matricula-estudiantes">{estudiante.primer_nombre}</td>
+                                    <td className="celda-tabla-matricula-estudiantes">{estudiante.primer_apellido}</td>
+                                    <td className="celda-tabla-matricula-estudiantes">{calcularEdad(convertirFecha(estudiante.fecha_nacimiento))}</td>
+                                    <td className="celda-tabla-matricula-estudiantes">{estudiante.genero}</td>
+                                    <td className="celda-tabla-matricula-estudiantes">{estudiante.jornada}</td>
+                                    <td className="celda-tabla-matricula-estudiantes">{estudiante.nivel}</td>
+                                    <td className="acciones-tabla-matricula-estudiantes">
+                                        <i 
+                                            className="bi bi-pencil-square icono-matricula"
+                                            onClick={() => handleEstudianteSeleccionado(estudiante)}
+                                            title="Empezar matrícula"
+                                        ></i>
                                     </td>
                                 </tr>
                                ))} 
@@ -262,44 +264,54 @@ function Busqueda({usuario}) {
                 )}
             </div>
             {matricula && (<div>
-                <label htmlFor="">Ingrese el nombre de la Materia</label>
-                <input type="text" value={asignatura} onChange={(e) => setAsignatura(e.target.value)} />
-                <button onClick={HandleBuscarAsignaturas}>Buscar</button>
-                <div className="Contendor-tabla">
+                <div className='contenedor-busqueda-asignaturas'>
+                    <label htmlFor="">Ingrese el nombre de la Materia: </label>
+                    <input type="text" value={asignatura} onChange={(e) => setAsignatura(e.target.value)} />
+                    <button className="btn-buscar-asignaturas" onClick={HandleBuscarAsignaturas}>Buscar</button>
+                </div>
+                <div className="contenedor-tabla-matricula-asignaciones">
                     {buscarAsignacion ? (
                         asignaciones.length === 0 ? (
-                            <p className="no-registros">No se encontraron coincidencias</p>
+                            <p className="sin-registros-matricula">No se encontraron coincidencias</p>
                         ) : (
-                            <table className="tabla_registros">
-                                <thead>
-                                    <tr>
-                                        <th>Nivel</th>
-                                        <th>Paralelo</th>
-                                        <th>Docente</th>
-                                        <th>Materia</th>
-                                        <th>Días</th>
-                                        <th>Hora Inicio</th>
-                                        <th>Hora Fin</th>
-                                        <th>Cupos disponibles</th>
-                                        <th>Seleccionar</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {asignaciones.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>{item.Materia.nivel}</td>
-                                            <td>{item.paralelo}</td>
-                                            <td>{`${item.Docente.primer_nombre} ${item.Docente.primer_apellido}`}</td>
-                                            <td>{item.Materia.nombre}</td>
-                                            <td>{`${item.dias[0]}${item.dias[1] ? `-${item.dias[1]}` : ''}`}</td>
-                                            <td>{item.horaInicio}</td>
-                                            <td>{item.horaFin}</td>
-                                            <td>{item.cupos}</td>
-                                            <td><button onClick={() => Inscribir(item)}>Inscribir</button></td>
+                            <div className="scroll-tabla-matricula-asignaciones">
+                                <table className="tabla-matricula-asignaciones">
+                                    <thead>
+                                        <tr>
+                                            <th className="encabezado-tabla-matricula-asignaciones">Nivel</th>
+                                            <th className="encabezado-tabla-matricula-asignaciones">Paralelo</th>
+                                            <th className="encabezado-tabla-matricula-asignaciones">Docente</th>
+                                            <th className="encabezado-tabla-matricula-asignaciones">Materia</th>
+                                            <th className="encabezado-tabla-matricula-asignaciones">Días</th>
+                                            <th className="encabezado-tabla-matricula-asignaciones">Hora Inicio</th>
+                                            <th className="encabezado-tabla-matricula-asignaciones">Hora Fin</th>
+                                            <th className="encabezado-tabla-matricula-asignaciones">Cupos disponibles</th>
+                                            <th className="encabezado-tabla-matricula-asignaciones">Seleccionar</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {asignaciones.map((item, index) => (
+                                            <tr key={index}>
+                                                <td className="celda-tabla-matricula-asignaciones">{item.Materia.nivel}</td>
+                                                <td className="celda-tabla-matricula-asignaciones">{item.paralelo}</td>
+                                                <td className="celda-tabla-matricula-asignaciones">{`${item.Docente.primer_nombre} ${item.Docente.primer_apellido}`}</td>
+                                                <td className="celda-tabla-matricula-asignaciones">{item.Materia.nombre}</td>
+                                                <td className="celda-tabla-matricula-asignaciones">{`${item.dias[0]}${item.dias[1] ? `-${item.dias[1]}` : ''}`}</td>
+                                                <td className="celda-tabla-matricula-asignaciones">{item.horaInicio}</td>
+                                                <td className="celda-tabla-matricula-asignaciones">{item.horaFin}</td>
+                                                <td className="celda-tabla-matricula-asignaciones">{item.cupos}</td>
+                                                <td className="acciones-tabla-matricula-asignaciones">
+                                                    <i 
+                                                        className="bi bi-clipboard2-check icono-inscribir"
+                                                        onClick={() => Inscribir(item)}
+                                                        title="Inscribir"
+                                                    ></i>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         )
                     ) : null}
                 </div>

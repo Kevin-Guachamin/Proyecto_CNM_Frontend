@@ -3,6 +3,7 @@ import Boton from '../../../components/Boton';
 import Loading from '../../../components/Loading';
 import { useState } from 'react';
 import axios from 'axios';
+import "../Styles/VerDatosRepresentante.css";
 
 function ViewDataEstudiante({onCancel, isLoading, entity }) {
   const [nroCedula,setNroCedula] = useState(""); // Inicializar con cadena vacia si es que hay valores undefined en entity
@@ -122,10 +123,10 @@ function ViewDataEstudiante({onCancel, isLoading, entity }) {
 
     return (
       <div className="modal-overlay">
-        <div className="modal-container">
+        <div className="modal-container modal-representante">
           <h2 className="modal-title">Información completa de {`${primer_nombre} ${primer_apellido}`}</h2>
   
-          <div className="modal-form">
+          <form onSubmit={(e) => {e.preventDefault(); handleSubmit();}} className="modal-form">
             <div className='rows'>
               <div className="form-group">
                 <label htmlFor="nroCedula">Número de cédula:</label>
@@ -215,45 +216,68 @@ function ViewDataEstudiante({onCancel, isLoading, entity }) {
               </div>
             </div>
  
-            <div className='rows'>
-              
-              <label>
-                Copia de Cédula:
+            <div className='file-upload-container'>
+              <div className='file-upload'>
+                <label className='custom-file-label'>
+                  Copia de Cédula:
+                </label>
                 <input
                   type="file"
                   name="copiaCedula"
-                  
+                  className='custom-file-input'
                   //onChange={handleFileChange}
                   accept="application/pdf"
                 />
-              </label>
-              <label>
-                Croquis:
+              </div>
+
+              <div className='file-upload'>
+                <label className='custom-file-label'>
+                  Croquis:
+                </label>
                 <input
+                  className='custom-file-input'
                   type="file"
                   name="croquis"
                   //onChange={handleFileChange}
                   accept="application/pdf"
                 />
-              </label>
-              
+              </div>
             </div>
-          </div>
-  
-          <div className="botones">
+
             {!dentroDeRango && (
-                <div>
-                <p style={{ color: 'red', marginTop: '10px' }}>
-                No se pueden actualizar datos fuera de fecha. 
+              <div className="alert-container">
+                <p className="alert-text">
+                  No se pueden actualizar datos fuera de fecha.
                 </p>
-                <p style={{ color: 'red', marginTop: '10px' }}>
-                Fecha: {formatearFecha(fechaInicio)} al {formatearFecha(fechaFin)} 
+                <p className="alert-text">
+                  Fecha: {formatearFecha(fechaInicio)} al {formatearFecha(fechaFin)}
                 </p>
-                </div> 
+              </div>
             )}
-            <Boton texto="Guardar" onClick={() => handleSubmit()} disabled={!dentroDeRango} estilo="boton-crear" />
-        <Boton texto="Cancelar" onClick={onCancel} estilo="boton-cancelar" />
-          </div>
+
+            <div className='rows-botones'>
+              <div className="botones">
+                <button 
+                  type='submit' 
+                  className='boton-crear' 
+                  disabled={!dentroDeRango}
+                >
+                  Guardar
+                </button>
+                <button
+                  type="button"
+                  className="boton-cancelar"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onCancel();
+                  }}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
     )

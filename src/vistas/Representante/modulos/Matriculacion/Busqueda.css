@@ -1,0 +1,285 @@
+/* Estilos de tablas específicos para matrícula */
+
+/* === PRIMERA TABLA: Estudiantes del representante === */
+
+/* Contenedor principal de la tabla de estudiantes */
+.contenedor-tabla-matricula-estudiantes {
+  padding: 20px;
+  height: 100%;
+  min-width: 0;
+}
+
+/* Wrapper para scroll horizontal y vertical - estudiantes */
+.scroll-tabla-matricula-estudiantes {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  max-height: 60vh;
+}
+
+/* La tabla principal de estudiantes */
+.tabla-matricula-estudiantes {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+/* Head sticky mientras scrollea el cuerpo - estudiantes */
+.tabla-matricula-estudiantes thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* Estilo del encabezado - estudiantes */
+.encabezado-tabla-matricula-estudiantes {
+  background-color: #00408A !important;
+  color: #ced4da !important;
+  font-weight: bold;
+  border: 1px solid #ced4da;
+  padding: 10px;
+  text-align: center !important;
+}
+
+/* Estilo de las celdas - estudiantes */
+.celda-tabla-matricula-estudiantes {
+  border: 1px solid #90A4AE !important;
+  vertical-align: middle;
+  background-color: #CFD8DC !important;
+  text-align: center;
+  padding: 8px;
+  white-space: nowrap;
+}
+
+/* Contenedor de iconos - estudiantes */
+.acciones-tabla-matricula-estudiantes {
+  padding-top: 0.8rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 2.85rem;
+  border: 1px solid #90A4AE;
+  vertical-align: middle;
+  background-color: #CFD8DC !important;
+}
+
+/* Icono de matrícula */
+.icono-matricula {
+  color: #28a745;
+  cursor: pointer;
+  font-size: 1.3rem;
+  transition: color 0.2s ease;
+}
+
+.icono-matricula:hover {
+  color: #0056b3;
+}
+
+/* === SEGUNDA TABLA: Asignaciones/Materias === */
+
+/* Contenedor principal de la tabla de asignaciones */
+.contenedor-tabla-matricula-asignaciones {
+  padding: 20px;
+  height: 100%;
+  min-width: 0;
+}
+
+/* Wrapper para scroll horizontal y vertical - asignaciones */
+.scroll-tabla-matricula-asignaciones {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  max-height: 60vh;
+}
+
+/* La tabla principal de asignaciones */
+.tabla-matricula-asignaciones {
+  width: 100%;
+  min-width: 1000px;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+/* Head sticky mientras scrollea el cuerpo - asignaciones */
+.tabla-matricula-asignaciones thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* Estilo del encabezado - asignaciones */
+.encabezado-tabla-matricula-asignaciones {
+  background-color: #00408A !important;
+  color: #ced4da !important;
+  font-weight: bold;
+  border: 1px solid #ced4da;
+  padding: 10px;
+  text-align: center !important;
+}
+
+/* Estilo de las celdas - asignaciones */
+.celda-tabla-matricula-asignaciones {
+  border: 1px solid #90A4AE !important;
+  vertical-align: middle;
+  background-color: #CFD8DC !important;
+  text-align: center;
+  padding: 8px;
+  white-space: nowrap;
+}
+
+/* Contenedor de iconos - asignaciones */
+.acciones-tabla-matricula-asignaciones {
+  padding-top: 0.8rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 2.85rem;
+  border: 1px solid #90A4AE;
+  vertical-align: middle;
+  background-color: #CFD8DC !important;
+}
+
+/* Icono de inscribir */
+.icono-inscribir {
+  color: #28a745;
+  cursor: pointer;
+  font-size: 1.4rem;
+  transition: color 0.2s ease;
+}
+
+.icono-inscribir:hover {
+  color: #0056b3;
+}
+
+/* === MENSAJE DE SIN REGISTROS === */
+.sin-registros-matricula {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #888;
+  padding: 2rem;
+  margin: 0;
+}
+
+/* Evita quiebres de línea para habilitar scroll horizontal */
+.tabla-matricula-estudiantes th,
+.tabla-matricula-estudiantes td,
+.tabla-matricula-asignaciones th,
+.tabla-matricula-asignaciones td {
+  white-space: nowrap;
+}
+
+/* === RESPONSIVE DESIGN === */
+@media (max-width: 768px) {
+  .contenedor-tabla-matricula-estudiantes,
+  .contenedor-tabla-matricula-asignaciones {
+    padding: 10px;
+  }
+  
+  .tabla-matricula-estudiantes {
+    min-width: 700px;
+  }
+  
+  .tabla-matricula-asignaciones {
+    min-width: 800px;
+  }
+  
+  .encabezado-tabla-matricula-estudiantes,
+  .celda-tabla-matricula-estudiantes,
+  .encabezado-tabla-matricula-asignaciones,
+  .celda-tabla-matricula-asignaciones {
+    padding: 6px;
+    font-size: 0.9rem;
+  }
+  
+  .acciones-tabla-matricula-estudiantes,
+  .acciones-tabla-matricula-asignaciones {
+    padding-top: 0.5rem;
+    height: 2.5rem;
+  }
+  
+  .icono-matricula,
+  .icono-inscribir {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabla-matricula-estudiantes {
+    min-width: 600px;
+  }
+  
+  .tabla-matricula-asignaciones {
+    min-width: 700px;
+  }
+  
+  .encabezado-tabla-matricula-estudiantes,
+  .celda-tabla-matricula-estudiantes,
+  .encabezado-tabla-matricula-asignaciones,
+  .celda-tabla-matricula-asignaciones {
+    padding: 4px;
+    font-size: 0.8rem;
+  }
+  
+  .acciones-tabla-matricula-estudiantes,
+  .acciones-tabla-matricula-asignaciones {
+    padding-top: 0.3rem;
+    height: 2.2rem;
+  }
+  
+  .icono-matricula,
+  .icono-inscribir {
+    font-size: 0.9rem;
+  }
+}
+
+/*Contenedor del filtro de búsqueda de asignaturas*/
+.contenedor-busqueda-asignaturas {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.btn-buscar-asignaturas {
+  background-color: #00408A;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 10%;
+  height: 2.5rem;
+}
+
+.btn-buscar-asignaturas:hover {
+  background-color: #003366;
+}
+
+/*Responsive del contenedor de búsqueda de asignaturas*/
+@media (max-width: 768px) {
+  .contenedor-busqueda-asignaturas {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn-buscar-asignaturas {
+    width: 15%;
+  }
+}
+
+@media (max-width: 680px) {
+  .contenedor-busqueda-asignaturas {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn-buscar-asignaturas {
+    width: 25%;
+  }
+}

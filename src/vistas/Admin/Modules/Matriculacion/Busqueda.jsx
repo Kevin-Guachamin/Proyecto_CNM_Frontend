@@ -26,14 +26,36 @@ function Busqueda({ subRol }) {
     const updateHeight = () => {
       if (!wrapRef.current) return;
       const top = wrapRef.current.getBoundingClientRect().top;
-      const h = Math.max(360, window.innerHeight - top - 8);
+      const availableHeight = window.innerHeight - top - 8;
+      
+      // Asegurar una altura mínima razonable en pantallas pequeñas
+      const minHeight = window.innerWidth <= 768 ? 400 : 360;
+      const h = Math.max(minHeight, availableHeight);
+      
       document.documentElement.style.setProperty('--busq-h', `${h}px`);
     };
+    
+    // Múltiples intentos para asegurar cálculo correcto
     updateHeight();
-    const onResize = () => requestAnimationFrame(updateHeight);
+    const timeout1 = setTimeout(updateHeight, 100);
+    const timeout2 = setTimeout(updateHeight, 300);
+    
+    const onResize = () => {
+      clearTimeout(window.busqResizeTimeout);
+      window.busqResizeTimeout = setTimeout(() => {
+        requestAnimationFrame(updateHeight);
+      }, 100);
+    };
+    
     window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
+    
+    return () => {
+      clearTimeout(timeout1);
+      clearTimeout(timeout2);
+      clearTimeout(window.busqResizeTimeout);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [estudiante]); // Agregar estudiante como dependencia para recalcular cuando aparezca
 
   // Altura real del footer sticky para reservar espacio al final del contenido
   useEffect(() => {
