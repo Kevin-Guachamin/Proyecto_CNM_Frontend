@@ -13,8 +13,8 @@ const Index = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [modulos] = useState([
-    { id: 1, titulo: "Información representante", icono: "📄", link: "/representante/perfil" },
-    { id: 2, titulo: "Información estudiantil", icono: "✏️", link: "/representante/estudiantes" },
+    { id: 1, titulo: "Información representante", icono: "👤", link: "/representante/perfil" },
+    { id: 2, titulo: "Información estudiantil", icono: "🧑‍🤝‍🧑", link: "/representante/estudiantes" },
     { id: 3, titulo: "Matriculación", icono: "📝",  link: "/representante/inscripcion"},
     { id: 4, titulo: "Cambiar contraseña", icono: "🔐", link: "/representante/password"}
 

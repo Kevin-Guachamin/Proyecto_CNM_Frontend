@@ -5,27 +5,27 @@ import { RiLockPasswordFill } from "react-icons/ri";
 export const modulosRepresentante = [
   { 
     name: "Inicio", 
-    icon: <Home size={20} />, 
+    icon: "🏠", 
     path: "/representante" 
   },
   { 
     name: "Mi información", 
-    icon: <User size={20} />, 
+    icon: "👤", 
     path: "/representante/perfil" 
   },
   { 
     name: "Mis estudiantes", 
-    icon: <Users size={20} />, 
+    icon: "🧑‍🤝‍🧑", 
     path: "/representante/estudiantes" 
   },
   { 
     name: "Matriculación", 
-    icon: <BookOpen size={20} />, 
+    icon: "📝", 
     path: "/representante/inscripcion" 
   },
   { 
     name: "Cambiar contraseña", 
-    icon: <RiLockPasswordFill size={20} />, 
+    icon: "🔐", 
     path: "/representante/password" 
   }
 ];
