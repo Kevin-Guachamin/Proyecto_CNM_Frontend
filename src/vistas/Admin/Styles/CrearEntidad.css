@@ -1,3 +1,73 @@
+/* --- Breakpoint intermedio: laptops/tablets apaisado --- */
+@media (max-width: 1280px){
+  .filtros{
+    flex-wrap: wrap;                 /* ahora sí permite salto */
+    gap: 10px;
+  }
+
+  /* Cada select/field ocupa ~1/3 de fila si cabe, o baja */
+  .filtros .form-group{
+    flex: 1 1 320px;                 /* base 320px, luego se acomoda */
+  }
+
+  /* El grupo de búsqueda + botón puede tomar más espacio */
+  .filtros .form-group:last-child{
+    flex: 2 1 480px;                 /* más ancho que los demás */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .search-input{
+    flex: 1 1 auto;                  /* el input crece */
+    min-width: 0;                    /* evita overflow raro */
+  }
+
+  .boton-add{
+    flex: 0 0 auto;                  /* el botón mantiene su tamaño */
+  }
+
+  .input-field,
+  .search-input{
+    width: 20vh;
+    min-width: 0;                    /* NO fuerces 260px aquí */
+  }
+
+  /* Si usas datepicker en filtros */
+  .react-datepicker-wrapper{
+    width: 100% !important;
+  }
+}
+
+/* --- Breakpoint “tablet” para apilar todo a una columna si hace falta --- */
+@media (max-width: 1024px){
+  .filtros .form-group{
+    flex: 1 1 100%;
+  }
+  .filtros .form-group:last-child{
+    flex: 1 1 100%;
+  }
+}
+
+/* Ya lo tenías: móvil <=768px (puedes mantenerlo tal cual) */
+@media (max-width: 768px){
+  .filtros{
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .filtros .form-group{
+    flex: 1 1 100%;
+  }
+  .input-field,
+  .search-input{
+    width: 100%;
+    min-width: 0;
+  }
+  .react-datepicker-wrapper{
+    width: 100% !important;
+  }
+}
+
 /* Fondo del modal */
 .modal-overlay {
     position: fixed;
@@ -92,7 +162,7 @@
 .form-group {
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: start;
     gap: 5px;
     
 }
@@ -290,3 +360,588 @@
   padding: 1rem;
   scroll-behavior: smooth;
 }
+
+/* ==========================================================
+   Responsive del modal "Periodo" (solo afecta a este modal)
+   ========================================================== */
+.modal-container.modal-periodo{
+  box-sizing: border-box;
+  width: min(720px, 92vw);     /* tamaño agradable en desktop y no se pasa en móvil */
+  max-height: 90vh;            /* evita que se corte en pantallas pequeñas */
+  overflow: auto;              /* scroll interno si el contenido crece */
+}
+
+/* Estructura base: que todo fluya bien y no desborde */
+.modal-periodo .modal-form{ width: 100%; }
+
+.modal-periodo .rows{
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;             /* permite saltos de línea cuando no cabe */
+  gap: 12px;
+}
+
+.modal-periodo .rows .form-group{
+  flex: 1 1 280px;             /* columna base 280px que se adapta */
+  min-width: 0;
+}
+
+/* Inputs y DatePicker a 100% del ancho del grupo */
+.modal-periodo .rows .form-group input,
+.modal-periodo .rows .form-group select,
+.modal-periodo .rows .form-group .input-field{
+  width: 100%;
+  max-width: none;
+}
+
+/* No limitar por reglas globales de .form-control */
+.modal-periodo .form-control{ max-width: 100%; }
+
+/* DatePicker: ocupar el ancho completo del form-group */
+.modal-periodo .react-datepicker-wrapper{
+  flex: 1 1 auto !important;
+  width: 100% !important;
+}
+.modal-periodo .react-datepicker__input-container{
+  justify-content: stretch;
+}
+
+/* Botones dentro del modal: que no desborden */
+.modal-periodo .botones{
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ------- Móvil (≤640px): una columna, etiquetas arriba ------- */
+@media (max-width: 640px){
+  .modal-container.modal-periodo{
+    width: 100%;
+    max-width: 100%;
+    border-radius: 10px;
+  }
+  .modal-periodo .rows .form-group{
+    flex: 1 1 100%;
+    align-items: stretch;
+  }
+  .modal-periodo .rows .form-group,
+  .modal-periodo .form-group{
+    flex-direction: column;    /* label arriba, input abajo */
+    gap: 6px;
+  }
+  .modal-periodo .botones{
+    justify-content: center;   /* centra Guardar/Cancelar en móvil */
+  }
+}
+
+/* ------- Tablet (641px–1024px): dos columnas cómodas ------- */
+@media (min-width: 641px) and (max-width: 1024px){
+  .modal-periodo .rows .form-group{
+    flex: 1 1 45%;             /* dos columnas */
+  }
+  /* Tercer campo (Fecha fin) ocupa toda la fila */
+  .modal-periodo .rows .form-group:nth-child(3){
+    flex: 1 1 100%;
+  }
+}
+
+/* ------- Desktop (≥1025px): layout balanceado y contenido ------- */
+@media (min-width: 1025px){
+  .modal-container.modal-periodo{
+    max-width: 700px;          /* evita que se vea desproporcionado */
+  }
+
+  /* Usamos grid SOLO aquí para controlar columnas con precisión */
+  .modal-periodo .rows{
+    display: grid;
+    grid-template-columns: 1fr 1fr;  /* 2 columnas iguales */
+    column-gap: 15px;
+    row-gap: 12px;
+  }
+
+  /* Descripción en la izquierda, Fecha inicio a la derecha */
+  .modal-periodo .rows .form-group:nth-child(1){ grid-column: 1; }
+  .modal-periodo .rows .form-group:nth-child(2){ grid-column: 2; }
+
+  /* Fecha fin ocupa el ancho completo en la segunda fila */
+  .modal-periodo .rows .form-group:nth-child(3){ grid-column: 1 / -1; }
+}
+
+/* ===== Overrides finos SOLO para el modal de periodo ===== */
+
+/* 1) Botones SIEMPRE centrados */
+.modal-container.modal-periodo .botones{
+  display: flex;
+  justify-content: center;   /* centrados */
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* 2) Controlar el ancho del 3er campo (Fecha fin) en pantallas medianas/grandes */
+@media (min-width: 641px){
+  /* La fila sigue siendo grid/dos columnas como ya definiste */
+  .modal-periodo .rows{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 15px;
+    row-gap: 12px;
+  }
+
+  /* Descripción e Inicio ocupan una columna cada uno (fila 1) */
+  .modal-periodo .rows .form-group:nth-child(1){ grid-column: 1; }
+  .modal-periodo .rows .form-group:nth-child(2){ grid-column: 2; }
+
+  /* Fecha fin ocupa la fila 2 completa PERO CON TOPE Y CENTRADO */
+  .modal-periodo .rows .form-group:nth-child(3){
+    grid-column: 1 / -1;      /* abarca ambas columnas */
+    justify-self: center;     /* se centra dentro del grid */
+    width: 100%;
+    max-width: 300px;         /* << tope de ancho agradable */
+  }
+
+  /* Hacer que el input/DatePicker respeten ese tope */
+  .modal-periodo .rows .form-group:nth-child(3) .react-datepicker-wrapper,
+  .modal-periodo .rows .form-group:nth-child(3) .react-datepicker__input-container,
+  .modal-periodo .rows .form-group:nth-child(3) .input-field,
+  .modal-periodo .rows .form-group:nth-child(3) input{
+    width: 100% !important;
+    max-width: 540px !important;   /* mismo tope que el contenedor */
+    margin: 0 auto;                /* centrado por si acaso */
+  }
+}
+
+/* En desktop, además limitamos un poco el propio modal */
+@media (min-width: 1025px){
+  .modal-container.modal-periodo{
+    max-width: 700px;        /* evita modal gigante */
+  }
+}
+
+/* ==========================================================
+   Responsive del modal "Asignatura" (solo afecta a este modal)
+   ========================================================== */
+.modal-container.modal-asignatura{
+  box-sizing: border-box;
+  width: min(720px, 92vw);
+  max-height: 90vh;
+  overflow: auto;                     /* scroll interno si crece */
+}
+
+/* Base */
+.modal-asignatura .modal-form{ width: 100%; }
+
+/* Usamos la misma idea de filas pero con grid para balancear */
+.modal-asignatura .rows{
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;         /* móvil: 1 columna */
+  row-gap: 12px;
+  column-gap: 15px;
+}
+
+.modal-asignatura .rows .form-group{
+  min-width: 0;
+}
+
+/* Inputs/selects se estiran a todo el ancho del grupo */
+.modal-asignatura .rows .form-group input,
+.modal-asignatura .rows .form-group select{
+  width: 100%;
+  max-width: none;
+}
+
+/* No heredar límites globales */
+.modal-asignatura .form-control{ max-width: 100%; }
+
+/* Botones SIEMPRE centrados */
+.modal-asignatura .botones{
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Si existe .rows-botones con ancho fijo, lo neutralizamos */
+.modal-asignatura .rows-botones{ width: 100% !important; }
+
+/* -------- Tablet (≥641px) : dos columnas por fila -------- */
+@media (min-width: 641px){
+  .modal-asignatura .rows{
+    grid-template-columns: 1fr 1fr;   /* 2 columnas */
+  }
+}
+
+/* -------- Desktop (≥1025px) : modal contenido -------- */
+@media (min-width: 1025px){
+  .modal-container.modal-asignatura{
+    max-width: 700px;                 /* evita que se vea gigante */
+  }
+}
+
+/* ==========================================================
+   Responsive del modal "Curso" (solo afecta a este modal)
+   ========================================================== */
+.modal-container.modal-curso{
+  box-sizing: border-box;
+  width: min(820px, 92vw);      /* un poco más ancho que los otros por tener 3 columnas */
+  max-height: 90vh;
+  overflow: auto;               /* scroll interno si crece */
+}
+
+/* Base */
+.modal-curso .modal-form{ width: 100%; }
+
+/* Inputs/Selects a 100% del ancho del grupo */
+.modal-curso .rows .form-group input,
+.modal-curso .rows .form-group select{
+  width: 100%;
+  max-width: none;
+}
+.modal-curso .form-control{ max-width: 100%; }
+
+/* Botones SIEMPRE centrados */
+.modal-curso .botones{
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* --------- MÓVIL (≤640px): 1 columna en todas las filas --------- */
+@media (max-width: 640px){
+  .modal-container.modal-curso{
+    width: 100%;
+    max-width: 100%;
+    border-radius: 10px;
+  }
+  .modal-curso .rows{
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 12px;
+    column-gap: 15px;
+    width: 100%;
+  }
+  .modal-curso .rows .form-group{
+    min-width: 0;
+  }
+}
+
+/* --------- TABLET (641–1024px): 2 columnas cómodas --------- */
+@media (min-width: 641px) and (max-width: 1024px){
+  .modal-curso .rows{
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* dos columnas */
+    column-gap: 15px;
+    row-gap: 12px;
+    width: 100%;
+  }
+  .modal-curso .rows .form-group{ min-width: 0; }
+  /* Fila 1 tiene solo dos campos: que cada uno tome una columna */
+  .modal-curso .rows:nth-of-type(1) .form-group{
+    grid-column: auto; /* 1 y 2 */
+  }
+}
+
+/* --------- DESKTOP (≥1025px): 3 columnas balanceadas --------- */
+@media (min-width: 1025px){
+  .modal-container.modal-curso{
+    max-width: 780px;                  /* evita modal gigante */
+  }
+
+  .modal-curso .rows{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; /* tres columnas */
+    column-gap: 16px;
+    row-gap: 12px;
+    width: 100%;
+  }
+  .modal-curso .rows .form-group{ min-width: 0; }
+
+  /* Fila 1 (Asignatura, Docente): que cada uno ocupe 1.5 col para respirar */
+  .modal-curso .rows:nth-of-type(1){
+    grid-template-columns: 1fr 1fr;     /* esa fila sigue en dos columnas */
+  }
+  .modal-curso .rows:nth-of-type(1) .form-group{
+    grid-column: auto;                  /* 1 y 2 */
+    justify-self: stretch;
+    width: 100%;
+    max-width: 560px;                   /* tope para que no se estiren de más */
+  }
+  .modal-curso .rows:nth-of-type(1) .form-group:first-child{
+    justify-self: end;                  /* ligeramente hacia el centro */
+  }
+  .modal-curso .rows:nth-of-type(1) .form-group:last-child{
+    justify-self: start;
+  }
+
+  /* Fila 2 (Paralelo, Día 1, Hora inicio): 3 columnas limpias */
+  .modal-curso .rows:nth-of-type(2) .form-group{
+    grid-column: auto;                  /* 1,2,3 */
+  }
+
+  /* Fila 3 (Cupos, Día 2, Hora fin): 3 columnas limpias */
+  .modal-curso .rows:nth-of-type(3) .form-group{
+    grid-column: auto;                  /* 1,2,3 */
+  }
+
+  /* Evitar estiramientos extra: topes suaves en selects largos */
+  .modal-curso .rows select{
+    max-width: 100%;
+  }
+}
+
+/* --------- Ajustes finos comunes --------- */
+/* Si existiera un ancho fijo heredado en .rows-botones, neutralizarlo */
+.modal-curso .rows-botones{ width: 100% !important; }
+
+/* Si el Autocomplete o selector horario usan inputs internos,
+   garantizamos ancho completo igualmente */
+.modal-curso .rows .form-group input[type="text"],
+.modal-curso .rows .form-group input[type="number"]{
+  width: 100%;
+}
+
+/* ==========================================================
+   Responsive del modal "Representante" (solo afecta a este)
+   ========================================================== */
+.modal-container.modal-representante{
+  box-sizing: border-box;
+  width: min(720px, 92vw); /* tamaño cómodo y no se sale en móvil */
+  max-height: 90vh;        /* evita recorte vertical */
+  overflow: auto;          /* scroll interno si el contenido crece */
+}
+
+/* Base del formulario */
+.modal-representante .modal-form{ width: 100%; }
+
+/* Filas: que puedan saltar si no cabe */
+.modal-representante .rows{
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;   /* ¡permite salto a nueva línea! */
+  gap: 12px;
+}
+
+/* Cada campo ocupa una "columna" flexible */
+.modal-representante .rows .form-group{
+  flex: 1 1 280px;  /* base 280px; se adapta */
+  min-width: 0;
+}
+
+/* Inputs/selects a ancho completo del grupo */
+.modal-representante .rows .form-group input,
+.modal-representante .rows .form-group select{
+  width: 100%;
+  max-width: none;
+}
+
+/* Subida de archivos: que también sea adaptable */
+.modal-representante .file-upload-container{
+  flex-wrap: wrap;             /* permite bajar a otra línea */
+  width: 100%;
+  justify-content: flex-start; /* mantiene la disposición original */
+}
+.modal-representante .file-upload{
+  flex: 1 1 260px;             /* dos columnas cómodas en pantallas medianas */
+  min-width: 0;
+}
+
+/* Botonera: quitar ancho fijo heredado y centrar si hace falta */
+.modal-representante .rows-botones{
+  width: 100% !important;
+}
+.modal-representante .botones{
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* --------- MÓVIL (≤640px): 1 columna, etiquetas arriba --------- */
+@media (max-width: 640px){
+  .modal-container.modal-representante{
+    width: 100%;
+    max-width: 100%;
+    border-radius: 10px;
+  }
+  .modal-representante .rows .form-group{
+    flex: 1 1 100%;
+    align-items: stretch;
+    flex-direction: column; /* label arriba, input abajo */
+    gap: 6px;
+  }
+  .modal-representante .file-upload-container{
+    flex-direction: column;
+    gap: 10px;
+  }
+  .modal-representante .botones{
+    justify-content: center;  /* botones centrados en móvil */
+  }
+}
+
+/* --------- TABLET (641–1024px): 2 columnas cómodas --------- */
+@media (min-width: 641px) and (max-width: 1024px){
+  .modal-representante .rows .form-group{
+    flex: 1 1 45%;
+  }
+}
+
+/* --------- DESKTOP (≥1025px): tamaño contenido --------- */
+@media (min-width: 1025px){
+  .modal-container.modal-representante{
+    max-width: 700px;
+  }
+}
+
+/* ===== Parche anti-desborde SOLO para el modal de representante ===== */
+.modal-container.modal-representante{
+  overflow-x: hidden;              /* evita scroll horizontal del modal */
+}
+
+/* Asegura que la fila de botones no fuerce ancho fijo */
+.modal-representante .rows-botones{
+  width: 100% !important;          /* sobreescribe el width:700px */
+}
+
+/* File uploads: que puedan encoger y no empujen el layout */
+.modal-representante .file-upload-container{
+  flex-wrap: wrap;                  /* ya lo tenías, reafirmamos */
+  max-width: 100%;
+}
+
+.modal-representante .file-upload{
+  flex: 1 1 280px;                  /* columnas flexibles */
+  min-width: 0;                     /* clave: permite encoger dentro de flex */
+  max-width: 100%;
+}
+
+/* El input de archivo ocupa el ancho disponible y no desborda */
+.modal-representante .custom-file-input{
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;                 /* por si el navegador pinta texto largo */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* En móviles, todo a una columna y botones centrados */
+@media (max-width: 640px){
+  .modal-representante .file-upload{
+    flex: 1 1 100%;
+  }
+  .modal-representante .botones{
+    justify-content: center;
+  }
+}
+
+/* ==========================================================
+   Responsive del modal "Estudiante" (solo afecta a este)
+   ========================================================== */
+.modal-container.modal-estudiante{
+  box-sizing: border-box;
+  width: min(820px, 92vw);   /* un poco más ancho: más campos */
+  max-height: 90vh;          /* evita recortes */
+  overflow: auto;            /* scroll interno vertical */
+  overflow-x: hidden;        /* sin scroll horizontal */
+}
+
+/* Base del form */
+.modal-estudiante .modal-form{ width: 100%; }
+
+/* Filas: permitir salto cuando no cabe */
+.modal-estudiante .rows{
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;           /* ¡clave! evita desbordes */
+  gap: 12px;
+}
+
+/* Cada form-group como columna flexible */
+.modal-estudiante .rows .form-group{
+  flex: 1 1 280px;           /* base 280px, se adapta */
+  min-width: 0;
+}
+
+/* Dirección (3 campos): también flexibles */
+.modal-estudiante .form-group-direccion{
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+/* Inputs/selects/datepicker a 100% del contenedor */
+.modal-estudiante .rows .form-group input,
+.modal-estudiante .rows .form-group select,
+.modal-estudiante .rows .form-group .input-field{
+  width: 100%;
+  max-width: none;
+}
+.modal-estudiante .react-datepicker-wrapper{
+  flex: 1 1 auto !important;
+  width: 100% !important;
+}
+.modal-estudiante .react-datepicker__input-container{
+  justify-content: stretch;
+}
+
+/* Contenedor de archivos: que no empuje el layout */
+.modal-estudiante .file-upload-container{
+  flex-wrap: wrap;           /* permite bajar a otra línea */
+  width: 100%;
+  justify-content: flex-start;
+}
+.modal-estudiante .file-upload{
+  flex: 1 1 260px;
+  min-width: 0;              /* evita desborde del texto del file input */
+  max-width: 100%;
+}
+.modal-estudiante .custom-file-input{
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Botonera: quitar anchos fijos heredados */
+.modal-estudiante .rows-botones{ width: 100% !important; }
+.modal-estudiante .botones{
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* --------- MÓVIL (≤640px): 1 columna --------- */
+@media (max-width: 640px){
+  .modal-container.modal-estudiante{
+    width: 100%; max-width: 100%; border-radius: 10px;
+  }
+  .modal-estudiante .rows .form-group,
+  .modal-estudiante .form-group-direccion{
+    flex: 1 1 100%;
+  }
+  .modal-estudiante .rows .form-group{
+    flex-direction: column;  /* label arriba, input abajo */
+    align-items: stretch;
+    gap: 6px;
+  }
+  .modal-estudiante .file-upload{ flex: 1 1 100%; }
+  .modal-estudiante .botones{ justify-content: center; }
+}
+
+/* --------- TABLET (641–1024px): 2 columnas --------- */
+@media (min-width: 641px) and (max-width: 1024px){
+  .modal-estudiante .rows .form-group,
+  .modal-estudiante .form-group-direccion{
+    flex: 1 1 45%;
+  }
+}
+
+/* --------- DESKTOP (≥1025px): tamaño contenido --------- */
+@media (min-width: 1025px){
+  .modal-container.modal-estudiante{ max-width: 780px; }
+}
+

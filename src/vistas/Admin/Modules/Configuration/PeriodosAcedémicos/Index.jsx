@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "../../../../../components/Header";
-import Layout from '../../../../../layout/Layout'
+import Layout from "../../../../../layout/Layout";
 import Loading from "../../../../../components/Loading";
 import Contenedor from "../../../Components/Contenedor";
 import { moduloInicio, modulesSettingsBase, construirModulosConPrefijo } from "../../../Components/Modulos";
@@ -11,86 +11,166 @@ import axios from "axios";
 import Paginación from "../../../Components/Paginación";
 
 function Index() {
-
-  const [loading, setLoading] = useState(true); // Estado para mostrar la carga
+  const [loading, setLoading] = useState(true);
   const [usuario, setUsuario] = useState(null);
-  const [periodos, setPeriodos] = useState([])
+  const [periodos, setPeriodos] = useState([]);
+
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [limit, setLimit] = useState(0);
-  const [width, setWidth] = useState(window.innerWidth);
-  const navigate = useNavigate()
+
+  const [modulos, setModulos] = useState([]);
+  const navigate = useNavigate();
+
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
-  const token = localStorage.getItem("token")
+  const token = localStorage.getItem("token");
+
   const headers = ["Descripción", "Fecha inicio", "Fecha fin", "Estado", "Acciones"];
-  const colums = ["descripcion", "fecha_inicio", "fecha_fin", "estado"]
-  const filterKey = "descripcion"
-  const PK = "ID"
-  const [modulos, setModulos] = useState([])
+  const colums  = ["descripcion", "fecha_inicio", "fecha_fin", "estado"];
+  const filterKey = "descripcion";
+  const PK = "ID";
 
-  useEffect(() => {
-    const handleResize = () => setWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  // Refs para calcular espacio visible y la altura real de la paginación
+  const wrapperRef = useRef(null);
+  const pagerRef = useRef(null);
+  const [pagerH, setPagerH] = useState(64); // altura aproximada de paginación
 
-  // ✅ Establecer límite de resultados según resolución
-  useEffect(() => {
-    const isLaptop = width <= 1822;
-    setLimit(isLaptop ? 13 : 21);
-  }, [width]);
+  // ✅ Autenticación + módulos
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
-    const parsedUser = JSON.parse(storedUser);
-    console.log("este es el usuario", parsedUser)
+    const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+
     if (!parsedUser || parsedUser.subRol !== "Administrador") {
-      navigate("/")
+      navigate("/");
+      return;
     }
-    // Mientras no se conecte al backend, dejamos un usuario de prueba
     setUsuario(parsedUser);
+
     const modulosDinamicos = [
       moduloInicio,
-      ...construirModulosConPrefijo(parsedUser.subRol, modulesSettingsBase)
+      ...construirModulosConPrefijo(parsedUser.subRol, modulesSettingsBase),
     ];
     setModulos(modulosDinamicos);
-  }, [API_URL, navigate]);
-  useEffect(() => {
-    if (!limit) return; // ⚠️ Esperar a que el limit se actualice
+  }, [navigate]);
 
+  // ✅ Medir altura real de la barra de paginación y exponerla como CSS var
+  useEffect(() => {
+    const updatePagerH = () => {
+      const h = pagerRef.current ? pagerRef.current.offsetHeight : 64;
+      const padded = h + 16; // respiro
+      setPagerH(padded);
+      document.documentElement.style.setProperty("--pager-h", `${padded}px`);
+    };
+    updatePagerH();
+
+    const ro = new ResizeObserver(updatePagerH);
+    if (pagerRef.current) ro.observe(pagerRef.current);
+    window.addEventListener("resize", updatePagerH);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", updatePagerH);
+    };
+  }, []);
+
+  // ✅ Calcular LIMIT según espacio disponible en viewport (sin scroll interno)
+  useEffect(() => {
+    const calcRows = () => {
+      const ROW_H = 50; // alto aprox. por fila
+      const GAP = 24;
+
+      const top = wrapperRef.current
+        ? wrapperRef.current.getBoundingClientRect().top
+        : 0;
+
+      const available = window.innerHeight - top - pagerH - GAP;
+      const rows = Math.max(5, Math.floor(available / ROW_H));
+      setLimit(rows);
+    };
+    calcRows();
+
+    const onResize = () => requestAnimationFrame(calcRows);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [pagerH]);
+
+  // ✅ Si cambia el limit (por resize), volver a la página 1
+  useEffect(() => {
+    if (limit) setPage(1);
+  }, [limit]);
+
+  // ✅ Traer periodos (page/limit)
+  useEffect(() => {
+    if (!limit) return;
+
+    let mounted = true;
     const fetchPeriodos = async () => {
       try {
         setLoading(true);
-        console.log("este es el limite", limit)
-        console.log("este es el valor de page", page)
-        const { data } = await axios.get(`${API_URL}/periodo_academico/obtener?page=${page}&limit=${limit}`, {
-          headers: { Authorization: `Bearer ${token}` }
+        const { data } = await axios.get(`${API_URL}/periodo_academico/obtener`, {
+          params: { page, limit },
+          headers: { Authorization: `Bearer ${token}` },
         });
-        setPeriodos(data.data);
-        setTotalPages(data.totalPages);
+        if (!mounted) return;
+        setPeriodos(data.data ?? []);
+        setTotalPages(data.totalPages ?? 1);
       } catch (error) {
         ErrorMessage(error);
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
 
     fetchPeriodos();
+    return () => {
+      mounted = false;
+    };
   }, [page, limit, API_URL, token]);
 
   return (
     <div className="section-container">
-      {/* Encabezado */}
       <div className="container-fluid p-0">
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
-      <Layout modules={modulos}>
-        {loading ? <Loading /> : <Contenedor  data={periodos} setData={setPeriodos} headers={headers} columnsToShow={colums} filterKey={filterKey} apiEndpoint={"periodo_academico"} CrearEntidad={CrearPeriodo} PK={PK} Paginación={
-          <Paginación totalPages={totalPages} page={page} setPage={setPage} />  
-        } limit={limit} page={page} setTotalPages={setTotalPages}/>}
 
+      <Layout modules={modulos}>
+        <div className="vista-periodos">
+          {loading ? (
+            <Loading />
+          ) : (
+            <>
+              {/* Zona tabla + paginación con el mismo patrón que Cursos */}
+              <div className="tabla-layout">
+                <div className="tabla-wrapper" ref={wrapperRef}>
+                  <Contenedor
+                    data={periodos}
+                    setData={setPeriodos}
+                    headers={headers}
+                    columnsToShow={colums}
+                    filterKey={filterKey}
+                    apiEndpoint={"periodo_academico"}
+                    CrearEntidad={CrearPeriodo}
+                    PK={PK}
+
+                    /* paginación externa (abajo): NO pasamos Paginación aquí */
+                    limit={limit}
+                    page={page}
+                    setTotalPages={setTotalPages}
+                    setPage={setPage}
+                  />
+                </div>
+
+                <div className="pagination-bar" ref={pagerRef}>
+                  {periodos.length > 0 && (
+                    <Paginación totalPages={totalPages} page={page} setPage={setPage} />
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </Layout>
     </div>
-  )
+  );
 }
 
-export default Index
+export default Index;

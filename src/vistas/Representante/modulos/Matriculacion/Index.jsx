@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from "react";
 import Header from "../../../../components/Header";
-import Layout from '../../../../layout/Layout'
+import Layout from '../../../../layout/Layout';
+import Loading from "../../../../components/Loading";
 import Busqueda from "./Busqueda";
 import { useNavigate } from "react-router-dom";
+import { modulosRepresentante } from "../../components/ModulosRepresentante";
 
 function Index() {
   const [usuario, setUsuario] = useState(null);
-  const navigate = useNavigate()
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
+  // ✅ Verificación de autenticación
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
 
     if (!storedUser) {
-      navigate("/");
+      navigate("/login");
       return;
     }
 
@@ -22,23 +26,18 @@ function Index() {
       
     } catch (error) {
       console.log("Error parseando el usuario de localStorage: ", error);
-      navigate("/");
+      navigate("/login");
       return; 
-
     }
 
-    if (!parsedUser || parsedUser.subRol === 'Admin') {
-      navigate("/")
+    if (!parsedUser) {
+      navigate("/login");
       return;
     }
+
     setUsuario(parsedUser);
-
-  }, []);
-
-  // Mientras carga, `usuario` es null
-  if (usuario === null) {
-    return <div>Cargando…</div>;
-  }
+    setLoading(false);
+  }, [navigate]);
 
   return (
     <div className="section-container">
@@ -46,8 +45,15 @@ function Index() {
       <div className="container-fluid p-0">
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
-      <Layout showSidebar={false}>
-        <Busqueda usuario={usuario} />
+
+      <Layout modules={modulosRepresentante}>
+        <div className="vista-matriculacion">
+          {loading ? (
+            <Loading />
+          ) : (
+            <Busqueda usuario={usuario} />
+          )}
+        </div>
       </Layout>
     </div>
   )

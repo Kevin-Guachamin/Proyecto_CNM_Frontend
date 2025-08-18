@@ -50,12 +50,12 @@
   display: flex;
   justify-content: center;
   width: 50%; /* Se asegura de que ocupa la otra mitad de la pantalla */
-  padding: 20px;
+  
 }
 
 .login-form-container {
   background: white;
-  padding: 40px;
+  padding: 15px 30px 15px 30px;
   border-radius: 10px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   width: 100%;
@@ -117,4 +117,115 @@
 .login-button:hover {
   background-color: #001F5B;
   transform: scale(1.05);
+}
+
+
+.page.page-login{
+  min-height: 100svh;               /* altura real del viewport */
+  display: flex;
+  flex-direction: column;
+}
+
+/* MAIN que ocupa el espacio disponible y centra el contenido */
+.login-main{
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(12px, 2vw, 24px);
+  box-sizing: border-box;
+}
+
+.login-content{
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;                   /* apila en pantallas pequeñas */
+}
+
+.login-logo-section,
+.login-form-section{
+  flex: 1 1 420px;                   /* flexible, no 50% rígido */
+  min-width: 280px;
+}
+
+.login-logo{ max-width: min(50%, 320px); height: auto; }
+.login-form-container{ width: 100%; max-width: 420px; }
+
+/* ---------- FOOTER LOCAL: pegado abajo y sin cortes ---------- */
+.footer-login{
+  background: #00408a;
+  color: #fff;
+  border-top: 5px solid #666;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px 16px 18px;
+  flex-shrink: 0;                    /* no se encoge */
+  text-align: center;
+}
+
+.footer-login__title{
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.footer-login__info{
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 8px 0;
+}
+
+.footer-login__item{
+  flex: 1 1 280px;
+  max-width: 360px;
+  text-align: center;
+}
+
+.footer-login__social{
+  margin-top: 6px;
+}
+
+.footer-login__icon{
+  color: #fff;
+  margin: 0 12px;
+  display: inline-flex;
+}
+
+/* Ajustes responsivos */
+@media (max-width: 1024px){
+  .login-form-container{ padding: 28px; }
+}
+@media (max-width: 480px){
+  .login-title{ font-size: 24px; }
+  .login-form-container{ padding: 22px; }
+}
+
+/* === Login: forzar scrollbar en pantallas pequeñas === */
+@media (max-width: 900px), (max-height: 720px) {
+  .page.page-login {
+    max-height: 100dvh;           /* limita al alto del viewport */
+    overflow-y: auto;             /* fuerza scroll vertical */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Que el contenido empiece arriba y se pueda recorrer */
+  .login-main {
+    align-items: flex-start;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  /* “Aire” al fondo para que el scroll llegue al final */
+  .page.page-login::after {
+    content: "";
+    display: block;
+    height: 16px;
+  }
 }

@@ -1,124 +1,270 @@
-.horario-table-responsive {
-    margin: 20px 0;
-    overflow-x: auto;
-  }
-  
-  .horario-tabla {
-    border-collapse: collapse;
-    width: 100%;
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #fdfdfd;
-  }
-  
-  .horario-header {
-    background-color: #00408A !important;
-    color: #ced4da !important;
-    font-weight: bold;
-    border: 1px solid #ced4da;
-    padding: 10px;
-  }
-  
-  .horario-hora {
-    background-color:#CFD8DC !important;
-    border: 1px solid #90A4AE !important;
-    color: white;
-    font-weight: bold;
-  }
-  
-  .horario-celda {
-    border: 1px solid #90A4AE !important;
-    padding: 10px;
-    vertical-align: middle;
-    background-color: #CFD8DC !important;
-    transition: background-color 0.2s ease-in-out;
-  }
-  
- 
-  
-  .horario-celda-asignada {
-    background-color: #FEFF3C !important;
-    vertical-align: middle;
-    padding: 4px;
-    max-width: 6rem;
-    overflow-wrap: break-word;
-  }
-  
-  .horario-materia-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 4px;
-    
-    margin: 0 auto;
-    word-break: break-word; /* rompe palabras largas */
-  }
-  
-  /* Asegura que los hijos no eviten el wrap */
-.horario-materia-container > * {
+/*********************  HORARIO  ************************/
+
+/* Config: 1 columna de hora + 5 días */
+:root{
+  --hora-col-min: /* Alto controlado por --matric-h (se define en el componente) */
+.matric-wrapper{
+  position: relative;
+  width: 100%;
+  height: var(--matric-h, 500px);   /* fallback más alto */
+  overflow-y: auto;          /* scroll vertical interno SIEMPRE */
+  overflow-x: hidden;        /* nunca scroll horizontal global */
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  background-color: #f4f4f4;
+  min-height: 400px;         /* altura mínima garantizada */
+}
+
+/* Pila vertical */
+.matric-content{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: var(--footer-h, 80px); /* reserva espacio para footer sticky */
+  margin-bottom: 30px;
+  flex: 1;
+  min-height: 0; /* permite que el contenido se comprima */
+}mo columna “Hora” */
+  --dia-col-min: 160px;  /* ancho mínimo cada día */
+  --dias: 5;             /* L-V */
+}
+
+.horario-table-responsive{
+  margin: 8px 0 0 0;    /* eliminar margin inferior completamente */
+  padding: 0;           /* eliminar cualquier padding */
+  overflow-x: auto;     /* aparece solo si hace falta */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Solo desborda cuando el contenedor es más estrecho que el mínimo calculado */
+.horario-tabla{
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 100%;
+  min-width: calc(var(--hora-col-min) + var(--dias) * var(--dia-col-min));
+  table-layout: fixed;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #fdfdfd;
+}
+
+/* Anchos mínimos por columna */
+.horario-tabla thead th:first-child,
+.horario-tabla tbody td:first-child{ min-width: var(--hora-col-min); }
+
+.horario-tabla thead th:not(:first-child),
+.horario-tabla tbody td:not(:first-child){ min-width: var(--dia-col-min); }
+
+.horario-header{
+  background-color: #00408A !important;
+  color: #ced4da !important;
+  font-weight: bold;
+  border: 1px solid #ced4da;
+  padding: 10px;
+}
+
+.horario-hora{
+  background-color:#CFD8DC !important;
+  border: 1px solid #90A4AE !important;
+  color: white;
+  font-weight: bold;
+}
+
+.horario-celda{
+  border: 1px solid #90A4AE !important;
+  padding: 10px;
+  vertical-align: middle;
+  background-color: #CFD8DC !important;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.horario-celda-asignada{
+  background-color: #FEFF3C !important;
+  vertical-align: middle;
+  padding: 4px;
+  max-width: 6rem;
+  overflow-wrap: break-word;
+}
+
+.horario-materia-container{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin: 0 auto;
+  word-break: break-word;
+}
+
+/* Asegura que los hijos no eviten el wrap */
+.horario-materia-container>*{
   white-space: normal !important;
-  
   text-align: center;
   word-break: break-word;
 }
-  
-  .horario-materia-nombre {
-    font-weight: 500;
-    color: #000405;
-    font-size: 1.2rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .container_btn-finalizar{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-  }
-  .btn-finalizar{
-    background-color: #007bff;
-    color: white;
-    max-width: 8.4rem;
-    border-radius: 10%;
-    font-size: 1.2rem;
-  }
-  .btn-finalizar:hover{
-    background-color: #00408A;
+
+.horario-materia-nombre{
+  font-weight: 500;
+  color: #000405;
+  font-size: 1.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.horario-boton{
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  line-height: 1;
+  border-radius: 4px;
+  height: auto;
+  background-color: #EF5350 !important;
+  color: white;
+  border: none;
+  max-width: 2.2rem;
+}
+.horario-boton:hover{
+  background-color: #e53935 !important;
+  color: white;
+}
+
+/* Responsive horario */
+@media (max-width: 768px){
+  :root{
+    --hora-col-min: 150px;
+    --dia-col-min: 130px;
   }
 
-  
-  .horario-boton {
-    font-size: 0.75rem;
-    padding: 2px 6px;
-    line-height: 1;
-    border-radius: 4px;
-    height: auto;
-    background-color: #EF5350 !important;
-    color: white;
-    border: none;
-    max-width: 2.2rem;
+  .horario-header,
+  .horario-celda,
+  .horario-hora{
+    font-size: 0.8rem;
+    padding: 6px;
   }
-  .horario-boton:hover {
-    background-color: #e53935 !important;
-    color: white;
+
+  .horario-materia-nombre{ font-size: 0.8rem; }
+
+  .horario-boton{
+    font-size: 0.7rem;
+    padding: 2px 4px;
+  }
+}
+
+
+/*******************  MATRÍCULA (contenedor con scroll interno)  *******************/
+
+/* Alto controlado por --matric-h (se define en el componente) */
+.matric-wrapper{
+  position: relative;
+  width: 100%;
+  height: var(--matric-h);   /* sin fallback 100vh para no “cortar” */
+  overflow-y: auto;          /* scroll vertical interno SIEMPRE */
+  overflow-x: hidden;        /* nunca scroll horizontal global */
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  background-color: #f4f4f4;
+}
+
+/* Pila vertical */
+.matric-content{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;  /* reducir gap para menos espacio entre elementos */
+  padding-bottom: 8px;
+  margin-bottom: 30px;
+}
+
+/* Filtros */
+.matric-filtros{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.search-input-container{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.label-search{ font-weight: 600; }
+.malla-link{ white-space: nowrap; }
+
+/* Bloques */
+.matric-cards,
+.matric-horario{ min-height: 0; }
+.matric-horario{ margin-bottom: 2px; } /* reducir margen inferior del horario */
+
+/* Evitar overflow horizontal por márgenes negativos del grid */
+.matric-cards>.row{
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Footer sticky al final del contenedor */
+.matric-footer{
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 12px;
+  background-color: #f4f4f4;
+}
+
+/* Botón finalizar */
+.btn-finalizar{
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 12px 20px;
+  max-width: 200px;
+  width: 100%;
+  min-height: 48px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.btn-finalizar:hover{ background-color: #00408A; }
+
+/* En pantallas pequeñas: apilar controles y dejar aire
+   a la barra horizontal del horario si aparece. */
+@media (max-width: 768px){
+  .matric-wrapper {
+    min-height: 350px; /* altura mínima menor en móviles */
   }
   
-  @media (max-width: 768px) {
-    .horario-header,
-    .horario-celda,
-    .horario-hora {
-      font-size: 0.8rem;
-      padding: 6px;
-    }
-  
-    .horario-materia-nombre {
-      font-size: 0.8rem;
-    }
-  
-    .horario-boton {
-      font-size: 0.7rem;
-      padding: 2px 4px;
-    }
+  .matric-filtros{
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-input-container{ width: 100%; }
+  .search-input-container .input-cedula{ flex: 1; }
+
+  .horario-table-responsive{ 
+    padding: 0;           /* eliminar padding en móviles */
+    margin: 0;            /* eliminar margin en móviles */
   }
   
+  .matric-footer {
+    padding: 20px 16px; /* más padding en móviles */
+  }
   
+  .btn-finalizar {
+    font-size: 16px;
+    padding: 14px 20px;
+    max-width: none; /* ancho completo en móviles */
+  }
+}
+
+/* La tabla sí puede hacer scroll horizontal si lo necesita */
+.horario-table-responsive{
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 0;            /* eliminar todo el margin */
+  padding: 0;           /* eliminar todo el padding */
+}

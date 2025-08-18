@@ -1,48 +1,61 @@
-/* Contenedor del header */
-.header-container {
-  background-color: #00408a; /* Azul profundo */
-  width: 100vw; /* Ocupar todo el ancho de la ventana */
-  height: 45px;
-  padding: 15px 0;
-  display: flex;
-  justify-content: center;
-  overflow-x: hidden; /* Evita que elementos internos causen scroll */
-  border-bottom: 0px /* Línea en el final del color azul */
+/* ====== Header base (desktop) ====== */
+:root{
+  --header-pad-x: 20px;
 }
 
-/* Contenido del header */
+.header-container {
+  background-color: #00408a;
+  width: 100%;                 /* evitar scroll por 100vw */
+  min-height: 56px;            /* altura mínima cómoda */
+  padding: 10px 0;
+  display: flex;
+  justify-content: center;
+  overflow-x: hidden;
+  border-bottom: 0;
+  box-sizing: border-box;
+}
+
 .header-content {
-  width: 100%; /* Asegura que ocupe todo el ancho */
-  max-width: none; /* Quita la restricción de 1200px */
+  width: 100%;
+  max-width: none;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 20px; /* Margen interno para evitar que quede pegado */
+  padding: 0 var(--header-pad-x);
+  gap: 16px;
+  flex-wrap: wrap;              /* permite bajar elementos si no caben */
 }
 
-/* Sección izquierda */
 .header-left {
   display: flex;
   align-items: center;
+  gap: 12px;
+  min-width: 0;
 }
 
 .header-logo {
   width: 60px;
-  margin-right: 15px;
+  flex: 0 0 auto;
 }
 
 .header-title {
   font-weight: bold;
-  color: white;
-  font-size: 22px;
+  color: #fff;
+  font-size: clamp(18px, 2.2vw, 22px);
+  line-height: 1.2;
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Sección derecha */
 .header-right {
   display: flex;
   align-items: center;
   gap: 15px;
+  flex: 0 0 auto;
+  flex-wrap: wrap;               /* si no caben, que bajen de línea */
+  justify-content: flex-end;
 }
 
 .header-version,
@@ -50,15 +63,15 @@
   color: #E3F2FD;
   font-size: 14px;
   margin: 0;
+  white-space: nowrap;
 }
 
-/* 🔹 Contenedor del menú */
+/* Menú */
 .menu-container {
   position: relative;
   display: inline-block;
 }
 
-/* 🔹 Botón de menú (☰) */
 .menu-button {
   background: none;
   border: none;
@@ -74,64 +87,43 @@
   transform: scale(1.1);
 }
 
-/* 🔹 Fondo oscuro semi-transparente (oculto por defecto) */
 .overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.4); /* Oscurece el fondo */
-  z-index: 999; /* Asegura que esté por encima del contenido */
-  display: none; /* Oculto por defecto */
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  z-index: 999;
+  display: none;
 }
 
-/* Mostrar overlay cuando el menú está abierto */
-.overlay.show {
-  display: block;
-}
+.overlay.show { display: block; }
 
-/* 🔹 Menú desplegable (oculto por defecto) */
 .dropdown-menu {
-  position: fixed; /* Fijo para que se superponga */
-  right: 20px; /* Se separa un poco del borde */
-  top: 60px; /* Ajusta la posición para que no quede pegado */
+  position: fixed;
+  right: 20px;
+  top: 60px;
   background: white;
   border: 1px solid #ccc;
   border-radius: 8px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px rgba(0,0,0,.2);
   width: 240px;
   padding: 15px;
-  display: none; /* Oculto por defecto */
+  display: none;
   flex-direction: column;
   align-items: flex-start;
-  z-index: 1001; /* Asegura que esté por encima del overlay */
+  z-index: 1001;
   animation: fadeIn 0.2s ease-in-out;
 }
 
-/* Mostrar el menú cuando esté activo */
-.dropdown-menu.show {
-  display: flex;
-}
+.dropdown-menu.show { display: flex; }
 
-/* 🔹 Bloquear scroll cuando el menú está abierto */
-body.menu-open {
-  overflow: hidden;
-}
+body.menu-open { overflow: hidden; }
 
-/* 🔹 Animación de apertura */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* 🔹 Contenedor de usuario en el menú */
+/* Usuario en menú */
 .user-info {
   display: flex;
   align-items: center;
@@ -141,7 +133,6 @@ body.menu-open {
   width: 100%;
 }
 
-/* 🔹 Imagen de perfil */
 .user-avatar {
   width: 40px;
   height: 40px;
@@ -149,7 +140,6 @@ body.menu-open {
   object-fit: cover;
 }
 
-/* 🔹 Información del usuario */
 .user-details {
   display: flex;
   flex-direction: column;
@@ -167,20 +157,16 @@ body.menu-open {
   margin: 0;
 }
 
-/* 🔹 Icono de usuario (Bootstrap) */
 .user-icon {
-  color: #00408a; /* Color del icono */
+  color: #00408a;
 }
 
-
-/* 🔹 Contenedor del botón (centrado) */
 .logout-container {
   display: flex;
   justify-content: center;
   width: 100%;
 }
 
-/* 🔹 Botón de cerrar sesión */
 .logout-button {
   background: #d9534f;
   color: white;
@@ -188,18 +174,80 @@ body.menu-open {
   padding: 8px;
   border-radius: 5px;
   cursor: pointer;
-  width: 60%; /* Ajusta el ancho */
+  width: 60%;
   transition: background 0.2s ease-in-out;
-  text-align: center; /* Asegura que el texto esté centrado */
+  text-align: center;
 }
 
 .logout-button:hover {
   background: #c9302c;
 }
 
-/* Sticky Header */
+/* Sticky */
 .sticky-header {
   position: sticky;
   top: 0;
   z-index: 1050;
+}
+
+/* ====== Breakpoints ====== */
+
+/* Laptops medianas */
+@media (max-width: 1200px){
+  .header-logo { width: 52px; }
+  .header-right { gap: 12px; }
+  .header-version, .header-date { font-size: 13px; }
+}
+
+/* Tablets */
+@media (max-width: 992px){
+  :root { --header-pad-x: 16px; }
+  .header-logo { width: 48px; }
+  .header-version, .header-date { font-size: 12px; }
+}
+
+/* Tablets pequeñas - ocultar fecha primero */
+@media (max-width: 850px){
+  .header-date { 
+    display: none; 
+  }
+}
+
+/* Móviles - ocultar también la versión */
+@media (max-width: 768px){
+  :root { --header-pad-x: 12px; }
+  .header-container { padding: 8px 0; }
+  .header-content { gap: 10px; }
+
+  .header-left { flex: 1 1 auto; }
+  .header-right { gap: 8px; flex: 1 1 auto; justify-content: flex-end; }
+
+  .header-version, .header-date {
+    display: none; /* Ocultar ambos en móvil */
+  }
+
+  .header-logo { width: 44px; }
+  .header-title {
+    font-size: clamp(14px, 4vw, 18px);
+    text-align: center;
+    flex: 1 1 100%;
+  }
+
+  /* Menú tipo sheet en móvil */
+  .dropdown-menu {
+    right: 50%;
+    transform: translateX(50%);
+    top: 56px;
+    width: 92vw;
+    max-width: 440px;
+    padding: 14px;
+  }
+}
+
+/* Móviles pequeños */
+@media (max-width: 380px){
+  .header-logo { width: 40px; }
+  .menu-button { font-size: 22px; }
+  .header-title { font-size: 16px; }
+  /* Versión y fecha ya están ocultas desde 768px */
 }

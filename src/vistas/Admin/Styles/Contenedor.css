@@ -1,47 +1,217 @@
-/* Estilos para el contenedor */
+/* ===== Contenedor general ===== */
 .Contenedor-general {
   padding: 10px;
-  max-height: 90vh; /* Ajusta si necesitas más/menos alto */
-  overflow-y: auto;
-  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background-color: #f3f4f6;
 }
+
+/* ===== Filtros ===== */
+.filtros {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+/*Si la pantalla es pequeña, apilar los filtros verticalmente */
+@media (max-width: 768px) {
+  .filtros {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== Tabla + paginación (sin scroll vertical interno) ===== */
+.tabla-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;                /* permite overflow-x en la tabla */
+}
+
+/*Media para el tabla-layout*/
+@media (max-width: 768px) {
+  .tabla-layout {
+    flex-direction: column;
+    padding-bottom: 100px;
+  }
+}
+
+/* SOLO scroll horizontal si la tabla es ancha; SIN scroll vertical interno */
+.tabla-wrapper {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+/* Si tu <table> usa otra clase, cámbiala aquí */
+.tabla_registros {
+  min-width: 760px;
+}
+@media (max-width: 768px) {
+  .tabla_registros { min-width: 680px; }
+}
+
+/* Paginación visible SIEMPRE */
+/* En escritorio/tablet: sticky al fondo del contenido */
+.pagination-bar {
+  position: sticky;
+  bottom: 0;
   
-  .modal {
+  padding: 10px 0;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+}
+
+/* En móviles: fija al viewport (no se pierde jamás) */
+@media (max-width: 768px) {
+  .pagination-bar {
     position: fixed;
-    top: 0;
     left: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex !important;
-    justify-content: center;
+    right: 0;
+    bottom: max(0px, env(safe-area-inset-bottom));
+    padding: 0;
+    background: #e5e7eb;
+    height: 90px;
+  }
+  /* Deja espacio al final para que la barra de paginación no tape las últimas filas */
+  .tabla-wrapper {
+    padding-bottom: 88px; /* alto aprox de la barra fija */
+  }
+}
+
+@media (min-width: 769px) {
+  .pagination-bar {
+    height: 0px;
+  }
+  
+}
+
+/* Mensaje de error */
+.label-error {
+  color: #c53030;
+  margin-bottom: 8px;
+}
+
+/* ===========================
+   Layout responsive Estudiantes
+   =========================== */
+.estud-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;            /* permite overflow-x en hijos */
+  background-color: #f3f4f6;
+}
+
+/* Contenedor que envuelve filtros + tabla (renderizados por ContenedorEstudiante) */
+.estud-wrapper {
+  overflow-x: auto;        /* solo horizontal si la tabla es ancha */
+  overflow-y: auto;     /* sin scroll vertical interno */  
+  -webkit-overflow-scrolling: touch;
+  background-color: #f3f4f6;
+}
+
+/* Barra de paginación: sticky en desktop/tablet */
+.estud-pagination {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+  z-index: 10;
+  background-color: #f3f4f6;
+}
+
+/* En móviles la paginación queda fija para que nunca se pierda */
+@media (max-width: 968px) {
+  .estud-pagination {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: max(0px, env(safe-area-inset-bottom));
+    height: 15%;
+    padding: 0px;
+    box-shadow: 0 -6px 12px rgba(0,0,0,.06);
     align-items: center;
   }
-  
-  .modal .modal-content {
-    background: white;
-    padding-left: 0px;
-    border-radius: 5px;
-    width: 60%;
+  /* deja espacio para que la barra fija no tape las últimas filas */
+  .estud-wrapper { padding-bottom: var(--pager-h, 96px); 
     
   }
-  .label-error {
-    color: red;
-    font-size: 14px;
-    font-weight: bold;
-    margin-top: 4px;
-    display: block;
-    animation: fadeIn 0.3s ease-in-out;
 }
 
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* (Opcional) Si tu ContenedorEstudiante usa una clase para filtros,
+   puedes añadir también .estud-filtros y reutilizar esta grilla: */
+.estud-filtros {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
 }
-  
- 
+@media (max-width: 768px) {
+  .estud-filtros { grid-template-columns: 1fr; }
+}
+
+/* ===========================
+   Layout responsive Representantes
+   =========================== */
+.repre-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;            /* permite overflow-x en hijos */
+  background-color: #f3f4f6;
+}
+
+/* Contenedor que envuelve filtros + tabla (renderizados por ContenedorRepresentantes) */
+.repre-wrapper {
+  overflow-x: auto;        /* solo horizontal si la tabla es ancha */
+  overflow-y: visible;     /* sin scroll vertical interno */
+  -webkit-overflow-scrolling: touch;
+  background-color: #f3f4f6;
+}
+
+/* Barra de paginación: sticky en desktop/tablet */
+.repre-pagination {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+  z-index: 10;
+  background: transparent;
+  background-color: #f3f4f6;
+}
+
+/* En móviles la paginación queda fija para que nunca se pierda */
+@media (max-width: 968px) {
+  .repre-pagination {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: max(0px, env(safe-area-inset-bottom));
+    height: 15%;
+    padding: 0px;
+    background: #f3f4f6;
+    box-shadow: 0 -6px 12px rgba(0,0,0,.06);
+    align-items: center;
+  }
+  /* deja espacio para que la barra fija no tape las últimas filas */
+  .repre-wrapper { padding-bottom: var(--pager-h, 96px); 
+      
+  }
+}
+
+/* (Opcional) Si tu ContenedorRepresentantes usa una clase para filtros,
+   puedes añadir también .repre-filtros y reutilizar esta grilla: */
+.repre-filtros {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+@media (max-width: 768px) {
+  .repre-filtros { grid-template-columns: 1fr; }
+}

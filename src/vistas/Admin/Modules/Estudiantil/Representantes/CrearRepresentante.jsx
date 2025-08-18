@@ -61,7 +61,7 @@ function CrearRepresentante({ onCancel, entityToUpdate, onSave }) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-container">
+      <div className="modal-container modal-representante">
         <h2 className="modal-title">{entityToUpdate ? 'Editar representante' : 'Agregar representante'}</h2>
 
         <form onSubmit={(e) => handleSubmit(e)} className="modal-form">
