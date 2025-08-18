@@ -1,0 +1,162 @@
+.reporte-general-container {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.reporte-header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tabla-reporte-general {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.tabla-reporte-general table {
+  margin-bottom: 0;
+}
+
+.tabla-reporte-general th {
+  background-color: #007bff;
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  border: none;
+  padding: 12px 8px;
+}
+
+.tabla-reporte-general td {
+  padding: 10px 8px;
+  vertical-align: middle;
+  border-color: #e9ecef;
+}
+
+.tabla-reporte-general tbody tr:hover {
+  background-color: #f8f9fa;
+  transition: background-color 0.2s ease;
+}
+
+.estado-aprobado {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.estado-supletorio {
+  color: #ffc107;
+  font-weight: 600;
+}
+
+.estado-reprobado {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.promedio-alto {
+  background-color: #d4edda;
+  color: #155724;
+  font-weight: 600;
+}
+
+.promedio-medio {
+  background-color: #fff3cd;
+  color: #856404;
+  font-weight: 600;
+}
+
+.promedio-bajo {
+  background-color: #f8d7da;
+  color: #721c24;
+  font-weight: 600;
+}
+
+.progress-container {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.btn-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+}
+
+.btn-volver:hover {
+  transform: translateX(-2px);
+}
+
+.btn-imprimir {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
+}
+
+@media print {
+  .reporte-header-actions,
+  .sidebar,
+  .header {
+    display: none !important;
+  }
+  
+  .content-container {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .tabla-reporte-general {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+  
+  .tabla-reporte-general th {
+    background-color: #000 !important;
+    color: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+.resumen-estadisticas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.estadistica-card {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.estadistica-numero {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #007bff;
+}
+
+.estadistica-label {
+  font-size: 0.875rem;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
