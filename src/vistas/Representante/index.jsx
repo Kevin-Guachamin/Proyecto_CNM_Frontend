@@ -5,6 +5,7 @@ import Tabla from '../Representante/components/Tabla_Representante';
 import Header from "../../components/Header";
 import Modulo from "../../components/Modulo";
 import Layout from "../../layout/Layout"; // antes "../../layout/components/Layout"
+import Loading from "../../components/Loading";
 
 const Index = () => {
   const  navigate = useNavigate();
