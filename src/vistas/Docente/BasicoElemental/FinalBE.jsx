@@ -89,7 +89,8 @@ const FinalBE = ({ quim1Data, quim2Data, datosModulo, escala }) => {
   // Columnas agrupadas y nombres
   const columnasAgrupadas = [
     { titulo: "", colspan: 2 },
-    { titulo: "RESULTADOS FINALES", colspan: 4 }
+    { titulo: "RESULTADOS FINALES", colspan: 4 },
+    { titulo: "", colspan: 1 }
   ];
   const columnas = [
     "Primer Quimestre",

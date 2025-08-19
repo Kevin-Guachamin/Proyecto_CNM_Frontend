@@ -2,6 +2,12 @@
 import { useEffect, useState } from "react";
 import { Table, Tabs, Tab, Container } from "react-bootstrap";
 import Header from "../../../components/Header";
+import { 
+    calcularPromedioAnual, 
+    calcularPromedioFinalConSupletorio, 
+    calcularPromedioQuimestral,
+    determinarEstado 
+} from "../../Docente/Promedios";
 
 
 const TablaEstudianteCalificaciones = ({datos, estudiante, periodosMatriculados}) => {
@@ -14,45 +20,158 @@ const TablaEstudianteCalificaciones = ({datos, estudiante, periodosMatriculados}
    console.log("Datos que llegan a tabla: ", datos); 
    console.log("Datos del estudiante que llegan a tabla: ", estudiante); 
    console.log("Datos del periodo que llegan a tabla: ", periodosMatriculados); 
+   
+    // Función para obtener la equivalencia según la nota
+    const obtenerEquivalencia = (nota) => {
+        const n = parseFloat(nota);
+        if (isNaN(n)) return "Sin calificación";
+        
+        if (n >= 9.00) return "Domina los aprendizajes requeridos";
+        if (n >= 7.00) return "Alcanza los aprendizajes requeridos";
+        if (n >= 4.01) return "Está próximo a alcanzar los aprendizajes requeridos";
+        return "No alcanza los aprendizajes requeridos";
+    };
+
+    // Función para formatear notas con 2 decimales
+    const formatearNota = (nota) => {
+        const n = parseFloat(nota);
+        return isNaN(n) ? "0.00" : n.toFixed(2);
+    };
+
+    // Función para calcular las notas finales usando la misma lógica del docente
+    const calcularNotasFinales = (materiaData) => {
+        if (materiaData.esBasicoElemental) {
+            return calcularNotasBE(materiaData);
+        } else {
+            return calcularNotasNormales(materiaData);
+        }
+    };
+
+    // Cálculo para niveles normales (no BE)
+    const calcularNotasNormales = (materiaData) => {
+        const { calificaciones: parciales, quimestrales, finales } = materiaData;
+        
+        if (!parciales || parciales.length === 0) {
+            return { 
+                notaq1: "0.00", 
+                notaq2: "0.00", 
+                notaFinal: "0.00", 
+                estado: "Sin datos",
+                equivalenciaQ1: "Sin calificación",
+                equivalenciaQ2: "Sin calificación", 
+                equivalenciaFinal: "Sin calificación"
+            };
+        }
+        
+        // Separar parciales por quimestre
+        const p1Q1 = parciales.find(p => p.parcial === 'P1' && p.quimestre === 'Q1');
+        const p2Q1 = parciales.find(p => p.parcial === 'P2' && p.quimestre === 'Q1');
+        const p1Q2 = parciales.find(p => p.parcial === 'P1' && p.quimestre === 'Q2');
+        const p2Q2 = parciales.find(p => p.parcial === 'P2' && p.quimestre === 'Q2');
+
+        // Calcular promedios parciales Q1
+        const promP1Q1 = calcularPromedioParcialNormal(p1Q1);
+        const promP2Q1 = calcularPromedioParcialNormal(p2Q1);
+        
+        // Calcular promedios parciales Q2
+        const promP1Q2 = calcularPromedioParcialNormal(p1Q2);
+        const promP2Q2 = calcularPromedioParcialNormal(p2Q2);
+
+        // Obtener exámenes quimestrales
+        const examenQ1 = quimestrales && quimestrales.length > 0 
+            ? quimestrales.find(q => q.quimestre === 'Q1')?.examen || 0 
+            : 0;
+        const examenQ2 = quimestrales && quimestrales.length > 0 
+            ? quimestrales.find(q => q.quimestre === 'Q2')?.examen || 0 
+            : 0;
+
+        // Calcular promedios quimestrales usando la función del docente
+        const { promedioFinal: notaQ1 } = calcularPromedioQuimestral(promP1Q1, promP2Q1, examenQ1);
+        const { promedioFinal: notaQ2 } = calcularPromedioQuimestral(promP1Q2, promP2Q2, examenQ2);
+
+        // Calcular promedio anual
+        const promedioAnual = calcularPromedioAnual(notaQ1, notaQ2);
+
+        // Calcular nota final con supletorio si existe
+        const examenSupletorio = finales && finales.length > 0 ? finales[0].examen_recuperacion : "";
+        const notaFinal = calcularPromedioFinalConSupletorio(promedioAnual, examenSupletorio);
+
+        return {
+            notaq1: formatearNota(notaQ1),
+            notaq2: formatearNota(notaQ2),
+            notaFinal: formatearNota(notaFinal),
+            estado: determinarEstado(notaFinal),
+            equivalenciaQ1: obtenerEquivalencia(notaQ1),
+            equivalenciaQ2: obtenerEquivalencia(notaQ2),
+            equivalenciaFinal: obtenerEquivalencia(notaFinal)
+        };
+    };
+
+    // Función auxiliar para calcular promedio parcial normal
+    const calcularPromedioParcialNormal = (parcial) => {
+        if (!parcial) return 0;
+        const insumo1 = parseFloat(parcial.insumo1) || 0;
+        const insumo2 = parseFloat(parcial.insumo2) || 0;
+        const evaluacion = parseFloat(parcial.evaluacion) || 0;
+        
+        const ponderacion70 = ((insumo1 + insumo2) / 2) * 0.7;
+        const ponderacion30 = evaluacion * 0.3;
+        
+        return ponderacion70 + ponderacion30;
+    };
+
     const calcularNotasBE = (notasBEMateria) => {
-        let notasP1Q1 = 0.0;
-        let notasP2Q1 = 0.0;
-        let notasP1Q2 = 0.0;
-        let notasP2Q2 = 0.0;
-
-        let evaluacionP1Q1 = 0.0;
-        let evaluacionP2Q1 = 0.0;
-        let evaluacionP1Q2 = 0.0;
-        let evaluacionP2Q2 = 0.0;
-
-        let notaQ1 = 0.0;
-        let notaQ2 = 0.0;
-
+        const { calificaciones: parciales, quimestrales } = notasBEMateria;
         
-        notasBEMateria.calificaciones.map(calificaciones => {
-           if (calificaciones.parcial === 'P1' && calificaciones.quimestre === 'Q1') {
-                notasP1Q1 = calcularParcialBE(calificaciones); 
-                evaluacionP1Q1 = calificaciones.evaluacion;
-           } else if (calificaciones.parcial === 'P2' && calificaciones.quimestre === 'Q1') {
-                notasP2Q1 = calcularParcialBE(calificaciones); 
-                evaluacionP2Q1 = calificaciones.evaluacion;
-           } else if (calificaciones.parcial === 'P1' && calificaciones.quimestre === 'Q2') {
-                notasP1Q2 = calcularParcialBE(calificaciones); 
-                evaluacionP1Q2 = calificaciones.evaluacion;
-           } else {
-                notasP2Q2 = calcularParcialBE(calificaciones); 
-                evaluacionP2Q2 = calificaciones.evaluacion;
-           } 
-        });
-
-
-        // Falta obtener las evaluaciones de la tabla calificaciones_quimestrales_BE
+        if (!parciales || parciales.length === 0) {
+            return { 
+                notaq1: "0.00", 
+                notaq2: "0.00", 
+                notaFinal: "0.00", 
+                estado: "Sin datos",
+                equivalenciaQ1: "Sin calificación",
+                equivalenciaQ2: "Sin calificación", 
+                equivalenciaFinal: "Sin calificación"
+            };
+        }
         
-         notaQ1 = calcularQuimestral(notasP1Q1, notasP2Q1, evaluacionP1Q1); // Las evaluaciones no corresponden a las quimestrales. REVISAR
-         notaQ2 = calcularQuimestral(notasP1Q2, notasP2Q2, evaluacionP1Q2); // Las evaluaciones no corresponden a las quimestrales. REVISAR
+        // Separar parciales por quimestre
+        const p1Q1 = parciales.find(p => p.parcial === 'P1' && p.quimestre === 'Q1');
+        const p2Q1 = parciales.find(p => p.parcial === 'P2' && p.quimestre === 'Q1');
+        const p1Q2 = parciales.find(p => p.parcial === 'P1' && p.quimestre === 'Q2');
+        const p2Q2 = parciales.find(p => p.parcial === 'P2' && p.quimestre === 'Q2');
 
-        return [notaQ1, notaQ2];
-    }
+        // Calcular notas parciales BE
+        const notasP1Q1 = calcularParcialBE(p1Q1);
+        const notasP2Q1 = calcularParcialBE(p2Q1);
+        const notasP1Q2 = calcularParcialBE(p1Q2);
+        const notasP2Q2 = calcularParcialBE(p2Q2);
+
+        // Obtener exámenes quimestrales
+        const examenQ1 = quimestrales && quimestrales.length > 0 
+            ? quimestrales.find(q => q.quimestre === 'Q1')?.examen || 0 
+            : 0;
+        const examenQ2 = quimestrales && quimestrales.length > 0 
+            ? quimestrales.find(q => q.quimestre === 'Q2')?.examen || 0 
+            : 0;
+
+        // Calcular notas quimestrales
+        const notaQ1 = calcularQuimestral(notasP1Q1, notasP2Q1, examenQ1);
+        const notaQ2 = calcularQuimestral(notasP1Q2, notasP2Q2, examenQ2);
+
+        // Para BE, la nota final es el promedio de los dos quimestres
+        const notaFinal = calcularPromedioAnual(notaQ1, notaQ2);
+
+        return {
+            notaq1: formatearNota(notaQ1),
+            notaq2: formatearNota(notaQ2),
+            notaFinal: formatearNota(notaFinal),
+            estado: notaFinal >= 7 ? "Aprobado" : "Reprobado",
+            equivalenciaQ1: obtenerEquivalencia(notaQ1),
+            equivalenciaQ2: obtenerEquivalencia(notaQ2),
+            equivalenciaFinal: obtenerEquivalencia(notaFinal)
+        };
+    };
 
     // Calculo de la nota Quimestral
     const calcularQuimestral = (notaP1, notaP2, notaExamen) => {
@@ -75,11 +194,13 @@ const TablaEstudianteCalificaciones = ({datos, estudiante, periodosMatriculados}
 
     // Calculo de la nota Parcial de cada Quimestre para basico elemental
     const calcularParcialBE = (notasParcial) => {
+        if (!notasParcial) return 0;
+        
         // Convierte a número o asigna 0 si no es un número válido
         const insumo1 = parseFloat(notasParcial.insumo1);
         const insumo2 = parseFloat(notasParcial.insumo2);
         const evaluacion = parseFloat(notasParcial.evaluacion);
-        const mejora = parseFloat(notasParcial.mejora);
+        const mejora = parseFloat(notasParcial.mejoramiento || notasParcial.mejora);
 
         // Función auxiliar para validar números
         const validarNumero = (num) => (isNaN(num) ? 0 : num);
@@ -108,13 +229,11 @@ const TablaEstudianteCalificaciones = ({datos, estudiante, periodosMatriculados}
 
         const ponderacion30 = promedioSumativas * 0.3;
 
-        // Caluclar nota parcial
+        // Calcular nota parcial
         const notaParcial = parseFloat((ponderacion70 + ponderacion30).toFixed(2));
 
-
         return notaParcial;
-
-    }   
+    };   
 
     // Calculo del promedio de todas las materias
     const calcularPromedio = (notas) => {
@@ -128,52 +247,52 @@ const TablaEstudianteCalificaciones = ({datos, estudiante, periodosMatriculados}
         
         let numeroMaterias = notas.length;
 
-
-        notas.map(notaMateria => {
-           sumatoriaQ1 += notaMateria.notaq1;
-           sumatoriaQ2 += notaMateria.notaq2;
-           sumatoriaFinal += notaMateria.notaFinal;
+        notas.forEach(notaMateria => {
+           sumatoriaQ1 += parseFloat(notaMateria.notaq1);
+           sumatoriaQ2 += parseFloat(notaMateria.notaq2);
+           sumatoriaFinal += parseFloat(notaMateria.notaFinal);
         });
 
-        promedioQ1 = parseFloat((sumatoriaQ1/numeroMaterias).toFixed(2));
-        promedioQ2 = parseFloat((sumatoriaQ2/numeroMaterias).toFixed(2));
-        promedioFinal = parseFloat((sumatoriaFinal/numeroMaterias).toFixed(2));
+        promedioQ1 = sumatoriaQ1/numeroMaterias;
+        promedioQ2 = sumatoriaQ2/numeroMaterias;
+        promedioFinal = sumatoriaFinal/numeroMaterias;
 
-        return {nombreMateria: "Promedio", notaq1: promedioQ1, notaq2: promedioQ2, notaFinal: promedioFinal}
-    }
+        return {
+            nombreMateria: "Promedio", 
+            notaq1: formatearNota(promedioQ1), 
+            notaq2: formatearNota(promedioQ2), 
+            notaFinal: formatearNota(promedioFinal),
+            estado: promedioFinal >= 7 ? "Aprobado" : "Reprobado",
+            equivalenciaQ1: obtenerEquivalencia(promedioQ1),
+            equivalenciaQ2: obtenerEquivalencia(promedioQ2),
+            equivalenciaFinal: obtenerEquivalencia(promedioFinal)
+        };
+    };
     
     const cargarDatos = () => {
-
         setIsLoading(true);
 
         if (!Array.isArray(datos) || datos.length === 0) {
             console.error('No hay datos válidos para procesar');
+            setIsLoading(false);
             return;
         }
 
         console.log('Notas estudiante en tablaEstudiante: ', datos);
         try {
             const notasMateria = datos.map(materias => {
-                if (materias.nivel && (materias.nivel.includes('Básico elemental') || materias.nivel.includes('BE'))) {
-                    if (materias.calificaciones && Array.isArray(materias.calificaciones)) {
-                        const [notaQ1, notaQ2] = calcularNotasBE(materias);
-
-                        console.log("Calculo de las notas de BE");
-                        return {
-                            nombreMateria: materias.nombreMateria,
-                            notaq1: notaQ1,
-                            notaq2: notaQ2
-                        };
-                    }
-                } else {
-                    console.log("Calculo de las notas los demas niveles");
-                }
-
-                // Caso por defecto si no entra en la condición
+                // Usar la función unificada para calcular las notas
+                const resultadoNotas = calcularNotasFinales(materias);
+                
                 return {
                     nombreMateria: materias.nombreMateria || 'Sin nombre',
-                    notaq1: 0,
-                    notaq2: 0
+                    notaq1: resultadoNotas.notaq1,
+                    notaq2: resultadoNotas.notaq2,
+                    notaFinal: resultadoNotas.notaFinal,
+                    estado: resultadoNotas.estado,
+                    equivalenciaQ1: resultadoNotas.equivalenciaQ1,
+                    equivalenciaQ2: resultadoNotas.equivalenciaQ2,
+                    equivalenciaFinal: resultadoNotas.equivalenciaFinal
                 };
             });
 
@@ -185,7 +304,7 @@ const TablaEstudianteCalificaciones = ({datos, estudiante, periodosMatriculados}
         } finally {
             setIsLoading(false);
         }
-    }
+    };
     
     const handleSelecTab = (key) => {
         setActiveTab(key);
@@ -253,10 +372,10 @@ const TablaEstudianteCalificaciones = ({datos, estudiante, periodosMatriculados}
                            </thead>
                            <tbody>
                                {materiasTabla.map((dato, index) => (
-                                   <tr key={index}>
+                                   <tr key={index} className={parseFloat(dato.notaq1) < 7 && dato.nombreMateria !== "Promedio" ? "table-warning" : ""}>
                                        <td>{dato.nombreMateria}</td>
                                        <td>{dato.notaq1}</td>
-                                       <td> Domina </td>
+                                       <td>{dato.equivalenciaQ1}</td>
                                    </tr>
                                ))}
                            </tbody> 
@@ -275,10 +394,10 @@ const TablaEstudianteCalificaciones = ({datos, estudiante, periodosMatriculados}
                            </thead>
                            <tbody>
                                {materiasTabla.map((dato, index) => (
-                                   <tr key={index}>
+                                   <tr key={index} className={parseFloat(dato.notaq2) < 7 && dato.nombreMateria !== "Promedio" ? "table-warning" : ""}>
                                        <td>{dato.nombreMateria}</td>
                                        <td>{dato.notaq2}</td>
-                                       <td> Domina </td>
+                                       <td>{dato.equivalenciaQ2}</td>
                                    </tr>
                                ))}
                            </tbody> 
@@ -297,10 +416,10 @@ const TablaEstudianteCalificaciones = ({datos, estudiante, periodosMatriculados}
                            </thead>
                            <tbody>
                                {materiasTabla.map((dato, index) => (
-                                   <tr key={index}>
+                                   <tr key={index} className={dato.estado === "Reprobado" ? "table-danger" : ""}>
                                        <td>{dato.nombreMateria}</td>
-                                       <td> Nota final </td>
-                                       <td> Domina </td>
+                                       <td>{dato.notaFinal}</td>
+                                       <td>{dato.equivalenciaFinal}</td>
                                    </tr>
                                ))}
                            </tbody>

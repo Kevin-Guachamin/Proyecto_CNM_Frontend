@@ -73,7 +73,7 @@ const VerCalificacionesEstudiante = () => {
         };
       })
       
-      // Obtener calificaciones parciales de una materia con el ID_asignacion
+      // Obtener calificaciones parciales, quimestrales y finales de una materia
       // mediante peticiones a endpoints
       const notas = await Promise.all(
         inscripciones.map(async inscripcion => {
@@ -82,11 +82,38 @@ const VerCalificacionesEstudiante = () => {
               inscripcion.nivel.includes('Básico Elemental') ||
               inscripcion.nivel.includes('BE');
               
-            const endpoint = esBasicoElemental
+            // Obtener parciales
+            const endpointParciales = esBasicoElemental
               ? `/parcialesbe/inscripcion/${inscripcion.ID_inscripcion}`
               : `/parciales/inscripcion/${inscripcion.ID_inscripcion}`;
   
-            const { data } = await axios.get(`${baseURL}${endpoint}`, headers);
+            const { data: parciales } = await axios.get(`${baseURL}${endpointParciales}`, headers);
+
+            // Obtener quimestrales
+            const endpointQuimestrales = esBasicoElemental
+              ? `/quimestralesbe/asignacion/${inscripcion.ID_asignacion}`
+              : `/quimestrales/asignacion/${inscripcion.ID_asignacion}`;
+              
+            let quimestrales = [];
+            try {
+              const { data: quiData } = await axios.get(`${baseURL}${endpointQuimestrales}`, headers);
+              // Filtrar solo las calificaciones de este estudiante
+              quimestrales = quiData.filter(q => q.idInscripcion === inscripcion.ID_inscripcion);
+            } catch (error) {
+              console.log(`No hay datos quimestrales para ${inscripcion.nombreMateria}`);
+            }
+
+            // Obtener finales (solo para niveles normales)
+            let finales = [];
+            if (!esBasicoElemental) {
+              try {
+                const { data: finalesData } = await axios.get(`${baseURL}/finales/asignacion/${inscripcion.ID_asignacion}`, headers);
+                // Filtrar solo las calificaciones de este estudiante
+                finales = finalesData.filter(f => f.idInscripcion === inscripcion.ID_inscripcion);
+              } catch (error) {
+                console.log(`No hay datos finales para ${inscripcion.nombreMateria}`);
+              }
+            }
 
             setPeriodoSel(true);
             
@@ -96,7 +123,10 @@ const VerCalificacionesEstudiante = () => {
               ID_asignacion: inscripcion.ID_asignacion,
               nombreMateria: inscripcion.nombreMateria,
               nivel: inscripcion.nivel,
-              calificaciones: data
+              calificaciones: parciales,
+              quimestrales: quimestrales,
+              finales: finales,
+              esBasicoElemental: esBasicoElemental
             };
           } catch (error) {
             console.error(`Error al obtener notas para ${inscripcion.nombreMateria}:`, error);
@@ -104,6 +134,7 @@ const VerCalificacionesEstudiante = () => {
             return {
               ID_asignacion: inscripcion.ID_asignacion,
               nombreMateria: inscripcion.nombreMateria,
+              nivel: inscripcion.nivel,
               error: true,
               mensaje: error.message
             };

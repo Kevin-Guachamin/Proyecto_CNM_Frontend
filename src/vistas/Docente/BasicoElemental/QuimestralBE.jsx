@@ -298,7 +298,7 @@ const QuimestralBE = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actua
     { titulo: "", colspan: 2 },
     { titulo: "RESUMEN DE APRENDIZAJES ", colspan: 7 },
     { titulo: "EVALUACIÓN", colspan: 2 },
-    { titulo: "", colspan: 1 }
+    { titulo: "", colspan: 2 }
   ];
 
   const nombreColumnaExtra = escala === "cualitativa" ? "Cualitativa" : "Cuantitativa";
