@@ -41,6 +41,9 @@ const VerDatosRepresentante = () => {
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFin, setFechaFin] = useState('');
 
+  // Estados para errores de validación
+  const [errors, setErrors] = useState({});
+
   /*
     OJO FALTA COMPROBAR EL FUNCIONAMIENTO CON LOS ARCHIVOS PDFS SUBIDOS
   */
@@ -131,10 +134,39 @@ const VerDatosRepresentante = () => {
   }
 
   const handleFileChange = (event) => {
-    const { name, files } = event.target;
+    const { name, files: selectedFiles } = event.target;
+    const file = selectedFiles[0];
+
+    if (file) {
+      // Validar que sea PDF
+      if (file.type !== 'application/pdf') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Formato no válido',
+          text: 'Solo se permiten archivos PDF.',
+          confirmButtonColor: '#003F89',
+        });
+        event.target.value = ''; // Limpiar el input
+        return;
+      }
+
+      // Validar tamaño máximo de 5MB
+      const maxSize = 5 * 1024 * 1024; // 5MB en bytes
+      if (file.size > maxSize) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Archivo muy grande',
+          text: 'El archivo no puede superar los 5MB.',
+          confirmButtonColor: '#003F89',
+        });
+        event.target.value = ''; // Limpiar el input
+        return;
+      }
+    }
+
     setFiles((prevState) => ({
       ...prevState,
-      [name]: files[0], // Solo se selecciona un archivo por input
+      [name]: file, // Solo se selecciona un archivo por input
     }));
   };
 
@@ -151,9 +183,35 @@ const VerDatosRepresentante = () => {
       return;
     }
 
+    // 👉 Si no hay cambios, avisar y cerrar modal
+    if (noHayCambios()) {
+      Swal.fire({
+        icon: "info",
+        title: "Sin cambios",
+        text: "No realizaste modificaciones.",
+        confirmButtonColor: "#003F89",
+      }).then(() => {
+        setMostrarModal(false); // cierra modal y regresa a la vista
+      });
+      return;
+    }
+
+    // Validar formulario
+    const newErrors = validateForm();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      Swal.fire({
+        icon: 'error',
+        title: 'Formulario incompleto',
+        text: 'Por favor, corrija los errores en el formulario antes de continuar.',
+        confirmButtonColor: '#003F89',
+      });
+      return;
+    }
+
     setSubmitting(true);
 
-    // Crear FormData igual que en CrearRepresentante
+    // Crear FormData
     const formData = new FormData();
     formData.append("copiaCedula", files.copiaCedula);
     formData.append("croquis", files.croquis);
@@ -167,7 +225,6 @@ const VerDatosRepresentante = () => {
     formData.append("convencional", convencional);
     formData.append("emergencia", emergencia);
 
-    // Llamar al endpoint igual que en la función Editar
     const baseURL = import.meta.env.VITE_URL_DEL_BACKEND;
     const token = localStorage.getItem("token");
 
@@ -180,35 +237,20 @@ const VerDatosRepresentante = () => {
       })
       .then((res) => {
         setSubmitting(false);
+
+        // Actualizar datos locales y cerrar modal SIN segunda pregunta
+        const usuarioActualizado = res.data;
+        localStorage.setItem("usuario", JSON.stringify(usuarioActualizado));
+        setRepresentante(usuarioActualizado);
+
         Swal.fire({
           icon: "success",
           title: "Datos actualizados con éxito",
           iconColor: "#218838",
-          confirmButtonText: "Entendido",
+          confirmButtonText: "OK",
           confirmButtonColor: "#003F89",
         }).then(() => {
-          // Actualizar los datos locales del usuario
-          const usuarioActualizado = res.data;
-          localStorage.setItem("usuario", JSON.stringify(usuarioActualizado));
-          setRepresentante(usuarioActualizado);
-
-          // Preguntar si quiere regresar o seguir editando
-          Swal.fire({
-            title: '¿Qué deseas hacer?',
-            showDenyButton: true,
-            showCancelButton: false,
-            confirmButtonText: 'Regresar',
-            denyButtonText: 'Seguir editando',
-            confirmButtonColor: '#003F89',
-            denyButtonColor: '#6c757d'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              navigate(0);
-            } else {
-              // Si elige "Seguir editando", cerrar el modal pero quedarse en la vista
-              setMostrarModal(false);
-            }
-          });
+          setMostrarModal(false); // cierra modal y regresa a la vista
         });
       })
       .catch((error) => {
@@ -216,10 +258,137 @@ const VerDatosRepresentante = () => {
         ErrorMessage(error);
         console.log(error);
       });
-  }
+  };
+
+  // Función de validación para representante
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Validar documento (cédula o pasaporte)
+    if (!nroCedula) {
+      newErrors.nroCedula = 'El número de documento es obligatorio';
+    } else if (!/^\d{7,10}$/.test(nroCedula)) {
+      newErrors.nroCedula = 'El documento debe tener entre 7 y 10 dígitos';
+    }
+
+    // Validar nombres (solo letras, tildes y diéresis - sin espacios al final)
+    if (!primer_nombre) {
+      newErrors.primer_nombre = 'El primer nombre es obligatorio';
+    } else if (!validarNombre(primer_nombre)) {
+      newErrors.primer_nombre = 'Solo se permiten letras, tildes y diéresis. No se permiten espacios al final';
+    }
+
+    if (!primer_apellido) {
+      newErrors.primer_apellido = 'El primer apellido es obligatorio';
+    } else if (!validarNombre(primer_apellido)) {
+      newErrors.primer_apellido = 'Solo se permiten letras, tildes y diéresis. No se permiten espacios al final';
+    }
+
+    // Segundo nombre y apellido (opcionales pero si tienen valor, validar)
+    if (segundo_nombre && !validarNombre(segundo_nombre)) {
+      newErrors.segundo_nombre = 'Solo se permiten letras, tildes y diéresis. No se permiten espacios al final';
+    }
+
+    if (segundo_apellido && !validarNombre(segundo_apellido)) {
+      newErrors.segundo_apellido = 'Solo se permiten letras, tildes y diéresis. No se permiten espacios al final';
+    }
+
+    // Validar email
+    if (!email) {
+      newErrors.email = 'El email es obligatorio';
+    } else if (!validarEmail(email)) {
+      newErrors.email = 'El formato del email no es válido';
+    }
+
+    // Validar celular (10 dígitos, empezar con 09)
+    if (!celular) {
+      newErrors.celular = 'El número de celular es obligatorio';
+    } else if (!/^09\d{8}$/.test(celular)) {
+      newErrors.celular = 'El celular debe tener 10 dígitos y empezar con 09';
+    }
+
+    // Teléfono convencional (opcional, pero si tiene valor, validar - 9 dígitos empezando con 0)
+    if (convencional && !/^0\d{8}$/.test(convencional)) {
+      newErrors.convencional = 'El teléfono convencional debe tener 9 dígitos y empezar con 0';
+    }
+
+    // Teléfono de emergencia (opcional, pero si tiene valor, validar - 10 dígitos empezando con 09)
+    if (emergencia && !/^09\d{8}$/.test(emergencia)) {
+      newErrors.emergencia = 'El teléfono de emergencia debe tener 10 dígitos y empezar con 09';
+    }
+
+    return newErrors;
+  };
+
+  // Función para validar nombres (solo letras, tildes, diéresis - sin espacios al final)
+  const validarNombre = (nombre) => {
+    // Expresión regular que permite letras, tildes (áéíóú), diéresis (üï), espacios internos
+    // pero no permite números, símbolos especiales, espacios al final
+    const regex = /^[a-zA-ZáéíóúÁÉÍÓÚüÜïÏñÑ]+(\s[a-zA-ZáéíóúÁÉÍÓÚüÜïÏñÑ]+)*$/;
+    return regex.test(nombre.trim()) && nombre === nombre.trim();
+  };
+
+  // Función para validar email
+  const validarEmail = (email) => {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
+  };
+
+  // Funciones para manejar cambios en los inputs con validación en tiempo real
+  const handleCedulaChange = (value) => {
+    // Solo permitir números y máximo 10 caracteres
+    const soloNumeros = value.replace(/[^0-9]/g, '').substring(0, 10);
+    setNroCedula(soloNumeros);
+    limpiarError('nroCedula');
+  };
+
+  const handleNombreChange = (field, value, setter) => {
+    // Remover caracteres especiales excepto letras, tildes, diéresis y espacios
+    const valorLimpio = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜïÏñÑ\s]/g, '');
+    setter(valorLimpio);
+    limpiarError(field);
+  };
+
+  const handleCelularChange = (value) => {
+    // Solo permitir números y máximo 10 caracteres
+    const soloNumeros = value.replace(/[^0-9]/g, '').substring(0, 10);
+    setCelular(soloNumeros);
+    limpiarError('celular');
+  };
+
+  const handleConvencionalChange = (value) => {
+    // Solo permitir números y máximo 9 caracteres
+    const soloNumeros = value.replace(/[^0-9]/g, '').substring(0, 9);
+    setConvencional(soloNumeros);
+    limpiarError('convencional');
+  };
+
+  const handleEmergenciaChange = (value) => {
+    // Solo permitir números y máximo 10 caracteres
+    const soloNumeros = value.replace(/[^0-9]/g, '').substring(0, 10);
+    setEmergencia(soloNumeros);
+    limpiarError('emergencia');
+  };
+
+  const handleEmailChange = (value) => {
+    // Remover espacios
+    const valorSinEspacios = value.replace(/\s/g, '');
+    setEmail(valorSinEspacios);
+    limpiarError('email');
+  };
+
+  // Limpiar errores cuando el usuario empiece a escribir
+  const limpiarError = (field) => {
+    if (errors[field]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+  };
 
   const handleConfirmacion = () => {
-
   }
 
 
@@ -231,6 +400,26 @@ const VerDatosRepresentante = () => {
       month: '2-digit',
       year: 'numeric'
     });
+  };
+
+  // Normaliza valores para comparar (evita null/undefined y espacios)
+  const norm = (v) => (v ?? "").toString().trim();
+
+  // ¿El usuario cambió algo?
+  const noHayCambios = () => {
+    return (
+      norm(nroCedula) === norm(representante.nroCedula) &&
+      norm(primer_nombre) === norm(representante.primer_nombre) &&
+      norm(primer_apellido) === norm(representante.primer_apellido) &&
+      norm(segundo_nombre) === norm(representante.segundo_nombre) &&
+      norm(segundo_apellido) === norm(representante.segundo_apellido) &&
+      norm(email) === norm(representante.email) &&
+      norm(celular) === norm(representante.celular) &&
+      norm(convencional) === norm(representante.convencional) &&
+      norm(emergencia) === norm(representante.emergencia) &&
+      !files.copiaCedula &&
+      !files.croquis
+    );
   };
 
 
@@ -347,52 +536,120 @@ const VerDatosRepresentante = () => {
                   <form onSubmit={(e) => handleSubmit(e)} className="modal-form">
                     <div className='rows'>
                       <div className="form-group">
-                        <label htmlFor="nroCedula">Número de cédula:</label>
-                        <input id="nroCedula" value={nroCedula} onChange={(e) => setNroCedula(e.target.value)} />
+                        <label htmlFor="nroCedula">Número de cédula: *</label>
+                        <input
+                          id="nroCedula"
+                          value={nroCedula}
+                          onChange={(e) => handleCedulaChange(e.target.value)}
+                          placeholder="Ingrese su número de cédula"
+                          maxLength="10"
+                          className={errors.nroCedula ? 'input-error' : ''}
+                        />
+                        {errors.nroCedula && <span className="error-text">{errors.nroCedula}</span>}
                       </div>
                       <div className="form-group">
-                        <label htmlFor="celular">#Celular:</label>
-                        <input id="celular" value={celular} onChange={(e) => setCelular(e.target.value)} />
+                        <label htmlFor="celular">#Celular: *</label>
+                        <input
+                          id="celular"
+                          value={celular}
+                          onChange={(e) => handleCelularChange(e.target.value)}
+                          placeholder="Ej: 0987654321"
+                          maxLength="10"
+                          className={errors.celular ? 'input-error' : ''}
+                        />
+                        {errors.celular && <span className="error-text">{errors.celular}</span>}
                       </div>
                     </div>
 
                     <div className='rows'>
                       <div className="form-group">
-                        <label htmlFor="primer_nombre">Primer nombre:</label>
-                        <input id="primer_nombre" value={primer_nombre} onChange={(e) => setPrimerNombre(e.target.value)} />
+                        <label htmlFor="primer_nombre">Primer nombre: *</label>
+                        <input
+                          id="primer_nombre"
+                          value={primer_nombre}
+                          onChange={(e) => handleNombreChange('primer_nombre', e.target.value, setPrimerNombre)}
+                          placeholder="Ingrese su primer nombre"
+                          className={errors.primer_nombre ? 'input-error' : ''}
+                        />
+                        {errors.primer_nombre && <span className="error-text">{errors.primer_nombre}</span>}
                       </div>
                       <div className="form-group">
-                        <label htmlFor="primer_apellido">Primer apellido:</label>
-                        <input id="primer_apellido" value={primer_apellido} onChange={(e) => setPrimerApellido(e.target.value)} />
+                        <label htmlFor="primer_apellido">Primer apellido: *</label>
+                        <input
+                          id="primer_apellido"
+                          value={primer_apellido}
+                          onChange={(e) => handleNombreChange('primer_apellido', e.target.value, setPrimerApellido)}
+                          placeholder="Ingrese su primer apellido"
+                          className={errors.primer_apellido ? 'input-error' : ''}
+                        />
+                        {errors.primer_apellido && <span className="error-text">{errors.primer_apellido}</span>}
                       </div>
                     </div>
 
                     <div className='rows'>
                       <div className="form-group">
                         <label htmlFor="segundo_nombre">Segundo nombre:</label>
-                        <input id="segundo_nombre" value={segundo_nombre} onChange={(e) => setSegundoNombre(e.target.value)} />
+                        <input
+                          id="segundo_nombre"
+                          value={segundo_nombre}
+                          onChange={(e) => handleNombreChange('segundo_nombre', e.target.value, setSegundoNombre)}
+                          placeholder="Ingrese su segundo nombre (opcional)"
+                          className={errors.segundo_nombre ? 'input-error' : ''}
+                        />
+                        {errors.segundo_nombre && <span className="error-text">{errors.segundo_nombre}</span>}
                       </div>
                       <div className="form-group">
                         <label htmlFor="segundo_apellido">Segundo apellido:</label>
-                        <input id="segundo_apellido" value={segundo_apellido} onChange={(e) => setSegundoApellido(e.target.value)} />
+                        <input
+                          id="segundo_apellido"
+                          value={segundo_apellido}
+                          onChange={(e) => handleNombreChange('segundo_apellido', e.target.value, setSegundoApellido)}
+                          placeholder="Ingrese su segundo apellido (opcional)"
+                          className={errors.segundo_apellido ? 'input-error' : ''}
+                        />
+                        {errors.segundo_apellido && <span className="error-text">{errors.segundo_apellido}</span>}
                       </div>
                     </div>
 
                     <div className='rows'>
                       <div className="form-group">
                         <label htmlFor="convencional">#Convencional:</label>
-                        <input id="convencional" value={convencional} onChange={(e) => setConvencional(e.target.value)} />
+                        <input
+                          id="convencional"
+                          value={convencional}
+                          onChange={(e) => handleConvencionalChange(e.target.value)}
+                          placeholder="Ej: 023456789 (opcional)"
+                          maxLength="9"
+                          className={errors.convencional ? 'input-error' : ''}
+                        />
+                        {errors.convencional && <span className="error-text">{errors.convencional}</span>}
                       </div>
                       <div className="form-group">
                         <label htmlFor="emergencia">#Emergencia:</label>
-                        <input id="emergencia" value={emergencia} onChange={(e) => setEmergencia(e.target.value)} />
+                        <input
+                          id="emergencia"
+                          value={emergencia}
+                          onChange={(e) => handleEmergenciaChange(e.target.value)}
+                          placeholder="Ej: 0987651234 (opcional)"
+                          maxLength="10"
+                          className={errors.emergencia ? 'input-error' : ''}
+                        />
+                        {errors.emergencia && <span className="error-text">{errors.emergencia}</span>}
                       </div>
                     </div>
 
                     <div className='rows'>
                       <div className="form-group">
-                        <label htmlFor="email">Email:</label>
-                        <input id="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                        <label htmlFor="email">Email: *</label>
+                        <input
+                          id="email"
+                          type="email"
+                          value={email}
+                          onChange={(e) => handleEmailChange(e.target.value)}
+                          placeholder="ejemplo@correo.com"
+                          className={errors.email ? 'input-error' : ''}
+                        />
+                        {errors.email && <span className="error-text">{errors.email}</span>}
                       </div>
                       <div className='form-group'>
                         {/* Espacio vacío para mantener la estructura */}
