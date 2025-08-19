@@ -10,8 +10,18 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import "./Calificaciones.css";
 import { ErrorMessage } from "../../Utils/ErrorMesaje";
+import { getModulos, transformModulesForLayout } from "../getModulos";
+import { useAuth } from "../../Utils/useAuth";
 
 function Calificaciones() {
+
+  // Protección de ruta - debe ir al inicio del componente
+  const auth = useAuth("Profesor");
+  
+  // Si no está autenticado, no renderizar nada (el hook maneja la redirección)
+  if (!auth.isAuthenticated) {
+    return null;
+  }
 
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState(null);
@@ -103,18 +113,22 @@ function Calificaciones() {
     if (!usuario) return [];
 
     const esSecretaria = usuario.subRol?.toLowerCase() === "secretaria";
-
-    return [
-      {
-        name: "Inicio",
-        icon: <Home size={20} />,
-        path: esSecretaria
-          ? `/secretaria/periodo/materias/${datosModulo.idPeriodo}`
-          : "/profesor/panelcursos",
-      },
-      { name: "Usuarios", icon: <Users size={20} /> },
-      { name: "Configuración", icon: <Settings size={20} /> },
-    ];
+    
+    if (esSecretaria) {
+      // Para secretarias, mantener los módulos específicos existentes
+      return [
+        {
+          name: "Inicio",
+          icon: <Home size={20} />,
+          path: `/secretaria/periodo/materias/${datosModulo.idPeriodo}`,
+        },
+        { name: "Usuarios", icon: <Users size={20} /> },
+        { name: "Configuración", icon: <Settings size={20} /> },
+      ];
+    } else {
+      // Para profesores, usar los módulos estándar
+      return transformModulesForLayout(getModulos("Profesor", true));
+    }
   }, [usuario, datosModulo.idPeriodo]);
 
   useEffect(() => {

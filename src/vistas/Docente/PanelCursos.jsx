@@ -9,9 +9,18 @@ import axios from "axios";
 import { ErrorMessage } from "../../Utils/ErrorMesaje";
 import { getModulos, transformModulesForLayout } from "../getModulos";
 import Swal from "sweetalert2";
+import { useAuth } from "../../Utils/useAuth";
 
 
 function PanelCursos() {
+  // Protección de ruta
+  const auth = useAuth("Profesor");
+  
+  // Si no está autenticado, no renderizar nada
+  if (!auth.isAuthenticated) {
+    return null;
+  }
+
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState(null);
   const [cursos, setCursos] = useState([]);

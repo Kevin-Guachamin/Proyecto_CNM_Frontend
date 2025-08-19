@@ -6,9 +6,18 @@ import Header from '../../../components/Header.jsx';
 import Loading from '../../../components/Loading.jsx';
 import axios from 'axios';
 import { getModulos, transformModulesForLayout } from '../../getModulos.jsx';
+import { useAuth } from '../../../Utils/useAuth.js';
 
 
 function Index() {
+  // Protección de ruta
+  const auth = useAuth("Profesor");
+  
+  // Si no está autenticado, no renderizar nada
+  if (!auth.isAuthenticated) {
+    return null;
+  }
+
   const [usuario, setUsuario] = useState(null);
   const [modules, setModules] = useState([]);
   const [solicitudes, setSolicitudes] = useState([])

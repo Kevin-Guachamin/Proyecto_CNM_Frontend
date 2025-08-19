@@ -4,8 +4,17 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Modulo from "../components/Modulo"; // O el componente que uses para mostrar los módulos
 import { getModulos } from "./getModulos";
+import { useAuth } from "../Utils/useAuth";
 
 const Inicio = () => {
+  // Protección de ruta - sin rol específico porque es para todos los usuarios autenticados
+  const auth = useAuth();
+  
+  // Si no está autenticado, no renderizar nada
+  if (!auth.isAuthenticated) {
+    return null;
+  }
+
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState(null);
   const [modulos, setModulos] = useState([]);
@@ -23,8 +32,6 @@ const Inicio = () => {
       setUsuario(parsedUser);
       // No incluimos "Inicio" porque ya estamos en la vista Inicio
       setModulos(getModulos(parsedUser.subRol, false));
-    } else {
-      navigate("/");
     }
   }, [navigate]);
 

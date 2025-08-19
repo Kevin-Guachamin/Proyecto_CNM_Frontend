@@ -6,7 +6,17 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ErrorMessage } from "../../../Utils/ErrorMesaje";
 import { getModulos, transformModulesForLayout } from "../../getModulos";
+import { useAuth } from "../../../Utils/useAuth";
+
 function Index() {
+    // Protección de ruta
+    const auth = useAuth("Profesor");
+    
+    // Si no está autenticado, no renderizar nada
+    if (!auth.isAuthenticated) {
+        return null;
+    }
+
     const [usuario, setUsuario] = useState(null);
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
     const navigate = useNavigate()
