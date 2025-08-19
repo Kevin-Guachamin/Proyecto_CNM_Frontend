@@ -109,13 +109,6 @@ const VerDatosRepresentante = () => {
         console.info("No hay proceso de actualización configurado.");
       }
 
-      // Establece si la fecha actual esta dentro del rango del proceso
-      if (inicio && fin && fechaActual >= inicio && fechaActual <= fin) {
-        setDentroDeRango(true);
-      } else {
-        setDentroDeRango(false);
-      }
-
     } catch (error) {
       console.error('Error al obtener datos de representante: ', error);
     } finally {

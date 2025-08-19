@@ -27,7 +27,7 @@ function ViewDataEstudiante({ onCancel, isLoading, entity }) {
   // Variables para la actualizacion de datos segun las fechas establecidas 
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFin, setFechaFin] = useState('');
-  const [dentroDeRango, setDentroDeRango] = useState('');
+  const [dentroDeRango, setDentroDeRango] = useState(false);
 
   /* 
     OJO FALTA COMPROBAR EL FUNCIONAMIENTO CON LOS ARCHIVOS PDFS SUBIDOS
@@ -38,52 +38,27 @@ function ViewDataEstudiante({ onCancel, isLoading, entity }) {
   }
 
   const cargarFechasActualizacionDatos = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const baseURL = import.meta.env.VITE_URL_DEL_BACKEND;
-      const headers = {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
+  try {
+    const token = localStorage.getItem('token');
+    const baseURL = import.meta.env.VITE_URL_DEL_BACKEND;
+    const headers = { headers: { Authorization: `Bearer ${token}` } };
 
-      // Obtener la fecha actual del servidor
-      const { data: response } = await axios.get(
-        `${baseURL}/fechas_procesos/fecha_actual`,
-        headers
-      );
-      const fechaActual = response.fechaActual;
+    // Solo este endpoint es necesario para habilitar/bloquear
+    const { data } = await axios.get(`${baseURL}/fechas_procesos/actualizacion`, headers);
 
-      // Obtener las fechas rango de la API para la actualizacion
-      const { data: fechaActualizacionDatos } = await axios.get(
-        `${baseURL}/fechas_procesos/actualizacion`,
-        headers
-      );
+    const { procesoActivo, fechaInicioProceso, fechaFinProceso } = data || {};
 
-      // Comprueba que haya datos en fechaActualizacionDatos
-      if (fechaActualizacionDatos) {
-        setFechaInicio(fechaActualizacionDatos.fechaInicioProceso);
-        setFechaFin(fechaActualizacionDatos.fechaFinProceso);
-      }
-
-      const inicio = fechaActualizacionDatos.fechaInicioProceso;
-      const fin = fechaActualizacionDatos.fechaFinProceso;
-
-      // Establece si la fecha actual esta dentro del rango de la
-      // fecha del proceso 
-      if (fechaActual >= inicio && fechaActual <= fin) {
-        setDentroDeRango(true);
-
-      } else {
-        setDentroDeRango(false);
-
-      }
-
-
-    } catch (error) {
-      console.log('Error al obtener las fechas de actualizacion de datos', error);
-    }
+    setFechaInicio(fechaInicioProceso || null);
+    setFechaFin(fechaFinProceso || null);
+    setDentroDeRango(!!procesoActivo);
+  } catch (error) {
+    console.log('Error al obtener las fechas de actualizacion de datos', error);
+    setDentroDeRango(false);
+    setFechaInicio(null);
+    setFechaFin(null);
   }
+};
+
 
   useEffect(() => {
     cargarFechasActualizacionDatos();
@@ -141,7 +116,7 @@ function ViewDataEstudiante({ onCancel, isLoading, entity }) {
             </div>
             <div className="form-group">
               <label htmlFor="nivel">Nivel:</label>
-              <input id="nivel" value={nivel} onChange={(e) => setNroCedula(e.target.value)} placeholder="Ingrese el nivel" />
+              <input id="nivel" value={nivel} onChange={(e) => setNivel(e.target.value)} placeholder="Ingrese el nivel" />
             </div>
           </div>
 
