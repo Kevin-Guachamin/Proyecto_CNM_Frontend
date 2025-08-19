@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { ErrorMessage } from '../../../../Utils/ErrorMesaje';
@@ -17,6 +17,99 @@ function Inscripciones({asignaciones,docente, periodo,setAsignaciones}) {
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
     const token = localStorage.getItem("token")
     const { estudiante, matricula } = location.state || {};
+
+    // Refs para el manejo responsivo
+    const wrapRef = useRef(null);
+    const footerRef = useRef(null);
+    const isInitialLoad = useRef(true);
+
+    // Cálculo de altura para el contenedor principal
+    useEffect(() => {
+        const setMatricHeight = () => {
+            const wrap = wrapRef.current;
+            if (!wrap) return;
+
+            const rect = wrap.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+            const availableHeight = viewportHeight - rect.top;
+            const minHeight = window.innerWidth <= 768 ? 200 : 300;
+            const finalHeight = Math.max(availableHeight - 20, minHeight);
+            
+            document.documentElement.style.setProperty('--matric-h', `${finalHeight}px`);
+        };
+
+        const timeout1 = setTimeout(setMatricHeight, 50);
+        const timeout2 = setTimeout(setMatricHeight, 200);
+
+        const onResize = () => {
+            clearTimeout(window.matricResizeTimeout);
+            window.matricResizeTimeout = setTimeout(() => {
+                setMatricHeight();
+            }, 100);
+        };
+
+        window.addEventListener('resize', onResize);
+        window.addEventListener('scroll', onResize, { passive: true });
+
+        return () => {
+            clearTimeout(timeout1);
+            clearTimeout(timeout2);
+            clearTimeout(window.matricResizeTimeout);
+            window.removeEventListener('resize', onResize);
+            window.removeEventListener('scroll', onResize);
+        };
+    }, [asignaciones, inscripciones]);
+
+    // Calcular altura del footer para reservar espacio
+    useEffect(() => {
+        const setFooterHeight = () => {
+            const h = footerRef.current ? footerRef.current.offsetHeight : 0;
+            const paddedHeight = h > 0 ? h + 16 : 0;
+            document.documentElement.style.setProperty('--footer-h', `${paddedHeight}px`);
+        };
+        
+        const timeout = setTimeout(setFooterHeight, 50);
+
+        const ro = new ResizeObserver(() => {
+            clearTimeout(window.footerResizeTimeout);
+            window.footerResizeTimeout = setTimeout(setFooterHeight, 100);
+        });
+        
+        if (footerRef.current) ro.observe(footerRef.current);
+
+        return () => {
+            clearTimeout(timeout);
+            clearTimeout(window.footerResizeTimeout);
+            ro.disconnect();
+        };
+    }, [inscripciones]);
+
+    // Asegurar que el botón sea visible cuando se agregue una nueva inscripción
+    useEffect(() => {
+        // Solo hacer scroll si se agregó una inscripción recientemente
+        // No hacer scroll en la carga inicial
+        if (inscripciones.length > 0 && footerRef.current && wrapRef.current) {
+            if (!isInitialLoad.current) {
+                // Si no es la carga inicial, hacer scroll hacia abajo para mostrar el botón
+                setTimeout(() => {
+                    const wrapper = wrapRef.current;
+                    if (wrapper) {
+                        wrapper.scrollTop = wrapper.scrollHeight;
+                    }
+                }, 200);
+            } else {
+                // Marcar que ya pasó la carga inicial
+                isInitialLoad.current = false;
+            }
+        }
+    }, [inscripciones.length]); // Cambiar dependencia a solo la longitud
+
+    // Asegurar que al cargar el componente siempre empiece arriba
+    useEffect(() => {
+        if (wrapRef.current) {
+            wrapRef.current.scrollTop = 0;
+        }
+    }, []); // Solo en mount
 
     const obtenerInscripciones = async () => {
         try {
@@ -95,52 +188,66 @@ function Inscripciones({asignaciones,docente, periodo,setAsignaciones}) {
         setIsModalOpen((prev) => !prev);
     }
     return (
-        <div className='Contenedor-general'>
-            <div className='container_btn-finalizar'>
-                <button className='boton-add' onClick={toggleModal}>Crear Curso</button>
-            </div>
-            {isModalOpen && <CrearCursoIndividual onCancel={toggleModal} onSave={handleCrearAsignacion} docente={docente} periodo={periodo.ID}/>}
-            <div className="Contenedor-tabla">
-                {asignaciones.length === 0 ? (
-                <p className="no-registros">No existen cursos libres para este docente</p>
-                ) : (
-                <Row xs={1} md={2} lg={5} className="g-2">
-                    {asignaciones.map((asig) => {
-                        const nombreCompletoDocente = `${asig.Docente?.primer_nombre}  ${asig.Docente?.primer_apellido} `.trim();
-                        return (
-                            <Col key={asig.ID} className="d-flex justify-content-center p-1">
-                                <Card style={{ maxWidth: "300px", cursor: "pointer", backgroundColor: "#CFD8DC" }} onClick={() => Inscribir(asig)}>
-                                    <Card.Body>
-                                        <Card.Title>{asig.Materia?.nombre}</Card.Title>
-                                        <Card.Subtitle className="mb-2 text-muted">
-                                            Paralelo:  {asig.paralelo} || Cupos: {asig.cupos}<br />
-                                        </Card.Subtitle>
-                                        <Card.Text>
-                                            <strong>Nivel:</strong> {asig.Materia.nivel} <br />
-                                            <strong>Horario:</strong> {asig.horaInicio} - {asig.horaFin} <br />
-                                            <strong>Días:</strong> {asig.dias.join(", ")} <br />
-                                            <strong>Docente:</strong> {nombreCompletoDocente} <br />
-                                        </Card.Text>
-                                        <div className="d-flex justify-content-between mt-3">
-                                        </div>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                        );
-                    })}
-                </Row>
-                )
-            }
-            </div>
-            {inscripciones.length > 0 && (
-                <div>
-                    <Horario materiasSeleccionadas={inscripciones} setMateriasSeleccionadas={setInscripciones} jornada={estudiante.jornada} />
+        <div ref={wrapRef} className="matric-wrapper">
+            <div className="matric-content">
+                {/* Botones de control */}
+                <div className="matric-filtros">
+                    <div className='container_btn-finalizar'>
+                        <button className='boton-add' onClick={toggleModal}>Crear Curso</button>
+                    </div>
+                </div>
 
+                {isModalOpen && <CrearCursoIndividual onCancel={toggleModal} onSave={handleCrearAsignacion} docente={docente} periodo={periodo.ID}/>}
+                
+                {/* Resultados (cards) */}
+                <div className="matric-cards">
+                    {asignaciones.length === 0 ? (
+                        <p className="no-registros">No existen cursos libres para este docente</p>
+                    ) : (
+                        <Row xs={1} md={2} lg={5} className="g-2">
+                            {asignaciones.map((asig) => {
+                                const nombreCompletoDocente = `${asig.Docente?.primer_nombre}  ${asig.Docente?.primer_apellido} `.trim();
+                                return (
+                                    <Col key={asig.ID} className="d-flex justify-content-center p-1">
+                                        <Card style={{ maxWidth: 300, cursor: "pointer", backgroundColor: "#CFD8DC" }} onClick={() => Inscribir(asig)}>
+                                            <Card.Body>
+                                                <Card.Title>{asig.Materia?.nombre}</Card.Title>
+                                                <Card.Subtitle className="mb-2 text-muted">
+                                                    Paralelo:  {asig.paralelo} || Cupos: {asig.cupos}
+                                                </Card.Subtitle>
+                                                <Card.Text>
+                                                    <strong>Nivel:</strong> {asig.Materia.nivel} <br />
+                                                    <strong>Horario:</strong> {asig.horaInicio} - {asig.horaFin} <br />
+                                                    <strong>Días:</strong> {asig.dias.join(", ")} <br />
+                                                    <strong>Docente:</strong> {nombreCompletoDocente}
+                                                </Card.Text>
+                                            </Card.Body>
+                                        </Card>
+                                    </Col>
+                                );
+                            })}
+                        </Row>
+                    )}
+                </div>
+
+                {/* Horario (con scroll horizontal cuando haga falta) */}
+                <div className="matric-horario">
+                    {inscripciones.length > 0 && (
+                        <Horario 
+                            materiasSeleccionadas={inscripciones} 
+                            setMateriasSeleccionadas={setInscripciones} 
+                            jornada={estudiante.jornada} 
+                        />
+                    )}
+                </div>
+            </div>
+
+            {/* Botón final - ahora sticky */}
+            {inscripciones.length > 0 && (
+                <div ref={footerRef} className='matric-footer'>
+                    <button className="btn-finalizar" onClick={FinalizarMatriculas}>Finalizar</button>
                 </div>
             )}
-            <div className='container_btn-finalizar'>
-                <button className="btn-finalizar" onClick={FinalizarMatriculas}>Finalizar</button>
-            </div>
         </div>
     )
 }

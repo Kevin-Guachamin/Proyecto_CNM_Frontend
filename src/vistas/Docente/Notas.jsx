@@ -17,7 +17,7 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
 
-      <Layout modules={modules} onNavigate={handleSidebarNavigation}>
+      <Layout modules={modules} onNavigate={handleSidebarNavigation} activeModule={1}>
         <div className="content-container">
           <Container className="mt-4">
             <div className="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">

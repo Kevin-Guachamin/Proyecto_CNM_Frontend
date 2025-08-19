@@ -2,8 +2,16 @@ import React, { useState, useEffect } from 'react'
 import Header from "../../../components/Header";
 import ChangePassword from '../../components/ChangePassword';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../Utils/useAuth';
 
 function Index() {
+    // Protección de ruta
+    const auth = useAuth("Profesor");
+    
+    // Si no está autenticado, no renderizar nada
+    if (!auth.isAuthenticated) {
+        return null;
+    }
 
     const [usuario, setUsuario] = useState("")
     const navigate = useNavigate()
