@@ -14,13 +14,20 @@ function NotasBE({ usuario, modules, datosModulo, handleSidebarNavigation, handl
 
   const [escalaSeleccionada, setEscalaSeleccionada] = useState("cualitativa");
 
+  // Determinar el activeModule según el rol del usuario
+  const getActiveModule = () => {
+    if (!usuario) return null;
+    const esSecretaria = usuario.subRol?.toLowerCase() === "secretaria";
+    return esSecretaria ? null : 1; // Secretaria: sin módulo activo, Profesor: módulo 1
+  };
+
   return (
     <>
       <div className="container-fluid p-0">
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
 
-      <Layout modules={modules} onNavigate={handleSidebarNavigation} activeModule={1}>
+      <Layout modules={modules} onNavigate={handleSidebarNavigation} activeModule={getActiveModule()}>
         <div className="content-container">
           <Container className="mt-4">
             <div className="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">

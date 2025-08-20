@@ -103,6 +103,10 @@ function FechasProcesos() {
     setShowModal(false);
   };
 
+  const handleFiltrar = (e) => {
+    setSearch(e.target.value);
+  };
+
   const filteredProcesos = procesos.filter(p =>
     p.proceso?.toLowerCase().includes(search.toLowerCase())
   );
@@ -120,7 +124,7 @@ function FechasProcesos() {
           <h2 className="mb-4">Administrar Fechas de Procesos</h2>
           <Filtro
             search={search}
-            setSearch={setSearch}
+            filtrar={handleFiltrar}
             toggleModal={handleAddProceso}
             filterKey={filterKey}
           />

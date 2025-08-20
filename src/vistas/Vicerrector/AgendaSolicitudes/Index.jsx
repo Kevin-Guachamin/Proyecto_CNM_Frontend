@@ -6,8 +6,18 @@ import Header from '../../../components/Header.jsx';
 import { ObtenerTodo } from '../../../Utils/CRUD/ObjetenerTodo.jsx';
 import Loading from '../../../components/Loading.jsx';
 import { getModulos, transformModulesForLayout } from '../../getModulos.jsx';
+import { useAuth } from '../../../Utils/useAuth';
+import { ErrorMessage } from '../../../Utils/ErrorMesaje';
 
 function Index() {
+  // Protección de ruta para Vicerrector
+  const auth = useAuth("Vicerrector");
+  
+  // Si no está autenticado, mostrar mensaje de error
+  if (!auth.isAuthenticated) {
+    return <ErrorMessage message="No tienes permisos para acceder a esta página" />;
+  }
+
   const [usuario, setUsuario] = useState(null);
   const [modules, setModules] = useState([]);
   const [solicitudes, setSolicitudes] = useState([])

@@ -49,7 +49,6 @@
   }
 }
 
-/* Ya lo tenías: móvil <=768px (puedes mantenerlo tal cual) */
 @media (max-width: 768px){
   .filtros{
     flex-wrap: wrap;
@@ -65,6 +64,88 @@
   }
   .react-datepicker-wrapper{
     width: 100% !important;
+  }
+
+  /* Responsive para modales */
+  .modal-container {
+    padding: 20px;
+    margin: 10px;
+    border-radius: 8px;
+  }
+
+  .modal-docente {
+    width: calc(100vw - 20px);
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  /* Formulario compacto para móvil */
+  .modal-form {
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  /* Form-group horizontal como en tu imagen */
+  .modal-form .form-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+  }
+
+  .modal-form .form-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+    min-width: 120px;
+    text-align: left;
+    flex-shrink: 0;
+  }
+
+  .modal-form .form-group input,
+  .modal-form .form-group select {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    min-height: 36px;
+    background: white;
+  }
+
+  .modal-form .form-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 8px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 32px;
+  }
+
+  .botones {
+    flex-direction: row;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: space-between;
+  }
+
+  .botones button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+
+
+/* Desktop pequeño */
+@media (min-width: 901px) and (max-width: 1024px) {
+  .modal-docente {
+    width: 700px;
+    max-width: 90vw;
   }
 }
 
@@ -90,6 +171,33 @@
     max-width: 90vw; /* No sobrepasa el 90% del viewport */
     max-height: 95vh; /* Limita la altura máxima */
     animation: fadeIn 0.3s ease-in-out;
+    overflow-y: auto; /* Scroll si es necesario */
+}
+
+/* Modal específico para docente con mejor ancho */
+.modal-docente {
+    width: 800px;
+    max-width: 95vw;
+}
+
+/* Layout de grilla para formularios */
+.form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.form-row .form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
 /* Animación de entrada */
