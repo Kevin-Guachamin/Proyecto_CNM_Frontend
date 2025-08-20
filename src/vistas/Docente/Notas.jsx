@@ -11,13 +11,21 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
   setActiveSubTabQuim1, setActiveSubTabQuim2, parcial1Quim1Data, parcial2Quim1Data, parcial1Quim2Data, parcial2Quim2Data, quim1Data,
   quim2Data, finalData, handleActualizarParcial1Quim1, handleActualizarParcial2Quim1, handleActualizarParcial1Quim2, handleActualizarParcial2Quim2,
   handleActualizarQuim1, handleActualizarQuim2, handleActualizarFinal, handleEditarFila, soloLectura, getRangoValido}) {
+  
+  // Determinar el activeModule según el rol del usuario
+  const getActiveModule = () => {
+    if (!usuario) return null;
+    const esSecretaria = usuario.subRol?.toLowerCase() === "secretaria";
+    return esSecretaria ? null : 1; // Secretaria: sin módulo activo, Profesor: módulo 1
+  };
+
   return (
     <>
       <div className="container-fluid p-0">
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
 
-      <Layout modules={modules} onNavigate={handleSidebarNavigation} activeModule={1}>
+      <Layout modules={modules} onNavigate={handleSidebarNavigation} activeModule={getActiveModule()}>
         <div className="content-container">
           <Container className="mt-4">
             <div className="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">

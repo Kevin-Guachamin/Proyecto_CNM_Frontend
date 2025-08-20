@@ -9,6 +9,24 @@
   .input-field {
     width: 200px; /* Ajusta el tamaño de los select, puedes cambiarlo si lo deseas */
   }
+
+/* Contenedor principal del filtro con input y botón */
+.filtro-container {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.filtro-input {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.filtro-button {
+    flex-shrink: 0;
+    margin-bottom: 0;
+}
+
 .filter-container {
     display: flex;
     align-items: center; /* Alinea los elementos verticalmente */
@@ -21,8 +39,7 @@
     padding: 5px 10px;
     border-radius: 5px;
     border: 1px solid #ccc;
-    width: 30ch; /* El ancho se ajustará automáticamente al contenido */
-    margin-right: 10px; /* Espacio entre el input y el botón */
+    width: 30vh; /* Usar todo el ancho disponible */
 }
 
 .boton-add {

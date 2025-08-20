@@ -15,18 +15,23 @@ import { useAuth } from "../../Utils/useAuth";
 
 function Calificaciones() {
 
-  // Protección de ruta - debe ir al inicio del componente
-  const auth = useAuth("Profesor");
+  // Protección de ruta - permitir acceso a Profesores y Secretarias
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  // Detectar si es acceso de secretaria basado en la ruta
+  const isSecretariaAccess = location.pathname.includes('/secretaria/');
+  
+  // Aplicar protección de rol según el contexto
+  const auth = useAuth(isSecretariaAccess ? "Secretaria" : "Profesor");
   
   // Si no está autenticado, no renderizar nada (el hook maneja la redirección)
   if (!auth.isAuthenticated) {
     return null;
   }
 
-  const navigate = useNavigate();
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(false);
-  const location = useLocation();
   const [inputsDisabled, setInputsDisabled] = useState(false);
   const moduloSeleccionado = location.state;
   const [parcial1Quim1Data, setParcial1Quim1Data] = useState([]);
@@ -115,21 +120,13 @@ function Calificaciones() {
     const esSecretaria = usuario.subRol?.toLowerCase() === "secretaria";
     
     if (esSecretaria) {
-      // Para secretarias, mantener los módulos específicos existentes
-      return [
-        {
-          name: "Inicio",
-          icon: <Home size={20} />,
-          path: `/secretaria/periodo/materias/${datosModulo.idPeriodo}`,
-        },
-        { name: "Usuarios", icon: <Users size={20} /> },
-        { name: "Configuración", icon: <Settings size={20} /> },
-      ];
+      // Para secretarias, usar los módulos reales de Secretaria
+      return transformModulesForLayout(getModulos("Secretaria", true));
     } else {
       // Para profesores, usar los módulos estándar
       return transformModulesForLayout(getModulos("Profesor", true));
     }
-  }, [usuario, datosModulo.idPeriodo]);
+  }, [usuario]);
 
   useEffect(() => {
     if (localStorage.getItem("inputsLocked") === null) {

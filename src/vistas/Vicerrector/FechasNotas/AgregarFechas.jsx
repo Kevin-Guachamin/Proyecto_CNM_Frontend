@@ -11,8 +11,17 @@ import Tabla from "../../Admin/Components/Tabla";
 import Swal from "sweetalert2";
 import { getModulos, transformModulesForLayout } from "../../getModulos";
 import { Eliminar } from '../../../Utils/CRUD/Eliminar';
+import { useAuth } from "../../../Utils/useAuth";
 
 function AgregarFechas() {
+  // Protección de ruta para Vicerrector
+  const auth = useAuth("Vicerrector");
+  
+  // Si no está autenticado, mostrar mensaje de error
+  if (!auth.isAuthenticated) {
+    return <ErrorMessage message="No tienes permisos para acceder a esta página" />;
+  }
+
   const navigate = useNavigate();
   const [usuario, setUsuario] = useState(null);
   const [fechas, setFechas] = useState([]);

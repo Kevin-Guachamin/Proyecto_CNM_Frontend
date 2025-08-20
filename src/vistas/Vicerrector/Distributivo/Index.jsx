@@ -4,8 +4,18 @@ import Layout from '../../../layout/Layout';
 import { useNavigate } from 'react-router-dom';
 import ContenedorCursos from '../../Admin/Modules/Configuration/Cursos/ContenedorCursos';
 import { getModulos, transformModulesForLayout } from "../../getModulos";
+import { useAuth } from '../../../Utils/useAuth';
+import { ErrorMessage } from '../../../Utils/ErrorMesaje';
 
 function Index() {
+    // Protección de ruta para Vicerrector
+    const auth = useAuth("Vicerrector");
+    
+    // Si no está autenticado, mostrar mensaje de error
+    if (!auth.isAuthenticated) {
+        return <ErrorMessage message="No tienes permisos para acceder a esta página" />;
+    }
+
      const [modules, setModules] = useState([]);
     
     const [usuario, setUsuario] = useState("")

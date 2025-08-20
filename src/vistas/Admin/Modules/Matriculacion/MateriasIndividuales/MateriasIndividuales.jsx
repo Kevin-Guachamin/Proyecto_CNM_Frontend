@@ -168,12 +168,12 @@ function MateriasIndividuales() {
                         <option value="3ro BCH">3ro BCH</option>
                     </select>
                 </div>
-                <div className="filter-container">
+                <div className="form-group">
                     <input
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         className="search-input"
-                        placeholder={`Filtrar por nombre del docente`}
+                        placeholder={`Nombre del docente`}
                     />
 
                 </div>

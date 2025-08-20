@@ -95,7 +95,7 @@ function Index() {
   // ✅ Calcular limit según espacio visible (sin scroll vertical interno)
   useEffect(() => {
     const calcRows = () => {
-      const ROW_H = 50; // alto aprox de una fila
+      const ROW_H = 70; // alto aprox de una fila
       const GAP = 24;
 
       const top =
