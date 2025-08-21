@@ -13,6 +13,7 @@ import CrearDocente from "./CrearDocente";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Paginación from "../../../Components/Paginación";
+import '../../../Styles/TablasResponsivas.css';
 
 function Index() {
   const [loading, setLoading] = useState(true);
@@ -20,9 +21,11 @@ function Index() {
   const [docentes, setDocentes] = useState([]);
   const [modulos, setModulos] = useState([]);
 
+  // paginación y filtros - PAGINACIÓN FIJA
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [limit, setLimit] = useState(0);
+  const ITEMS_PER_PAGE = 10; // FIJO - no más recálculos dinámicos
+  const [search, setSearch] = useState("");
 
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const token = localStorage.getItem("token");
@@ -52,12 +55,11 @@ function Index() {
   const filterKey = "primer_nombre";
   const PK = "nroCedula";
 
-  // Refs para el patrón tabla + paginación externa
-  const wrapperRef = useRef(null);
+  // refs - solo para paginación
   const pagerRef = useRef(null);
-  const [pagerH, setPagerH] = useState(70); // alto real de la paginación (+respiro)
+  const [pagerH, setPagerH] = useState(70);
 
-  // ✅ Autenticación y módulos
+  // ======= Auth + módulos =======
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = storedUser ? JSON.parse(storedUser) : null;
@@ -75,58 +77,27 @@ function Index() {
     setModulos(modulosDinamicos);
   }, [navigate]);
 
-  // ✅ Medir altura real de la barra de paginación (para no tapar filas)
+  // ======= Paginación - altura del paginador =======
   useEffect(() => {
     const updatePagerH = () => {
       const h = pagerRef.current ? pagerRef.current.offsetHeight : 70;
-      setPagerH(h + 16); // plus respiro
+      setPagerH(h);
     };
     updatePagerH();
 
-    const ro = new ResizeObserver(updatePagerH);
-    if (pagerRef.current) ro.observe(pagerRef.current);
-    window.addEventListener("resize", updatePagerH);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", updatePagerH);
-    };
-  }, []);
-
-  // ✅ Calcular limit según espacio visible (sin scroll vertical interno)
-  useEffect(() => {
-    const calcRows = () => {
-      const ROW_H = 70; // alto aprox de una fila
-      const GAP = 24;
-
-      const top =
-        wrapperRef.current?.getBoundingClientRect().top ?? 0;
-
-      const available = window.innerHeight - top - pagerH - GAP;
-      const rows = Math.max(5, Math.floor(available / ROW_H));
-      setLimit(rows);
-    };
-
-    calcRows();
-    const onResize = () => requestAnimationFrame(calcRows);
+    const onResize = () => requestAnimationFrame(updatePagerH);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
-  }, [pagerH]);
+  }, []);
 
-  // ✅ Si cambia el limit, vuelve a la primera página
+  // ======= Obtener docentes con paginación fija =======
   useEffect(() => {
-    if (limit) setPage(1);
-  }, [limit]);
-
-  // ✅ Obtener docentes (page/limit)
-  useEffect(() => {
-    if (!limit) return;
-
     let mounted = true;
     const fetchDocentes = async () => {
       try {
         setLoading(true);
         const { data } = await axios.get(`${API_URL}/docente/obtener`, {
-          params: { page, limit },
+          params: { page, limit: ITEMS_PER_PAGE },
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!mounted) return;
@@ -143,50 +114,53 @@ function Index() {
     return () => {
       mounted = false;
     };
-  }, [page, limit, API_URL, token]);
+  }, [page, API_URL, token]);
+
+  // ======= Filtros =======
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  };
+
+  // ======= Filtrar datos =======
+  const filteredData = docentes.filter((docente) =>
+    docente[filterKey]?.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="section-container">
-      {/* Encabezado */}
       <div className="container-fluid p-0">
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
 
       <Layout modules={modulos}>
-        {loading ? (
-          <Loading />
-        ) : (
-          // Usa tus clases globales de Contenedor.css
-          <div className="tabla-layout">
-            <div className="tabla-wrapper" ref={wrapperRef}>
-              <Contenedor
-                limit={limit}
-                page={page}
-                data={docentes}
-                setData={setDocentes}
-                headers={headers}
-                columnsToShow={colums}
-                filterKey={filterKey}
-                apiEndpoint={"docente"}
-                CrearEntidad={CrearDocente}
-                PK={PK}
-                // 👇 La paginación va afuera (en .pagination-bar)
-                setTotalPages={setTotalPages}
-                setPage={setPage}
-              />
-            </div>
-
-            <div className="pagination-bar" ref={pagerRef}>
-              {docentes.length > 0 && (
-                <Paginación
-                  totalPages={totalPages}
-                  page={page}
-                  setPage={setPage}
+        <div className="vista-docentes">
+          {loading ? (
+            <Loading />
+          ) : (
+            <div className="docentes-container">
+              <div className="docentes-content">
+                <Contenedor
+                  search={search}
+                  filtrar={handleSearch}
+                  data={filteredData}
+                  setData={setDocentes}
+                  headers={headers}
+                  columnsToShow={colums}
+                  filterKey={filterKey}
+                  apiEndpoint={"docente"}
+                  CrearEntidad={CrearDocente}
+                  PK={PK}
                 />
-              )}
+              </div>
+              
+              <div className="docentes-pagination" ref={pagerRef}>
+                {totalPages > 1 && (
+                  <Paginación totalPages={totalPages} page={page} setPage={setPage} />
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </Layout>
     </div>
   );

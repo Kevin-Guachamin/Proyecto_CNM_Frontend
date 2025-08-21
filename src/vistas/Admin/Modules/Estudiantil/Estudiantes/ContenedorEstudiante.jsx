@@ -8,7 +8,7 @@ import DownloadFiles from './DownloadFiles';
 import "../../../Styles/Contenedor.css"
 
 
-function ContenedorEstudiante({ search, filtrar,data, setData, headers, columnsToShow, filterKey, apiEndpoint, CrearEntidad, PK, OnView, Paginación,handleCursos }) {
+function ContenedorEstudiante({ search, filtrar, data, setData, headers, columnsToShow, filterKey, apiEndpoint, CrearEntidad, PK, OnView, handleCursos }) {
   
   const [entityToUpdate, setEntityToUpdate] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,9 +38,7 @@ function ContenedorEstudiante({ search, filtrar,data, setData, headers, columnsT
   
 
   return (
-    <div className='Contenedor-general'>
-
-     
+    <div className='Contenedor-tabla'>
       <div className="filter-container">
         <input
           value={search}
@@ -93,7 +91,6 @@ function ContenedorEstudiante({ search, filtrar,data, setData, headers, columnsT
         headers={headers}
         columnsToShow={columnsToShow}
       />
-      {Paginación && data.lenght > 0 && <div className='Paginación'>{Paginación}</div>}
     </div>
   );
 }

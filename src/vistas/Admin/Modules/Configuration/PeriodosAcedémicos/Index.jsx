@@ -9,15 +9,18 @@ import CrearPeriodo from "./CrearPeriodo";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Paginación from "../../../Components/Paginación";
+import '../../../Styles/TablasResponsivas.css';
 
 function Index() {
   const [loading, setLoading] = useState(true);
   const [usuario, setUsuario] = useState(null);
   const [periodos, setPeriodos] = useState([]);
 
+  // paginación y filtros - PAGINACIÓN FIJA
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [limit, setLimit] = useState(0);
+  const ITEMS_PER_PAGE = 10; // FIJO - no más recálculos dinámicos
+  const [search, setSearch] = useState("");
 
   const [modulos, setModulos] = useState([]);
   const navigate = useNavigate();
@@ -30,12 +33,11 @@ function Index() {
   const filterKey = "descripcion";
   const PK = "ID";
 
-  // Refs para calcular espacio visible y la altura real de la paginación
-  const wrapperRef = useRef(null);
+  // refs - solo para paginación
   const pagerRef = useRef(null);
-  const [pagerH, setPagerH] = useState(64); // altura aproximada de paginación
+  const [pagerH, setPagerH] = useState(70);
 
-  // ✅ Autenticación + módulos
+  // ======= Auth + módulos =======
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = storedUser ? JSON.parse(storedUser) : null;
@@ -53,61 +55,27 @@ function Index() {
     setModulos(modulosDinamicos);
   }, [navigate]);
 
-  // ✅ Medir altura real de la barra de paginación y exponerla como CSS var
+  // ======= Paginación - altura del paginador =======
   useEffect(() => {
     const updatePagerH = () => {
-      const h = pagerRef.current ? pagerRef.current.offsetHeight : 64;
-      const padded = h + 16; // respiro
-      setPagerH(padded);
-      document.documentElement.style.setProperty("--pager-h", `${padded}px`);
+      const h = pagerRef.current ? pagerRef.current.offsetHeight : 70;
+      setPagerH(h);
     };
     updatePagerH();
 
-    const ro = new ResizeObserver(updatePagerH);
-    if (pagerRef.current) ro.observe(pagerRef.current);
-    window.addEventListener("resize", updatePagerH);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", updatePagerH);
-    };
-  }, []);
-
-  // ✅ Calcular LIMIT según espacio disponible en viewport (sin scroll interno)
-  useEffect(() => {
-    const calcRows = () => {
-      const ROW_H = 50; // alto aprox. por fila
-      const GAP = 24;
-
-      const top = wrapperRef.current
-        ? wrapperRef.current.getBoundingClientRect().top
-        : 0;
-
-      const available = window.innerHeight - top - pagerH - GAP;
-      const rows = Math.max(5, Math.floor(available / ROW_H));
-      setLimit(rows);
-    };
-    calcRows();
-
-    const onResize = () => requestAnimationFrame(calcRows);
+    const onResize = () => requestAnimationFrame(updatePagerH);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
-  }, [pagerH]);
+  }, []);
 
-  // ✅ Si cambia el limit (por resize), volver a la página 1
+  // ======= Obtener períodos con paginación fija =======
   useEffect(() => {
-    if (limit) setPage(1);
-  }, [limit]);
-
-  // ✅ Traer periodos (page/limit)
-  useEffect(() => {
-    if (!limit) return;
-
     let mounted = true;
     const fetchPeriodos = async () => {
       try {
         setLoading(true);
         const { data } = await axios.get(`${API_URL}/periodo_academico/obtener`, {
-          params: { page, limit },
+          params: { page, limit: ITEMS_PER_PAGE },
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!mounted) return;
@@ -124,7 +92,17 @@ function Index() {
     return () => {
       mounted = false;
     };
-  }, [page, limit, API_URL, token]);
+  }, [page, API_URL, token]);
+
+  // ======= Filtros =======
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  };
+
+  // ======= Filtrar datos =======
+  const filteredData = periodos.filter((periodo) =>
+    periodo[filterKey]?.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="section-container">
@@ -137,35 +115,28 @@ function Index() {
           {loading ? (
             <Loading />
           ) : (
-            <>
-              {/* Zona tabla + paginación con el mismo patrón que Cursos */}
-              <div className="tabla-layout">
-                <div className="tabla-wrapper" ref={wrapperRef}>
-                  <Contenedor
-                    data={periodos}
-                    setData={setPeriodos}
-                    headers={headers}
-                    columnsToShow={colums}
-                    filterKey={filterKey}
-                    apiEndpoint={"periodo_academico"}
-                    CrearEntidad={CrearPeriodo}
-                    PK={PK}
-
-                    /* paginación externa (abajo): NO pasamos Paginación aquí */
-                    limit={limit}
-                    page={page}
-                    setTotalPages={setTotalPages}
-                    setPage={setPage}
-                  />
-                </div>
-
-                <div className="pagination-bar" ref={pagerRef}>
-                  {periodos.length > 0 && (
-                    <Paginación totalPages={totalPages} page={page} setPage={setPage} />
-                  )}
-                </div>
+            <div className="periodos-container">
+              <div className="periodos-content">
+                <Contenedor
+                  search={search}
+                  filtrar={handleSearch}
+                  data={filteredData}
+                  setData={setPeriodos}
+                  headers={headers}
+                  columnsToShow={colums}
+                  filterKey={filterKey}
+                  apiEndpoint={"periodo_academico"}
+                  CrearEntidad={CrearPeriodo}
+                  PK={PK}
+                />
               </div>
-            </>
+              
+              <div className="periodos-pagination" ref={pagerRef}>
+                {totalPages > 1 && (
+                  <Paginación totalPages={totalPages} page={page} setPage={setPage} />
+                )}
+              </div>
+            </div>
           )}
         </div>
       </Layout>

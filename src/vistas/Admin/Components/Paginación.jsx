@@ -8,7 +8,7 @@ function Paginación({ totalPages, page, setPage }) {
   };
 
   return (
-    <div className="paginacion-ajustada">
+    <div className="paginacion-contenedor">
       <ReactPaginate
         previousLabel={"← Anterior"}
         nextLabel={"Siguiente →"}

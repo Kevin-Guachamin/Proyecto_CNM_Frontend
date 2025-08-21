@@ -1,0 +1,410 @@
+/* ===========================
+   Layout Responsivo para Tablas con Paginación Fija
+   Sin recálculos dinámicos - Solo CSS responsivo
+   =========================== */
+
+.periodos-container,
+.asignaturas-container,
+.docentes-container,
+.cursos-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+  min-height: 70vh;
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+.estudiantes-container,
+.representantes-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+  min-height: 70vh;
+  max-height: 84vh;
+  overflow: hidden;
+}
+
+.estudiantes-content,
+.representantes-content,
+.periodos-content,
+.asignaturas-content,
+.docentes-content,
+.cursos-content,
+.materias-individuales-content {
+  flex: 1;
+  overflow: auto;
+  padding: 0;
+  margin: 0;
+}
+
+.estudiantes-pagination,
+.representantes-pagination,
+.periodos-pagination,
+.asignaturas-pagination,
+.docentes-pagination,
+.cursos-pagination,
+.materias-individuales-pagination {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  background-color: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+  z-index: 10;
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ===========================
+   Tabla Responsiva Mejorada
+   =========================== */
+.Contenedor-tabla {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background-color: #f4f4f4;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.filter-container {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tabla-scroll {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: auto;
+  min-height: 200px;
+}
+
+.tabla_registros {
+  width: 100%;
+  min-width: 900px; /* Ancho mínimo para scroll horizontal */
+  border-collapse: collapse;
+}
+
+.no-registros {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+/* ===========================
+   Responsividad por Media Queries
+   =========================== */
+
+/* Tablets y pantallas medianas */
+@media (max-width: 968px) {
+  .estudiantes-container,
+  .representantes-container,
+  .periodos-container,
+  .asignaturas-container,
+  .docentes-container,
+  .cursos-container {
+    min-height: 60vh;
+    max-height: 80vh;
+  }
+  
+  .filter-container {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px;
+  }
+  
+  .filter-container .search-input,
+  .filter-container .input-field,
+  .filter-container .boton-download {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  .tabla_registros {
+    min-width: 700px;
+  }
+  
+  .tabla_registros thead th,
+  .tabla_registros tbody td {
+    padding: 8px 6px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Móviles */
+@media (max-width: 640px) {
+  .estudiantes-container,
+  .representantes-container,
+  .periodos-container,
+  .asignaturas-container,
+  .docentes-container,
+  .cursos-container {
+    min-height: 50vh;
+    max-height: 75vh;
+  }
+  
+  .Contenedor-tabla {
+    padding: 8px;
+  }
+  
+  .tabla_registros {
+    min-width: 600px;
+  }
+  
+  .tabla_registros thead th,
+  .tabla_registros tbody td {
+    padding: 6px 4px;
+    font-size: 0.85rem;
+  }
+  
+  .botones-icon {
+    min-width: 100px;
+    gap: 6px;
+  }
+  
+  .estudiantes-pagination,
+  .representantes-pagination,
+  .periodos-pagination,
+  .asignaturas-pagination,
+  .docentes-pagination,
+  .cursos-pagination {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    border-top: 2px solid #e5e7eb;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    padding: 12px 8px;
+    max-height: 120px;
+  }
+  
+  .estudiantes-content,
+  .representantes-content,
+  .periodos-content,
+  .asignaturas-content,
+  .docentes-content,
+  .cursos-content {
+    padding-bottom: 120px;
+    overflow-y: auto;
+  }
+}
+
+/* Móviles muy pequeños */
+@media (max-width: 480px) {
+  .estudiantes-container,
+  .representantes-container,
+  .periodos-container,
+  .asignaturas-container,
+  .docentes-container,
+  .cursos-container {
+    max-height: 70vh;
+  }
+  
+  .tabla_registros {
+    min-width: 500px;
+  }
+  
+  .tabla_registros thead th,
+  .tabla_registros tbody td {
+    padding: 4px 3px;
+    font-size: 0.8rem;
+  }
+  
+  .filter-container {
+    padding: 8px;
+  }
+  
+  .estudiantes-pagination,
+  .representantes-pagination,
+  .periodos-pagination,
+  .asignaturas-pagination,
+  .docentes-pagination,
+  .cursos-pagination {
+    padding: 8px;
+    max-height: 100px;
+  }
+  
+  .estudiantes-content,
+  .representantes-content,
+  .periodos-content,
+  .asignaturas-content,
+  .docentes-content,
+  .cursos-content {
+    padding-bottom: 100px;
+  }
+  
+  .pagination-info {
+    font-size: 0.75rem;
+  }
+}
+
+/* ===========================
+   Componentes específicos responsivos
+   =========================== */
+
+.search-input {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  min-width: 200px;
+}
+
+.input-field {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.boton-download {
+  padding: 8px 16px;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.boton-download:hover {
+  background-color: #2563eb;
+}
+
+/* Iconos responsivos */
+.icon {
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.edit-icon { color: #3b82f6; }
+.delete-icon { color: #ef4444; }
+.view-icon { color: #12c026; }
+
+.edit-icon:hover { color: #1d4ed8; }
+.delete-icon:hover { color: #dc2626; }
+.view-icon:hover { color: #0c7518; }
+
+@media (max-width: 640px) {
+  .search-input {
+    min-width: unset;
+  }
+  
+  .icon {
+    font-size: 0.9rem;
+  }
+}
+
+/* ===========================
+   Estilos para React-Paginate
+   =========================== */
+.paginacion-contenedor {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap;
+}
+
+.pagination li {
+  margin: 0 2px;
+}
+
+.pagination li a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  color: #374151;
+  text-decoration: none;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-size: 0.9rem;
+  min-width: 40px;
+}
+
+.pagination li a:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.pagination li.selected a {
+  background-color: #3b82f6;
+  color: #ffffff;
+  border-color: #3b82f6;
+}
+
+.pagination li.disabled a {
+  color: #9ca3af;
+  cursor: not-allowed;
+  background-color: #f9fafb;
+}
+
+.pagination li.disabled a:hover {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.pagination li.break a {
+  border: none;
+  background: none;
+  color: #6b7280;
+}
+
+/* Responsive para paginación */
+@media (max-width: 640px) {
+  .pagination li a {
+    padding: 6px 8px;
+    font-size: 0.8rem;
+    min-width: 32px;
+  }
+  
+  .pagination {
+    gap: 2px;
+  }
+  
+  .pagination li {
+    margin: 0 1px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pagination li a {
+    padding: 4px 6px;
+    font-size: 0.75rem;
+    min-width: 28px;
+  }
+}
