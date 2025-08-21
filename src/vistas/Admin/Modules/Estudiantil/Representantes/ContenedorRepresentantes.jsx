@@ -5,7 +5,7 @@ import { Editar } from '../../../../../Utils/CRUD/Editar';
 import "../../../Styles/Contenedor.css"
 
 
-function ContenedorRepresentantes({ search,filtrar,data, setData, headers, columnsToShow, filterKey, apiEndpoint, CrearEntidad, PK, OnView, Paginación}) {
+function ContenedorRepresentantes({ search, filtrar, data, setData, headers, columnsToShow, filterKey, apiEndpoint, CrearEntidad, PK, OnView}) {
   
   const [entityToUpdate, setEntityToUpdate] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,9 +38,7 @@ function ContenedorRepresentantes({ search,filtrar,data, setData, headers, colum
   
 
   return (
-    <div className='Contenedor-general'>
-
-     
+    <div className='Contenedor-tabla'>
       <div className="filter-container">
         <input
           value={search}
@@ -73,7 +71,6 @@ function ContenedorRepresentantes({ search,filtrar,data, setData, headers, colum
         headers={headers}
         columnsToShow={columnsToShow}
       />
-      {Paginación && data.length > 0 && <div className='Paginación'>{Paginación}</div>}
     </div>
   );
 }

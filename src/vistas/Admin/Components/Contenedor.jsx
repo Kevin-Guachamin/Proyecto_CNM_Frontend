@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Filtro from './Filtro';
 import Tabla from './Tabla';
 import { Eliminar } from '../../../Utils/CRUD/Eliminar';
@@ -16,24 +16,37 @@ function Contenedor({ setTotalPages,data, setData, headers, columnsToShow, filte
   const token=localStorage.getItem("token")
   const [search,setSearch]=useState("")
 
-  const fetchEntidades = async (e) => {
-    e.preventDefault()
-    setSearch(e.target.value)
+  // ======= Función para hacer peticiones con filtro =======
+  const fetchEntidadesConFiltro = async (searchTerm = search, currentPage = page) => {
     try {
-      console.log("este es el valor de limit que se manda del front",limit)
-      console.log("este es el valor del page que se manda del front", page)
+      console.log("Buscando con:", { searchTerm, currentPage, limit });
       const { data } = await axios.get(
-        `${API_URL}/${apiEndpoint}/obtener?page=${page}&limit=${limit}&search=${e.target.value}`,
+        `${API_URL}/${apiEndpoint}/obtener?page=${currentPage}&limit=${limit}&search=${searchTerm}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      console.log("esta es la data",data)
+      console.log("Datos recibidos:", data);
       setData(data.data);
-      setTotalPages(data.totalPages);
+      if (setTotalPages) setTotalPages(data.totalPages);
     } catch (error) {
       ErrorMessage(error);
     } 
+  };
+
+  // ======= Ejecutar búsqueda cuando cambie la página (manteniendo filtro) =======
+  useEffect(() => {
+    if (page && limit) {
+      fetchEntidadesConFiltro(search, page);
+    }
+  }, [page]); // Solo cuando cambie la página
+
+  const fetchEntidades = async (e) => {
+    e.preventDefault()
+    const newSearch = e.target.value;
+    setSearch(newSearch);
+    // Hacer búsqueda en página 1 cuando cambie el filtro
+    fetchEntidadesConFiltro(newSearch, 1);
   };
   
 

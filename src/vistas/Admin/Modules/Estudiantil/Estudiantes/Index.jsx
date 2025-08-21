@@ -15,6 +15,7 @@ import Paginación from "../../../Components/Paginación";
 import { useNavigate } from "react-router-dom";
 import TabSwitcher from "./Tabulador";
 import ViewData from "./ViewData";
+import '../../../Styles/TablasResponsivas.css';
 
 function Index() {
   const [loading, setLoading] = useState(true);
@@ -23,10 +24,10 @@ function Index() {
   const [estudiantes, setEstudiantes] = useState([]);
   const [estudiante, setEstudiante] = useState({});
 
-  // paginación y filtros
+  // paginación y filtros - PAGINACIÓN FIJA
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [limit, setLimit] = useState(0);
+  const ITEMS_PER_PAGE = 10; // FIJO - no más recálculos dinámicos
   const [search, setSearch] = useState("");
   const [nivel, setNivel] = useState("");
 
@@ -36,8 +37,7 @@ function Index() {
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const token = localStorage.getItem("token");
 
-  // refs
-  const wrapperRef = useRef(null);
+  // refs - solo para paginación
   const pagerRef = useRef(null);
   const [pagerH, setPagerH] = useState(70);
 
@@ -62,7 +62,7 @@ function Index() {
     setModulos(modulosDinamicos);
   }, [navigate]);
 
-  // ======= Medir altura de la paginación y exponer --pager-h =======
+  // ======= Medir altura de la paginación =======
   useEffect(() => {
     const updatePagerH = () => {
       const h = pagerRef.current ? pagerRef.current.offsetHeight : 70;
@@ -75,60 +75,17 @@ function Index() {
 
     const ro = new ResizeObserver(updatePagerH);
     if (pagerRef.current) ro.observe(pagerRef.current);
-    window.addEventListener("resize", updatePagerH);
     
     return () => {
       ro.disconnect();
-      window.removeEventListener("resize", updatePagerH);
     };
   }, []);
 
-  // ======= Calcular limit según alto visible =======
-  useEffect(() => {
-    const calcRows = () => {
-      const ROW_H = 89; // alto aprox de fila
-      const GAP = 24;
-
-      const top = wrapperRef.current
-        ? wrapperRef.current.getBoundingClientRect().top
-        : 100; // valor por defecto si no está disponible
-
-      const available = window.innerHeight - top - pagerH - GAP;
-      const rows = Math.max(3, Math.floor(available / ROW_H)); // mínimo 3 filas
-      setLimit(rows);
-    };
-
-    // Pequeño delay para asegurar que el DOM esté renderizado
-    const timeout = setTimeout(calcRows, 100);
-    
-    const onResize = () => requestAnimationFrame(calcRows);
-    window.addEventListener("resize", onResize);
-    
-    return () => {
-      clearTimeout(timeout);
-      window.removeEventListener("resize", onResize);
-    };
-  }, [pagerH]);
-
-  // ======= Reset a página 1 =======
-  useEffect(() => { if (limit) setPage(1); }, [limit]);
+  // ======= Reset a página 1 solo por filtros =======
   useEffect(() => { setPage(1); }, [search, nivel]);
 
-  // ======= Forzar recálculo cuando el componente se monte =======
+  // ======= Fetch con paginación fija =======
   useEffect(() => {
-    const forceRecalc = () => {
-      window.dispatchEvent(new Event('resize'));
-    };
-
-    const timeout = setTimeout(forceRecalc, 200);
-    
-    return () => clearTimeout(timeout);
-  }, []);
-
-  // ======= Fetch =======
-  useEffect(() => {
-    if (!limit) return;
-
     let mounted = true;
     const fetchData = async () => {
       try {
@@ -139,7 +96,7 @@ function Index() {
           : `${API_URL}/estudiante/obtener`;
 
         const { data } = await axios.get(baseUrl, {
-          params: { page, limit, search },
+          params: { page, limit: ITEMS_PER_PAGE, search },
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -148,6 +105,7 @@ function Index() {
         setEstudiantes(Array.isArray(list) ? list : []);
         setTotalPages(data?.totalPages ?? 1);
       } catch (error) {
+        console.error('Error fetching students:', error);
         ErrorMessage(error);
       } finally {
         if (mounted) setLoading(false);
@@ -156,7 +114,7 @@ function Index() {
 
     const t = setTimeout(fetchData, 300); // debounce
     return () => { mounted = false; clearTimeout(t); };
-  }, [API_URL, token, page, limit, search, nivel]);
+  }, [API_URL, token, page, search, nivel, ITEMS_PER_PAGE]);
 
   // ======= Handlers =======
   const filtrar = (e) => setSearch(e?.target?.value ?? "");
@@ -175,8 +133,8 @@ function Index() {
       component: loading ? (
         <Loading />
       ) : (
-        <div className="estud-layout">
-          <div className="estud-wrapper" ref={wrapperRef}>
+        <div className="estudiantes-container">
+          <div className="estudiantes-content">
             <ContenedorEstudiante
               data={estudiantes}
               setData={setEstudiantes}
@@ -209,7 +167,7 @@ function Index() {
           </div>
 
           <div
-            className="estud-pagination"
+            className="estudiantes-pagination"
             ref={pagerRef}
             role="navigation"
             aria-label="Paginación de estudiantes"

@@ -15,7 +15,8 @@ import Paginación from "../../../Components/Paginación";
 import { useNavigate } from "react-router-dom";
 import TabSwitcher from "../Estudiantes/Tabulador";
 import InfoRepresentante from "../Estudiantes/InfoRepresentante";
-import '../../../Styles/TarjetaEstudiante.css'
+import '../../../Styles/TarjetaEstudiante.css';
+import '../../../Styles/TablasResponsivas.css';
 
 function Index() {
   const [loading, setLoading] = useState(true);
@@ -25,10 +26,10 @@ function Index() {
   const [representantes, setRepresentantes] = useState([]);
   const [representante, setRepresentante] = useState({});
 
-  // paginación + filtro
+  // paginación + filtro - PAGINACIÓN FIJA
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [limit, setLimit] = useState(0);
+  const ITEMS_PER_PAGE = 10; // FIJO - no más recálculos dinámicos
   const [search, setSearch] = useState("");
 
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
@@ -47,8 +48,7 @@ function Index() {
   const filterKey = "primer_nombre";
   const PK = "nroCedula";
 
-  // Refs para layout responsive (tabla + paginación externa)
-  const wrapperRef = useRef(null);
+  // refs - solo para paginación
   const pagerRef = useRef(null);
   const [pagerH, setPagerH] = useState(70);
 
@@ -72,7 +72,7 @@ function Index() {
     setModulos(modulosDinamicos);
   }, [navigate]);
 
-  // ========= Medir altura de la barra y exponer --pager-h =========
+  // ========= Medir altura de la paginación =========
   useEffect(() => {
     const updatePagerH = () => {
       const h = pagerRef.current ? pagerRef.current.offsetHeight : 70;
@@ -80,65 +80,28 @@ function Index() {
       setPagerH(padded);
       document.documentElement.style.setProperty("--pager-h", `${padded}px`);
     };
+
     updatePagerH();
 
     const ro = new ResizeObserver(updatePagerH);
     if (pagerRef.current) ro.observe(pagerRef.current);
-    window.addEventListener("resize", updatePagerH);
+    
     return () => {
       ro.disconnect();
-      window.removeEventListener("resize", updatePagerH);
     };
   }, []);
 
-  // ========= Calcular limit por alto visible (SIN mínimo) =========
-  useEffect(() => {
-    const ROW_H = 89; // alto aprox de fila
-    const GAP = 24;
-
-    const calcRows = () => {
-      const top = wrapperRef.current
-        ? wrapperRef.current.getBoundingClientRect().top
-        : 0;
-
-      const available = window.innerHeight - top - pagerH - GAP;
-      const rows = Math.floor(available / ROW_H); // sin mínimo
-      setLimit(prev => (prev !== rows ? rows : prev));
-    };
-
-    let ticking = false;
-    const onResize = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        calcRows();
-        ticking = false;
-      });
-    };
-
-    calcRows();
-    window.addEventListener("resize", onResize);
-    window.addEventListener("orientationchange", onResize);
-    return () => {
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("orientationchange", onResize);
-    };
-  }, [pagerH]);
-
-  // ========= Reset a página 1 si cambia limit o search =========
-  useEffect(() => { if (limit) setPage(1); }, [limit]);
+  // ========= Reset a página 1 solo por filtros =========
   useEffect(() => { setPage(1); }, [search]);
 
-  // ========= Fetch central (page/limit/search) con debounce =========
+  // ========= Fetch con paginación fija =========
   useEffect(() => {
-    if (!limit) return;
-
     let mounted = true;
     const fetchData = async () => {
       try {
         setLoading(true);
         const { data } = await axios.get(`${API_URL}/representante/obtener`, {
-          params: { page, limit, search },
+          params: { page, limit: ITEMS_PER_PAGE, search },
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -147,18 +110,16 @@ function Index() {
         setRepresentantes(Array.isArray(list) ? list : []);
         setTotalPages(data?.totalPages ?? 1);
       } catch (error) {
+        console.error('Error fetching representatives:', error);
         ErrorMessage(error);
       } finally {
         if (mounted) setLoading(false);
       }
     };
 
-    const t = setTimeout(fetchData, 300);
-    return () => {
-      mounted = false;
-      clearTimeout(t);
-    };
-  }, [API_URL, token, page, limit, search]);
+    const t = setTimeout(fetchData, 300); // debounce
+    return () => { mounted = false; clearTimeout(t); };
+  }, [API_URL, token, page, search, ITEMS_PER_PAGE]);
 
   // ========= Handlers =========
   const filtrar = (e) => setSearch(e?.target?.value ?? "");
@@ -176,8 +137,8 @@ function Index() {
       component: loading ? (
         <Loading />
       ) : (
-        <div className="repre-layout">
-          <div className="repre-wrapper" ref={wrapperRef}>
+        <div className="representantes-container">
+          <div className="representantes-content">
             <ContenedorRepresentantes
               data={representantes}
               setData={setRepresentantes}
@@ -194,7 +155,7 @@ function Index() {
           </div>
 
           <div
-            className="repre-pagination"
+            className="representantes-pagination"
             ref={pagerRef}
             role="navigation"
             aria-label="Paginación de representantes"

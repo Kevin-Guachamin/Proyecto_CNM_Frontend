@@ -13,17 +13,19 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ErrorMessage } from "../../../../../Utils/ErrorMesaje";
 import Paginación from "../../../Components/Paginación";
+import '../../../Styles/TablasResponsivas.css';
 
 function Index() {
   const [loading, setLoading] = useState(true);
   const [usuario, setUsuario] = useState(null);
   const [asignaturas, setAsignaturas] = useState([]);
 
+  // paginación y filtros - PAGINACIÓN FIJA
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [limit, setLimit] = useState(0);
-
+  const ITEMS_PER_PAGE = 10; // FIJO - no más recálculos dinámicos
   const [search, setSearch] = useState("");
+
   const [modulos, setModulos] = useState([]);
 
   const navigate = useNavigate();
@@ -35,12 +37,11 @@ function Index() {
   const filterKey = "nombre";
   const PK = "ID";
 
-  // Refs para aplicar el patrón de tabla + paginación externa
-  const wrapperRef = useRef(null);
+  // refs - solo para paginación
   const pagerRef = useRef(null);
-  const [pagerH, setPagerH] = useState(70); // alto real de la barra de paginación
+  const [pagerH, setPagerH] = useState(70);
 
-  // ✅ Verificar usuario autenticado + módulos
+  // ======= Auth + módulos =======
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = storedUser ? JSON.parse(storedUser) : null;
@@ -58,82 +59,57 @@ function Index() {
     setModulos(modulosDinamicos);
   }, [navigate]);
 
-  // ✅ Medir altura real de la paginación (para que nunca tape las últimas filas)
+  // ======= Paginación - altura del paginador =======
   useEffect(() => {
     const updatePagerH = () => {
       const h = pagerRef.current ? pagerRef.current.offsetHeight : 70;
-      setPagerH(h + 16); // un poco de respiro
+      setPagerH(h);
     };
     updatePagerH();
 
-    const ro = new ResizeObserver(updatePagerH);
-    if (pagerRef.current) ro.observe(pagerRef.current);
-    window.addEventListener("resize", updatePagerH);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", updatePagerH);
-    };
-  }, []);
-
-  // ✅ Calcular limit por ALTO disponible (sin scroll vertical interno)
-  useEffect(() => {
-    const calcRows = () => {
-      const ROW_H = 69; // alto aprox de fila
-      const GAP = 30;
-
-      const top = wrapperRef.current
-        ? wrapperRef.current.getBoundingClientRect().top
-        : 0;
-
-      const available = window.innerHeight - top - pagerH - GAP;
-      const rows = Math.max(5, Math.floor(available / ROW_H));
-      setLimit(rows);
-    };
-
-    calcRows();
-    const onResize = () => requestAnimationFrame(calcRows);
+    const onResize = () => requestAnimationFrame(updatePagerH);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
-  }, [pagerH]);
+  }, []);
 
-  // ✅ Si cambia el limit (por resize), vuelve a la página 1
+  // ======= Obtener asignaturas con paginación fija (solo carga inicial) =======
   useEffect(() => {
-    if (limit) setPage(1);
-  }, [limit]);
+    let mounted = true;
+    const fetchAsignaturas = async () => {
+      try {
+        setLoading(true);
+        const { data } = await axios.get(`${API_URL}/materia/obtener`, {
+          params: { page: 1, limit: ITEMS_PER_PAGE }, // Siempre página 1 inicial
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!mounted) return;
+        setAsignaturas(data.data ?? []);
+        setTotalPages(data.totalPages ?? 1);
+      } catch (error) {
+        ErrorMessage(error);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
 
-  // ✅ Obtener asignaturas (page/limit/search) con debounce
-  useEffect(() => {
-    if (!limit) return;
+    // Solo cargar datos iniciales una vez
+    if (asignaturas.length === 0) {
+      const t = setTimeout(fetchAsignaturas, 300);
+      return () => { mounted = false; clearTimeout(t); };
+    }
+    
+    return () => { mounted = false; };
+  }, [API_URL, token, ITEMS_PER_PAGE]); // Removido 'page' para evitar re-cargas
 
-    const delay = setTimeout(() => {
-      const fetchAsignaturas = async () => {
-        try {
-          setLoading(true);
-          const { data } = await axios.get(`${API_URL}/materia/obtener`, {
-            params: { page, limit, search },
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          setAsignaturas(data.data ?? []);
-          setTotalPages(data.totalPages ?? 1);
-        } catch (error) {
-          ErrorMessage(error);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchAsignaturas();
-    }, 350);
-
-    return () => clearTimeout(delay);
-  }, [page, limit, search, API_URL, token]);
-
-  // 🔎 handler del filtro
-  const handleSearchChange = (e) => {
-    const value = e?.target?.value ?? "";
-    setSearch(value);
-    setPage(1);
+  // ======= Filtros =======
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
   };
+
+  // ======= Reset a página 1 cuando cambie el filtro =======
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
 
   return (
     <div className="section-container">
@@ -142,39 +118,37 @@ function Index() {
       </div>
 
       <Layout modules={modulos}>
-        {loading ? (
-          <Loading />
-        ) : (
-          // ⬇️ Usamos las clases de Contenedor.css: .tabla-layout / .tabla-wrapper / .pagination-bar
-          <div className="tabla-layout">
-            <div className="tabla-wrapper" ref={wrapperRef}>
-              <Contenedor
-                data={asignaturas}
-                setData={setAsignaturas}
-                headers={headers}
-                columnsToShow={colums}
-                filterKey={filterKey}
-                apiEndpoint="materia"
-                CrearEntidad={CrearAsignatura}
-                PK={PK}
-                // 👇 La paginación va afuera; aquí NO pasamos <Paginación />
-                page={page}
-                limit={limit}
-                setTotalPages={setTotalPages}
-                setPage={setPage}
-                // filtro controlado
-                search={search}
-                filtrar={handleSearchChange}
-              />
+        <div className="vista-asignaturas">
+          {loading ? (
+            <Loading />
+          ) : (
+            <div className="asignaturas-container">
+              <div className="asignaturas-content">
+                <Contenedor
+                  search={search}
+                  filtrar={handleSearch}
+                  data={asignaturas} // ✅ Datos sin filtrar - Contenedor maneja el search
+                  setData={setAsignaturas}
+                  setTotalPages={setTotalPages} // ✅ Pasamos setTotalPages
+                  headers={headers}
+                  columnsToShow={colums}
+                  filterKey={filterKey}
+                  apiEndpoint="materia"
+                  CrearEntidad={CrearAsignatura}
+                  PK={PK}
+                  page={page} // ✅ Pasamos page
+                  limit={ITEMS_PER_PAGE} // ✅ Pasamos limit
+                />
+              </div>
+              
+              <div className="asignaturas-pagination" ref={pagerRef}>
+                {totalPages > 1 && (
+                  <Paginación totalPages={totalPages} page={page} setPage={setPage} />
+                )}
+              </div>
             </div>
-
-            <div className="pagination-bar" ref={pagerRef}>
-              {asignaturas.length > 0 && (
-                <Paginación totalPages={totalPages} page={page} setPage={setPage} />
-              )}
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </Layout>
     </div>
   );
