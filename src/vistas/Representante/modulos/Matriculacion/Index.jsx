@@ -5,8 +5,18 @@ import Loading from "../../../../components/Loading";
 import Busqueda from "./Busqueda";
 import { useNavigate } from "react-router-dom";
 import { modulosRepresentante } from "../../components/ModulosRepresentante";
+import { useAuth } from '../../../../Utils/useAuth';
+import { ErrorMessage } from '../../../../Utils/ErrorMesaje';
 
 function Index() {
+  // Protección de ruta para Representante
+  const auth = useAuth("representante");
+  
+  // Si no está autenticado, mostrar mensaje de error
+  if (!auth.isAuthenticated) {
+    return <ErrorMessage message="No tienes permisos para acceder a esta página" />;
+  }
+
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -16,7 +26,7 @@ function Index() {
     const storedUser = localStorage.getItem("usuario");
 
     if (!storedUser) {
-      navigate("/login");
+      navigate("/");
       return;
     }
 
@@ -26,12 +36,12 @@ function Index() {
       
     } catch (error) {
       console.log("Error parseando el usuario de localStorage: ", error);
-      navigate("/login");
+      navigate("/");
       return; 
     }
 
     if (!parsedUser) {
-      navigate("/login");
+      navigate("/");
       return;
     }
 

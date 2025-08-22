@@ -90,19 +90,19 @@ function Index() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // ======= Obtener docentes con paginación fija =======
+  // ======= Obtener docentes - carga inicial completa =======
   useEffect(() => {
     let mounted = true;
     const fetchDocentes = async () => {
       try {
         setLoading(true);
+        // Cargar TODOS los docentes de una vez para filtrar en frontend
         const { data } = await axios.get(`${API_URL}/docente/obtener`, {
-          params: { page, limit: ITEMS_PER_PAGE },
+          params: { page: 1, limit: 1000 }, // Límite alto para obtener todos
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!mounted) return;
         setDocentes(data.data ?? []);
-        setTotalPages(data.totalPages ?? 1);
       } catch (error) {
         ErrorMessage(error);
       } finally {
@@ -110,21 +110,45 @@ function Index() {
       }
     };
 
-    fetchDocentes();
+    // Solo cargar una vez al inicio
+    if (docentes.length === 0) {
+      fetchDocentes();
+    }
     return () => {
       mounted = false;
     };
-  }, [page, API_URL, token]);
+  }, [API_URL, token]); // Removido 'page' para evitar recargas
 
   // ======= Filtros =======
   const handleSearch = (e) => {
     setSearch(e.target.value);
   };
 
-  // ======= Filtrar datos =======
-  const filteredData = docentes.filter((docente) =>
-    docente[filterKey]?.toLowerCase().includes(search.toLowerCase())
-  );
+  // Volver a la primera página cuando cambie el filtro/búsqueda
+  useEffect(() => {
+    setPage(1);
+  }, [search, filterKey]);
+
+  // ======= Filtrar datos (frontend) =======
+  const filteredData = docentes.filter((docente) => {
+    if (!search.trim()) return true;
+    const val = docente[filterKey];
+    if (val && val.toString().toLowerCase().includes(search.toLowerCase())) return true;
+    const nombreCompleto = `${docente.primer_nombre || ''} ${docente.segundo_nombre || ''} ${docente.primer_apellido || ''} ${docente.segundo_apellido || ''}`.toLowerCase();
+    return nombreCompleto.includes(search.toLowerCase());
+  });
+
+  // Paginación local sobre datos filtrados
+  const totalFilteredPages = Math.max(1, Math.ceil(filteredData.length / ITEMS_PER_PAGE));
+  const startIndex = (page - 1) * ITEMS_PER_PAGE;
+  const pageData = filteredData.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  // Asegurar que la página actual no exceda el total de páginas filtradas
+  useEffect(() => {
+    if (page > totalFilteredPages) {
+      setPage(totalFilteredPages);
+    }
+  }, [totalFilteredPages]);
 
   return (
     <div className="section-container">
@@ -142,7 +166,7 @@ function Index() {
                 <Contenedor
                   search={search}
                   filtrar={handleSearch}
-                  data={filteredData}
+                  data={pageData}
                   setData={setDocentes}
                   headers={headers}
                   columnsToShow={colums}
@@ -150,12 +174,16 @@ function Index() {
                   apiEndpoint={"docente"}
                   CrearEntidad={CrearDocente}
                   PK={PK}
+                  // Evitar llamadas al backend durante el filtro
+                  avoidBackendFilter={true}
+                  externalSearch={search}
+                  onFilterChange={handleSearch}
                 />
               </div>
               
               <div className="docentes-pagination" ref={pagerRef}>
-                {totalPages > 1 && (
-                  <Paginación totalPages={totalPages} page={page} setPage={setPage} />
+                {totalFilteredPages > 1 && (
+                  <Paginación totalPages={totalFilteredPages} page={page} setPage={setPage} />
                 )}
               </div>
             </div>

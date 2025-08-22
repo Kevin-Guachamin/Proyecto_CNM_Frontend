@@ -144,10 +144,30 @@ function Index() {
     JSON.stringify(curso).toLowerCase().includes(search.toLowerCase())
   );
 
-  // ======= Paginación local para grupos =======
-  const startIndex = (page - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedData = grupo ? filteredData.slice(startIndex, endIndex) : filteredData;
+  // ======= Paginación (frontend vs backend) =======
+  // - Con grupo o con búsqueda: paginación frontend sobre filteredData
+  // - Solo periodo (sin grupo y sin búsqueda): paginación backend
+  const isSearching = search.trim().length > 0;
+
+  let paginatedData;
+  let totalPagesToShow;
+
+  if (grupo || isSearching) {
+    // Paginación frontend
+    const start = (page - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+    paginatedData = filteredData.slice(start, end);
+    totalPagesToShow = Math.max(1, Math.ceil(filteredData.length / ITEMS_PER_PAGE));
+  } else {
+    // Paginación backend
+    paginatedData = cursos;
+    totalPagesToShow = totalPages;
+  }
+
+  // Resetear a página 1 cuando cambia el término de búsqueda
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
 
   return (
     <div className="section-container">
@@ -173,8 +193,8 @@ function Index() {
             </div>
             
             <div className="cursos-pagination" ref={pagerRef}>
-              {totalPages > 1 && (
-                <Paginación totalPages={totalPages} page={page} setPage={setPage} />
+              {totalPagesToShow > 1 && (
+                <Paginación totalPages={totalPagesToShow} page={page} setPage={setPage} />
               )}
             </div>
           </div>

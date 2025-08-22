@@ -6,8 +6,18 @@ import Header from "../../components/Header";
 import Modulo from "../../components/Modulo";
 import Layout from "../../layout/Layout"; // antes "../../layout/components/Layout"
 import Loading from "../../components/Loading";
+import { useAuth } from '../../Utils/useAuth';
+import { ErrorMessage } from '../../Utils/ErrorMesaje';
 
 const Index = () => {
+  // Protección de ruta para Representante
+  const auth = useAuth("representante");
+  
+  // Si no está autenticado, mostrar mensaje de error
+  if (!auth.isAuthenticated) {
+    return <ErrorMessage message="No tienes permisos para acceder a esta página" />;
+  }
+
   const  navigate = useNavigate();
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(false);

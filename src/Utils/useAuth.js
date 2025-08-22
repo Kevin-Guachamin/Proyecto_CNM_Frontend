@@ -42,7 +42,10 @@ export const useAuth = (requiredRole = null) => {
       try {
         const parsedUser = JSON.parse(usuario);
         
-        if (parsedUser.subRol !== requiredRole) {
+        // Verificar tanto 'rol' como 'subRol' para compatibilidad
+        const userRole = parsedUser.subRol || parsedUser.rol;
+        
+        if (userRole !== requiredRole) {
           setIsAuthenticated(false);
           setIsChecking(false);
           

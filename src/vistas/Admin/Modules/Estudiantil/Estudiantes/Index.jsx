@@ -84,26 +84,26 @@ function Index() {
   // ======= Reset a página 1 solo por filtros =======
   useEffect(() => { setPage(1); }, [search, nivel]);
 
-  // ======= Fetch con paginación fija =======
+  // ======= Fetch - carga inicial completa =======
   useEffect(() => {
     let mounted = true;
     const fetchData = async () => {
       try {
         setLoading(true);
 
+        // Cargar TODOS los estudiantes de una vez para filtrar en frontend
         const baseUrl = nivel
           ? `${API_URL}/estudiante/nivel/${encodeURIComponent(nivel)}`
           : `${API_URL}/estudiante/obtener`;
 
         const { data } = await axios.get(baseUrl, {
-          params: { page, limit: ITEMS_PER_PAGE, search },
+          params: { page: 1, limit: 1000 }, // Límite alto para obtener todos
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!mounted) return;
         const list = data?.data ?? data?.estudiantes ?? [];
         setEstudiantes(Array.isArray(list) ? list : []);
-        setTotalPages(data?.totalPages ?? 1);
       } catch (error) {
         console.error('Error fetching students:', error);
         ErrorMessage(error);
@@ -112,9 +112,10 @@ function Index() {
       }
     };
 
+    // Solo cargar cuando cambie el nivel o al inicio
     const t = setTimeout(fetchData, 300); // debounce
     return () => { mounted = false; clearTimeout(t); };
-  }, [API_URL, token, page, search, nivel, ITEMS_PER_PAGE]);
+  }, [API_URL, token, nivel]); // Removido 'page' y 'search' para evitar recargas
 
   // ======= Handlers =======
   const filtrar = (e) => setSearch(e?.target?.value ?? "");
@@ -124,6 +125,41 @@ function Index() {
     setActiveTabId("tab2");
     openTab("tab2");
   };
+
+  // ======= Filtrar datos en frontend =======
+  const filteredData = estudiantes.filter((estudiante) => {
+    if (!search.trim()) return true;
+    const searchLower = search.toLowerCase();
+    
+    // Buscar en primer nombre
+    const primerNombre = estudiante.primer_nombre;
+    if (primerNombre && primerNombre.toString().toLowerCase().includes(searchLower)) {
+      return true;
+    }
+    
+    // También buscar en nombre completo y otros campos
+    const nombreCompleto = `${estudiante.primer_nombre || ''} ${estudiante.segundo_nombre || ''} ${estudiante.primer_apellido || ''} ${estudiante.segundo_apellido || ''}`.toLowerCase();
+    if (nombreCompleto.includes(searchLower)) return true;
+
+    // Buscar en cédula
+    const cedula = estudiante.nroCedula;
+    if (cedula && cedula.toString().toLowerCase().includes(searchLower)) {
+      return true;
+    }
+
+    return false;
+  });
+
+  // ======= Paginación frontend =======
+  const totalFilteredPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+  const startIndex = (page - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const currentPageData = filteredData.slice(startIndex, endIndex);
+
+  // ======= Reset a página 1 cuando cambie el filtro =======
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
 
   // ======= Tabs =======
   const tabs = [
@@ -136,7 +172,7 @@ function Index() {
         <div className="estudiantes-container">
           <div className="estudiantes-content">
             <ContenedorEstudiante
-              data={estudiantes}
+              data={currentPageData}
               setData={setEstudiantes}
               headers={[
                 "Cédula/Pasaporte",
@@ -163,6 +199,7 @@ function Index() {
               handleCursos={handleCursos}
               filtrar={filtrar}
               search={search}
+              nivel={nivel}
             />
           </div>
 
@@ -172,8 +209,8 @@ function Index() {
             role="navigation"
             aria-label="Paginación de estudiantes"
           >
-            {estudiantes.length > 0 && (
-              <Paginación totalPages={totalPages} page={page} setPage={setPage} />
+            {totalFilteredPages > 1 && (
+              <Paginación totalPages={totalFilteredPages} page={page} setPage={setPage} />
             )}
           </div>
         </div>

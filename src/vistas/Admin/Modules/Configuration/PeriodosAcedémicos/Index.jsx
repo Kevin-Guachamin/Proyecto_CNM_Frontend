@@ -74,6 +74,11 @@ function Index() {
     const fetchPeriodos = async () => {
       try {
         setLoading(true);
+        // Si hay búsqueda activa, no sobreescribir datos filtrados desde Contenedor
+        if (search && search.trim().length > 0) {
+          if (mounted) setLoading(false);
+          return;
+        }
         const { data } = await axios.get(`${API_URL}/periodo_academico/obtener`, {
           params: { page, limit: ITEMS_PER_PAGE },
           headers: { Authorization: `Bearer ${token}` },
@@ -97,6 +102,7 @@ function Index() {
   // ======= Filtros =======
   const handleSearch = (e) => {
     setSearch(e.target.value);
+    setPage(1); // Resetear a la primera página cuando cambia el filtro
   };
 
   // ======= Filtrar datos =======
@@ -118,9 +124,7 @@ function Index() {
             <div className="periodos-container">
               <div className="periodos-content">
                 <Contenedor
-                  search={search}
-                  filtrar={handleSearch}
-                  data={filteredData}
+                  data={periodos}
                   setData={setPeriodos}
                   headers={headers}
                   columnsToShow={colums}
@@ -128,6 +132,12 @@ function Index() {
                   apiEndpoint={"periodo_academico"}
                   CrearEntidad={CrearPeriodo}
                   PK={PK}
+                  page={page}
+                  limit={ITEMS_PER_PAGE}
+                  setTotalPages={setTotalPages}
+                  // Mantener el filtro entre páginas y evitar sobrescritura
+                  externalSearch={search}
+                  onFilterChange={handleSearch}
                 />
               </div>
               

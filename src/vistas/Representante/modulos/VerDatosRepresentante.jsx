@@ -11,8 +11,17 @@ import { modulosRepresentante } from "../components/ModulosRepresentante";
 import "../Styles/VerDatosRepresentante.css";
 import Swal from 'sweetalert2';
 import { ErrorMessage } from "../../../Utils/ErrorMesaje";
+import { useAuth } from '../../../Utils/useAuth';
 
 const VerDatosRepresentante = () => {
+  // Protección de ruta para Representante
+  const auth = useAuth("representante");
+  
+  // Si no está autenticado, mostrar mensaje de error
+  if (!auth.isAuthenticated) {
+    return <ErrorMessage message="No tienes permisos para acceder a esta página" />;
+  }
+
   const [representante, setRepresentante] = useState([]);
   const location = useLocation();
   const [mostrarModal, setMostrarModal] = useState(false); // Cambiar a false para no mostrar el modal inicialmente
