@@ -5,8 +5,18 @@ import { useState } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import "../Styles/VerDatosRepresentante.css";
+import { useAuth } from '../../../Utils/useAuth';
+import { ErrorMessage } from '../../../Utils/ErrorMesaje';
 
 function ViewDataEstudiante({ onCancel, isLoading, entity, onUpdated }) {
+  // Protección de ruta para Representante (solo si se usa como página standalone)
+  const auth = useAuth("representante");
+  
+  // Si no está autenticado y no hay props de modal, mostrar mensaje de error
+  if (!auth.isAuthenticated && !onCancel) {
+    return <ErrorMessage message="No tienes permisos para acceder a esta página" />;
+  }
+
   const [nroCedula, setNroCedula] = useState(""); // Inicializar con cadena vacia si es que hay valores undefined en entity
   const [primer_nombre, setPrimerNombre] = useState("");
   const [primer_apellido, setPrimerApellido] = useState("");

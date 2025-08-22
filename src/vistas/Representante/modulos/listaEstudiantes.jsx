@@ -7,8 +7,18 @@ import Loading from "../../../components/Loading";
 import VerDatosEstudiante from '../../Representante/modulos/VerDatosEstudiante';
 import { useLocation, useNavigate } from "react-router-dom";
 import { modulosRepresentante } from "../components/ModulosRepresentante";
+import { useAuth } from '../../../Utils/useAuth';
+import { ErrorMessage } from '../../../Utils/ErrorMesaje';
 
 function ListaEstudiantes() {
+  // Protección de ruta para Representante
+  const auth = useAuth("representante");
+  
+  // Si no está autenticado, mostrar mensaje de error
+  if (!auth.isAuthenticated) {
+    return <ErrorMessage message="No tienes permisos para acceder a esta página" />;
+  }
+
   // Estado para almacenar la información del usuario conectado
   const [usuario, setUsuario] = useState(null);
   const [datosEstudiante, setDatosEstudiante] = useState([]);
@@ -36,7 +46,7 @@ function ListaEstudiantes() {
     const parsedUser = storedUser ? JSON.parse(storedUser) : null;
 
     if (!parsedUser) {
-      navigate("/login");
+      navigate("/");
       return;
     }
     setUsuario(parsedUser);

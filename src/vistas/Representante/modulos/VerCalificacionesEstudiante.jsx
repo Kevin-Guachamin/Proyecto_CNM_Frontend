@@ -12,8 +12,18 @@ import { useLocation } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
 import { modulosRepresentante } from "../components/ModulosRepresentante";
 import './VerCalificacionesEstudiante.css';
+import { useAuth } from '../../../Utils/useAuth';
+import { ErrorMessage } from '../../../Utils/ErrorMesaje';
 
 const VerCalificacionesEstudiante = () => {
+  // Protección de ruta para Representante
+  const auth = useAuth("representante");
+  
+  // Si no está autenticado, mostrar mensaje de error
+  if (!auth.isAuthenticated) {
+    return <ErrorMessage message="No tienes permisos para acceder a esta página" />;
+  }
+
   const [notasEstudiante, setNotasEstudiante] = useState([]);
   const [loading, setLoading] = useState(true);
   const { state } = useLocation();
@@ -32,7 +42,7 @@ const VerCalificacionesEstudiante = () => {
     const parsedUser = storedUser ? JSON.parse(storedUser) : null;
 
     if (!parsedUser) {
-      navigate("/login");
+      navigate("/");
       return;
     }
     

@@ -94,21 +94,21 @@ function Index() {
   // ========= Reset a página 1 solo por filtros =========
   useEffect(() => { setPage(1); }, [search]);
 
-  // ========= Fetch con paginación fija =========
+  // ========= Fetch - carga inicial completa =========
   useEffect(() => {
     let mounted = true;
     const fetchData = async () => {
       try {
         setLoading(true);
+        // Cargar TODOS los representantes de una vez para filtrar en frontend
         const { data } = await axios.get(`${API_URL}/representante/obtener`, {
-          params: { page, limit: ITEMS_PER_PAGE, search },
+          params: { page: 1, limit: 1000 }, // Límite alto para obtener todos
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!mounted) return;
         const list = data?.data ?? data?.representantes ?? [];
         setRepresentantes(Array.isArray(list) ? list : []);
-        setTotalPages(data?.totalPages ?? 1);
       } catch (error) {
         console.error('Error fetching representatives:', error);
         ErrorMessage(error);
@@ -117,9 +117,13 @@ function Index() {
       }
     };
 
-    const t = setTimeout(fetchData, 300); // debounce
-    return () => { mounted = false; clearTimeout(t); };
-  }, [API_URL, token, page, search, ITEMS_PER_PAGE]);
+    // Solo cargar una vez al inicio
+    if (representantes.length === 0) {
+      const t = setTimeout(fetchData, 300); // debounce
+      return () => { mounted = false; clearTimeout(t); };
+    }
+    return () => { mounted = false; };
+  }, [API_URL, token]); // Removido 'page' y 'search' para evitar recargas
 
   // ========= Handlers =========
   const filtrar = (e) => setSearch(e?.target?.value ?? "");
@@ -128,6 +132,47 @@ function Index() {
     setActiveTabId("tab2");
     openTab("tab2");
   };
+
+  // ========= Filtrar datos en frontend =========
+  const filteredData = representantes.filter((representante) => {
+    if (!search.trim()) return true;
+    const searchLower = search.toLowerCase();
+    
+    // Buscar en primer nombre
+    const primerNombre = representante.primer_nombre;
+    if (primerNombre && primerNombre.toString().toLowerCase().includes(searchLower)) {
+      return true;
+    }
+    
+    // También buscar en nombre completo y otros campos
+    const nombreCompleto = `${representante.primer_nombre || ''} ${representante.segundo_nombre || ''} ${representante.primer_apellido || ''} ${representante.segundo_apellido || ''}`.toLowerCase();
+    if (nombreCompleto.includes(searchLower)) return true;
+
+    // Buscar en cédula
+    const cedula = representante.nroCedula;
+    if (cedula && cedula.toString().toLowerCase().includes(searchLower)) {
+      return true;
+    }
+
+    // Buscar en email
+    const email = representante.email;
+    if (email && email.toString().toLowerCase().includes(searchLower)) {
+      return true;
+    }
+
+    return false;
+  });
+
+  // ========= Paginación frontend =========
+  const totalFilteredPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+  const startIndex = (page - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const currentPageData = filteredData.slice(startIndex, endIndex);
+
+  // ========= Reset a página 1 cuando cambie el filtro =========
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
 
   // ========= Tabs =========
   const tabs = [
@@ -140,7 +185,7 @@ function Index() {
         <div className="representantes-container">
           <div className="representantes-content">
             <ContenedorRepresentantes
-              data={representantes}
+              data={currentPageData}
               setData={setRepresentantes}
               headers={headers}
               columnsToShow={colums}
@@ -160,8 +205,8 @@ function Index() {
             role="navigation"
             aria-label="Paginación de representantes"
           >
-            {representantes.length > 0 && (
-              <Paginación totalPages={totalPages} page={page} setPage={setPage} />
+            {totalFilteredPages > 1 && (
+              <Paginación totalPages={totalFilteredPages} page={page} setPage={setPage} />
             )}
           </div>
         </div>
