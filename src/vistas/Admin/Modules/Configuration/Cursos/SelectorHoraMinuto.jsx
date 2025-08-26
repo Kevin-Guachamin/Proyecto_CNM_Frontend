@@ -1,8 +1,11 @@
 import React from "react";
 
 export default function SelectorHoraMinuto({ value, onChange, min = "07:00", max = "19:00" }) {
+  // Si no hay valor, usar el mínimo como valor por defecto
+  const defaultValue = value || min;
+  
   // Parsear el value en hora y minuto
-  const [horaActual, minutoActual] = value ? value.split(":") : ["07", "00"];
+  const [horaActual, minutoActual] = defaultValue.split(":");
 
   // Obtener rango de horas desde min a max
   const minHora = parseInt(min.split(":")[0]);

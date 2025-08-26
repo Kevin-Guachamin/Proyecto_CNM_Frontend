@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import Filtro from '../../../Components/Filtro';
-import Tabla from './TablaCursos';
-import { Eliminar } from '../../../../../Utils/CRUD/Eliminar';
-import { Editar } from '../../../../../Utils/CRUD/Editar';
+import FiltroVicerrector from '../../Components/FiltroVicerrector';
+import Tabla from './TablaCursosVicerrector';
 import axios from 'axios';
-import { ErrorMessage } from '../../../../../Utils/ErrorMesaje';
-import "../../../Styles/Contenedor.css";
-import CrearCurso from "./CrearCurso";
-import Loading from '../../../../../components/Loading';
+import { ErrorMessage } from '../../../../Utils/ErrorMesaje';
+import "../../../Admin/Styles/Contenedor.css";
+import Loading from '../../../../components/Loading';
 
-function ContenedorCursos({ 
+function ContenedorCursosVicerrector({ 
   search, 
   filtrar, 
   data, 
@@ -21,13 +18,11 @@ function ContenedorCursos({
   loading 
 }) {
   const [periodos, setPeriodos] = useState([]);
-  const [entityToUpdate, setEntityToUpdate] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const token = localStorage.getItem("token");
 
-  const headers = ["ID", "Nivel", "Materia", "Paralelo", "Docente", "Acciones"];
+  const headers = ["ID", "Nivel", "Materia", "Paralelo", "Docente"];
 
   // === Cargar periodos ===
   useEffect(() => {
@@ -41,19 +36,10 @@ function ContenedorCursos({
   // Handlers
   const handlePeriodoChange = (e) => setPeriodo(e.target.value);
   const Handle = (valor) => setGrupo(valor || '');
-  const toggleModal = () => { setIsModalOpen(prev => !prev); setEntityToUpdate(null); };
-  const handleSaveEntity = (newEntity, headersExtra) =>
-    Editar(entityToUpdate, newEntity, `${API_URL}/asignacion`, setData, setIsModalOpen, "ID", headersExtra);
-  const handleEdit = (entity) => { setEntityToUpdate(entity); setIsModalOpen(true); };
-  const handleDelete = (entity) => Eliminar(entity, `${API_URL}/asignacion/eliminar`, "esta asignación", setData, "ID");
 
   return (
     <div className='Contenedor-general'>
-      {!periodo && (
-        <div className="alert-message">
-          ⚠️ Debe seleccionar un período académico para poder ver y agregar cursos
-        </div>
-      )}
+      {!periodo && <label className="label-error">*Se requiere un periodo</label>}
 
       {/* Filtros (fila) */}
       <div className='filtros'>
@@ -78,26 +64,15 @@ function ContenedorCursos({
         </div>
 
         <div className='form-group'>
-          <Filtro
+          <FiltroVicerrector
             search={search}
             filtrar={filtrar}
-            toggleModal={!periodo ? null : toggleModal}
             filterKey="Nombre materia"
             disabled={!grupo}
             placeholder={!grupo ? "Seleccione un grupo para filtrar" : undefined}
-            addButtonDisabled={!periodo}
           />
         </div>
       </div>
-
-      {isModalOpen && periodo && (
-        <CrearCurso
-          onCancel={toggleModal}
-          entityToUpdate={entityToUpdate}
-          onSave={handleSaveEntity}
-          periodo={periodo}
-        />
-      )}
 
       {/* Tabla sin paginación */}
       <div className="tabla-wrapper">
@@ -106,8 +81,6 @@ function ContenedorCursos({
         ) : (
           <Tabla
             filteredData={data}
-            OnEdit={handleEdit}
-            OnDelete={handleDelete}
             headers={headers}
           />
         )}
@@ -116,4 +89,4 @@ function ContenedorCursos({
   );
 }
 
-export default ContenedorCursos;
+export default ContenedorCursosVicerrector;

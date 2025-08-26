@@ -94,7 +94,10 @@ function Busqueda({usuario}) {
     const HandleBuscarAsignaturas = () => {
         setBucarAsignacion(true)
 
-        axios.get(`${API_URL}/asignacion/obtener/materias/${periodo.ID}/${encodeURIComponent(estudiante.nivel)}/${asignatura}/${estudiante.jornada}`,{
+        // Si no se ingresa nada, enviar 'all' para obtener todas las materias
+        const busquedaMateria = asignatura && asignatura.trim() !== '' ? asignatura : 'all';
+
+        axios.get(`${API_URL}/asignacion/obtener/materias/${periodo.ID}/${encodeURIComponent(estudiante.nivel)}/${busquedaMateria}/${estudiante.jornada}`,{
             headers: { Authorization: `Bearer ${token}` },
           })
             .then((response) => {
@@ -117,43 +120,120 @@ function Busqueda({usuario}) {
                 const newMatricula = await axios.post(`${API_URL}/matricula/crear`, { nivel: estudiante.nivel, estado: "En curso", ID_estudiante: estudiante.ID, ID_periodo_academico: periodo.ID },{
                     headers: { Authorization: `Bearer ${token}` },
                   })
-                setMatricula(newMatricula)
+                setMatricula(newMatricula.data)
+                // Limpiar inscripciones para nueva matrícula
+                setInscripciones([])
+            } else {
+                // Cargar inscripciones existentes
+                await obtenerInscripciones(response.data.ID)
             }
         } catch (error) {
             ErrorMessage(error)
         }
 
     }
-    const obtenerAsignaciones = async () => {
-        try {
-            const response = await axios.get(`${API_URL}/asignacion/obtener/matricula/${matricula.ID}`,{
-                headers: { Authorization: `Bearer ${token}` },
-              })
-            console.log("este es el response, ", response)
-            setInscripciones(response.data)
 
+    const obtenerInscripciones = async (matriculaId) => {
+        try {
+            const response = await axios.get(`${API_URL}/inscripcion/obtener/matricula/${matriculaId}`,{
+                headers: { Authorization: `Bearer ${token}` },
+            })
+            setInscripciones(response.data)
         } catch (error) {
             ErrorMessage(error)
         }
-
     }
+
+    const retirarInscripcion = async (asignacion) => {
+        try {
+            // Buscar la inscripción correspondiente
+            const inscripcionARetirar = inscripciones.find(inscripcion => 
+                inscripcion.Asignacion && inscripcion.Asignacion.ID === asignacion.ID
+            );
+
+            if (!inscripcionARetirar) {
+                throw new Error("No se encontró la inscripción a retirar");
+            }
+
+            await axios.delete(`${API_URL}/inscripcion/eliminar/${inscripcionARetirar.ID}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            Swal.fire({
+                icon: "success",
+                title: "Inscripción retirada",
+                text: `Se ha retirado la inscripción de ${asignacion.Materia?.nombre}`,
+                iconColor: "#28a745",
+                confirmButtonText: "Entendido",
+                confirmButtonColor: "#003F89",
+            });
+
+            // Recargar inscripciones y materias disponibles
+            await obtenerInscripciones(matricula.ID);
+            HandleBuscarAsignaturas();
+        } catch (error) {
+            ErrorMessage(error);
+        }
+    };
     const tienenDiasSolapados = (dias1, dias2) => {
+        // Asegurar que ambos arrays existen y no están vacíos
+        if (!dias1 || !dias2 || !Array.isArray(dias1) || !Array.isArray(dias2)) {
+            return false;
+        }
+        
         return dias1.some(dia => dias2.includes(dia));
     }
 
     const tienenHorariosSolapados = (horaInicioA, horaFinA, horaInicioB, horaFinB) => {
-        return horaInicioA < horaFinB && horaFinA > horaInicioB;
+        // Convertir horarios a formato comparable (asumiendo formato HH:MM)
+        const convertirHora = (hora) => {
+            if (typeof hora === 'string') {
+                const [horas, minutos] = hora.split(':').map(Number);
+                return horas * 60 + minutos; // Convertir a minutos
+            }
+            return 0;
+        };
+        
+        const inicioA = convertirHora(horaInicioA);
+        const finA = convertirHora(horaFinA);
+        const inicioB = convertirHora(horaInicioB);
+        const finB = convertirHora(horaFinB);
+        
+        return inicioA < finB && finA > inicioB;
     }
+
     const Inscribir = async (asignacion) => {
         try {
-            // Primero, verifica si hay conflicto de días + horarios
-            const conflicto = inscripciones.some(asig => {
-                const hayDiasSolapados = tienenDiasSolapados(asig.dias, asignacion.dias);
+            // Primero, verificar si ya está inscrito en esta misma asignación
+            const yaInscrito = inscripciones.some(inscripcion => {
+                const asignacionExistente = inscripcion.Asignacion;
+                return asignacionExistente && asignacionExistente.ID === asignacion.ID;
+            });
+
+            if (yaInscrito) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Ya inscrito",
+                    text: "El estudiante ya está inscrito en esta materia",
+                    iconColor: "#f39c12",
+                    confirmButtonText: "Entendido",
+                    confirmButtonColor: "#003F89",
+                });
+                return;
+            }
+            
+            // Luego, verifica si hay conflicto de días + horarios con OTRAS asignaciones
+            const conflicto = inscripciones.some(inscripcion => {
+                // Acceder a los datos de la asignación dentro de la inscripción
+                const asignacionExistente = inscripcion.Asignacion;
+                if (!asignacionExistente || asignacionExistente.ID === asignacion.ID) return false;
+                
+                const hayDiasSolapados = tienenDiasSolapados(asignacionExistente.dias, asignacion.dias);
                 const hayHorarioSolapado = tienenHorariosSolapados(
                     asignacion.horaInicio,
                     asignacion.horaFin,
-                    asig.horaInicio,
-                    asig.horaFin
+                    asignacionExistente.horaInicio,
+                    asignacionExistente.horaFin
                 );
 
                 return hayDiasSolapados && hayHorarioSolapado;
@@ -175,7 +255,8 @@ function Busqueda({usuario}) {
                 confirmButtonText: "Entendido",
                 confirmButtonColor: "#003F89",
             });
-            obtenerAsignaciones()
+            // Recargar inscripciones y materias disponibles
+            await obtenerInscripciones(matricula.ID)
             HandleBuscarAsignaturas()
         } catch (error) {
             ErrorMessage(error);
@@ -265,8 +346,13 @@ function Busqueda({usuario}) {
             </div>
             {matricula && (<div>
                 <div className='contenedor-busqueda-asignaturas'>
-                    <label htmlFor="">Ingrese el nombre de la Materia: </label>
-                    <input type="text" value={asignatura} onChange={(e) => setAsignatura(e.target.value)} />
+                    <label htmlFor="">Ingrese el nombre de la Materia (opcional - dejar vacío para ver todas): </label>
+                    <input 
+                        type="text" 
+                        value={asignatura || ''} 
+                        onChange={(e) => setAsignatura(e.target.value)} 
+                        placeholder="Ej: Piano, Violín, etc. (opcional)"
+                    />
                     <button className="btn-buscar-asignaturas" onClick={HandleBuscarAsignaturas}>Buscar</button>
                 </div>
                 <div className="contenedor-tabla-matricula-asignaciones">
@@ -316,7 +402,12 @@ function Busqueda({usuario}) {
                     ) : null}
                 </div>
             </div>)}
-            {inscripciones.length > 0 && (<Horarios asignaciones={inscripciones} />)}
+            {inscripciones.length > 0 && (
+                <Horarios 
+                    asignaciones={inscripciones.map(insc => insc.Asignacion).filter(Boolean)} 
+                    onRetirarInscripcion={retirarInscripcion}
+                />
+            )}
 
         </div>
     )

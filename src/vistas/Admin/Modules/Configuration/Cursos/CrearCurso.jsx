@@ -2,7 +2,7 @@ import React from 'react'
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ErrorMessage } from '../../../../../Utils/ErrorMesaje';
-import AutoCompleteInput from './AutoCompleteInput';
+import SelectInput from './SelectInput';
 import Boton from '../../../../../components/Boton';
 import SelectorHoraMinuto from './SelectorHoraMinuto';
 
@@ -13,8 +13,8 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
   const [asignaturas, setAsignaturas] = useState([])
   const [dia1, setDia1] = useState("")
   const [dia2, setDia2] = useState("")
-  const [horaInicio, setHoraInicio] = useState("")
-  const [horaFin, setHoraFin] = useState("")
+  const [horaInicio, setHoraInicio] = useState("07:00")
+  const [horaFin, setHoraFin] = useState("08:00")
   const [cupos, setCupos] = useState("")
   const [docentes, setDocentes] = useState([])
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
@@ -49,24 +49,65 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
   }, [API_URL, setDocentes])
   useEffect(() => {
     if (entityToUpdate) {
-
       setParalelo(entityToUpdate.paralelo || "");
-      setDocente(entityToUpdate.Docente || "");
-      setAsignatura(entityToUpdate.Materia || "");
+      
+      // Para docente, buscar el objeto completo en la lista de docentes
+      if (entityToUpdate.Docente && docentes.length > 0) {
+        const docenteCompleto = docentes.find(d => 
+          d.nroCedula === entityToUpdate.Docente.nroCedula || 
+          d.nroCedula === entityToUpdate.nroCedula_docente
+        );
+        setDocente(docenteCompleto || null);
+      }
+      
+      // Para asignatura, buscar el objeto completo en la lista de asignaturas
+      if (entityToUpdate.Materia && asignaturas.length > 0) {
+        const asignaturaCompleta = asignaturas.find(a => 
+          a.ID === entityToUpdate.Materia.ID || 
+          a.ID === entityToUpdate.ID_materia
+        );
+        setAsignatura(asignaturaCompleta || null);
+      }
+      
       setDia1(entityToUpdate.dias[0] || "")
       setDia2(entityToUpdate.dias[1] || "")
       setHoraInicio(entityToUpdate.horaInicio || "")
       setHoraFin(entityToUpdate.horaFin || "")
       setCupos(entityToUpdate.cupos || "")
     }
-  }, [entityToUpdate]);
+  }, [entityToUpdate, docentes, asignaturas]);
 
   const handleSubmit = () => {
-
     try {
       if (!periodo) {
         throw new Error("No se ha seleccionado un periodo");
       }
+      
+      if (!asignatura) {
+        throw new Error("Debe seleccionar una asignatura");
+      }
+      
+      if (!docente) {
+        throw new Error("Debe seleccionar un docente");
+      }
+      
+      if (!paralelo.trim()) {
+        throw new Error("Debe ingresar un paralelo");
+      }
+      
+      if (!horaInicio || !horaFin) {
+        throw new Error("Debe seleccionar hora de inicio y fin");
+      }
+      
+      // Validar que la hora de fin sea mayor que la hora de inicio
+      if (horaFin <= horaInicio) {
+        throw new Error("La hora de fin debe ser mayor que la hora de inicio");
+      }
+      
+      if (!cupos || cupos <= 0) {
+        throw new Error("Debe ingresar un número válido de cupos");
+      }
+      
       let dias
       if (dia1 === "") {
         dias = [dia2]
@@ -77,18 +118,32 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
       else {
         dias = [dia1, dia2]
       }
-      if (dia1 === dia2) {
+      
+      if (dias.length === 0) {
+        throw new Error("Debe seleccionar al menos un día");
+      }
+      
+      if (dia1 === dia2 && dia1 !== "") {
         throw new Error("Los días deben ser diferentes")
       }
+      
       console.log("esta es la asignatura", asignatura.ID)
-      const newAsignacion = { paralelo, horaInicio, horaFin, dias, cupos: Number(cupos), ID_periodo_academico: Number(periodo), nroCedula_docente: docente.nroCedula, ID_materia: asignatura.ID };
+      const newAsignacion = { 
+        paralelo, 
+        horaInicio, 
+        horaFin, 
+        dias, 
+        cupos: Number(cupos), 
+        ID_periodo_academico: Number(periodo), 
+        nroCedula_docente: docente.nroCedula, 
+        ID_materia: asignatura.ID 
+      };
       onSave(newAsignacion, {
         headers: { Authorization: `Bearer ${token}` },
       });
     } catch (error) {
       ErrorMessage(error)
     }
-
   };
 
   return (
@@ -100,12 +155,26 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
 
             <div className="form-group">
               <label htmlFor="asignaturas">Asignatura:</label>
-              <AutoCompleteInput inputValue={asignatura} setInputValue={setAsignatura} opciones={asignaturas} key1="nombre" key2="nivel" />
+              <SelectInput 
+                value={asignatura} 
+                onChange={setAsignatura} 
+                opciones={asignaturas} 
+                key1="nombre" 
+                key2="nivel"
+                placeholder="Selecciona una asignatura"
+              />
             </div>
 
             <div className="form-group">
               <label htmlFor="docentes">Docente:</label>
-              <AutoCompleteInput inputValue={docente} setInputValue={setDocente} opciones={docentes} key1="primer_nombre" key2="primer_apellido" />
+              <SelectInput 
+                value={docente} 
+                onChange={setDocente} 
+                opciones={docentes} 
+                key1="primer_nombre" 
+                key2="primer_apellido"
+                placeholder="Selecciona un docente"
+              />
             </div>
           </div>
           <div className='rows'>
@@ -126,7 +195,7 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
               </select>
             </div>
             <div className='form-group'>
-              <label htmlFor="">Horar inicio:</label>
+              <label htmlFor="">Hora inicio:</label>
               <SelectorHoraMinuto
                 value={horaInicio}
                 onChange={(e) => setHoraInicio(e.target.value)}
@@ -162,7 +231,7 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
               </select>
             </div>
             <div className='form-group'>
-              <label htmlFor="">Horar fin:</label>
+              <label htmlFor="">Hora fin:</label>
               <SelectorHoraMinuto
                 value={horaFin}
                 onChange={(e) => setHoraFin(e.target.value)}

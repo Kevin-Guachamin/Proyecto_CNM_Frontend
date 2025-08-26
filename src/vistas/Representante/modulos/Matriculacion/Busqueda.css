@@ -1,10 +1,22 @@
 /* Estilos de tablas específicos para matrícula */
 
+/* Contenedor principal responsive */
+.contenedor-busqueda {
+  width: 100%;
+  height: calc(95vh - 40px);
+  padding: 10px 20px 20px 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
 /* === PRIMERA TABLA: Estudiantes del representante === */
 
 /* Contenedor principal de la tabla de estudiantes */
 .contenedor-tabla-matricula-estudiantes {
-  padding: 20px;
+  padding: 10px 0;
   height: 100%;
   min-width: 0;
 }
@@ -14,9 +26,11 @@
   width: 100%;
   overflow-x: auto;
   overflow-y: auto;
-  border: 1px solid #ccc;
+  border: none;
   border-radius: 8px;
-  max-height: 60vh;
+  max-height: 35vh;
+  min-height: 200px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* La tabla principal de estudiantes */
@@ -48,7 +62,7 @@
 .celda-tabla-matricula-estudiantes {
   border: 1px solid #90A4AE !important;
   vertical-align: middle;
-  background-color: #CFD8DC !important;
+  background-color: #fff !important;
   text-align: center;
   padding: 8px;
   white-space: nowrap;
@@ -63,7 +77,7 @@
   height: 2.85rem;
   border: 1px solid #90A4AE;
   vertical-align: middle;
-  background-color: #CFD8DC !important;
+  background-color: #fff !important;
 }
 
 /* Icono de matrícula */
@@ -82,7 +96,7 @@
 
 /* Contenedor principal de la tabla de asignaciones */
 .contenedor-tabla-matricula-asignaciones {
-  padding: 20px;
+  padding: 10px 0;
   height: 100%;
   min-width: 0;
 }
@@ -92,9 +106,11 @@
   width: 100%;
   overflow-x: auto;
   overflow-y: auto;
-  border: 1px solid #ccc;
+  border: none;
   border-radius: 8px;
-  max-height: 60vh;
+  max-height: 35vh;
+  min-height: 200px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* La tabla principal de asignaciones */
@@ -126,7 +142,7 @@
 .celda-tabla-matricula-asignaciones {
   border: 1px solid #90A4AE !important;
   vertical-align: middle;
-  background-color: #CFD8DC !important;
+  background-color: #fff !important;
   text-align: center;
   padding: 8px;
   white-space: nowrap;
@@ -141,7 +157,7 @@
   height: 2.85rem;
   border: 1px solid #90A4AE;
   vertical-align: middle;
-  background-color: #CFD8DC !important;
+  background-color: #fff !important;
 }
 
 /* Icono de inscribir */
@@ -154,6 +170,18 @@
 
 .icono-inscribir:hover {
   color: #0056b3;
+}
+
+/* Icono de retirar inscripción */
+.icono-retirar {
+  color: #dc3545;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: color 0.2s ease;
+}
+
+.icono-retirar:hover {
+  color: #a71d2a;
 }
 
 /* === MENSAJE DE SIN REGISTROS === */
@@ -203,7 +231,8 @@
   }
   
   .icono-matricula,
-  .icono-inscribir {
+  .icono-inscribir,
+  .icono-retirar {
     font-size: 1rem;
   }
 }
@@ -232,7 +261,8 @@
   }
   
   .icono-matricula,
-  .icono-inscribir {
+  .icono-inscribir,
+  .icono-retirar {
     font-size: 0.9rem;
   }
 }
@@ -281,5 +311,207 @@
 
   .btn-buscar-asignaturas {
     width: 25%;
+  }
+}
+
+/* === COMPONENTE HORARIOS === */
+
+.contenedor-horarios {
+  margin-top: 15px;
+  margin-bottom: 10px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  flex-shrink: 0;
+}
+
+.titulo-horarios {
+  color: #00408A;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Tabla de horarios */
+.contenedor-tabla-horarios {
+  margin-bottom: 20px;
+  overflow-x: auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.tabla-horarios {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  min-width: 600px;
+}
+
+.tabla-horarios thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.encabezado-horarios {
+  background-color: #00408A !important;
+  color: #ced4da !important;
+  font-weight: bold;
+  border: 1px solid #ced4da;
+  padding: 12px;
+  text-align: center;
+}
+
+.celda-horarios {
+  border: 1px solid #90A4AE;
+  padding: 8px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 0.9rem;
+}
+
+.dia-semana {
+  background-color: #f1f3f4;
+  font-weight: bold;
+  color: #00408A;
+}
+
+/* Resumen semanal */
+.resumen-semanal {
+  margin-top: 15px;
+}
+
+.resumen-semanal h4 {
+  color: #00408A;
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.grid-dias {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  max-width: 100%;
+}
+
+.dia-container {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white;
+  min-height: 100px;
+}
+
+.con-clases {
+  border-color: #00408A;
+}
+
+.sin-clases {
+  border-color: #ccc;
+  opacity: 0.7;
+}
+
+.dia-titulo {
+  background-color: #00408A;
+  color: white;
+  padding: 8px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+.sin-clases .dia-titulo {
+  background-color: #6c757d;
+}
+
+.dia-contenido {
+  padding: 8px;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.clase-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border-left: 3px solid #00408A;
+}
+
+.materia-nombre {
+  font-weight: bold;
+  color: #00408A;
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
+.docente-nombre {
+  font-size: 0.65rem;
+  color: #495057;
+  font-style: italic;
+  line-height: 1.1;
+}
+
+.horario-time {
+  font-size: 0.7rem;
+  color: #6c757d;
+}
+
+.sin-clases-texto {
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+  font-size: 0.8rem;
+  margin-top: 15px;
+}
+
+/* Responsive para horarios */
+@media (max-width: 768px) {
+  .contenedor-horarios {
+    padding: 15px;
+    margin-top: 15px;
+  }
+  
+  .grid-dias {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  
+  .dia-container {
+    min-height: 80px;
+  }
+  
+  .contenedor-tabla-horarios {
+    max-height: 250px;
+  }
+  
+  .scroll-tabla-matricula-estudiantes,
+  .scroll-tabla-matricula-asignaciones {
+    max-height: 30vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .contenedor-horarios {
+    padding: 10px;
+  }
+  
+  .grid-dias {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  
+  .scroll-tabla-matricula-estudiantes,
+  .scroll-tabla-matricula-asignaciones {
+    max-height: 25vh;
   }
 }
