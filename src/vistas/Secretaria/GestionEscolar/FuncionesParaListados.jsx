@@ -1,123 +1,119 @@
-// funcionesListas.jsx
-//import XlsxPopulate from "xlsx-populate";
-//import { saveAs } from "file-saver";
+// exportarListado_1col_vector_con_estilos_compacto.js
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import autoTable from "jspdf-autotable";
 import Swal from "sweetalert2";
 
-// Exportar a Excel
-// export const exportarListadoAExcel = async (datosEstudiantes, datosModulo) => {
-//     try {
-//       const response = await fetch("/Plantillas/Plantilla_Listados.xlsx");
-//       const arrayBuffer = await response.arrayBuffer();
-  
-//       const workbook = await XlsxPopulate.fromDataAsync(arrayBuffer);
-//       const hoja = workbook.sheet(0);
-  
-//       // Reemplaza campos del encabezado
-//       hoja.cell("B7").value(`${datosModulo.docente}`);
-//       hoja.cell("F7").value(`${datosModulo.materia}`);
-//       hoja.cell("B9").value(`${datosModulo.descripcionPeriodo}`);
-//       hoja.cell("F9").value(`${datosModulo.paralelo}`);
-//       hoja.cell("B11").value(`${datosModulo.jornada}`);
-  
-//       // Insertar estudiantes con bordes
-//       let filaInicio = 16;
-//       datosEstudiantes.forEach((est, i) => {
-//         const fila = filaInicio + i;
-//         hoja.cell(`A${fila}`).value(i + 1);
-//         hoja.cell(`D${fila}`).value(est["Nómina de Estudiantes"]);
-//         hoja.range(`A${fila}:H${fila}`).style("border", true);
-//       });
-  
-//       const blob = await workbook.outputAsync();
-//       const nombreArchivo = `ListadoEstudiantes_${datosModulo.materia}_${datosModulo.paralelo}.xlsx`;
-//       saveAs(blob, nombreArchivo);
-//     } catch (error) {
-//       console.error("Error al exportar desde plantilla:", error);
-//     }
-//   };
-  
-// Exportar a PDF
-export const exportarListadoAPDF = async (elementoId, nombreArchivo = "ListadoEstudiantes.pdf") => {
+/** Carga imagen y devuelve dataURL */
+async function loadImageAsDataURL(src) {
+    if (!src) return null;
+    const res = await fetch(src, { cache: "no-store" });
+    const blob = await res.blob();
+    return await new Promise((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onload = () => resolve(fr.result);
+        fr.onerror = reject;
+        fr.readAsDataURL(blob);
+    });
+}
+
+export async function exportarListadoAPDF(
+    filas,
+    header,
+    nombreArchivo = "ListadoEstudiantes.pdf"
+) {
     try {
-        const contenido = document.getElementById(elementoId);
-        if (!contenido) {
-            Swal.fire({
-                icon: "error",
-                title: "Elemento no encontrado",
-                text: `No se encontró el elemento con ID "${elementoId}" para exportar.`,
-            });
+        if (!Array.isArray(filas) || filas.length === 0) {
+            Swal.fire({ icon: "warning", title: "Sin datos", text: "No hay filas para exportar." });
             return;
         }
 
-        const contenedorClonado = contenido.cloneNode(true);
-        contenedorClonado.classList.add("pdf-export");
+        const pdf = new jsPDF({ orientation: "p", unit: "pt", format: "a4", compress: true });
+        const pageW = pdf.internal.pageSize.getWidth();
+        const pageH = pdf.internal.pageSize.getHeight();
 
-        const elementosNoPrint = contenedorClonado.querySelectorAll(".no-print");
-        elementosNoPrint.forEach(el => {
-            el.style.display = "none";
-        });
+        const margin = 28;
+        const gutter = 200;                              // espacio lateral extra
+        const tableW = pageW - (margin * 2) - gutter;   // ancho efectivo de tabla
+        const side = (pageW - tableW) / 2;              // margen calculado para centrar
 
-        const tempContainer = document.createElement("div");
-        tempContainer.style.width = "1000px";
-        tempContainer.style.position = "absolute";
-        tempContainer.style.left = "-9999px";
-        document.body.appendChild(tempContainer);
-        tempContainer.appendChild(contenedorClonado);
+        // ==== Logos ====
+        const logoIzq = await loadImageAsDataURL(header?.logoIzq);
+        const logoDer = header?.logoDer ? await loadImageAsDataURL(header.logoDer) : null;
 
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // ==== Encabezado ====
+        const titulo = header?.titulo || "CONSERVATORIO NACIONAL DE MUSICA";
+        const subtitulo = header?.subtitulo || "LISTADO DE ESTUDIANTES";
+        const info = header?.info || {};
 
-        const canvas = await html2canvas(contenedorClonado, {
-            scale: 3,
-            useCORS: true,
-            scrollY: 0,
-            scrollX: 0,
-        });
+        const headerTop = 22;
+        const logoH = 42, logoW = 42;
+        const headerBottomY = 100;
 
-        document.body.removeChild(tempContainer);
+        if (logoIzq) pdf.addImage(logoIzq, "PNG", margin, headerTop - 4, logoW, logoH);
+        if (logoDer) pdf.addImage(logoDer, "PNG", pageW - margin - logoW, headerTop - 4, logoW, logoH);
 
-        const imgData = canvas.toDataURL("image/png", 1.0);
-        const pdf = new jsPDF("p", "pt", "a4");
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-
-        const margin = 40;
-        let imgWidth = pageWidth - margin * 2;
-        let imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-        if (imgHeight > pageHeight - margin * 2) {
-            imgHeight = pageHeight - margin * 2;
-            imgWidth = (canvas.width * imgHeight) / canvas.height;
-        }
-
-        const xOffset = (pageWidth - imgWidth) / 2;
-        const yOffset = margin;
-
-        pdf.addImage(imgData, "PNG", xOffset, yOffset, imgWidth, imgHeight);
-
-        // 📝 Pie de página fijo al final del PDF
-        const xRight = pageWidth - margin;
-        const footerY1 = pageHeight - 40;
-        const footerY2 = pageHeight - 25;
+        pdf.setFont("helvetica", "bold"); pdf.setFontSize(13);
+        pdf.text(titulo, pageW / 2, headerTop + 8, { align: "center" });
+        pdf.setFont("helvetica", "normal"); pdf.setFontSize(11);
+        pdf.text(subtitulo, pageW / 2, headerTop + 26, { align: "center" });
 
         pdf.setFontSize(9);
-        pdf.setTextColor(85, 85, 85); // #555
-        pdf.text("Documento generado automáticamente por el sistema académico.", xRight, footerY1, { align: "right" });
-        pdf.text(`Fecha de emisión: ${new Date().toLocaleDateString("es-EC", {
-            day: "numeric",
-            month: "long",
-            year: "numeric"
-        })}`, xRight, footerY2, { align: "right" });
+        let y = headerTop + 46;
+        const colGap = 220;
+        pdf.text(`Profesor: ${info["Profesor"] || "-"}`, margin, y);
+        pdf.text(`Asignatura: ${info["Asignatura"] || "-"}`, margin + colGap, y);
+        pdf.text(`Paralelo: ${info["Paralelo"] || "-"}`, margin + colGap * 2 - 20, y);
+        y += 12;
+        pdf.text(`Año Lectivo: ${info["Año Lectivo"] || "-"}`, margin, y);
+        pdf.text(`Jornada: ${info["Jornada"] || "-"}`, margin + colGap, y);
+
+        pdf.setDrawColor(180); pdf.setLineWidth(0.6);
+        pdf.line(margin, headerBottomY - 4, pageW - margin, headerBottomY - 4);
+
+        // ==== Tabla 1 columna ====
+        const head = [["Nro", "Nómina de Estudiantes"]];
+        const body = filas.map(r => [r.Nro ?? r["Nro"], r["Nómina de Estudiantes"] ?? r.nombre ?? ""]);
+
+        autoTable(pdf, {
+            head,
+            body,
+            startY: headerBottomY + 6,
+            margin: { left: side, right: side },   // centrada
+            tableWidth: tableW,                    // ancho fijo
+            theme: "grid",
+            styles: {
+                font: "helvetica",
+                fontSize: 9,                         // más compacto
+                cellPadding: { top: 3, right: 5, bottom: 3, left: 5 },
+                lineColor: [120, 120, 120],
+                lineWidth: 0.25,
+                halign: "left",
+                valign: "middle",
+                overflow: "linebreak"
+            },
+            headStyles: {
+                fillColor: [230, 230, 230],
+                textColor: 20,
+                lineColor: [120, 120, 120],
+                lineWidth: 0.5,
+                fontStyle: "bold",
+                halign: "center"
+            },
+            alternateRowStyles: { fillColor: [248, 248, 248] },
+            columnStyles: {
+                0: { cellWidth: 38, halign: "center" },      // columna Nro más angosta
+                1: { cellWidth: tableW - 38 }                // el resto para el nombre
+            },
+            didDrawPage: () => {
+                pdf.setFontSize(9);
+                pdf.setTextColor(85);
+                pdf.text("Generado por SGE", pageW - margin, pageH - 10, { align: "right" });
+            }
+        });
 
         pdf.save(nombreArchivo);
-    } catch (error) {
-        Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Ocurrió un problema al exportar el PDF.",
-        });
-        console.error(error);
+    } catch (err) {
+        console.error(err);
+        Swal.fire({ icon: "error", title: "Error", text: "No se pudo exportar el PDF." });
     }
-};
-
+}

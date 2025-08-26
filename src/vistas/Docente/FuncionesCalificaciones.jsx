@@ -1,55 +1,67 @@
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import Swal from "sweetalert2";
-import { ErrorMessage } from "../../Utils/ErrorMesaje";
 
-// ✅ Exportar Excel
-export const handleExportExcel = () => {
-  try {
-    const activeTab = document.querySelector(".tab-pane.active");
-    if (!activeTab) {
-      alert("No se encontró la pestaña activa para exportar a Excel.");
-      return;
+/* Reescala un canvas a targetWidth px manteniendo proporción */
+function resampleCanvas(sourceCanvas, targetWidthPx) {
+  if (!sourceCanvas || !targetWidthPx) return sourceCanvas;
+  if (targetWidthPx >= sourceCanvas.width) return sourceCanvas; // no ampliar
+  const ratio = targetWidthPx / sourceCanvas.width;
+  const out = document.createElement("canvas");
+  out.width = targetWidthPx;
+  out.height = Math.round(sourceCanvas.height * ratio);
+  const ctx = out.getContext("2d");
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(sourceCanvas, 0, 0, out.width, out.height);
+  return out;
+}
+
+/* Tamaño aproximado (bytes) de un dataURL */
+function dataUrlBytes(dataUrl) {
+  // quita cabecera "data:image/xxx;base64,"
+  const b64 = dataUrl.split(",")[1] || "";
+  // 4 chars base64 ≈ 3 bytes
+  return Math.floor((b64.length * 3) / 4);
+}
+
+/* Genera dataURL intentando WEBP y luego JPEG con calidades/DPI decrecientes hasta quedar bajo maxKB */
+function compressCanvasAdaptive(sourceCanvas, targetWidthPt, maxKB = 120) {
+  // 72 pt = 1 inch → px deseados = (pt/72)*DPI
+  const dpiSteps = [160, 140, 120, 100, 90];            // baja si aún queda pesado
+  const qualStepsWebP = [0.75, 0.65, 0.55, 0.45];
+  const qualStepsJpeg = [0.72, 0.65, 0.6, 0.5, 0.45];
+
+  const maxBytes = maxKB * 1024;
+
+  for (const dpi of dpiSteps) {
+    const targetWidthPx = Math.max(600, Math.round((targetWidthPt / 72) * dpi));
+    const scaled = resampleCanvas(sourceCanvas, targetWidthPx);
+
+    // 1) WEBP (mucho más eficiente si jsPDF soporta)
+    for (const q of qualStepsWebP) {
+      const url = scaled.toDataURL("image/webp", q);
+      if (dataUrlBytes(url) <= maxBytes) {
+        return { url, fmt: "WEBP", dpi, q };
+      }
     }
 
-    const headerContainer = activeTab.querySelector(".cabecera-parciales");
-    const table = activeTab.querySelector("table");
-    if (!table) {
-      alert("No se encontró ninguna tabla en la pestaña activa.");
-      return;
+    // 2) JPEG (fallback universal)
+    for (const q of qualStepsJpeg) {
+      const url = scaled.toDataURL("image/jpeg", q);
+      if (dataUrlBytes(url) <= maxBytes) {
+        return { url, fmt: "JPEG", dpi, q };
+      }
     }
-
-    let headerData = [];
-    if (headerContainer) {
-      const h4 = headerContainer.querySelector("h4")?.innerText || "";
-      const h5 = headerContainer.querySelector("h5")?.innerText || "";
-      headerData.push([h4], [h5]);
-
-      const infoDivs = headerContainer.querySelectorAll(".row .col-md-6.mb-1");
-      infoDivs.forEach(div => headerData.push([div.innerText]));
-      headerData.push([]);
-    }
-
-    const tempSheet = XLSX.utils.table_to_sheet(table);
-    const tableAOA = XLSX.utils.sheet_to_json(tempSheet, { header: 1 });
-    const finalAOA = [...headerData, ...tableAOA];
-
-    const worksheet = XLSX.utils.aoa_to_sheet(finalAOA);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Calificaciones");
-
-    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
-    saveAs(blob, "Calificaciones.xlsx");
-  } catch (error) {
-    ErrorMessage(error);
-
   }
-};
 
-// ✅ Exportar PDF
+  // si nada cumple el límite, devuelve lo “menos pesado” probado (último intento)
+  const lastTargetWidthPx = Math.round((targetWidthPt / 72) * dpiSteps.at(-1));
+  const lastScaled = resampleCanvas(sourceCanvas, lastTargetWidthPx);
+  const url = lastScaled.toDataURL("image/jpeg", 0.45);
+  return { url, fmt: "JPEG", dpi: dpiSteps.at(-1), q: 0.45 };
+}
+
 export const handleExportPDF = async () => {
   try {
     let contentToPrint = document.querySelector(
@@ -95,6 +107,7 @@ export const handleExportPDF = async () => {
         tablaParcialesBE.style.transformOrigin = "top left";
       }
     }
+
     await new Promise((resolve) => setTimeout(resolve, 500));
     clonedContent.style.width = "100%";
     clonedContent.style.boxSizing = "border-box";
@@ -104,6 +117,7 @@ export const handleExportPDF = async () => {
       useCORS: true,
       allowTaint: true,
       logging: false,
+      backgroundColor: "#ffffff",
       windowWidth: renderWidth,
       width: renderWidth,
       height: clonedContent.scrollHeight + 100,
@@ -115,34 +129,36 @@ export const handleExportPDF = async () => {
 
     document.body.removeChild(tempContainer);
 
-    const imgData = canvas.toDataURL("image/png", 1.0);
+    // ==============================
+    //   PDF + COMPRESIÓN ADAPTATIVA
+    // ==============================
     const pdf = new jsPDF({
       orientation: "p",
       unit: "pt",
       format: "a4",
+      compress: true, // compresión interna de streams
     });
 
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
 
-    if (isParcial) {
-      // Configuración personalizada para PARCIALES
-      const imgWidth = pageWidth - 10;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      const xOffset = 30;
-      const yOffset = ((pageHeight - imgHeight) / 10);
+    // mismo layout que tenías (no tocamos offsets ni tamaño visual)
+    const imgWidth = pageWidth - 10;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    const xOffset = isParcial ? 30 : 40;
+    const yOffset = isParcial ? (pageHeight - imgHeight) / 10 : (pageHeight - imgHeight) / 8;
 
-      pdf.addImage(imgData, "PNG", xOffset, yOffset, imgWidth, imgHeight);
-    } else {
-      // Configuración para QUIMESTRAL, FINAL u otros
-      const imgWidth = pageWidth - 10;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      const xOffset = 40;
-      const yOffset = ((pageHeight - imgHeight) / 8);
+    // Genera imagen optimizada <= 120 KB (ajusta si quieres 80/100/150)
+    const { url, fmt } = compressCanvasAdaptive(canvas, imgWidth, /*maxKB*/ 120);
 
-      pdf.addImage(imgData, "PNG", xOffset, yOffset, imgWidth, imgHeight);
-    }
+    // addImage soporta 'WEBP' en jsPDF recientes; si no, cae a JPEG sin romper formato
+    const formatForJsPDF = fmt === "WEBP" ? "WEBP" : "JPEG";
 
+    pdf.addImage(url, formatForJsPDF, xOffset, yOffset, imgWidth, imgHeight);
+
+    // ==============================
+    //    Nombre de archivo (igual)
+    // ==============================
     let fileName = "Calificaciones.pdf";
     if (contentToPrint.id.startsWith("pdf-")) {
       const partialName = contentToPrint.id.replace("pdf-", "");

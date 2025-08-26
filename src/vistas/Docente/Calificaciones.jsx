@@ -3,7 +3,7 @@ import Notas from "./Notas";
 import NotasBE from "./BasicoElemental/NotasBE";
 import { Home, Users, Settings } from "lucide-react";
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import { handleExportExcel, handleExportPDF, parseFecha, handleEditar as ejecutarHandleEditar } from "./FuncionesCalificaciones";
+import { handleExportPDF, parseFecha, handleEditar as ejecutarHandleEditar } from "./FuncionesCalificaciones";
 import { useNavigate, useLocation } from "react-router-dom";
 import Loading from "../../components/Loading";
 import axios from "axios";
@@ -526,7 +526,6 @@ function Calificaciones() {
       modules={modules}
       datosModulo={datosModulo}
       handleSidebarNavigation={handleSidebarNavigation}
-      handleExportExcel={handleExportExcel}
       handleExportPDF={handleExportPDF}
       handleSave={handleSave}
       handleEditar={handleEditar}

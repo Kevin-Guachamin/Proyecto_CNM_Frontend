@@ -6,7 +6,7 @@ import Final from "./FinalBE";
 import Header from "../../../components/Header";
 import Layout from "../../../layout/Layout";
 
-function NotasBE({ usuario, modules, datosModulo, handleSidebarNavigation, handleExportExcel, handleExportPDF, handleSave, handleEditar,
+function NotasBE({ usuario, modules, datosModulo, handleSidebarNavigation, handleExportPDF, handleSave, handleEditar,
   forceEdit, inputsDisabled, estadoFechas, textoRangoFechas, activeMainTab, activeSubTabQuim1, activeSubTabQuim2, setActiveMainTab,
   setActiveSubTabQuim1, setActiveSubTabQuim2, parcial1Quim1Data, parcial2Quim1Data, parcial1Quim2Data, parcial2Quim2Data, quim1Data,
   quim2Data, finalData, handleActualizarParcial1Quim1, handleActualizarParcial2Quim1, handleActualizarParcial1Quim2, handleActualizarParcial2Quim2,
@@ -37,13 +37,6 @@ function NotasBE({ usuario, modules, datosModulo, handleSidebarNavigation, handl
                 {/* Línea de Exportaciones */}
                 <div className="d-flex align-items-center gap-2">
                   <span className="label-text">Exportaciones:</span>
-                  <button
-                    className="btn btn-success btn-sm"
-                    onClick={handleExportExcel}
-                    title="Exportar a Excel"
-                  >
-                    <i className="bi bi-file-earmark-excel-fill"></i>
-                  </button>
                   <button
                     className="btn btn-danger btn-sm"
                     onClick={handleExportPDF}
