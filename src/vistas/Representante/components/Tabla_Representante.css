@@ -1,5 +1,14 @@
 /* Estilos de tabla específicos para representante */
-
+.vista-estudiantes {
+  width: 100%;
+  height: calc(85vh - 40px);
+  padding: 10px 20px 20px 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
 /* Contenedor principal de la tabla */
 .contenedor-tabla-representante {
   padding: 20px;
@@ -73,7 +82,7 @@
 }
 
 .icono-accion-representante:hover {
-  color: #0d5200;
+  color: #0056b3;
 }
 
 /* Mensaje cuando no hay registros */
@@ -137,3 +146,87 @@
     font-size: 0.9rem;
   }
 } 
+
+/* Estilos para la sección de resumen semanal */
+.seccion-resumen-semanal {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #00408A;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  animation: slideDown 0.3s ease-in-out;
+  box-shadow: 0 2px 10px rgba(0, 64, 138, 0.1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header-resumen {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #00408A;
+}
+
+.header-resumen h3 {
+  margin: 0;
+  color: #00408A;
+  font-weight: bold;
+  font-size: 1.4rem;
+}
+
+.contenido-resumen {
+  padding: 10px 0;
+}
+
+/* Contenedor específico para nuestro resumen semanal */
+.resumen-semanal-estudiante {
+  margin: 0;
+  padding: 0;
+}
+
+/* Estilos para el mensaje de información */
+.contenido-resumen .alert {
+  border-radius: 8px;
+  border: 1px solid #0dcaf0;
+  background-color: #d1ecf1;
+  color: #0c5460;
+  padding: 15px;
+  margin: 0;
+}
+.btn.btn-outline-secondary.btn-sm{
+  height: 40px;
+  width: 40px;
+}
+
+/* Responsive para la sección de resumen semanal */
+@media (max-width: 768px) {
+  .seccion-resumen-semanal {
+    margin-top: 15px;
+    padding: 15px;
+  }
+  
+  .header-resumen {
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .header-resumen h3 {
+    font-size: 1.2rem;
+  }
+  
+  .contenido-resumen .alert {
+    font-size: 0.9rem;
+    padding: 12px;
+  }
+}

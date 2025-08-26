@@ -4,7 +4,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import './Tabla_Representante.css'
 import { useNavigate } from "react-router-dom";
 
-const Tabla = ({datos, isLoading, handleVerCalificaciones, handleVerDatosEstudiante}) => {
+const Tabla = ({datos, isLoading, handleVerCalificaciones, handleVerDatosEstudiante, handleVerResumenSemanal}) => {
     const navigate = useNavigate();
 
     // Comprueba que los props sean arrays
@@ -65,6 +65,11 @@ const Tabla = ({datos, isLoading, handleVerCalificaciones, handleVerDatosEstudia
                                         className="bi bi-info-circle icono-accion-representante"
                                         onClick={() => handleVerDatosEstudiante(estudiante.nroCedula)}
                                         title="Ver información"
+                                    ></i>
+                                    <i
+                                        className="bi bi-calendar-week icono-accion-representante"
+                                        onClick={() => handleVerResumenSemanal(estudiante.nroCedula)}
+                                        title="Ver horario"
                                     ></i>
                                 </td>
                             </tr>

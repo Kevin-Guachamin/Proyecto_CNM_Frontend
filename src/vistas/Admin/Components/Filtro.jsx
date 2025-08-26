@@ -3,7 +3,16 @@ import BotonAdd from '../../../components/BotonAdd'
 import "../Styles/Filtro.css"
 
 
-function Filtro({ search, toggleModal, filterKey, filtrar, disabled = false, placeholder }) {
+function Filtro({ 
+  search, 
+  toggleModal, 
+  filterKey, 
+  filtrar, 
+  disabled = false, 
+  placeholder,
+  addButtonText,
+  addButtonDisabled = false
+}) {
 
 
 
@@ -24,7 +33,16 @@ function Filtro({ search, toggleModal, filterKey, filtrar, disabled = false, pla
         />
       </div>
       <div className="form-group filtro-button">
-        <BotonAdd onClick={toggleModal} />
+        <BotonAdd 
+          onClick={addButtonDisabled ? null : toggleModal} 
+          disabled={addButtonDisabled}
+          title={addButtonText}
+        />
+        {addButtonDisabled && addButtonText && (
+          <div className="info-message">
+            {addButtonText}
+          </div>
+        )}
       </div>
     </div>
   );

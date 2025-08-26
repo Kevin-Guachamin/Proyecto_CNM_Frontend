@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import { Table, Tabs, Tab, Container } from "react-bootstrap";
 import Header from "../../../components/Header";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { 
     calcularPromedioAnual, 
     calcularPromedioFinalConSupletorio, 
@@ -268,6 +270,206 @@ const TablaEstudianteCalificaciones = ({datos, estudiante, periodosMatriculados}
             equivalenciaFinal: obtenerEquivalencia(promedioFinal)
         };
     };
+
+    // Función para exportar el reporte a PDF
+    const handleExportPDF = () => {
+        try {
+            // Validar datos antes de proceder
+            if (!materiasTabla || materiasTabla.length === 0) {
+                alert('No hay datos de calificaciones para exportar.');
+                return;
+            }
+
+            if (!estudiante || !periodosMatriculados || periodosMatriculados.length === 0) {
+                alert('Faltan datos del estudiante o período académico.');
+                return;
+            }
+
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const pageWidth = doc.internal.pageSize.width;
+            const pageHeight = doc.internal.pageSize.height;
+            
+            // Colores corporativos
+            const azulCorporativo = [0, 64, 138]; // #00408A
+            const grisTexto = [51, 51, 51]; // #333
+            
+            // Encabezado del documento
+            doc.setFillColor(...azulCorporativo);
+            doc.rect(0, 0, pageWidth, 30, 'F');
+            
+            // Título principal
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(18);
+            doc.setFont('helvetica', 'bold');
+            doc.text('REPORTE DE CALIFICACIONES', pageWidth / 2, 15, { align: 'center' });
+            
+            // Información del período
+            doc.setFontSize(12);
+            const descripcionPeriodo = periodosMatriculados[0]?.descripcion || 'Período no especificado';
+            doc.text(descripcionPeriodo, pageWidth / 2, 25, { align: 'center' });
+            
+            // Información del estudiante
+            let yPos = 45;
+            doc.setTextColor(...grisTexto);
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'normal');
+            
+            const primerNombre = estudiante.primer_nombre || '';
+            const segundoNombre = estudiante.segundo_nombre || '';
+            const primerApellido = estudiante.primer_apellido || '';
+            const segundoApellido = estudiante.segundo_apellido || '';
+            const nombreCompleto = `${primerNombre} ${segundoNombre} ${primerApellido} ${segundoApellido}`.trim();
+            
+            doc.text(`Estudiante: ${nombreCompleto}`, 20, yPos);
+            doc.text(`Nivel: ${periodosMatriculados[0]?.nivel || 'No especificado'}`, 20, yPos + 8);
+            doc.text(`Fecha de generación: ${new Date().toLocaleDateString('es-ES')}`, 20, yPos + 16);
+            
+            yPos += 35;
+            
+            // Función auxiliar para crear tabla con estilos
+            const crearTablaConEstilos = (titulo, datosTabla, yInicial) => {
+                // Título de la sección
+                doc.setFillColor(...azulCorporativo);
+                doc.rect(20, yInicial, pageWidth - 40, 10, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'bold');
+                doc.text(titulo, pageWidth / 2, yInicial + 7, { align: 'center' });
+                
+                yInicial += 15;
+                
+                // Configurar datos para autoTable
+                const tableData = datosTabla.map(row => {
+                    try {
+                        if (titulo.includes('Quimestre 1')) {
+                            return [
+                                row.nombreMateria || 'Sin nombre',
+                                row.notaq1 || '0.00',
+                                row.equivalenciaQ1 || 'Sin equivalencia'
+                            ];
+                        } else if (titulo.includes('Quimestre 2')) {
+                            return [
+                                row.nombreMateria || 'Sin nombre',
+                                row.notaq2 || '0.00',
+                                row.equivalenciaQ2 || 'Sin equivalencia'
+                            ];
+                        } else { // Nota Final
+                            return [
+                                row.nombreMateria || 'Sin nombre',
+                                row.notaFinal || '0.00',
+                                row.equivalenciaFinal || 'Sin equivalencia'
+                            ];
+                        }
+                    } catch (err) {
+                        return ['Error', '0.00', 'Error'];
+                    }
+                });
+                
+                // Configurar estilos de la tabla
+                autoTable(doc, {
+                    head: [['Asignatura', 'Nota', 'Equivalencia']],
+                    body: tableData,
+                    startY: yInicial,
+                    margin: { left: 20, right: 20 },
+                    styles: {
+                        fontSize: 9,
+                        cellPadding: 4,
+                        textColor: grisTexto,
+                        lineColor: [200, 200, 200],
+                        lineWidth: 0.5
+                    },
+                    headStyles: {
+                        fillColor: azulCorporativo,
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold',
+                        fontSize: 10
+                    },
+                    alternateRowStyles: {
+                        fillColor: [248, 249, 250]
+                    },
+                    didParseCell: function(data) {
+                        try {
+                            const rowData = datosTabla[data.row.index];
+                            if (rowData && data.row.index < datosTabla.length) {
+                                // Colorear filas según el estado
+                                if (titulo.includes('Final') && rowData.estado === "Reprobado") {
+                                    // Fila roja para reprobados en nota final
+                                    data.cell.styles.fillColor = [252, 215, 215]; // Rojo claro
+                                    data.cell.styles.textColor = [114, 28, 36]; // Rojo oscuro
+                                } else if (!titulo.includes('Final')) {
+                                    // Amarillo para notas bajas en quimestres
+                                    const nota = titulo.includes('Quimestre 1') ? 
+                                        parseFloat(rowData.notaq1) : parseFloat(rowData.notaq2);
+                                    if (nota < 7 && rowData.nombreMateria !== "Promedio") {
+                                        data.cell.styles.fillColor = [255, 243, 205]; // Amarillo claro
+                                        data.cell.styles.textColor = [133, 100, 4]; // Amarillo oscuro
+                                    }
+                                }
+                                
+                                // Resaltar fila de promedio
+                                if (rowData.nombreMateria === "Promedio") {
+                                    data.cell.styles.fontStyle = 'bold';
+                                    data.cell.styles.fillColor = [230, 230, 230];
+                                }
+                            }
+                        } catch (err) {
+                            console.error('Error en didParseCell:', err);
+                        }
+                    }
+                });
+                
+                return doc.lastAutoTable.finalY + 10;
+            };
+            
+            // Crear las tres tablas
+            let currentY = yPos;
+            
+            // Tabla Quimestre 1
+            currentY = crearTablaConEstilos('QUIMESTRE 1', materiasTabla, currentY);
+            
+            // Verificar si necesitamos nueva página
+            if (currentY > pageHeight - 100) {
+                doc.addPage();
+                currentY = 20;
+            }
+            
+            // Tabla Quimestre 2
+            currentY = crearTablaConEstilos('QUIMESTRE 2', materiasTabla, currentY);
+            
+            // Verificar si necesitamos nueva página
+            if (currentY > pageHeight - 100) {
+                doc.addPage();
+                currentY = 20;
+            }
+            
+            // Tabla Nota Final
+            currentY = crearTablaConEstilos('NOTA FINAL', materiasTabla, currentY);
+            
+            // Pie de página con leyenda
+            if (currentY > pageHeight - 50) {
+                doc.addPage();
+                currentY = 20;
+            }
+            
+            doc.setFontSize(8);
+            doc.setTextColor(...grisTexto);
+            doc.text('Leyenda:', 20, currentY + 10);
+            doc.text('• Amarillo: Calificaciones menores a 7.00 en quimestres', 20, currentY + 18);
+            doc.text('• Rojo: Materias reprobadas (nota final menor a 7.00)', 20, currentY + 26);
+            doc.text('• Gris: Fila de promedio general', 20, currentY + 34);
+            
+            // Generar nombre del archivo
+            const fechaHoy = new Date().toLocaleDateString('es-ES').replace(/\//g, '-');
+            const nombreArchivo = `Calificaciones_${primerNombre}_${primerApellido}_${fechaHoy}.pdf`;
+            
+            // Descargar el PDF
+            doc.save(nombreArchivo);
+            
+        } catch (error) {
+            console.error('Error al generar PDF:', error);
+            alert(`Error al generar el PDF: ${error.message || 'Error desconocido'}. Revise la consola para más detalles.`);
+        }
+    };
     
     const cargarDatos = () => {
         setIsLoading(true);
@@ -342,7 +544,7 @@ const TablaEstudianteCalificaciones = ({datos, estudiante, periodosMatriculados}
 		   <div>
 			   <button
 				   className="btn btn-danger me-2"
-				   //onClick={handleExportPDF}
+				   onClick={handleExportPDF}
 				   title="Exportar a PDF"
 				   >
 				   <i className="bi bi-file-earmark-pdf-fill"></i>

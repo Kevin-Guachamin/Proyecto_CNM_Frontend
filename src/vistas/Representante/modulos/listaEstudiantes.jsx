@@ -5,6 +5,9 @@ import Header from "../../../components/Header";
 import Layout from "../../../layout/Layout";
 import Loading from "../../../components/Loading";
 import VerDatosEstudiante from '../../Representante/modulos/VerDatosEstudiante';
+import Horarios from './Matriculacion/Horarios';
+import '../components/Tabla_Representante.css'; // Importar estilos para la sección de resumen
+import './Matriculacion/Busqueda.css'; // Importar estilos para las tarjetas del resumen semanal
 import { useLocation, useNavigate } from "react-router-dom";
 import { modulosRepresentante } from "../components/ModulosRepresentante";
 import { useAuth } from '../../../Utils/useAuth';
@@ -25,6 +28,9 @@ function ListaEstudiantes() {
   const [estudianteSeleccionado, setEstudianteSeleccionado] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCalificacionesOpen, setIsCalificacionesOpen] = useState(false);
+  const [isResumenSemanalOpen, setIsResumenSemanalOpen] = useState(false);
+  const [asignacionesResumen, setAsignacionesResumen] = useState([]);
+  const [estudianteResumen, setEstudianteResumen] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   let periodosMatriculados = [];
   //let periodosDatos = [];
@@ -127,6 +133,64 @@ function ListaEstudiantes() {
 
   }
 
+  const handleVerResumenSemanal = async (estudianteCedula) => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem("token");
+      const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
+      
+      // Obtener datos del estudiante
+      const respuestaEstudiante = await axios.get(`${API_URL}/estudiante/obtener/${estudianteCedula}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // Obtener período académico activo
+      const respuestaPeriodo = await axios.get(`${API_URL}/periodo_academico/activo`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // Obtener matrícula del estudiante en el período activo
+      const respuestaMatricula = await axios.get(
+        `${API_URL}/matricula/estudiante/periodo/${respuestaEstudiante.data.ID}/${respuestaPeriodo.data.ID}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      if (respuestaMatricula.data) {
+        // Obtener inscripciones del estudiante
+        const respuestaInscripciones = await axios.get(
+          `${API_URL}/inscripcion/obtener/matricula/${respuestaMatricula.data.ID}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        
+        // Extraer las asignaciones de las inscripciones (como en Matriculación)
+        const asignaciones = respuestaInscripciones.data
+          .map(insc => insc.Asignacion)
+          .filter(Boolean);
+        
+        setEstudianteResumen(respuestaEstudiante.data);
+        setAsignacionesResumen(asignaciones);
+        setIsResumenSemanalOpen(true);
+      } else {
+        // Si no tiene matrícula, mostrar mensaje
+        setEstudianteResumen(respuestaEstudiante.data);
+        setAsignacionesResumen([]);
+        setIsResumenSemanalOpen(true);
+      }
+
+    } catch (error) {
+      console.log('Error al obtener el resumen semanal del estudiante', error);
+      ErrorMessage(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCloseResumenSemanal = () => {
+    setIsResumenSemanalOpen(false);
+    setEstudianteResumen(null);
+    setAsignacionesResumen([]);
+  };
+
 
   //  Obtener los datos del representante guardados en localStorage
   useEffect(() => {
@@ -194,7 +258,82 @@ function ListaEstudiantes() {
               isLoading={isLoading}
               handleVerCalificaciones={handleVerCalificaciones}
               handleVerDatosEstudiante={handleVerDatosEstudiante}
+              handleVerResumenSemanal={handleVerResumenSemanal}
             />
+          )}
+
+          {/* Sección de resumen semanal del estudiante */}
+          {isResumenSemanalOpen && (
+            <div className="seccion-resumen-semanal">
+              <div className="header-resumen">
+                <h3>Horario de: {estudianteResumen?.primer_nombre} {estudianteResumen?.primer_apellido}</h3>
+                <button 
+                  className="btn btn-outline-secondary btn-sm" 
+                  onClick={handleCloseResumenSemanal}
+                  type="button"
+                >
+                  <i className="bi bi-x-lg"></i>
+                </button>
+              </div>
+              <div className="contenido-resumen">
+                {asignacionesResumen.length > 0 ? (
+                  <div className="resumen-semanal-estudiante">
+                    <div className="grid-dias">
+                      {(() => {
+                        // Organizar asignaciones por día
+                        const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+                        const horarioPorDia = {};
+                        
+                        diasSemana.forEach(dia => {
+                          horarioPorDia[dia] = [];
+                        });
+
+                        asignacionesResumen.forEach(asignacion => {
+                          if (asignacion && asignacion.dias) {
+                            asignacion.dias.forEach(dia => {
+                              if (horarioPorDia[dia]) {
+                                horarioPorDia[dia].push(asignacion);
+                              }
+                            });
+                          }
+                        });
+
+                        return Object.entries(horarioPorDia).map(([dia, asignacionesDia]) => (
+                          <div key={dia} className={`dia-container ${asignacionesDia.length > 0 ? 'con-clases' : 'sin-clases'}`}>
+                            <div className="dia-titulo">{dia}</div>
+                            <div className="dia-contenido">
+                              {asignacionesDia.length > 0 ? (
+                                asignacionesDia
+                                  .sort((a, b) => a.horaInicio.localeCompare(b.horaInicio))
+                                  .map((asignacion, index) => (
+                                  <div key={index} className="clase-item">
+                                    <span className="materia-nombre">{asignacion.Materia?.nombre}</span>
+                                    <span className="docente-nombre">
+                                      {asignacion.Docente ? 
+                                        `${asignacion.Docente.primer_nombre} ${asignacion.Docente.primer_apellido}` 
+                                        : 'Sin docente'
+                                      }
+                                    </span>
+                                    <span className="horario-time">{asignacion.horaInicio} - {asignacion.horaFin}</span>
+                                  </div>
+                                ))
+                              ) : (
+                                <span className="sin-clases-texto">Sin clases</span>
+                              )}
+                            </div>
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="alert alert-info">
+                    <i className="bi bi-info-circle"></i>
+                    <span className="ms-2">Este estudiante no tiene materias inscritas en el período académico actual.</span>
+                  </div>
+                )}
+              </div>
+            </div>
           )}
 
           {/* Modal de datos del estudiante */}
