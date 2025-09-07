@@ -283,6 +283,7 @@ function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatos
       .then(([respEstudiantes, respParciales]) => {
         const estudiantes = respEstudiantes.data;
         const parciales = respParciales.data;
+        console.log("estos son los parciales",parciales)
 
         const nuevosDatos = estudiantes.map(est => {
           const parcialGuardado = parciales.find(p =>
@@ -290,7 +291,7 @@ function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatos
             p.parcial === obtenerEtiquetaParcial() &&
             p.quimestre === obtenerEtiquetaQuimestre()
           ) || {};
-
+          console.log("este se guardo", parcialGuardado)
           const fila = {
             idInscripcion: est.idInscripcion,
             idParcial: parcialGuardado?.idParcial,

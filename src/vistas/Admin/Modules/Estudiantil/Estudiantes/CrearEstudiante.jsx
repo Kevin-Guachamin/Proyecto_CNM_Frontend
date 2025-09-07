@@ -4,10 +4,7 @@ import DatePicker from 'react-datepicker';
 import '../../../Styles/CrearEntidad.css';
 import "react-datepicker/dist/react-datepicker.css";
 import { convertirFecha } from '../../../../../Utils/Funciones';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-//import { faDownload } from '@fortawesome/free-solid-svg-icons';
-//import axios from 'axios';
-import { ErrorMessage } from '../../../../../Utils/ErrorMesaje';
+
 
 function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
   const [nroCedula, setNroCedula] = useState("")
@@ -24,9 +21,10 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
   const [sector, setSector] = useState("")
   const [parroquia, setParroquia] = useState("")
   const [canton, setCanton] = useState("")
-  const [nacionalidad,setNacionalidad]=useState("")
-  const token=localStorage.getItem("token")
-  
+  const [nacionalidad, setNacionalidad] = useState("")
+  const [nivel, setNivel] = useState("")
+  const token = localStorage.getItem("token")
+
   useEffect(() => {
     if (entityToUpdate) {
       setNroCedula(entityToUpdate.nroCedula || "");
@@ -45,9 +43,10 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
       setParroquia(palabras[1] || "")
       setCanton(palabras[2] || "")
       setNacionalidad(entityToUpdate.nacionalidad || "")
+      setNivel(entityToUpdate.nivel || "")
     }
   }, [entityToUpdate]);
-  
+
 
   const [files, setFiles] = useState({
     matricula_IER: entityToUpdate ? entityToUpdate.matricula_IER : null,
@@ -60,7 +59,7 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
       [name]: files[0], // Solo se selecciona un archivo por input
     }));
   };
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const direccion = [sector, parroquia, canton].join(" ")
@@ -81,16 +80,17 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
     formData.append("especialidad", especialidad)
     formData.append("IER", IER)
     formData.append("direccion", direccion)
-    formData.append("nacionalidad",nacionalidad)
+    formData.append("nacionalidad", nacionalidad)
+    formData.append("nivel", nivel)
 
-    if(!entityToUpdate){
+    if (!entityToUpdate) {
       formData.append("nroCedula_representante", representante)
-      onSave(formData, { headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` }});
-    }else{
-      onSave(formData,{ headers: { "Content-Type": "multipart/form-data",  Authorization: `Bearer ${token}` } })
+      onSave(formData, { headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` } });
+    } else {
+      onSave(formData, { headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` } })
     }
 
-    
+
   };
 
   return (
@@ -134,9 +134,9 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
 
           </div>
           <div className='rows'>
-            
 
-            
+
+
           </div>
           <div className='rows'>
 
@@ -195,6 +195,27 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
             </div>
           </div>
           <div className='rows'>
+
+            <div className="form-group">
+              <label htmlFor="nivel">Nivel:</label>
+              <select required id="nivel" value={nivel} onChange={(e) => setNivel(e.target.value)}>
+                <option value="1ro Básico Elemental" >1ro Básico Elemental</option>
+                <option value="2do Básico Elemental">2do Básico Elemental</option>
+                <option value="2do Básico Elemental">2do Básico Elemental</option>
+                <option value="1ro Básico Medio">1ro Básico Medio</option>
+                <option value="2do Básico Medio">2do Básico Medio</option>
+                <option value="3ro Básico Medio">3ro Básico Medio</option>
+                <option value="1ro Básico Superior">1ro Básico Superior</option>
+                <option value="2do Básico Superior">2do Básico Superior</option>
+                <option value="3ro Básico Superior">3ro Básico Superior</option>
+                <option value="1ro Bachillerato">1ro Bachillerato</option>
+                <option value="2do Bachillerato">2do Bachillerato</option>
+                <option value="3ro Bachillerato">3ro Bachillerato</option>
+
+              </select>
+            </div>
+          </div>
+          <div className='rows'>
             <label htmlFor="direccion">Dirección:</label>
           </div>
           <div className='rows'>
@@ -226,7 +247,7 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
                 accept="application/pdf"
                 className="custom-file-input"
               />
-              
+
             </div>
 
             <div className="file-upload">

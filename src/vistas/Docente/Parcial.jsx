@@ -235,7 +235,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
       .then(([respEstudiantes, respParciales]) => {
         const estudiantes = respEstudiantes.data;
         const parciales = respParciales.data;
-
+        
         const nuevosDatos = estudiantes.map(est => {
           const parcialGuardado = parciales.find(p =>
             p.idInscripcion === est.idInscripcion &&
