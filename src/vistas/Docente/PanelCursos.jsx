@@ -14,7 +14,8 @@ import { useAuth } from "../../Utils/useAuth";
 
 function PanelCursos() {
   // Protección de ruta
-  const auth = useAuth("Profesor");
+  const auth = useAuth(["Profesor", "Administrador", "Vicerrector"]);
+
   
   // Si no está autenticado, no renderizar nada
   if (!auth.isAuthenticated) {
@@ -45,6 +46,7 @@ function PanelCursos() {
   
     if (storedUser && storedToken) {
       const parsedUser = JSON.parse(storedUser);
+      console.log("este es el usuario que quiero ver",parsedUser)
       setUsuario(parsedUser);
   
       const modulosBase = getModulos(parsedUser.subRol, true);

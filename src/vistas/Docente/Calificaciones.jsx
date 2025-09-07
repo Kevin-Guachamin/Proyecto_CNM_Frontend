@@ -23,7 +23,7 @@ function Calificaciones() {
   const isSecretariaAccess = location.pathname.includes('/secretaria/');
   
   // Aplicar protección de rol según el contexto
-  const auth = useAuth(isSecretariaAccess ? "Secretaria" : "Profesor");
+  const auth = useAuth(isSecretariaAccess ? "Secretaria" : ["Profesor", "Administrador", "Vicerrector"]);
   
   // Si no está autenticado, no renderizar nada (el hook maneja la redirección)
   if (!auth.isAuthenticated) {
@@ -117,15 +117,17 @@ function Calificaciones() {
   const modules = React.useMemo(() => {
     if (!usuario) return [];
 
-    const esSecretaria = usuario.subRol?.toLowerCase() === "secretaria";
+    // const esSecretaria = usuario.subRol?.toLowerCase() === "secretaria";
     
-    if (esSecretaria) {
-      // Para secretarias, usar los módulos reales de Secretaria
-      return transformModulesForLayout(getModulos("Secretaria", true));
-    } else {
-      // Para profesores, usar los módulos estándar
-      return transformModulesForLayout(getModulos("Profesor", true));
-    }
+    // if (esSecretaria) {
+    //   // Para secretarias, usar los módulos reales de Secretaria
+    //   return transformModulesForLayout(getModulos("Secretaria", true));
+    // } else {
+    //   // Para profesores, usar los módulos estándar
+    //   return transformModulesForLayout(getModulos("Profesor", true));
+    // }
+    console.log("este es el subrol",usuario)
+    return transformModulesForLayout(getModulos(usuario.subRol, true));
   }, [usuario]);
 
   useEffect(() => {

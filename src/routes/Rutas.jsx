@@ -69,6 +69,8 @@ function Rutas() {
       <Route path="/admin/buscar_materias" element={<BuscarMaterias />} />
       <Route path="/admin/asignacionesIndividuales" element={<DistributivoIndividual />} />
       <Route path="/admin/cursos_vacios" element={<CursosVacios />} />
+      <Route path="/admin/panelcursos/calificaciones" element={<Calificaciones />} />
+      <Route path="/admin/panelcursos" element={<PanelCursos />} />
 
       {/*RUTAS DEL DOCENTE-Profesor*/}
       <Route path="/profesor/panelcursos/calificaciones" element={<Calificaciones />} />
