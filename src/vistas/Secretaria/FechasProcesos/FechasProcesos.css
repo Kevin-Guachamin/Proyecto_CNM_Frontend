@@ -1,0 +1,190 @@
+/* Estilos específicos para FechasProcesos */
+/* Solo modifica el scroll de la tabla y la paginación responsiva */
+
+.vista-procesos {
+  height: calc(100vh - 60px); /* Ajustar según la altura del header */
+  display: flex;
+  flex-direction: column;
+}
+
+.procesos-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.procesos-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.procesos-content h2 {
+  flex-shrink: 0;
+  margin-bottom: 16px;
+}
+
+/* Contenedor del filtro - fijo */
+.procesos-content > div:first-of-type {
+  flex-shrink: 0;
+  margin-bottom: 16px;
+}
+
+/* Solo la tabla tiene scroll */
+.procesos-content .Contenedor-tabla {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.procesos-content .tabla-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+/* Paginación fija en la parte inferior */
+.procesos-pagination {
+  flex-shrink: 0;
+  padding: 16px;
+  background-color: white;
+  border-top: 1px solid #e5e7eb;
+  box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
+}
+
+/* Mejoras para la paginación responsiva */
+.procesos-pagination .paginacion-contenedor {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.procesos-pagination .pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.procesos-pagination .pagination li {
+  list-style: none;
+}
+
+.procesos-pagination .pagination li a {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  color: #374151;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  min-width: 40px;
+  text-align: center;
+  display: block;
+}
+
+.procesos-pagination .pagination li a:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.procesos-pagination .pagination li.selected a {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.procesos-pagination .pagination li.disabled a {
+  color: #9ca3af;
+  cursor: not-allowed;
+  background-color: #f9fafb;
+}
+
+/* Responsividad para pantallas pequeñas */
+@media (max-width: 768px) {
+  .procesos-content {
+    padding: 12px;
+  }
+  
+  .procesos-pagination {
+    padding: 12px;
+  }
+  
+  .procesos-pagination .pagination li a {
+    padding: 6px 10px;
+    font-size: 13px;
+    min-width: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .procesos-content {
+    padding: 8px;
+  }
+  
+  .procesos-pagination {
+    padding: 12px 8px;
+  }
+  
+  .procesos-pagination .pagination {
+    gap: 6px;
+  }
+  
+  .procesos-pagination .pagination li a {
+    padding: 8px 12px;
+    font-size: 14px;
+    min-width: 40px;
+    font-weight: 500;
+  }
+  
+  /* Hacer los botones de navegación más visibles en móviles */
+  .procesos-pagination .pagination li.previous a,
+  .procesos-pagination .pagination li.next a {
+    background-color: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+    font-weight: 600;
+  }
+  
+  .procesos-pagination .pagination li.previous a:hover,
+  .procesos-pagination .pagination li.next a:hover {
+    background-color: #2563eb;
+    border-color: #2563eb;
+  }
+}
+
+@media (max-width: 360px) {
+  .procesos-pagination .pagination li a {
+    padding: 6px 10px;
+    font-size: 13px;
+    min-width: 36px;
+  }
+  
+  .procesos-pagination {
+    padding: 10px 6px;
+  }
+}
+
+/* Scrollbar personalizado para la tabla */
+.procesos-content .tabla-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.procesos-content .tabla-scroll::-webkit-scrollbar-track {
+  background-color: #f1f5f9;
+  border-radius: 4px;
+}
+
+.procesos-content .tabla-scroll::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 4px;
+}
+
+.procesos-content .tabla-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
