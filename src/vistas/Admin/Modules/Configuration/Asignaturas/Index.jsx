@@ -118,12 +118,22 @@ function Index() {
       </div>
 
       <Layout modules={modulos}>
-        <div className="vista-asignaturas">
+        <div className="vista-asignaturas" style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          height: 'calc(100vh - 60px)' 
+        }}>
           {loading ? (
             <Loading />
           ) : (
-            <div className="asignaturas-container">
-              <div className="asignaturas-content">
+            <>
+              {/* Contenido con scroll solo en la tabla */}
+              <div style={{ 
+                flex: '1', 
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
                 <Contenedor
                   search={search}
                   filtrar={handleSearch}
@@ -141,12 +151,18 @@ function Index() {
                 />
               </div>
               
-              <div className="asignaturas-pagination" ref={pagerRef}>
+              {/* Paginación fija en la parte inferior */}
+              <div style={{ 
+                flexShrink: 0,
+                padding: '15px',
+                borderTop: '1px solid #e5e7eb',
+                backgroundColor: '#f9fafb'
+              }} ref={pagerRef}>
                 {totalPages > 1 && (
                   <Paginación totalPages={totalPages} page={page} setPage={setPage} />
                 )}
               </div>
-            </div>
+            </>
           )}
         </div>
       </Layout>

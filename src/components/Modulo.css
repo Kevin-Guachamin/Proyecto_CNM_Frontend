@@ -4,6 +4,30 @@
     flex-wrap: wrap;
     gap: 20px;
     padding: 1%;
+    max-height: calc(100vw - 200px); /* Altura máxima ajustable según el header */
+    overflow-y: auto; /* Scroll vertical cuando sea necesario */
+    overflow-x: hidden; /* Evita scroll horizontal innecesario */
+    /* Estilos para el scrollbar */
+    scrollbar-width: thin;
+  }
+  
+  /* Webkit scrollbar (Chrome, Safari, Edge) */
+  .contenedor-modulos::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .contenedor-modulos::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 4px;
+  }
+  
+  .contenedor-modulos::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+  }
+  
+  .contenedor-modulos::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
   }
   
   .modulo-card {
@@ -49,7 +73,8 @@
   @media (max-width: 1024px) {
     .contenedor-modulos {
       gap: 15px;
-      padding: 0 20px;
+      
+      
     }
 
     .modulo-card {
@@ -74,7 +99,8 @@
   @media (max-width: 768px) {
     .contenedor-modulos {
       gap: 12px;
-      padding: 0 15px;
+      
+      max-height: calc(100vh - 160px); /* Ajuste para tablets pequeñas */
     }
 
     .modulo-card {
@@ -103,6 +129,7 @@
     .contenedor-modulos {
       gap: 10px;
       padding: 0 10px;
+      max-height: calc(100vh - 140px); /* Ajuste para móviles */
     }
 
     .modulo-card {
@@ -131,6 +158,7 @@
     .contenedor-modulos {
       gap: 8px;
       padding: 0 8px;
+      max-height: calc(100vh - 120px); /* Ajuste para móviles muy pequeños */
     }
 
     .modulo-card {

@@ -3,10 +3,25 @@
    Sin recálculos dinámicos - Solo CSS responsivo
    =========================== */
 
+.section-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.vista-procesos {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .periodos-container,
 .asignaturas-container,
 .docentes-container,
-.cursos-container {
+.cursos-container,
+.procesos-container {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -33,7 +48,8 @@
 .asignaturas-content,
 .docentes-content,
 .cursos-content,
-.materias-individuales-content {
+.materias-individuales-content,
+.procesos-content {
   flex: 1;
   overflow: auto;
   padding: 0;
@@ -46,7 +62,8 @@
 .asignaturas-pagination,
 .docentes-pagination,
 .cursos-pagination,
-.materias-individuales-pagination {
+.materias-individuales-pagination,
+.procesos-pagination {
   flex-shrink: 0;
   display: flex;
   justify-content: center;

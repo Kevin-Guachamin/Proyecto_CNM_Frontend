@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './Busqueda.css';
 import { IoEyeOutline } from "react-icons/io5";
+import { Card, Row, Col } from 'react-bootstrap';
 
 function Busqueda({usuario}) {
     const [periodo, setPeriodo] = useState("")
@@ -19,9 +20,49 @@ function Busqueda({usuario}) {
     const [inscripciones, setInscripciones] = useState([])
     const [buscarAsignacion, setBucarAsignacion] = useState(false);
     const [estudiantesRepresentante, setEstudiantesRepresentante] = useState(null)
+    const [periodoMatriculaActivo, setPeriodoMatriculaActivo] = useState(true)
+    const [mensajePeriodo, setMensajePeriodo] = useState("")
+    const [fechasMatricula, setFechasMatricula] = useState({ inicio: null, fin: null })
     const token=localStorage.getItem("token")
     const navigate = useNavigate();
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
+
+    // Función para formatear fechas evitando problemas de zona horaria
+    const formatearFecha = (fechaIso) => {
+        if (!fechaIso) return '';
+        const fecha = new Date(`${fechaIso}T00:00:00`); // evita desfase por zona horaria
+        return fecha.toLocaleDateString('es-EC', {
+            day: '2-digit',
+            month: '2-digit',  
+            year: 'numeric'
+        });
+    };
+
+    // Verificar período de matrícula al cargar el componente
+    useEffect(() => {
+        const verificarPeriodoMatricula = async () => {
+            try {
+                const response = await axios.get(`${API_URL}/fechas_procesos/matricula`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setPeriodoMatriculaActivo(response.data.periodoActivo);
+                setMensajePeriodo(response.data.mensaje);
+                
+                // Guardar las fechas del período
+                if (response.data.fechaInicioPeriodo && response.data.fechaFinPeriodo) {
+                    setFechasMatricula({
+                        inicio: response.data.fechaInicioPeriodo,
+                        fin: response.data.fechaFinPeriodo
+                    });
+                }
+            } catch (error) {
+                console.log('Error al verificar período de matrícula:', error);
+                setPeriodoMatriculaActivo(false);
+                setMensajePeriodo('No se pudo verificar el período de matrícula');
+            }
+        };
+        verificarPeriodoMatricula();
+    }, []);
 
     useEffect(() => {
 
@@ -203,6 +244,19 @@ function Busqueda({usuario}) {
     }
 
     const Inscribir = async (asignacion) => {
+        // Verificar si el período de matrícula está activo
+        if (!periodoMatriculaActivo) {
+            Swal.fire({
+                icon: "warning",
+                title: "Período de matrícula inactivo",
+                text: mensajePeriodo,
+                iconColor: "#f39c12",
+                confirmButtonText: "Entendido",
+                confirmButtonColor: "#3085d6"
+            });
+            return;
+        }
+
         try {
             // Primero, verificar si ya está inscrito en esta misma asignación
             const yaInscrito = inscripciones.some(inscripcion => {
@@ -299,6 +353,25 @@ function Busqueda({usuario}) {
     return (
         <div className='contenedor-busqueda'>
             <h1 className='periodo-title'>{`Periodo académico activo ${periodo.descripcion}`}</h1>
+            
+            {/* Alerta general de período inactivo */}
+            {!periodoMatriculaActivo && (
+                <div className="alerta-periodo-global">
+                    <div className="alerta-header">
+                        <i className="bi bi-exclamation-circle-fill"></i>
+                        <h3>Matrícula no disponible</h3>
+                    </div>
+                    <div className="alerta-content">
+                        <p className="mensaje-principal">{mensajePeriodo}</p>
+                        {fechasMatricula.inicio && fechasMatricula.fin && (
+                            <p className="fechas-periodo">
+                                <strong>Período de matrícula:</strong> {formatearFecha(fechasMatricula.inicio)} - {formatearFecha(fechasMatricula.fin)}
+                            </p>
+                        )}
+                        <p className="instrucciones">Para realizar matrículas, contacte con la administración del conservatorio.</p>
+                    </div>
+                </div>
+            )}
             <div className="contenedor-tabla-matricula-estudiantes">
                 {!estudiantesRepresentante && (
                     <p className="sin-registros-matricula">No se encontraron estudiantes.</p>
@@ -331,9 +404,9 @@ function Busqueda({usuario}) {
                                     <td className="celda-tabla-matricula-estudiantes">{estudiante.nivel}</td>
                                     <td className="acciones-tabla-matricula-estudiantes">
                                         <i 
-                                            className="bi bi-pencil-square icono-matricula"
-                                            onClick={() => handleEstudianteSeleccionado(estudiante)}
-                                            title="Empezar matrícula"
+                                            className={`bi bi-pencil-square ${periodoMatriculaActivo ? 'icono-matricula' : 'icono-matricula-deshabilitado'}`}
+                                            onClick={() => periodoMatriculaActivo && handleEstudianteSeleccionado(estudiante)}
+                                            title={periodoMatriculaActivo ? "Empezar matrícula" : "Período de matrícula inactivo"}
                                         ></i>
                                     </td>
                                 </tr>
@@ -353,51 +426,67 @@ function Busqueda({usuario}) {
                         onChange={(e) => setAsignatura(e.target.value)} 
                         placeholder="Ej: Piano, Violín, etc. (opcional)"
                     />
-                    <button className="btn-buscar-asignaturas" onClick={HandleBuscarAsignaturas}>Buscar</button>
+                    <button 
+                        className="btn-buscar-asignaturas" 
+                        onClick={HandleBuscarAsignaturas}
+                        disabled={!periodoMatriculaActivo}
+                        title={!periodoMatriculaActivo ? "Período de matrícula inactivo" : "Buscar materias"}
+                    >
+                        Buscar
+                    </button>
                 </div>
-                <div className="contenedor-tabla-matricula-asignaciones">
+                
+                {/* Mensaje sobre el estado del período de matrícula */}
+                {!periodoMatriculaActivo && (
+                    <div className="alerta-periodo-matricula">
+                        <i className="bi bi-exclamation-triangle-fill"></i>
+                        <div className="mensaje-periodo">
+                            <span className="mensaje-principal">{mensajePeriodo}</span>
+                            {fechasMatricula.inicio && fechasMatricula.fin && (
+                                <span className="fechas-periodo">
+                                    Período de matrícula: {formatearFecha(fechasMatricula.inicio)} - {formatearFecha(fechasMatricula.fin)}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                )}
+                
+                <div className="matric-cards">
                     {buscarAsignacion ? (
                         asignaciones.length === 0 ? (
-                            <p className="sin-registros-matricula">No se encontraron coincidencias</p>
+                            <p className="no-registros">No se encontraron coincidencias</p>
                         ) : (
-                            <div className="scroll-tabla-matricula-asignaciones">
-                                <table className="tabla-matricula-asignaciones">
-                                    <thead>
-                                        <tr>
-                                            <th className="encabezado-tabla-matricula-asignaciones">Nivel</th>
-                                            <th className="encabezado-tabla-matricula-asignaciones">Paralelo</th>
-                                            <th className="encabezado-tabla-matricula-asignaciones">Docente</th>
-                                            <th className="encabezado-tabla-matricula-asignaciones">Materia</th>
-                                            <th className="encabezado-tabla-matricula-asignaciones">Días</th>
-                                            <th className="encabezado-tabla-matricula-asignaciones">Hora Inicio</th>
-                                            <th className="encabezado-tabla-matricula-asignaciones">Hora Fin</th>
-                                            <th className="encabezado-tabla-matricula-asignaciones">Cupos disponibles</th>
-                                            <th className="encabezado-tabla-matricula-asignaciones">Seleccionar</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {asignaciones.map((item, index) => (
-                                            <tr key={index}>
-                                                <td className="celda-tabla-matricula-asignaciones">{item.Materia.nivel}</td>
-                                                <td className="celda-tabla-matricula-asignaciones">{item.paralelo}</td>
-                                                <td className="celda-tabla-matricula-asignaciones">{`${item.Docente.primer_nombre} ${item.Docente.primer_apellido}`}</td>
-                                                <td className="celda-tabla-matricula-asignaciones">{item.Materia.nombre}</td>
-                                                <td className="celda-tabla-matricula-asignaciones">{`${item.dias[0]}${item.dias[1] ? `-${item.dias[1]}` : ''}`}</td>
-                                                <td className="celda-tabla-matricula-asignaciones">{item.horaInicio}</td>
-                                                <td className="celda-tabla-matricula-asignaciones">{item.horaFin}</td>
-                                                <td className="celda-tabla-matricula-asignaciones">{item.cupos}</td>
-                                                <td className="acciones-tabla-matricula-asignaciones">
-                                                    <i 
-                                                        className="bi bi-clipboard2-check icono-inscribir"
-                                                        onClick={() => Inscribir(item)}
-                                                        title="Inscribir"
-                                                    ></i>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                            <Row xs={1} md={2} lg={5} className="g-2">
+                                {asignaciones.map((asig) => {
+                                    const nombreDoc = `${asig.Docente?.primer_nombre || ''} ${asig.Docente?.primer_apellido || ''}`.trim();
+                                    return (
+                                        <Col key={asig.ID} className="d-flex justify-content-center p-1">
+                                            <Card
+                                                style={{ 
+                                                    maxWidth: 300, 
+                                                    cursor: periodoMatriculaActivo ? "pointer" : "not-allowed", 
+                                                    backgroundColor: periodoMatriculaActivo ? "#CFD8DC" : "#f0f0f0",
+                                                    opacity: periodoMatriculaActivo ? 1 : 0.6
+                                                }}
+                                                onClick={() => periodoMatriculaActivo && Inscribir(asig)}
+                                            >
+                                                <Card.Body>
+                                                    <Card.Title>{asig.Materia?.nombre}</Card.Title>
+                                                    <Card.Subtitle className="mb-2 text-muted">
+                                                        Paralelo: {asig.paralelo} || Cupos: {asig.cupos}
+                                                    </Card.Subtitle>
+                                                    <Card.Text>
+                                                        <strong>Nivel:</strong> {asig.Materia?.nivel} <br />
+                                                        <strong>Horario:</strong> {asig.horaInicio} - {asig.horaFin} <br />
+                                                        <strong>Días:</strong> {asig.dias?.join(", ")} <br />
+                                                        <strong>Docente:</strong> {nombreDoc}
+                                                    </Card.Text>
+                                                </Card.Body>
+                                            </Card>
+                                        </Col>
+                                    );
+                                })}
+                            </Row>
                         )
                     ) : null}
                 </div>
