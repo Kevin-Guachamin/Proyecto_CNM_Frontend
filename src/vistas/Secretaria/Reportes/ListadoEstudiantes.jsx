@@ -142,9 +142,13 @@ function ListadoEstudiantes() {
                 <div className="content-container mt-3">
                     <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                         <h2 className="titulo-nivel m-0">Listado de Estudiantes - {nivel}</h2>
-                        <Button className="btn-resumen" size="sm" onClick={handleResumenGeneral}>
-                            <i className="bi bi-graph-up"></i> Reportes Generales
-                        </Button>
+                        <button
+                            className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1 px-3"
+                            style={{ maxWidth: "120px" }}
+                            onClick={() => navigate(`/secretaria/reportes`)}
+                        >
+                            <i className="bi bi-arrow-left-circle-fill"></i> Regresar
+                        </button>
                     </div>
                     {estudiantes.length > 0 ? (
                         <Table striped bordered hover responsive>

@@ -46,3 +46,22 @@
     text-overflow: ellipsis;
     font-size: 0.9rem;
   }
+
+  /* Contenedor general del certificado (encabezado + tabla) */
+.certificado-container {
+  max-width: 1100px;
+  margin: 0 auto 1.5rem auto;
+}
+
+/* tabla usa todo el ancho del certificado */
+.certificado-container .tabla-certificado .table {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+/* botón pequeñito como icono */
+.btn-export-pdf {
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.5rem;
+}
+

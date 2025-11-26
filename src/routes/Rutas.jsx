@@ -95,6 +95,9 @@ function Rutas() {
       <Route path="/vicerrector/password" element={<ChangePassword_Vicerrector />} />
       <Route path="/vicerrector/distributivo" element={<Distributivo />} />
       <Route path="/vicerrector/solicitudes" element={<Solicitudes />} />
+      <Route path="/vicerrector/panelcursos/calificaciones" element={<Calificaciones />} />
+      <Route path="/vicerrector/panelcursos" element={<PanelCursos />} />
+
 
       {/*RUTAS DEL DOCENTE-Secretaria*/}
       <Route path="/secretaria/administracion-escolar" element={<GestionEscolar />} />
