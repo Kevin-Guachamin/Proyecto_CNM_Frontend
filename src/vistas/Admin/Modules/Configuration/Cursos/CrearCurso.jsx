@@ -5,6 +5,7 @@ import { ErrorMessage } from '../../../../../Utils/ErrorMesaje';
 import SelectInput from './SelectInput';
 import Boton from '../../../../../components/Boton';
 import SelectorHoraMinuto from './SelectorHoraMinuto';
+import AutoCompleteInput from './AutoCompleteInput';
 
 function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
   const [paralelo, setParalelo] = useState("");
@@ -155,26 +156,12 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
 
             <div className="form-group">
               <label htmlFor="asignaturas">Asignatura:</label>
-              <SelectInput 
-                value={asignatura} 
-                onChange={setAsignatura} 
-                opciones={asignaturas} 
-                key1="nombre" 
-                key2="nivel"
-                placeholder="Selecciona una asignatura"
-              />
+              <AutoCompleteInput inputValue={asignatura} setInputValue={setAsignatura} opciones={asignaturas} key1="nombre" key2="nivel" />
             </div>
 
             <div className="form-group">
               <label htmlFor="docentes">Docente:</label>
-              <SelectInput 
-                value={docente} 
-                onChange={setDocente} 
-                opciones={docentes} 
-                key1="primer_nombre" 
-                key2="primer_apellido"
-                placeholder="Selecciona un docente"
-              />
+              <AutoCompleteInput inputValue={docente} setInputValue={setDocente} opciones={docentes} key1="primer_nombre" key2="primer_apellido" />
             </div>
           </div>
           <div className='rows'>
