@@ -57,7 +57,6 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
       .then(([respEstudiantes, respQuimestrales]) => {
         const estudiantes = respEstudiantes.data;
         const quimestrales = respQuimestrales.data;
-
         const nuevosDatos = estudiantes.map(est => {
           const p1 = parcial1Data.find(p => p.id_inscripcion === est.idInscripcion) || {};
           const p2 = parcial2Data.find(p => p.id_inscripcion === est.idInscripcion) || {};

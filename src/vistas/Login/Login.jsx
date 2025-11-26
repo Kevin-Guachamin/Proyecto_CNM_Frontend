@@ -56,6 +56,7 @@ function Login() {
       }
     } catch (error) {
       setLoading(false);
+      console.log("este es el error de inicio de sesion")
       ErrorMessage(error);
     }
   };

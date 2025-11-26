@@ -1,4 +1,3 @@
-import React from 'react'
 import axios from 'axios';
 import { ErrorMessage } from '../../Utils/ErrorMesaje';
 function BuscarEstudiante({cedula,setCedula,setEstudiante,setBuscado}) {
@@ -15,7 +14,6 @@ function BuscarEstudiante({cedula,setCedula,setEstudiante,setBuscado}) {
     const HandleBuscarEstudiante = async () => {
         setBuscado(true)
         setEstudiante(null)
-        
         try {
             if (!cedula) {
                 return
@@ -24,11 +22,8 @@ function BuscarEstudiante({cedula,setCedula,setEstudiante,setBuscado}) {
                 headers: { Authorization: `Bearer ${token}` },
               });
             setEstudiante(response.data)
-
-
         } catch (error) {
             ErrorMessage(error);
-
         }
     }
     return (
