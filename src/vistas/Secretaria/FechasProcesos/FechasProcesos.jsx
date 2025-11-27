@@ -142,7 +142,7 @@ function FechasProcesos() {
 
   const handleDeleteProceso = async (proceso) => {
     try {
-      const URL = `${import.meta.env.VITE_URL_DEL_BACKEND}/fechas_procesos/eliminar/${proceso.ID}`;
+      const URL = `${import.meta.env.VITE_URL_DEL_BACKEND}/fechas_procesos/eliminar`;
       await Eliminar(proceso, URL, proceso.proceso, setAllProcesos, "ID");
       // Recargar todos los datos después de eliminar
       const response = await axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/fechas_procesos/obtener_todo`);
