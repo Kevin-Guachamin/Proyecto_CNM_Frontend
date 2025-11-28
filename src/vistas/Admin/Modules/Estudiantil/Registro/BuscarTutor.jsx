@@ -46,19 +46,23 @@ function BuscarTutor() {
 
   const handleSaveRepresentante = async (formData) => {
     const formObject = Object.fromEntries(formData.entries());
-    const { data } = await axios.post(`${API_URL}/representante/crear`, formObject, {
-      headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` },
-    });
-    setRepresentante(data);
-    setModalRepresentante(false);
-    Swal.fire({
-      icon: 'success',
-      title: `${data.primer_nombre} ${data.primer_apellido} registrado con éxito`,
-      iconColor: '#218838',
-      confirmButtonText: 'Entendido',
-      confirmButtonColor: '#003F89',
-    });
-  };
+    try {
+      const { data } = await axios.post(`${API_URL}/representante/crear`, formObject, {
+        headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` },
+      });
+      setRepresentante(data);
+      setModalRepresentante(false);
+      Swal.fire({
+        icon: 'success',
+        title: `${data.primer_nombre} ${data.primer_apellido} registrado con éxito`,
+        iconColor: '#218838',
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#003F89',
+      });
+    } catch (error) {
+      ErrorMessage(error);
+    };
+  }
 
   const handleSaveEstudiante = (formData) => {
     const formObject = Object.fromEntries(formData.entries());
