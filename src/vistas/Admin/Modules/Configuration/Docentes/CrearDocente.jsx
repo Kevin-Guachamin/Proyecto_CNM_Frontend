@@ -53,7 +53,7 @@ function CrearDocente({ onCancel, entityToUpdate, onSave }) {
                                 <option value="">Selecciona un rol</option>
                                 <option value="Administrador">Administrador</option>
                                 <option value="Profesor">Profesor</option>
-                                <option value="Vicerrector">Vicerector</option>
+                                <option value="Vicerrector">Vicerrector</option>
                                 <option value="Secretaria">Secretaria</option>
                             </select>
                         </div>
