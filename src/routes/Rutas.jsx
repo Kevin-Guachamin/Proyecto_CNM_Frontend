@@ -46,78 +46,83 @@ import ListadoEstudiantes from '../vistas/Secretaria/Reportes/ListadoEstudiantes
 import ReporteEstudiante from '../vistas/Secretaria/Reportes/ReporteEstudiante.jsx';
 import ReporteGeneral from '../vistas/Secretaria/Reportes/ReporteGeneral.jsx';
 //import InformacionEstudiantes from '../vistas/Secretaria/InformacionEstudiantil/Estudiantes/Index.jsx';
+import RutaProtegida from '../vistas/Login/RutaProtegida.jsx';
 
 function Rutas() {
   return (
     <Routes>
+      {/* 🚪 Rutas públicas */}
       <Route path="/" element={<Login />} />
-      <Route path="/inicio" element={<Inicio />} />
       <Route path="/request-recover-password" element={<VerificarCorreo />} />
       <Route path="/reset-password" element={<ResetPassword />} />
 
-      {/*RUTAS DEL ADMINISTRADOR*/}
-      <Route path="/admin/periodos" element={<Periodos_Academicos />} />
-      <Route path="/admin/asignaturas" element={<Asignaguras />} />
-      <Route path="/admin/docentes" element={<Docentes />} />
-      <Route path="/admin/estudiantes" element={<Estudiantes />} />
-      <Route path='/admin/cursos' element={<Cursos />} />
-      <Route path='/admin/matriculacion' element={<Matriculacion />} />
-      <Route path='/admin/horarios' element={<Horarios />} />
-      <Route path='/admin/inscripcion' element={<Inscripcion />} />
-      <Route path='/admin/representantes' element={<Representantes />} />
-      <Route path="/admin/password" element={<ChangePassword_Admin />} />
-      <Route path="/admin/buscar_materias" element={<BuscarMaterias />} />
-      <Route path="/admin/asignacionesIndividuales" element={<DistributivoIndividual />} />
-      <Route path="/admin/cursos_vacios" element={<CursosVacios />} />
-      <Route path="/admin/panelcursos/calificaciones" element={<Calificaciones />} />
-      <Route path="/admin/panelcursos" element={<PanelCursos />} />
+      {/* 🔒 Rutas protegidas (requieren login y respetan debeCambiarPassword) */}
+      <Route element={<RutaProtegida />}>
+        <Route path="/inicio" element={<Inicio />} />
 
-      {/*RUTAS DEL DOCENTE-Profesor*/}
-      <Route path="/profesor/panelcursos/calificaciones" element={<Calificaciones />} />
-      <Route path="/profesor/panelcursos" element={<PanelCursos />} />
-      <Route path="/profesor/password" element={<ChangePassword_Profesor />} />
-      <Route path='/profesor/solicitudes' element={<SolicitudesDocente />} />
-      <Route path='/profesor/matricula' element={<MatriculaIndividual />} />
-      <Route path='/profesor/materias' element={<MateriasIndividuales />} />
-      <Route path='/profesor/inscripciones' element={<InscripcionesIndividuales />} />
+        {/* ADMINISTRADOR */}
+        <Route path="/admin/periodos" element={<Periodos_Academicos />} />
+        <Route path="/admin/asignaturas" element={<Asignaguras />} />
+        <Route path="/admin/docentes" element={<Docentes />} />
+        <Route path="/admin/estudiantes" element={<Estudiantes />} />
+        <Route path="/admin/cursos" element={<Cursos />} />
+        <Route path="/admin/matriculacion" element={<Matriculacion />} />
+        <Route path="/admin/horarios" element={<Horarios />} />
+        <Route path="/admin/inscripcion" element={<Inscripcion />} />
+        <Route path="/admin/representantes" element={<Representantes />} />
+        <Route path="/admin/password" element={<ChangePassword_Admin />} />
+        <Route path="/admin/buscar_materias" element={<BuscarMaterias />} />
+        <Route path="/admin/asignacionesIndividuales" element={<DistributivoIndividual />} />
+        <Route path="/admin/cursos_vacios" element={<CursosVacios />} />
+        <Route path="/admin/panelcursos/calificaciones" element={<Calificaciones />} />
+        <Route path="/admin/panelcursos" element={<PanelCursos />} />
 
-      {/*Rutas DEL REPRESENTANTE*/}
-      <Route path="/representante" element={<Representante />} />
-      <Route path="/representante/estudiantes" element={<ListaEstudiantes />} />
-      <Route path="/representante/perfil" element={<VerDatosRepresentante />} />
-      <Route path="/representante/password" element={<ChangePassword_Representante />} />
-      <Route path="/estudiante/perfil" element={<VerDatosEstudiante />} />
-      <Route path="/representante/inscripcion" element={<InscripcionRepresentante />} />
-      <Route path="/representante/calificaciones" element={<VerCalificacionesEstudiante />} />
+        {/* DOCENTE - Profesor */}
+        <Route path="/profesor/panelcursos/calificaciones" element={<Calificaciones />} />
+        <Route path="/profesor/panelcursos" element={<PanelCursos />} />
+        <Route path="/profesor/password" element={<ChangePassword_Profesor />} />
+        <Route path="/profesor/solicitudes" element={<SolicitudesDocente />} />
+        <Route path="/profesor/matricula" element={<MatriculaIndividual />} />
+        <Route path="/profesor/materias" element={<MateriasIndividuales />} />
+        <Route path="/profesor/inscripciones" element={<InscripcionesIndividuales />} />
 
-      {/*RUTAS DEL DOCENTE-Vicerrector*/}
-      <Route path="/vicerrector/reportes" element={<AgregarFechas />} />
-      <Route path="/vicerrector/password" element={<ChangePassword_Vicerrector />} />
-      <Route path="/vicerrector/distributivo" element={<Distributivo />} />
-      <Route path="/vicerrector/solicitudes" element={<Solicitudes />} />
-      <Route path="/vicerrector/panelcursos/calificaciones" element={<Calificaciones />} />
-      <Route path="/vicerrector/panelcursos" element={<PanelCursos />} />
+        {/* REPRESENTANTE */}
+        <Route path="/representante" element={<Representante />} />
+        <Route path="/representante/estudiantes" element={<ListaEstudiantes />} />
+        <Route path="/representante/perfil" element={<VerDatosRepresentante />} />
+        <Route path="/representante/password" element={<ChangePassword_Representante />} />
+        <Route path="/estudiante/perfil" element={<VerDatosEstudiante />} />
+        <Route path="/representante/inscripcion" element={<InscripcionRepresentante />} />
+        <Route path="/representante/calificaciones" element={<VerCalificacionesEstudiante />} />
 
+        {/* VICERRECTOR */}
+        <Route path="/vicerrector/reportes" element={<AgregarFechas />} />
+        <Route path="/vicerrector/password" element={<ChangePassword_Vicerrector />} />
+        <Route path="/vicerrector/distributivo" element={<Distributivo />} />
+        <Route path="/vicerrector/solicitudes" element={<Solicitudes />} />
+        <Route path="/vicerrector/panelcursos/calificaciones" element={<Calificaciones />} />
+        <Route path="/vicerrector/panelcursos" element={<PanelCursos />} />
 
-      {/*RUTAS DEL DOCENTE-Secretaria*/}
-      <Route path="/secretaria/administracion-escolar" element={<GestionEscolar />} />
-      <Route path="/secretaria/periodo/materias/:idPeriodo" element={<MateriasPorPeriodo />} />
-      <Route path="/secretaria/periodo/materias/estudiantes/:id_asignacion" element={<ListadoCursos />} />
-      <Route path="/secretaria/calificaciones/asignacion/:asigId" element={<Calificaciones />} />
-      <Route path="/secretaria/password" element={<ChangePassword_Secretaria />} />
-      <Route path="/secretaria/informacion" element={<InformacionEstudiantil />} />
-      <Route path="/secretaria/informacion/representantes" element={<Representantes />} />
-      <Route path="/secretaria/informacion/estudiantes" element={<Estudiantes />} />
-      <Route path="/secretaria/informacion/inscripcion" element={<Inscripcion />} />
-      <Route path="/secretaria/procesos" element={<FechasProcesos />} />
-      <Route path='/secretaria/matriculacion' element={<Matriculacion />} />
-      <Route path='/secretaria/horarios' element={<Horarios />} />
-      <Route path="/secretaria/buscar_materias" element={<BuscarMaterias />} />
-      <Route path="/secretaria/asignacionesIndividuales" element={<DistributivoIndividual />} />
-      <Route path="/secretaria/reportes" element={<Reportes />} />
-      <Route path="/secretaria/reportes/nivel/:nivel" element={<ListadoEstudiantes />} />
-      <Route path="/secretaria/reportes/estudiante/:idEstudiante" element={<ReporteEstudiante />} />
-      <Route path="/secretaria/reportes/resumen/:nivel" element={<ReporteGeneral />} />
+        {/* SECRETARIA */}
+        <Route path="/secretaria/administracion-escolar" element={<GestionEscolar />} />
+        <Route path="/secretaria/periodo/materias/:idPeriodo" element={<MateriasPorPeriodo />} />
+        <Route path="/secretaria/periodo/materias/estudiantes/:id_asignacion" element={<ListadoCursos />} />
+        <Route path="/secretaria/calificaciones/asignacion/:asigId" element={<Calificaciones />} />
+        <Route path="/secretaria/password" element={<ChangePassword_Secretaria />} />
+        <Route path="/secretaria/informacion" element={<InformacionEstudiantil />} />
+        <Route path="/secretaria/informacion/representantes" element={<Representantes />} />
+        <Route path="/secretaria/informacion/estudiantes" element={<Estudiantes />} />
+        <Route path="/secretaria/informacion/inscripcion" element={<Inscripcion />} />
+        <Route path="/secretaria/procesos" element={<FechasProcesos />} />
+        <Route path="/secretaria/matriculacion" element={<Matriculacion />} />
+        <Route path="/secretaria/horarios" element={<Horarios />} />
+        <Route path="/secretaria/buscar_materias" element={<BuscarMaterias />} />
+        <Route path="/secretaria/asignacionesIndividuales" element={<DistributivoIndividual />} />
+        <Route path="/secretaria/reportes" element={<Reportes />} />
+        <Route path="/secretaria/reportes/nivel/:nivel" element={<ListadoEstudiantes />} />
+        <Route path="/secretaria/reportes/estudiante/:idEstudiante" element={<ReporteEstudiante />} />
+        <Route path="/secretaria/reportes/resumen/:nivel" element={<ReporteGeneral />} />
+      </Route>
     </Routes>
   )
 }

@@ -38,15 +38,54 @@ function Login() {
         `${import.meta.env.VITE_URL_DEL_BACKEND}/login`,
         { nroCedula, password }
       );
+
       const { token, ...user } = response.data;
+
+      // Guardar usuario y token como antes
       localStorage.setItem("usuario", JSON.stringify(user));
       localStorage.setItem("token", token);
       setLoading(false);
 
-      if (user.rol === "representante") navigate("/representante");
-      else if (["Profesor", "Administrador", "Vicerrector", "Secretaria"].includes(user.subRol))
+      // 👇 RUTA de cambio de contraseña según rol/subRol
+      let passwordRoute = null;
+
+      if (user.rol === "representante") {
+        passwordRoute = "/representante/password";
+      } else if (user.rol === "docente") {
+        switch (user.subRol) {
+          case "Administrador":
+            passwordRoute = "/admin/password";
+            break;
+          case "Profesor":
+            passwordRoute = "/profesor/password";
+            break;
+          case "Vicerrector":
+            passwordRoute = "/vicerrector/password";
+            break;
+          case "Secretaria":
+            passwordRoute = "/secretaria/password";
+            break;
+          default:
+            passwordRoute = null;
+        }
+      }
+
+      // 🔐 Si debe cambiar la contraseña → obligarlo a ir a su página de cambio de contraseña
+      if (user.debeCambiarPassword && passwordRoute) {
+        navigate(passwordRoute, { replace: true });
+        return;
+      }
+
+      // 🧭 Flujo normal (cuando YA cambió la contraseña)
+      if (user.rol === "representante") {
+        navigate("/representante");
+      } else if (
+        ["Profesor", "Administrador", "Vicerrector", "Secretaria"].includes(
+          user.subRol
+        )
+      ) {
         navigate("/inicio");
-      else {
+      } else {
         Swal.fire({
           icon: "error",
           title: "Acceso no permitido",
@@ -56,7 +95,7 @@ function Login() {
       }
     } catch (error) {
       setLoading(false);
-      console.log("este es el error de inicio de sesion")
+      console.log("este es el error de inicio de sesion");
       ErrorMessage(error);
     }
   };
