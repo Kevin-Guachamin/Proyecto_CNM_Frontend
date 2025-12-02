@@ -28,27 +28,50 @@ function ChangePassword({ redireccion }) {
         {
           headers: { Authorization: `Bearer ${token}` },
         }
-
       );
-      setSuccess(true)
+
+      // ⭐ CAMBIO IMPORTANTE:
+      // Bajar el flag en el localStorage para que RutaProtegida ya NO bloquee al usuario
+      const storedUser = localStorage.getItem("usuario");
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        user.debeCambiarPassword = false;
+        localStorage.setItem("usuario", JSON.stringify(user));
+      }
+
+      setSuccess(true);
       setCurrentPassword("");
       setNewPassword("");
+
+      // ⭐ Redirigir al módulo correspondiente después de 2 segundos
       setTimeout(() => {
-        console.log("Redirigiendo...");
-        window.location.href = redireccion;
+        navigate(redireccion, { replace: true });
       }, 2000);
 
     } catch (err) {
       console.log("este es el error", err);
-      setError(err.response.data.message)
-      setSuccess(false)
-
+      setError(err.response?.data?.message || "Ocurrió un error");
+      setSuccess(false);
     }
   };
 
+  // BOTÓN CANCELAR → Se va al LOGIN, no al módulo
   const OnCancel = () => {
-    navigate(`${redireccion}`)
+  const storedUser = localStorage.getItem("usuario");
+  const user = storedUser ? JSON.parse(storedUser) : null;
+
+  // 🔹 Si todavía está marcado como "debeCambiarPassword" (primer login forzado)
+  if (user?.debeCambiarPassword) {
+    // => Cerrar sesión y volver al login
+    localStorage.removeItem("usuario");
+    localStorage.removeItem("token");
+    navigate("/", { replace: true });
+  } else {
+    // 🔹 Si ya NO es primer login (vino desde el menú)
+    // => Solo volver al módulo, sin cerrar sesión
+    navigate(redireccion, { replace: true });
   }
+};
 
   const [rules, setRules] = useState({
     length: false,
@@ -73,9 +96,9 @@ function ChangePassword({ redireccion }) {
       {success ? (
         <p className='success-message'>¡Tu contraseña ha sido actualizada correctamente!</p>
       ) : (
-
         <form onSubmit={handleSubmit} className="form">
           {error && <p className="error-message">{error}</p>}
+
           <div className="login-field">
             <label>Contraseña actual:</label>
             <Input
@@ -98,32 +121,41 @@ function ChangePassword({ redireccion }) {
               }}
             />
           </div>
+
           <ul className="password-rules">
             <li className={rules.length ? "rule-pass" : "rule-fail"}>
               <i className={`bi ${rules.length ? "bi-check-circle-fill" : "bi-x-circle-fill"}`}></i>
-              <span> 🔒 Mínimo 8 caracteres</span>
+              <span>Mínimo 8 caracteres</span>
             </li>
+
             <li className={rules.uppercase ? "rule-pass" : "rule-fail"}>
               <i className={`bi ${rules.uppercase ? "bi-check-circle-fill" : "bi-x-circle-fill"}`}></i>
-              <span> 🔠 Al menos una letra mayúscula</span>
+              <span>Al menos una letra mayúscula</span>
             </li>
+
             <li className={rules.number ? "rule-pass" : "rule-fail"}>
               <i className={`bi ${rules.number ? "bi-check-circle-fill" : "bi-x-circle-fill"}`}></i>
-              <span> 🔢 Al menos un número</span>
+              <span>Al menos un número</span>
             </li>
+
             <li className={rules.special ? "rule-pass" : "rule-fail"}>
               <i className={`bi ${rules.special ? "bi-check-circle-fill" : "bi-x-circle-fill"}`}></i>
-              <span> 🔣 Al menos un carácter especial (ej. !, @, #, $)</span>
+              <span>Al menos un carácter especial</span>
             </li>
           </ul>
+
           <div className="button-group">
             <button type="submit" className="btns primary">Cambiar</button>
-            <button type="button" className="btns secondary" onClick={OnCancel}>Cancelar</button>
+
+            {/* ⭐ Botón cancel actualizado */}
+            <button type="button" className="btns secondary" onClick={OnCancel}>
+              Cancelar
+            </button>
           </div>
         </form>
       )}
     </div>
-  )
+  );
 }
 
-export default ChangePassword
+export default ChangePassword;
