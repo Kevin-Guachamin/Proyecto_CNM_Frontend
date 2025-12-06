@@ -1,7 +1,7 @@
 /* Contenedor principal con altura mínima y scroll vertical */
 .content-container {
     min-height: 500px; /* Ajusta según necesidad */
-    max-height: 80vh; /* Permite que el contenido no se desborde demasiado */
+    max-height: 90vh; /* Permite que el contenido no se desborde demasiado */
     overflow-y: auto; /* Habilita el scroll vertical solo si es necesario */
     padding: 20px;
 }

@@ -152,6 +152,34 @@ function Busqueda({usuario}) {
     const HandleMatricular = async (estudiante) => {
 
         try {
+            // PRIMERO: Verificar que el estudiante tiene los documentos actualizados (RF11 y RF12)
+            const verificacionResponse = await axios.get(
+                `${API_URL}/estudiante/verificar-matricula-ier/${estudiante.ID}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            if (!verificacionResponse.data.datosActualizados) {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Documentación pendiente",
+                    html: `
+                        <p>${verificacionResponse.data.message}</p>
+                        <br>
+                        <p><strong>Para continuar con la matrícula debe:</strong></p>
+                        <ul style="text-align: left; margin: 10px 20px;">
+                            <li>Actualizar los datos del estudiante</li>
+                            <li>Cargar el documento de Matrícula IER (PDF)</li>
+                        </ul>
+                        <p style="margin-top: 10px;">Por favor, actualice los datos del estudiante antes de matricular.</p>
+                    `,
+                    iconColor: "#ffc107",
+                    confirmButtonText: "Entendido",
+                    confirmButtonColor: "#003F89",
+                });
+                return; // Detener el proceso de matriculación
+            }
+
+            // SEGUNDO: Si tiene los documentos, proceder con la matriculación
             const response = await axios.get(`${API_URL}/matricula/estudiante/periodo/${estudiante.ID}/${periodo.ID}`,{
                 headers: { Authorization: `Bearer ${token}` },
               })
@@ -294,7 +322,7 @@ function Busqueda({usuario}) {
             });
 
             if (conflicto) {
-                throw new Error("Inscripcion no valida por cruze de horarios")
+                throw new Error("Inscripcion no valida por cruce de horarios")
             }
             await axios.post(`${API_URL}/inscripcion/crear`, {
                 ID_matricula: matricula.ID,
