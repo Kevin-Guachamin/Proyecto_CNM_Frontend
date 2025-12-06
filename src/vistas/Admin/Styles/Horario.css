@@ -6,10 +6,8 @@
 .matric-wrapper{
   position: relative;
   width: 100%;
-  height: var(--matric-h, 500px);   /* fallback más alto */
   overflow-y: auto;          /* scroll vertical interno SIEMPRE */
   overflow-x: hidden;        /* nunca scroll horizontal global */
-  -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
   background-color: #f4f4f4;

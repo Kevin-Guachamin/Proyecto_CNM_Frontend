@@ -83,8 +83,7 @@ function ContenedorCursos({
             filtrar={filtrar}
             toggleModal={!periodo ? null : toggleModal}
             filterKey="Nombre materia"
-            disabled={!grupo}
-            placeholder={!grupo ? "Seleccione un grupo para filtrar" : undefined}
+            placeholder={"Filtrar por nombre materia"}
             addButtonDisabled={!periodo}
           />
         </div>
