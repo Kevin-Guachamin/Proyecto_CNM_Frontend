@@ -1,5 +1,5 @@
 import React from "react";
-import { Table} from "react-bootstrap";
+import { Table } from "react-bootstrap";
 import '../../../Admin/Styles/Horario.css'
 
 
@@ -7,7 +7,7 @@ const diasSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
 
 const Horario = ({ materiasSeleccionadas, jornada }) => {
 
-  
+
     const horasMatutina = [
         "07:00 - 07:45",
         "07:45 - 08:30",
@@ -31,16 +31,33 @@ const Horario = ({ materiasSeleccionadas, jornada }) => {
 
 
 
-    const obtenerMateria = (dia, hora) => {
+    const obtenerMateria = (dia, bloqueHora) => {
+        // bloqueHora viene como "07:00 - 07:45"
+        const [inicioBloque, finBloque] = bloqueHora.split(" - ");
+
+        // Convertir a minutos
+        const toMin = (h) => {
+            const [HH, MM] = h.split(":").map(Number);
+            return HH * 60 + MM;
+        };
+
+        const inicioB = toMin(inicioBloque);
+        const finB = toMin(finBloque);
+
         return materiasSeleccionadas.find((inscripcion) => {
-            const asignacion = inscripcion.Asignacion;
-            const horaAsignacion = `${asignacion.horaInicio} - ${asignacion.horaFin}`;
-            return (
-                horaAsignacion === hora &&
-                asignacion.dias.includes(dia)
-            );
+            const { horaInicio, horaFin, dias } = inscripcion.Asignacion;
+
+            const inicioA = toMin(horaInicio);
+            const finA = toMin(horaFin);
+
+            // 1. Verificar día
+            if (!dias.includes(dia)) return false;
+
+            // 2. Verificar si el bloque está dentro del rango del horario asignado
+            return inicioB >= inicioA && finB <= finA;
         });
     };
+
 
     return (
         <div className="horario-table-responsive">

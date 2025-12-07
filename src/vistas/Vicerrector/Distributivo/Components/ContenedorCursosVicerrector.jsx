@@ -69,7 +69,7 @@ function ContenedorCursosVicerrector({
             filtrar={filtrar}
             filterKey="Nombre materia"
             disabled={!grupo}
-            placeholder={!grupo ? "Seleccione un grupo para filtrar" : undefined}
+            placeholder={"Filtrar por Nombre materia"}
           />
         </div>
       </div>
