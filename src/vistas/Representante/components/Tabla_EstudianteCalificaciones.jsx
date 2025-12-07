@@ -341,13 +341,13 @@ const TablaEstudianteCalificaciones = ({datos, estudiante, periodosMatriculados}
                 // Configurar datos para autoTable
                 const tableData = datosTabla.map(row => {
                     try {
-                        if (titulo.includes('Quimestre 1')) {
+                        if (titulo.toUpperCase().includes('QUIMESTRE 1')) {
                             return [
                                 row.nombreMateria || 'Sin nombre',
                                 row.notaq1 || '0.00',
                                 row.equivalenciaQ1 || 'Sin equivalencia'
                             ];
-                        } else if (titulo.includes('Quimestre 2')) {
+                        } else if (titulo.toUpperCase().includes('QUIMESTRE 2')) {
                             return [
                                 row.nombreMateria || 'Sin nombre',
                                 row.notaq2 || '0.00',
@@ -389,27 +389,33 @@ const TablaEstudianteCalificaciones = ({datos, estudiante, periodosMatriculados}
                     },
                     didParseCell: function(data) {
                         try {
+                            // No aplicar estilos personalizados al encabezado
+                            if (data.section === 'head') {
+                                return;
+                            }
+                            
                             const rowData = datosTabla[data.row.index];
                             if (rowData && data.row.index < datosTabla.length) {
-                                // Colorear filas según el estado
-                                if (titulo.includes('Final') && rowData.estado === "Reprobado") {
-                                    // Fila roja para reprobados en nota final
+                                // Resaltar fila de promedio primero
+                                if (rowData.nombreMateria === "Promedio") {
+                                    data.cell.styles.fontStyle = 'bold';
+                                    // Color por defecto para promedio
+                                    data.cell.styles.fillColor = [230, 230, 230];
+                                }
+                                
+                                // Colorear filas según el estado (esto sobrescribe el gris si es necesario)
+                                if (titulo.toUpperCase().includes('FINAL') && rowData.estado === "Reprobado") {
+                                    // Fila roja para reprobados en nota final (incluye promedio)
                                     data.cell.styles.fillColor = [252, 215, 215]; // Rojo claro
                                     data.cell.styles.textColor = [114, 28, 36]; // Rojo oscuro
-                                } else if (!titulo.includes('Final')) {
+                                } else if (!titulo.toUpperCase().includes('FINAL')) {
                                     // Amarillo para notas bajas en quimestres
-                                    const nota = titulo.includes('Quimestre 1') ? 
+                                    const nota = titulo.toUpperCase().includes('QUIMESTRE 1') ? 
                                         parseFloat(rowData.notaq1) : parseFloat(rowData.notaq2);
                                     if (nota < 7 && rowData.nombreMateria !== "Promedio") {
                                         data.cell.styles.fillColor = [255, 243, 205]; // Amarillo claro
                                         data.cell.styles.textColor = [133, 100, 4]; // Amarillo oscuro
                                     }
-                                }
-                                
-                                // Resaltar fila de promedio
-                                if (rowData.nombreMateria === "Promedio") {
-                                    data.cell.styles.fontStyle = 'bold';
-                                    data.cell.styles.fillColor = [230, 230, 230];
                                 }
                             }
                         } catch (err) {
@@ -456,7 +462,6 @@ const TablaEstudianteCalificaciones = ({datos, estudiante, periodosMatriculados}
             doc.text('Leyenda:', 20, currentY + 10);
             doc.text('• Amarillo: Calificaciones menores a 7.00 en quimestres', 20, currentY + 18);
             doc.text('• Rojo: Materias reprobadas (nota final menor a 7.00)', 20, currentY + 26);
-            doc.text('• Gris: Fila de promedio general', 20, currentY + 34);
             
             // Generar nombre del archivo
             const fechaHoy = new Date().toLocaleDateString('es-ES').replace(/\//g, '-');
