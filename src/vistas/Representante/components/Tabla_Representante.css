@@ -44,7 +44,7 @@
 /* Estilo del encabezado */
 .encabezado-tabla-representante {
   background-color: #00408A !important;
-  color: #ced4da !important;
+  color: #FFFFFF !important;
   font-weight: bold;
   border: 1px solid #ced4da;
   padding: 10px;
@@ -55,7 +55,7 @@
 .celda-tabla-representante {
   border: 1px solid #90A4AE !important;
   vertical-align: middle;
-  background-color: #CFD8DC !important;
+  background-color: #FFFFFF !important;
   text-align: center;
   padding: 8px;
   white-space: nowrap;
@@ -70,7 +70,7 @@
   height: 2.85rem;
   border: 1px solid #90A4AE;
   vertical-align: middle;
-  background-color: #CFD8DC !important;
+  background-color: #FFFFFF !important;
 }
 
 /* Estilos para los iconos */

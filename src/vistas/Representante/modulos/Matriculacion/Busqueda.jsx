@@ -334,6 +334,18 @@ function Busqueda({usuario}) {
         HandleMatricular(estudiante);
     }
 
+    const handleCancelarMatricula = () => {
+        setEstudiante(null);
+        setMatricula(null);
+        setInscripciones([]);
+        setAsignaciones([]);
+        setBucarAsignacion(false);
+        setAsignatura(null);
+    }
+
+    const handleVolverModulos = () => {
+        navigate('/representante'); // Usa el navigate ya definido
+    }
 
     useEffect(() => {
         if (!usuario) {
@@ -366,7 +378,36 @@ function Busqueda({usuario}) {
                     </div>
                 </div>
             )}
-            <div className="contenedor-tabla-matricula-estudiantes">
+            
+            {/* Banner del estudiante en matriculación */}
+            {estudiante && matricula && (
+                <div className="banner-estudiante-matriculando">
+                    <div className="banner-info">
+                        <div className="banner-icono">
+                            <i className="bi bi-person-circle"></i>
+                        </div>
+                        <div className="banner-datos">
+                            <h4>Matriculando a:</h4>
+                            <p className="nombre-estudiante">{estudiante.primer_nombre} {estudiante.segundo_nombre} {estudiante.primer_apellido} {estudiante.segundo_apellido}</p>
+                            <p className="detalles-estudiante">
+                                <span><strong>Cédula:</strong> {estudiante.nroCedula}</span> 
+                                <span><strong>Nivel:</strong> {estudiante.nivel}</span>
+                                <span><strong>Jornada:</strong> {estudiante.jornada}</span>
+                            </p>
+                        </div>
+                    </div>
+                    <button 
+                        className="btn-cancelar-matricula"
+                        onClick={handleCancelarMatricula}
+                        title="Cancelar y volver a la lista de estudiantes"
+                    >
+                        <i className="bi bi-x-circle"></i> Cancelar matrícula
+                    </button>
+                </div>
+            )}
+            
+            <div className="contenedor-tabla-matricula-estudiantes" style={{display: matricula ? 'none' : 'block'}}>
+
                 {!estudiantesRepresentante && (
                     <p className="sin-registros-matricula">No se encontraron estudiantes.</p>
                 )}
