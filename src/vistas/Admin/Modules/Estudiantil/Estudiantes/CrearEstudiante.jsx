@@ -201,7 +201,6 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
               <select required id="nivel" value={nivel} onChange={(e) => setNivel(e.target.value)}>
                 <option value="1ro Básico Elemental" >1ro Básico Elemental</option>
                 <option value="2do Básico Elemental">2do Básico Elemental</option>
-                <option value="2do Básico Elemental">2do Básico Elemental</option>
                 <option value="1ro Básico Medio">1ro Básico Medio</option>
                 <option value="2do Básico Medio">2do Básico Medio</option>
                 <option value="3ro Básico Medio">3ro Básico Medio</option>

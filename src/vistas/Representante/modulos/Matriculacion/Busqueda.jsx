@@ -6,14 +6,11 @@ import Horarios from './Horarios';
 import Swal from 'sweetalert2';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './Busqueda.css';
-import { IoEyeOutline } from "react-icons/io5";
 import { Card, Row, Col } from 'react-bootstrap';
 
 function Busqueda({usuario}) {
     const [periodo, setPeriodo] = useState("")
-    const [cedula, setCedula] = useState("")
     const [estudiante, setEstudiante] = useState("")
-    const [buscado, setBuscado] = useState(false); // Estado para saber si ya se buscó
     const [asignaciones, setAsignaciones] = useState([])
     const [asignatura, setAsignatura] = useState(null)
     const [matricula, setMatricula] = useState("")
@@ -24,7 +21,6 @@ function Busqueda({usuario}) {
     const [mensajePeriodo, setMensajePeriodo] = useState("")
     const [fechasMatricula, setFechasMatricula] = useState({ inicio: null, fin: null })
     const token=localStorage.getItem("token")
-    const navigate = useNavigate();
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
 
     // Función para formatear fechas evitando problemas de zona horaria
@@ -104,34 +100,7 @@ function Busqueda({usuario}) {
         const [dia, mes, año] = fecha.split('/');
         return new Date(`${año}-${mes}-${dia}`); // Convertir a formato ISO (yyyy-mm-dd)
     };
-    const handlenroCedulaChange = (e) => {
-        // Remover caracteres no numéricos
-        const onlyNumbers = e.target.value.replace(/[^0-9]/g, "");
-        // Permitir solo hasta 10 dígitos
-        if (onlyNumbers.length <= 10) {
-            setCedula(onlyNumbers);
-        }
-    };
-
-    const HandleBuscarEstudiante = async () => {
-        setBuscado(true)
-        setEstudiante(null)
-        setMatricula(null)
-        try {
-            if (!cedula) {
-                return
-            }
-            const response = await axios.get(`${API_URL}/estudiante/obtener/${cedula}`,{
-                headers: { Authorization: `Bearer ${token}` },
-              });
-            setEstudiante(response.data)
-
-
-        } catch (error) {
-            ErrorMessage(error);
-
-        }
-    }
+    
     const HandleBuscarAsignaturas = () => {
         setBucarAsignacion(true)
 
@@ -365,9 +334,6 @@ function Busqueda({usuario}) {
         HandleMatricular(estudiante);
     }
 
-    const handleVolverModulos = () => {
-        navigate('/representante'); // Usa el navigate ya definido
-    }
 
     useEffect(() => {
         if (!usuario) {
