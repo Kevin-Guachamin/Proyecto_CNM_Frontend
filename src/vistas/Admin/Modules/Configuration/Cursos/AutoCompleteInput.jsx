@@ -22,7 +22,7 @@ const AutoCompleteInput = ({ opciones, inputValue, setInputValue, key1, key2 }) 
       setShowSuggestions(false);
       return;
     }
-
+    console.log("opciones", opciones)
     // Filtramos todas las opciones cada vez que el usuario escribe
     const matches = opciones.filter((opcion) =>
       `${opcion[key1]} ${opcion[key2]}`
