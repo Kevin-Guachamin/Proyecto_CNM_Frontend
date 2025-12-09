@@ -100,7 +100,9 @@ function Index() {
         const { data } = await axios.get(`${API_URL}/docente/obtener`, {
           params: { page: 1, limit: 1000 }, // Límite alto para obtener todos
           headers: { Authorization: `Bearer ${token}` },
+          
         });
+        console.log("esta es la data luego de enviar limit 1000", data)
         if (!mounted) return;
         setDocentes(data.data ?? []);
       } catch (error) {
