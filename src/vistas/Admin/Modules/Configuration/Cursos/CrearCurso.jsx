@@ -25,7 +25,7 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(response => {
-        console.log("estos son los docentes", response)
+        console.log("estos son los docentes de la base", response.data.data)
         setDocentes(response.data.data);
 
       })

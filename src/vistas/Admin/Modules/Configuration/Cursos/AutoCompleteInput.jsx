@@ -11,7 +11,7 @@ const AutoCompleteInput = ({ opciones, inputValue, setInputValue, key1, key2 }) 
       setInput(`${inputValue[key1]} ${inputValue[key2]}`)
     }
 
-  },[inputValue])
+  },[inputValue,key1,key2])
   
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -22,13 +22,15 @@ const AutoCompleteInput = ({ opciones, inputValue, setInputValue, key1, key2 }) 
       setShowSuggestions(false);
       return;
     }
-    console.log("este son las opciones",opciones)
-    // Filtramos las opciones basándonos en los dos atributos proporcionados (key1, key2)
-    const matches = opciones.filter((opcion) =>
-      `${opcion[key1]} ${opcion[key2]}`.toLowerCase().includes(value.toLowerCase())
-    );
 
-    setFilteredOptions(matches);
+    // Filtramos todas las opciones cada vez que el usuario escribe
+    const matches = opciones.filter((opcion) =>
+      `${opcion[key1]} ${opcion[key2]}`
+        .toLowerCase()
+        .includes(value.toLowerCase())
+    );
+    console.log("matches", matches)
+    setFilteredOptions(matches); // opcional: limitar a 20 resultados
     setShowSuggestions(matches.length > 0);
   };
 

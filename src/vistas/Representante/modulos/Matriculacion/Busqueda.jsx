@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios'
 import { ErrorMessage } from '../../../../Utils/ErrorMesaje';
 import Horarios from './Horarios';
@@ -343,9 +342,7 @@ function Busqueda({usuario}) {
         setAsignatura(null);
     }
 
-    const handleVolverModulos = () => {
-        navigate('/representante'); // Usa el navigate ya definido
-    }
+
 
     useEffect(() => {
         if (!usuario) {
