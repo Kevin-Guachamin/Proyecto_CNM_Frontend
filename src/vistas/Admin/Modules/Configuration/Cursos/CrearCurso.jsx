@@ -21,7 +21,7 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const token = localStorage.getItem("token")
   useEffect(() => {
-    axios.get(`${API_URL}/docente/obtener`, {
+    axios.get(`${API_URL}/docente/obtener?limit=${1000}`,{
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(response => {
@@ -33,7 +33,7 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
         ErrorMessage(error);
 
       })
-    axios.get(`${API_URL}/materia/obtener`, {
+    axios.get(`${API_URL}/materia/obtener?limit=${1000}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(response => {
