@@ -120,6 +120,7 @@ function BuscarMaterias() {
         `${API_URL}/asignacion/obtener/materias/${periodo.ID}/${estudiante.nivel}/${asignatura || ''}/${estudiante.jornada}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      console.log("asignaciones obtenidas", data);
       setAsignaciones(data);
     } catch (error) {
       ErrorMessage(error);
