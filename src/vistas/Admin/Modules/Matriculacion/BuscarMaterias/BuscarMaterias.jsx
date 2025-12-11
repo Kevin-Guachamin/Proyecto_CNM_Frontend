@@ -7,7 +7,7 @@ import { Card, Row, Col } from "react-bootstrap";
 import Horario from '../Horario';
 
 function BuscarMaterias() {
-  const [asignatura, setAsignatura] = useState(null);
+  const [asignatura, setAsignatura] = useState('');
   const [buscarAsignacion, setBucarAsignacion] = useState(false);
   const [asignaciones, setAsignaciones] = useState([]);
   const [inscripciones, setInscripciones] = useState([]);
@@ -117,12 +117,13 @@ function BuscarMaterias() {
     setBucarAsignacion(true);
     try {
       const { data } = await axios.get(
-        `${API_URL}/asignacion/obtener/materias/${periodo.ID}/${estudiante.nivel}/${asignatura || ''}/${estudiante.jornada}`,
+        `${API_URL}/asignacion/obtener/materias/${periodo.ID}/${estudiante.nivel}/${asignatura}/${estudiante.jornada}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       console.log("asignaciones obtenidas", data);
       setAsignaciones(data);
     } catch (error) {
+      console.log("error al obtener asignaciones", error);
       ErrorMessage(error);
     }
   };
@@ -172,7 +173,7 @@ function BuscarMaterias() {
             <input
               className="input-cedula"
               type="text"
-              value={asignatura ?? ''}
+              value={asignatura ?? 'vacio'}
               onChange={(e) => setAsignatura(e.target.value)}
             />
             <button className="btn-buscar" onClick={HandleBuscarAsignaturas}>Buscar</button>

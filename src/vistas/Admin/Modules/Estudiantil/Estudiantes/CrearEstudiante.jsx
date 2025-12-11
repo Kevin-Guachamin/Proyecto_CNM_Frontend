@@ -22,7 +22,7 @@ function CrearEstudiante({ onCancel, entityToUpdate, onSave, representante }) {
   const [parroquia, setParroquia] = useState("")
   const [canton, setCanton] = useState("")
   const [nacionalidad, setNacionalidad] = useState("")
-  const [nivel, setNivel] = useState("")
+  const [nivel, setNivel] = useState("1ro Básico Elemental")
   const token = localStorage.getItem("token")
 
   useEffect(() => {

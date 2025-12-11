@@ -26,6 +26,7 @@ export function ErrorMessage(error){
                 });
               }
               else{
+                console.log("entre aquí otro??")
                 Swal.fire({
                   title: 'Error',
                   text: `${error.message}`,
