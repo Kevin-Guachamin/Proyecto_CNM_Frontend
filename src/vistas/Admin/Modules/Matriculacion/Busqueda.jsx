@@ -1,15 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { ErrorMessage } from '../../../../Utils/ErrorMesaje';
-import BuscarEstudiante from '../../../components/BuscarEstudiante';
-import InfoEstudiante from '../Estudiantil/Estudiantes/InfoEstudiante';
 import { useNavigate } from 'react-router-dom';
 import '../../../components/BuscarEstudiante.css';
+import BuscarEstudianteByApellido from '../../../components/BuscarEstudianteByApellido';
 
 function Busqueda({ subRol }) {
   const [periodo, setPeriodo] = useState('');
-  const [cedula, setCedula] = useState('');
-  const [estudiante, setEstudiante] = useState('');
+  const [apellido, setApellido] = useState('');
+  const [estudiantes, setEstudiantes] = useState([]);
   const [buscado, setBuscado] = useState(false);
   const [matricula, setMatricula] = useState('');
 
@@ -27,35 +26,35 @@ function Busqueda({ subRol }) {
       if (!wrapRef.current) return;
       const top = wrapRef.current.getBoundingClientRect().top;
       const availableHeight = window.innerHeight - top - 8;
-      
+
       // Asegurar una altura mínima razonable en pantallas pequeñas
       const minHeight = window.innerWidth <= 768 ? 400 : 360;
       const h = Math.max(minHeight, availableHeight);
-      
+
       document.documentElement.style.setProperty('--busq-h', `${h}px`);
     };
-    
+
     // Múltiples intentos para asegurar cálculo correcto
     updateHeight();
     const timeout1 = setTimeout(updateHeight, 100);
     const timeout2 = setTimeout(updateHeight, 300);
-    
+
     const onResize = () => {
       clearTimeout(window.busqResizeTimeout);
       window.busqResizeTimeout = setTimeout(() => {
         requestAnimationFrame(updateHeight);
       }, 100);
     };
-    
+
     window.addEventListener('resize', onResize);
-    
+
     return () => {
       clearTimeout(timeout1);
       clearTimeout(timeout2);
       clearTimeout(window.busqResizeTimeout);
       window.removeEventListener('resize', onResize);
     };
-  }, [estudiante]); // Agregar estudiante como dependencia para recalcular cuando aparezca
+  }, []); // Agregar estudiante como dependencia para recalcular cuando aparezca
 
   // Altura real del footer sticky para reservar espacio al final del contenido
   useEffect(() => {
@@ -73,7 +72,7 @@ function Busqueda({ subRol }) {
       ro.disconnect();
       window.removeEventListener('resize', setCtaHeight);
     };
-  }, [estudiante]);
+  }, []);
 
   // Periodo activo
   useEffect(() => {
@@ -86,7 +85,7 @@ function Busqueda({ subRol }) {
   }, [API_URL, token]);
 
   // Navegar / crear matrícula
-  const HandleMatricular = async () => {
+  const HandleMatricular = async (estudiante) => {
     try {
       const resp = await axios.get(
         `${API_URL}/matricula/estudiante/periodo/${estudiante.ID}/${periodo.ID}`,
@@ -133,35 +132,58 @@ function Busqueda({ subRol }) {
             {`Periodo académico activo ${periodo?.descripcion ?? ''}`}
           </h1>
 
-          <BuscarEstudiante
-            estudiante={estudiante}
-            setEstudiante={setEstudiante}
+          <BuscarEstudianteByApellido
+            setEstudiantes={setEstudiantes}
             setBuscado={setBuscado}
-            cedula={cedula}
-            setCedula={setCedula}
+            apellido={apellido}
+            setApellido={setApellido}
           />
 
           <div className="Contenedor-estudiante">
-            {buscado && !estudiante && (
-              <p className="no-registros">No se encontró el estudiante.</p>
+            {buscado && estudiantes.length === 0 && (
+              <p className="no-registros">No se encontró coincidencias.</p>
             )}
 
-            {estudiante && (
-              <div className="info-estudiante-wrapper">
-                <InfoEstudiante estudiante={estudiante} />
+            {estudiantes.length > 0 && (
+              <div className="scroll-tabla-matricula-estudiantes">
+                <table className="tabla-matricula-estudiantes">
+                  <thead>
+                    <tr>
+                      <th className="encabezado-tabla-matricula-estudiantes">Cédula</th>
+                      <th className="encabezado-tabla-matricula-estudiantes">Primer nombre</th>
+                      <th className="encabezado-tabla-matricula-estudiantes">Primer apellido</th>
+                      <th className="encabezado-tabla-matricula-estudiantes">Género</th>
+                      <th className="encabezado-tabla-matricula-estudiantes">Jornada</th>
+                      <th className="encabezado-tabla-matricula-estudiantes">Nivel</th>
+                      <th className="encabezado-tabla-matricula-estudiantes">Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {estudiantes.map((estudiante, index) => (
+                      <tr key={index}>
+                        <td className="celda-tabla-matricula-estudiantes">{estudiante.nroCedula}</td>
+                        <td className="celda-tabla-matricula-estudiantes">{estudiante.primer_nombre}</td>
+                        <td className="celda-tabla-matricula-estudiantes">{estudiante.primer_apellido}</td>
+                        <td className="celda-tabla-matricula-estudiantes">{estudiante.genero}</td>
+                        <td className="celda-tabla-matricula-estudiantes">{estudiante.jornada}</td>
+                        <td className="celda-tabla-matricula-estudiantes">{estudiante.nivel}</td>
+                        <td className="acciones-tabla-matricula-estudiantes">
+                          <button
+                            className="btn btn-sm btn-link text-primary"
+                            onClick={() => HandleMatricular(estudiante)}
+                          >
+                            Empezar matrícula
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
+
             )}
           </div>
         </div>
-
-        {/* Footer sticky (solo si hay estudiante) */}
-        {estudiante && (
-          <div ref={ctaRef} className="cta-footer">
-            <button className="btn-buscar btn-cta" onClick={HandleMatricular}>
-              Empezar o modificar matrícula
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
