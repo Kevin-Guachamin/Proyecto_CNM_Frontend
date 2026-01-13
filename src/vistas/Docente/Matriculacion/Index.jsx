@@ -25,7 +25,7 @@ function Index() {
     const storedUser = localStorage.getItem("usuario");
     const parsedUser = JSON.parse(storedUser);
 
-    if (!parsedUser || (parsedUser.subRol !== "Profesor")) {
+    if (!parsedUser || (parsedUser.subRol !== "Profesor"&& parsedUser.subRol !== "Administrador")) {
       navigate("/");
     } else {
       setUsuario(parsedUser);
@@ -41,7 +41,7 @@ function Index() {
         {usuario && <Header isAuthenticated={true} usuario={usuario} />}
       </div>
       <Layout modules={transformModulesForLayout(modulos)} activeModule={3}>
-        <Busqueda docente={usuario}/>
+        <Busqueda/>
       </Layout>
     </div>
   )

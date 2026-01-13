@@ -206,6 +206,7 @@ function Inscripciones({asignaciones,docente, periodo,setAsignaciones}) {
                     ) : (
                         <Row xs={1} md={2} lg={5} className="g-2">
                             {asignaciones.map((asig) => {
+                                console.log("esta es la asignacion", asig)
                                 const nombreCompletoDocente = `${asig.Docente?.primer_nombre}  ${asig.Docente?.primer_apellido} `.trim();
                                 return (
                                     <Col key={asig.ID} className="d-flex justify-content-center p-1">

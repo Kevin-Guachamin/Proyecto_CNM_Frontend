@@ -4,6 +4,7 @@ import axios from 'axios';
 import { ErrorMessage } from '../../../Utils/ErrorMesaje';
 import AutoCompleteInput from '../../Admin/Modules/Configuration/Cursos/AutoCompleteInput';
 import Boton from '../../../components/Boton';
+import SelectorHoraMinuto from '../../Admin/Modules/Configuration/Cursos/SelectorHoraMinuto';
 
 
 
@@ -92,15 +93,12 @@ function CrearCursoIndividual({ onCancel, onSave, periodo,docente }) {
             </div>
             <div className='form-group'>
               <label htmlFor="">Horar inicio:</label>
-              <input
-                type="time"
-                value={horaInicio}
-                onChange={(e) => {
-                  setHoraInicio(e.target.value); // Guardar solo la hora y los minutos
-                }}
-                min="07:00" // Inicio a las 7:00 AM
-                max="19:00" // Fin a las 19:00 PM
-              />
+              <SelectorHoraMinuto
+                              value={horaInicio}
+                              onChange={(e) => setHoraInicio(e.target.value)}
+                              min="07:00"
+                              max="19:00"
+                            />
 
             </div>
           </div>
@@ -119,15 +117,12 @@ function CrearCursoIndividual({ onCancel, onSave, periodo,docente }) {
             </div>
             <div className='form-group'>
               <label htmlFor="">Horar fin:</label>
-              <input
-                type="time"
-                value={horaFin}
-                onChange={(e) => {
-                  setHoraFin(e.target.value); // Guardar solo la hora y los minutos
-                }}
-                min="07:00" // Inicio a las 7:00 AM
-                max="19:00" // Fin a las 19:00 PM
-              />
+              <SelectorHoraMinuto
+                              value={horaFin}
+                              onChange={(e) => setHoraFin(e.target.value)}
+                              min="07:00"
+                              max="19:00"
+                            />
 
             </div>
 
