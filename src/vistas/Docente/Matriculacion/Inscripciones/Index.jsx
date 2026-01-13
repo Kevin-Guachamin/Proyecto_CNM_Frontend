@@ -6,16 +6,10 @@ import { getModulos,transformModulesForLayout } from "../../../getModulos";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ErrorMessage } from "../../../../Utils/ErrorMesaje";
-import { useAuth } from "../../../../Utils/useAuth";
+
 
 function Index() {
-    // Protección de ruta
-    const auth = useAuth("Profesor");
     
-    // Si no está autenticado, no renderizar nada
-    if (!auth.isAuthenticated) {
-        return null;
-    }
 
     const [usuario, setUsuario] = useState(null);
     const [periodo, setPeriodo] = useState("")
@@ -28,7 +22,7 @@ function Index() {
     useEffect(() => {
         const storedUser = localStorage.getItem("usuario");
         const parsedUser = JSON.parse(storedUser);
-        if (!parsedUser || parsedUser.subRol !== "Profesor") {
+        if (!parsedUser || (parsedUser.subRol !== "Profesor"&& parsedUser.subRol !== "Administrador"&& parsedUser.subRol !== "Vicerrector")) {
             navigate("/")
         }
         setUsuario(parsedUser)
