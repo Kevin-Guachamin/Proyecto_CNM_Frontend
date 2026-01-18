@@ -219,7 +219,8 @@ function Inscripciones({asignaciones,docente, periodo,setAsignaciones}) {
                                                 </Card.Subtitle>
                                                 <Card.Text>
                                                     <strong>Nivel:</strong> {asig.Materia.nivel} <br />
-                                                    <strong>Horario:</strong> {asig.horaInicio} - {asig.horaFin} <br />
+                                                    <strong>Horario día 1:</strong> {asig.horaInicio} - {asig.horaFin} <br />
+                                                    <strong>Horario día 2:</strong> {asig.hora1} - {asig.hora2} <br />
                                                     <strong>Días:</strong> {asig.dias.join(", ")} <br />
                                                     <strong>Docente:</strong> {nombreCompletoDocente}
                                                 </Card.Text>

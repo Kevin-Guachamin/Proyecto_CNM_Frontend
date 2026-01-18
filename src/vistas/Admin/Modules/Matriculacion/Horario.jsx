@@ -3,7 +3,7 @@ import { Table, Button } from "react-bootstrap";
 import Swal from "sweetalert2";
 import axios from "axios";
 import '../../Styles/Horario.css'
-import { ErrorMessage } from "../../../../Utils/ErrorMesaje";
+
 
 const diasSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
 
