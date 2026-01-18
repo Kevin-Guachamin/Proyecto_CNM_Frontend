@@ -15,6 +15,8 @@ function CrearCursoIndividual({ onCancel, onSave, periodo,docente }) {
   const [dia2, setDia2] = useState("")
   const [horaInicio, setHoraInicio] = useState("")
   const [horaFin, setHoraFin] = useState("")
+  const [hora1, setHora1] = useState("")
+  const [hora2, setHora2] = useState("")
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const token=localStorage.getItem("token")
   useEffect(() => {
@@ -54,7 +56,7 @@ function CrearCursoIndividual({ onCancel, onSave, periodo,docente }) {
         throw new Error("Los días deben ser diferentes")
       }
       console.log("esta es la asignatura",docente)
-      const newAsignacion = { horaInicio, horaFin, dias, ID_periodo_academico: Number(periodo), nroCedula_docente: docente.nroCedula, ID_materia: asignatura.ID, cupos: 1 };
+      const newAsignacion = { hora1,hora2,horaInicio, horaFin, dias, ID_periodo_academico: Number(periodo), nroCedula_docente: docente.nroCedula, ID_materia: asignatura.ID, cupos: 1 };
       onSave(newAsignacion)
         
       ;
@@ -101,6 +103,17 @@ function CrearCursoIndividual({ onCancel, onSave, periodo,docente }) {
                             />
 
             </div>
+            <div className='form-group'>
+              <label htmlFor="">Horar fin:</label>
+              <SelectorHoraMinuto
+                              value={horaFin}
+                              onChange={(e) => setHoraFin(e.target.value)}
+                              min="07:00"
+                              max="19:00"
+                            />
+
+            </div>
+
           </div>
           <div className='rows'>
     
@@ -116,15 +129,26 @@ function CrearCursoIndividual({ onCancel, onSave, periodo,docente }) {
               </select>
             </div>
             <div className='form-group'>
-              <label htmlFor="">Horar fin:</label>
+              <label htmlFor="">Horar inicio:</label>
               <SelectorHoraMinuto
-                              value={horaFin}
-                              onChange={(e) => setHoraFin(e.target.value)}
+                              value={hora1}
+                              onChange={(e) => setHora1(e.target.value)}
                               min="07:00"
                               max="19:00"
                             />
 
             </div>
+            <div className='form-group'>
+              <label htmlFor="">Horar fin:</label>
+              <SelectorHoraMinuto
+                              value={hora2}
+                              onChange={(e) => setHora2(e.target.value)}
+                              min="07:00"
+                              max="19:00"
+                            />
+
+            </div>
+            
 
           </div>
         </div>

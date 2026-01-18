@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 import TablaInscripciones from './TablaInscripciones'
 import { ErrorMessage } from '../../../../../Utils/ErrorMesaje'
@@ -66,12 +66,8 @@ function MateriasIndividuales() {
     const filteredData = Array.isArray(inscripciones)
 
         ? inscripciones.filter((item) => {
-            
-            console.log("este es el item",item)
+
             const value = item?.Asignacion?.Docente?.primer_nombre;
-            console.log("este es el value",value)
-
-
             return typeof value === "string"
                 ? value.toLowerCase().includes(search.toLowerCase())
                 : false;
