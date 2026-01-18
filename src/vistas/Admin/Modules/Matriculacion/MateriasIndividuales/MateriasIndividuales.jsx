@@ -73,7 +73,6 @@ function MateriasIndividuales() {
                 : false;
         })
         : [];
-
     const handleDelete = (inscripcion) => {
         Swal.fire({
             title: '¿Estás seguro?',
@@ -177,7 +176,6 @@ function MateriasIndividuales() {
 
             {loading ? <Loading /> : <TablaInscripciones
                 inscripciones={filteredData}
-                
                 OnDelete={handleDelete}
                 headers={Headers}
 
