@@ -166,6 +166,7 @@ function Inscripciones({asignaciones,docente, periodo,setAsignaciones}) {
         navigate("/profesor/matricula")
     }
     const handleCrearAsignacion =(asignacion)=>{
+        console.log("esta es la asignacion a crear",asignacion)
         axios.post(`${API_URL}/asignacion/crear`,asignacion,{
             headers: { Authorization: `Bearer ${token}` },
         })

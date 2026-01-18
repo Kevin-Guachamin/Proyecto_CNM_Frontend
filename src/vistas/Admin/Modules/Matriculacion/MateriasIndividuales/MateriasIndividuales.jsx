@@ -91,7 +91,7 @@ function MateriasIndividuales() {
                     console.log("este no tiene ID",inscripcion.Asignacion)
                     
                     setInscripciones((prevData) => 
-                        prevData.filter((d) => d.Asignacion && d.Asignacion.ID !== inscripcion.Asignacion.ID)
+                        prevData.filter((d) => d.Inscripcion && d.Inscripcion.ID !== inscripcion.ID)
                       );
                 })
                 // Eliminar usuario por PK

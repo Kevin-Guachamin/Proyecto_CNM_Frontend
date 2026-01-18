@@ -1,6 +1,6 @@
 import React from 'react'
 import { FaTrash } from 'react-icons/fa'; // Importar íconos
-function TablaInscripciones({inscripciones,OnDelete,OnEdit}) {
+function TablaInscripciones({inscripciones,OnDelete}) {
     console.log("estas son las inscripciones en tabla",inscripciones)
   return (
     <div className="Contenedor-tabla">
@@ -22,6 +22,7 @@ function TablaInscripciones({inscripciones,OnDelete,OnEdit}) {
                             <tbody>
                                 {inscripciones.map((item, index) => (
                                     <tr key={index}>
+                                        {console.log("este es el item en tabla",item)}
                                         <td className='tabla-celda'>{`${item.Matricula.Estudiante.primer_nombre} ${item.Matricula.Estudiante.primer_apellido}`}</td>
                                         <td className='tabla-celda'>{item.Matricula.Estudiante.nivel}</td>
                                         <td className='tabla-celda'>{item.Asignacion.Materia.nombre}</td>
