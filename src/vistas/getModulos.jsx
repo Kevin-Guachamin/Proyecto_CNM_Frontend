@@ -19,7 +19,9 @@ export const getModulos = (subRol, includeInicio = false) => {
           { id: 2, titulo: "Fechas para notas", icono: "📅", link: "/vicerrector/reportes" },
           { id: 3, titulo: "Agenda solicitudes", icono: "📝", link: "/vicerrector/solicitudes"},
           { id: 4, titulo: "Cambiar contraseña", icono: "🔐", link: "/vicerrector/password"},
-          { id: 5, titulo: "Calificaciones", icono: "📊", link: "/vicerrector/panelcursos"}
+          { id: 5, titulo: "Calificaciones", icono: "📊", link: "/vicerrector/panelcursos"},
+          { id: 6, titulo: "Matriculacion materias grupales", icono: "✏️", link: "/admin/matriculacion"},
+          { id: 7, titulo: "Matriculación individual", icono: "✏️", link: "/profesor/matricula"},
         ];
         break;
       case "Secretaria":
