@@ -15,8 +15,8 @@ function CrearCursoIndividual({ onCancel, onSave, periodo,docente }) {
   const [dia2, setDia2] = useState("")
   const [horaInicio, setHoraInicio] = useState("")
   const [horaFin, setHoraFin] = useState("")
-  const [hora1, setHora1] = useState("")
-  const [hora2, setHora2] = useState("")
+  const [hora1, setHora1] = useState(null)
+  const [hora2, setHora2] = useState(null)
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const token=localStorage.getItem("token")
   useEffect(() => {

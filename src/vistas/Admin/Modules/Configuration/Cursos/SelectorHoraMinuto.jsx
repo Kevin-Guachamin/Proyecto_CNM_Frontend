@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, useState } from "react";
 
 export default function SelectorHoraMinuto({
   value = "",
@@ -6,7 +6,20 @@ export default function SelectorHoraMinuto({
   min = "07:00",
   max = "19:00"
 }) {
-  const [horaActual, minutoActual] = value ? value.split(":") : ["", ""];
+  const [hora, setHora] = useState("");
+  const [minuto, setMinuto] = useState("");
+
+  // Sincronizar cuando el padre cambie el value
+  useEffect(() => {
+    if (value) {
+      const [h, m] = value.split(":");
+      setHora(h);
+      setMinuto(m);
+    } else {
+      setHora("");
+      setMinuto("");
+    }
+  }, [value]);
 
   const minHora = parseInt(min.split(":")[0]);
   const maxHora = parseInt(max.split(":")[0]);
@@ -21,22 +34,18 @@ export default function SelectorHoraMinuto({
   const emitirCambio = (h, m) => {
     if (h && m) {
       onChange({ target: { value: `${h}:${m}` } });
-    } else {
-      onChange({ target: { value: "" } });
     }
-  };
-
-  const handleHoraChange = (newHora) => {
-    emitirCambio(newHora, minutoActual);
-  };
-
-  const handleMinutoChange = (newMinuto) => {
-    emitirCambio(horaActual, newMinuto);
   };
 
   return (
     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-      <select value={horaActual} onChange={e => handleHoraChange(e.target.value)}>
+      <select
+        value={hora}
+        onChange={e => {
+          setHora(e.target.value);
+          emitirCambio(e.target.value, minuto);
+        }}
+      >
         <option value="" disabled>HH</option>
         {horas.map(h => (
           <option key={h} value={h}>{h}</option>
@@ -45,7 +54,13 @@ export default function SelectorHoraMinuto({
 
       :
 
-      <select value={minutoActual} onChange={e => handleMinutoChange(e.target.value)}>
+      <select
+        value={minuto}
+        onChange={e => {
+          setMinuto(e.target.value);
+          emitirCambio(hora, e.target.value);
+        }}
+      >
         <option value="" disabled>MM</option>
         {minutos.map(m => (
           <option key={m} value={m}>{m}</option>
@@ -54,3 +69,4 @@ export default function SelectorHoraMinuto({
     </div>
   );
 }
+
