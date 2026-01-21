@@ -239,7 +239,8 @@ function Inscripciones({asignaciones,docente, periodo,setAsignaciones}) {
                         <Horario 
                             materiasSeleccionadas={inscripciones} 
                             setMateriasSeleccionadas={setInscripciones} 
-                            jornada={estudiante.jornada} 
+                            jornada={estudiante.jornada}
+                            nivel={estudiante.nivel}
                         />
                     )}
                 </div>

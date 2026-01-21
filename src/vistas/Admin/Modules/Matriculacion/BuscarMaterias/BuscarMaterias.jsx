@@ -226,6 +226,7 @@ function BuscarMaterias() {
               materiasSeleccionadas={inscripciones}
               setMateriasSeleccionadas={setInscripciones}
               jornada={estudiante.jornada}
+              nivel={estudiante.nivel}
             />
           )}
         </div>

@@ -7,7 +7,7 @@ import '../../Styles/Horario.css'
 
 const diasSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
 
-const Horario = ({ materiasSeleccionadas, setMateriasSeleccionadas, jornada }) => {
+const Horario = ({ materiasSeleccionadas, setMateriasSeleccionadas, jornada, nivel }) => {
 
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
     const token = localStorage.getItem("token")
@@ -30,7 +30,24 @@ const Horario = ({ materiasSeleccionadas, setMateriasSeleccionadas, jornada }) =
         "18:15 - 19:00",
     ];
 
-    const horas = jornada === "Matutina" ? horasMatutina : horasVespertina;
+    let horas = jornada === "Matutina" ? horasMatutina : horasVespertina;
+    if (nivel === "3ro Bachillerato") {
+        horas = [
+            "07:00 - 07:45",
+            "07:45 - 08:30",
+            "08:30 - 09:15",
+            "09:15 - 10:00",
+            "10:00 - 10:45",
+            "10:45 - 11:30",
+            "11:30 - 12:15",
+            "14:30 - 15:15",
+            "15:15 - 16:00",
+            "16:00 - 16:45",
+            "16:45 - 17:30",
+            "17:30 - 18:15",
+            "18:15 - 19:00",
+        ]
+    }
 
     const eliminarMateria = (inscripcion) => {
         Swal.fire({
