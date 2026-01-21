@@ -14,8 +14,8 @@ function CrearCurso({ onCancel, entityToUpdate, onSave, periodo }) {
   const [asignaturas, setAsignaturas] = useState([])
   const [dia1, setDia1] = useState("")
   const [dia2, setDia2] = useState("")
-  const [horaInicio, setHoraInicio] = useState("07:00")
-  const [horaFin, setHoraFin] = useState("08:00")
+  const [horaInicio, setHoraInicio] = useState("")
+  const [horaFin, setHoraFin] = useState("")
   const [cupos, setCupos] = useState("")
   const [docentes, setDocentes] = useState([])
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;

@@ -13,10 +13,10 @@ function CrearCursoIndividual({ onCancel, onSave, periodo,docente }) {
   const [asignaturas, setAsignaturas] = useState([])
   const [dia1, setDia1] = useState("")
   const [dia2, setDia2] = useState("")
-  const [horaInicio, setHoraInicio] = useState("07:00")
-  const [horaFin, setHoraFin] = useState("07:00")
-  const [hora1, setHora1] = useState("07:00")
-  const [hora2, setHora2] = useState("07:00")
+  const [horaInicio, setHoraInicio] = useState("")
+  const [horaFin, setHoraFin] = useState("")
+  const [hora1, setHora1] = useState("")
+  const [hora2, setHora2] = useState("")
   const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
   const token=localStorage.getItem("token")
   useEffect(() => {
