@@ -87,9 +87,9 @@ function Contenedor({
     setEntityToUpdate(null);
   };
 
-  const handleSaveEntity = (newEntity,headers) => {
+  const handleSaveEntity = (ID,newEntity,headers) => {
     console.log("estoy llegando hasta aca")
-    Editar(entityToUpdate, newEntity, `${API_URL}/${apiEndpoint}`, setData, setIsModalOpen,PK,headers);
+    Editar(ID,entityToUpdate, newEntity, `${API_URL}/${apiEndpoint}`, setData, setIsModalOpen,PK,headers);
   };
 
   const handleEdit = (entity) => {

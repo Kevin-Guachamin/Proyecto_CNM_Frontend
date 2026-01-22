@@ -3,13 +3,13 @@ import { ErrorMessage } from '../ErrorMesaje';
 import Swal from 'sweetalert2';
 
 
-export function Editar (dataToUpdate,newData, URL, setData, setIsModalOpen, PK,headers){
+export function Editar (ID,dataToUpdate,newData, URL, setData, setIsModalOpen, PK,headers){
     
     if (dataToUpdate) {
         // Si estamos editando un usuario, lo actualizamos
         
         axios
-          .put(`${URL}/editar/${dataToUpdate[PK]}`, newData,headers)
+          .put(`${URL}/editar/${ID ?? dataToUpdate[PK]}`, newData,headers)
           .then((res) => {
             
             setData((prevData) => {
