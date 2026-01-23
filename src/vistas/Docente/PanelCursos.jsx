@@ -16,7 +16,7 @@ function PanelCursos() {
   // Protección de ruta
   const auth = useAuth(["Profesor", "Administrador", "Vicerrector"]);
 
-  
+
   // Si no está autenticado, no renderizar nada
   if (!auth.isAuthenticated) {
     return null;
@@ -33,7 +33,7 @@ function PanelCursos() {
     // Reemplaza cualquier ocurrencia de "HH:MM:SS" por "HH:MM"
     return horario.replace(/(\d{2}:\d{2}):\d{2}/g, "$1");
   }
-  
+
   const storedToken = localStorage.getItem("token");
   const config = {
     headers: {
@@ -43,12 +43,12 @@ function PanelCursos() {
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const storedToken = localStorage.getItem("token");
-  
+
     if (storedUser && storedToken) {
       const parsedUser = JSON.parse(storedUser);
-      console.log("este es el usuario que quiero ver",parsedUser)
+      console.log("este es el usuario que quiero ver", parsedUser)
       setUsuario(parsedUser);
-  
+
       const modulosBase = getModulos(parsedUser.subRol, true);
       setModules(transformModulesForLayout(modulosBase));
 
@@ -56,30 +56,47 @@ function PanelCursos() {
       axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/periodo_academico/activo`, config)
         .then((response) => {
           const periodoActivo = response.data;
-  
+
           if (periodoActivo && periodoActivo.estado === "Activo") {
             // Paso 2: Obtener cursos si el periodo está activo
-            axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/asignacion/docente/${parsedUser.nroCedula}`, config)
+            axios
+              .get(`${import.meta.env.VITE_URL_DEL_BACKEND}/asignacion/docente/${parsedUser.nroCedula}`, config)
               .then((response) => {
-                const data = response.data;
-  
-                if (Array.isArray(data) && data.length > 0) {
+                const { data, message } = response.data;
+
+                // ✅ Caso: no hay asignaciones (estado normal)
+                if (Array.isArray(data) && data.length === 0) {
+                  setCursos([]);
+
+                  Swal.fire({
+                    icon: "info",
+                    title: "Sin asignaciones",
+                    text: message || "Aún no tienes cursos asignados para el período activo.",
+                    confirmButtonText: "Entendido",
+                  });
+
+                  return;
+                }
+
+                // ✅ Caso: sí hay asignaciones
+                if (Array.isArray(data)) {
                   const cursosData = data.map((curso) => ({
                     id: curso.ID,
                     titulo: `Curso: ${curso.materia}`,
-                    descripcion: `Paralelo: ${curso.paralelo}\n Horario: ${formatearHorario(curso.horario)}\n Nivel: ${curso.nivel}`,
+                    descripcion: `Paralelo: ${curso.paralelo}\nHorario: ${formatearHorario(curso.horario)}\nNivel: ${curso.nivel}`,
                     link: "/profesor/panelcursos/calificaciones",
                     nivel: curso.nivel,
                   }));
+
                   setCursos(cursosData);
-                } else {
-                  setCursos([]);
                 }
               })
               .catch((error) => {
+                // ❌ Errores reales (401, 500, etc.)
                 ErrorMessage(error);
                 setCursos([]);
               });
+
           } else {
             Swal.fire({
               icon: "info",
@@ -108,12 +125,12 @@ function PanelCursos() {
     } else {
       navigate("/");
     }
-  }, [navigate]); 
-  
+  }, [navigate]);
+
   const handleModuloClick = (modulo) => {
     setLoading(true);
-    
-    axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/asignacion/obtener/${modulo.id}`,config)
+
+    axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/asignacion/obtener/${modulo.id}`, config)
       .then((response) => {
         const moduloCompleto = {
           ...response.data,
@@ -123,11 +140,11 @@ function PanelCursos() {
       })
       .catch((error) => {
         ErrorMessage(error);
-        setLoading(false); 
+        setLoading(false);
         alert("Ocurrió un error al cargar los datos del módulo.");
       });
   };
-  
+
   const handleSidebarNavigation = (path) => {
     setLoading(true);
     setTimeout(() => navigate(path), 800);
@@ -149,8 +166,15 @@ function PanelCursos() {
       <Layout modules={modules} onNavigate={handleSidebarNavigation}>
         <div className="content-container">
           <h2 className="mb-4">Cursos</h2>
-          <Modulo modulos={cursosModulos} onModuloClick={(modulo) => handleModuloClick(modulo)} />
-          </div>
+          {cursosModulos.length > 0 ? (
+            <Modulo modulos={cursosModulos} onModuloClick={handleModuloClick} />
+          ) : (
+            <div className="alert alert-info">
+              Aún no tienes cursos asignados para el período activo.
+              <br />
+            </div>
+          )}
+        </div>
       </Layout>
     </>
   );

@@ -52,7 +52,17 @@ function Calificaciones() {
   const [solicitudEnRango, setSolicitudEnRango] = useState(false);
 
   const getRangoValido = (clave) => {
-    return estadoFechas[clave] || (solicitudAceptada?.descripcion === clave);
+    // Normalizar para comparar: convertir guiones bajos a guiones medios
+    const solicitudDesc = solicitudAceptada?.descripcion?.replace(/_/g, "-");
+    const coincideConSolicitud = solicitudDesc === clave && solicitudEnRango;
+    return estadoFechas[clave] || coincideConSolicitud;
+  };
+
+  const esPorSolicitud = (clave) => {
+    // Retorna true si la edición está permitida por solicitud (no por fechas normales)
+    const solicitudDesc = solicitudAceptada?.descripcion?.replace(/_/g, "-");
+    const coincideConSolicitud = solicitudDesc === clave && solicitudEnRango;
+    return !estadoFechas[clave] && coincideConSolicitud;
   };
   
   const obtenerParcialBE = (subtab) => {
@@ -271,7 +281,13 @@ function Calificaciones() {
               icon: "success",
               title: "Guardado",
               text: "Calificaciones guardadas correctamente."
-            }).then(() => { setInputsDisabled(true); localStorage.setItem("inputsLocked", "true"); });
+            }).then(() => { 
+              setInputsDisabled(true); 
+              localStorage.setItem("inputsLocked", "true");
+              setForceEdit(false); // Resetear para que la próxima vez detecte datos guardados
+              // Recargar la página para actualizar los datos con los IDs del backend
+              window.location.reload();
+            });
             // Aquí actualizas tus savedKeys como venías haciendo
             if (isQuimestral) {
               setSavedKeysQuim(prev => {
@@ -356,7 +372,12 @@ function Calificaciones() {
               icon: "success",
               title: "Guardado",
               text: "Examen(es) supletorio(s) guardado(s) correctamente."
-            }).then(() => setInputsDisabled(true));
+            }).then(() => {
+              setInputsDisabled(true);
+              setForceEdit(false); // Resetear para que la próxima vez detecte datos guardados
+              // Recargar la página para actualizar los datos con los IDs del backend
+              window.location.reload();
+            });
             // Actualizar las “keys” guardadas
             setSavedKeysFinal(prev => {
               const copy = new Set(prev);
@@ -558,6 +579,7 @@ function Calificaciones() {
       handleEditarFila={handleEditarFila}
       soloLectura={soloLectura}
       getRangoValido={getRangoValido}
+      esPorSolicitud={esPorSolicitud}
     />
   );
 }
