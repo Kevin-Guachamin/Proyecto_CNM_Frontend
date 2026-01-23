@@ -4,9 +4,9 @@ import '../../../Admin/Styles/Horario.css'
 
 const diasSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
 
-const Horario = ({ materiasSeleccionadas, jornada,nivel }) => {
+const Horario = ({ materiasSeleccionadas, jornada, nivel }) => {
 
-
+    console.log("materiasSeleccionadas", materiasSeleccionadas);
     const horasMatutina = [
         "07:00 - 07:45",
         "07:45 - 08:30",
@@ -26,7 +26,7 @@ const Horario = ({ materiasSeleccionadas, jornada,nivel }) => {
         "18:15 - 19:00",
     ];
 
-   let horas = jornada === "Matutina" ? horasMatutina : horasVespertina;
+    let horas = jornada === "Matutina" ? horasMatutina : horasVespertina;
     if (nivel === "3ro Bachillerato") {
         horas = [
             "07:00 - 07:45",
@@ -69,26 +69,33 @@ const Horario = ({ materiasSeleccionadas, jornada,nivel }) => {
                 dias
             } = inscripcion.Asignacion;
 
-            // 1️⃣ Verificar que el día exista
+            // 1️⃣ Validar día
             const indexDia = dias.indexOf(dia);
             if (indexDia === -1) return false;
 
-            // 2️⃣ Elegir rango según el día
             let inicioA, finA;
 
-            if (indexDia === 0) {
+            // 2️⃣ Decidir horario
+            if (hora1 && hora2) {
+                // 📌 Hay horarios distintos
+                if (indexDia === 0) {
+                    inicioA = toMin(horaInicio);
+                    finA = toMin(horaFin);
+                } else if (indexDia === 1) {
+                    inicioA = toMin(hora1);
+                    finA = toMin(hora2);
+                } else {
+                    return false;
+                }
+            } else {
+                // 📌 Horario único para todos los días
                 inicioA = toMin(horaInicio);
                 finA = toMin(horaFin);
-            } else if (indexDia === 1) {
-                inicioA = toMin(hora1);
-                finA = toMin(hora2);
-            } else {
-                return false; // no soportado
             }
 
             if (inicioA === null || finA === null) return false;
 
-            // 3️⃣ Validar bloque
+            // 3️⃣ Validar bloque horario
             return inicioB >= inicioA && finB <= finA;
         });
     };
