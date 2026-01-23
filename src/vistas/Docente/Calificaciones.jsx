@@ -72,7 +72,7 @@ function Calificaciones() {
   };
   
   const makeKey = ({ id_inscripcion, quimestre, parcial }) => {
-    const esBe = datosModulo?.nivel?.toLowerCase().includes("be");
+    const esBe = datosModulo?.nivel?.toLowerCase().includes("be") || datosModulo?.tipoNivel === "BE";
     if (esBe) {
       const tab = activeMainTab === "quimestre1" ? "Q1" :
                   activeMainTab === "quimestre2" ? "Q2" : "FINAL";
@@ -85,7 +85,7 @@ function Calificaciones() {
   };  
   
   const makeKeyQuim = ({ id_inscripcion, quimestre }) => {
-    const esBe = datosModulo?.nivel?.toLowerCase().includes("be");
+    const esBe = datosModulo?.nivel?.toLowerCase().includes("be") || datosModulo?.tipoNivel === "BE";
     if (esBe) {
       const tab =
         activeMainTab === "quimestre1" ? "Q1" :
@@ -123,6 +123,59 @@ function Calificaciones() {
   const handleActualizarFinal = React.useCallback((datos) => {
     setFinalData(datos);
   }, []);
+
+  // Actualizar savedKeys cuando los datos cambian y ya tienen ID guardado
+  useEffect(() => {
+    const parcialData = [
+      ...parcial1Quim1Data,
+      ...parcial2Quim1Data,
+      ...parcial1Quim2Data,
+      ...parcial2Quim2Data
+    ];
+    
+    const newSavedKeys = new Set();
+    parcialData.forEach(row => {
+      // Si el registro tiene idParcial, significa que ya está guardado
+      if (row.idParcial || row.id_parcial) {
+        const key = makeKey(row);
+        newSavedKeys.add(key);
+      }
+    });
+    
+    if (newSavedKeys.size > 0) {
+      setSavedKeys(newSavedKeys);
+    }
+  }, [parcial1Quim1Data, parcial2Quim1Data, parcial1Quim2Data, parcial2Quim2Data]);
+
+  useEffect(() => {
+    const quimData = [...quim1Data, ...quim2Data];
+    
+    const newSavedKeysQuim = new Set();
+    quimData.forEach(row => {
+      if (row.idQuimestral || row.id_quimestral) {
+        const key = makeKeyQuim(row);
+        newSavedKeysQuim.add(key);
+      }
+    });
+    
+    if (newSavedKeysQuim.size > 0) {
+      setSavedKeysQuim(newSavedKeysQuim);
+    }
+  }, [quim1Data, quim2Data]);
+
+  useEffect(() => {
+    const newSavedKeysFinal = new Set();
+    finalData.forEach(row => {
+      if (row.idFinal || row.id_final) {
+        const key = makeKeyFinal(row);
+        newSavedKeysFinal.add(key);
+      }
+    });
+    
+    if (newSavedKeysFinal.size > 0) {
+      setSavedKeysFinal(newSavedKeysFinal);
+    }
+  }, [finalData]);
 
   const modules = React.useMemo(() => {
     if (!usuario) return [];
@@ -188,7 +241,7 @@ function Calificaciones() {
     let activeData = [];
     let isQuimestral = false;
     let isFinal = false;
-    const esBe = datosModulo?.nivel?.toLowerCase().includes("be");
+    const esBe = datosModulo?.nivel?.toLowerCase().includes("be") || datosModulo?.tipoNivel === "BE";
 
     // 1) Determinar qué pestaña (Parcial, Quimestral o Final) está activa
     if (activeMainTab === "quimestre1") {
@@ -264,7 +317,7 @@ function Calificaciones() {
         });
       }
       // 3) Realizar el POST
-      const endpoint = esBE
+      const endpoint = esBe
         ? isQuimestral
           ? `${import.meta.env.VITE_URL_DEL_BACKEND}/quimestralesbe/bulk`
           : `${import.meta.env.VITE_URL_DEL_BACKEND}/parcialesbe/bulk`
@@ -539,7 +592,8 @@ function Calificaciones() {
     setInputsDisabled(false);
   };
 
-  const esBE = datosModulo?.nivel?.toLowerCase().includes("be");
+  // Determinar si es BE: puede ser por nivel directo o por tipoNivel en materias agrupadas
+  const esBE = datosModulo?.nivel?.toLowerCase().includes("be") || datosModulo?.tipoNivel === "BE";
 
   const ComponenteNotas = esBE ? NotasBE : Notas;
 

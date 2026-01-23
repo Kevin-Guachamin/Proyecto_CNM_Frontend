@@ -26,85 +26,151 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
 
   // Combinar los datos de Quimestre 1 y 2
   useEffect(() => {
-    if (!datosModulo?.ID) return;
-    // ✅ Aquí agregamos el token antes de hacer cualquier request
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
     }
 
-    const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${datosModulo.ID}`;
-    const urlFinales = `${import.meta.env.VITE_URL_DEL_BACKEND}/finales/asignacion/${datosModulo.ID}`;
+    const esGrupoIndividual = datosModulo?.asignaciones && datosModulo.asignaciones.length > 0;
 
-    Promise.all([axios.get(urlInscripciones), axios.get(urlFinales)])
-      .then(([respEstudiantes, respFinales]) => {
-        const estudiantes = respEstudiantes.data;
-        const finales = respFinales.data;
-
-        const nuevosDatos = estudiantes.map((est) => {
-          // Buscar examen supletorio en "finales"
-          const finalGuardado = finales.find(
-            (f) => f.idInscripcion === est.idInscripcion
-          ) || {};
-
-          // Buscar sus datos de quimestre 1 y 2
-          const quim1 = quim1Data.find(
-            (q) => q.id_inscripcion === est.idInscripcion
-          ) || {};
-          const quim2 = quim2Data.find(
-            (q) => q.id_inscripcion === est.idInscripcion
-          ) || {};
-
-          // Tomar los promedios finales (numéricos) de Q1 y Q2
-          const q1PF = parseFloat(quim1["Promedio Completo"]) || 0;
-          const q2PF = parseFloat(quim2["Promedio Completo"]) || 0;
-          const promedioAnual = calcularPromedioAnual(q1PF, q2PF);
-          const q1PC = parseFloat(quim1["Promedio Comportamiento Completo"]) || 0;
-          const q2PC = parseFloat(quim2["Promedio Comportamiento Completo"]) || 0;
-
-          const promedioComportamiento = calcularPromedioComportamientoFinal(q1PC, q2PC);
-          const comportamiento = calcularValoracionComportamiento(promedioComportamiento);
-
-          const examenSupletorio = finalGuardado.examen_recuperacion ?? ""; // ← esta línea es necesaria
-          const pFinal = calcularPromedioFinalConSupletorio(promedioAnual, examenSupletorio);
-          const estado = determinarEstado(pFinal);
-
-          // Nota que guardamos en propiedades "numéricas" (prefijo _)
-          // y también en las llaves visibles si quieres un valor inicial
-          return {
-            // Identificador
-            idInscripcion: est.idInscripcion, // o est.idInscripcion, según tu BD
-            idFinal: finalGuardado.id,
-            // Props numéricas internas
-            _primerQuimestre: q1PF,
-            _segundoQuimestre: q2PF,
-            _promedioAnual: promedioAnual,
-            _promedioFinal: pFinal,
-
-            // Flags
-            promedioAnualRequeridoSupletorio: promedioAnual < 7,
-            promedioFinalInsuficiente: pFinal < 7,
-
-            // Campos para la tabla
-            Nro: est.nro,
-            "Nómina de Estudiantes": est.nombre,
-            "Primer Quimestre": q1PF,          // Puedes poner .toFixed(2) aquí si gustas
-            "Segundo Quimestre": q2PF,
-            "Promedio Anual": promedioAnual,
-            "Comportamiento": comportamiento,
-            "Examen Supletorio": examenSupletorio,
-            "Promedio Final": pFinal,         // Valor inicial (se convertirá en <span> o string después)
-            "Nivel": abreviarNivel(est.nivel),
-            "Estado": estado,
-          };
-        });
-
-        setDatos(nuevosDatos);
-        setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
-      })
-      .catch((err) => {
-        ErrorMessage(err);
+    if (esGrupoIndividual) {
+      // Cargar datos de todas las asignaciones del grupo
+      const promesasAsignaciones = datosModulo.asignaciones.map(asignacion => {
+        const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${asignacion.ID}`;
+        const urlFinales = `${import.meta.env.VITE_URL_DEL_BACKEND}/finales/asignacion/${asignacion.ID}`;
+        return Promise.all([axios.get(urlInscripciones), axios.get(urlFinales)])
+          .then(([respEstudiantes, respFinales]) => ({
+            asignacion,
+            estudiantes: respEstudiantes.data,
+            finales: respFinales.data
+          }));
       });
+
+      Promise.all(promesasAsignaciones)
+        .then(resultados => {
+          let nroGlobal = 1;
+          const todosLosDatos = [];
+
+          resultados.forEach(({ asignacion, estudiantes, finales }) => {
+            estudiantes.forEach(est => {
+              const finalGuardado = finales.find(
+                (f) => f.idInscripcion === est.idInscripcion
+              ) || {};
+
+              const quim1 = quim1Data.find(
+                (q) => q.id_inscripcion === est.idInscripcion
+              ) || {};
+              const quim2 = quim2Data.find(
+                (q) => q.id_inscripcion === est.idInscripcion
+              ) || {};
+
+              const q1PF = parseFloat(quim1["Promedio Completo"]) || 0;
+              const q2PF = parseFloat(quim2["Promedio Completo"]) || 0;
+              const promedioAnual = calcularPromedioAnual(q1PF, q2PF);
+              const q1PC = parseFloat(quim1["Promedio Comportamiento Completo"]) || 0;
+              const q2PC = parseFloat(quim2["Promedio Comportamiento Completo"]) || 0;
+
+              const promedioComportamiento = calcularPromedioComportamientoFinal(q1PC, q2PC);
+              const comportamiento = calcularValoracionComportamiento(promedioComportamiento);
+
+              const examenSupletorio = finalGuardado.examen_recuperacion ?? "";
+              const pFinal = calcularPromedioFinalConSupletorio(promedioAnual, examenSupletorio);
+              const estado = determinarEstado(pFinal);
+
+              todosLosDatos.push({
+                idInscripcion: est.idInscripcion,
+                idFinal: finalGuardado.id,
+                idAsignacion: asignacion.ID,
+                _primerQuimestre: q1PF,
+                _segundoQuimestre: q2PF,
+                _promedioAnual: promedioAnual,
+                _promedioFinal: pFinal,
+                promedioAnualRequeridoSupletorio: promedioAnual < 7,
+                promedioFinalInsuficiente: pFinal < 7,
+                Nro: nroGlobal++,
+                "Nómina de Estudiantes": est.nombre,
+                "Primer Quimestre": q1PF,
+                "Segundo Quimestre": q2PF,
+                "Promedio Anual": promedioAnual,
+                "Comportamiento": comportamiento,
+                "Examen Supletorio": examenSupletorio,
+                "Promedio Final": pFinal,
+                "Nivel": abreviarNivel(est.nivel),
+                "Estado": estado,
+              });
+            });
+          });
+
+          setDatos(todosLosDatos);
+          setDatosOriginales(JSON.parse(JSON.stringify(todosLosDatos)));
+        })
+        .catch((err) => {
+          ErrorMessage(err);
+        });
+    } else if (datosModulo?.ID) {
+      // Lógica original para materias grupales
+      const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${datosModulo.ID}`;
+      const urlFinales = `${import.meta.env.VITE_URL_DEL_BACKEND}/finales/asignacion/${datosModulo.ID}`;
+
+      Promise.all([axios.get(urlInscripciones), axios.get(urlFinales)])
+        .then(([respEstudiantes, respFinales]) => {
+          const estudiantes = respEstudiantes.data;
+          const finales = respFinales.data;
+
+          const nuevosDatos = estudiantes.map((est) => {
+            const finalGuardado = finales.find(
+              (f) => f.idInscripcion === est.idInscripcion
+            ) || {};
+
+            const quim1 = quim1Data.find(
+              (q) => q.id_inscripcion === est.idInscripcion
+            ) || {};
+            const quim2 = quim2Data.find(
+              (q) => q.id_inscripcion === est.idInscripcion
+            ) || {};
+
+            const q1PF = parseFloat(quim1["Promedio Completo"]) || 0;
+            const q2PF = parseFloat(quim2["Promedio Completo"]) || 0;
+            const promedioAnual = calcularPromedioAnual(q1PF, q2PF);
+            const q1PC = parseFloat(quim1["Promedio Comportamiento Completo"]) || 0;
+            const q2PC = parseFloat(quim2["Promedio Comportamiento Completo"]) || 0;
+
+            const promedioComportamiento = calcularPromedioComportamientoFinal(q1PC, q2PC);
+            const comportamiento = calcularValoracionComportamiento(promedioComportamiento);
+
+            const examenSupletorio = finalGuardado.examen_recuperacion ?? "";
+            const pFinal = calcularPromedioFinalConSupletorio(promedioAnual, examenSupletorio);
+            const estado = determinarEstado(pFinal);
+
+            return {
+              idInscripcion: est.idInscripcion,
+              idFinal: finalGuardado.id,
+              _primerQuimestre: q1PF,
+              _segundoQuimestre: q2PF,
+              _promedioAnual: promedioAnual,
+              _promedioFinal: pFinal,
+              promedioAnualRequeridoSupletorio: promedioAnual < 7,
+              promedioFinalInsuficiente: pFinal < 7,
+              Nro: est.nro,
+              "Nómina de Estudiantes": est.nombre,
+              "Primer Quimestre": q1PF,
+              "Segundo Quimestre": q2PF,
+              "Promedio Anual": promedioAnual,
+              "Comportamiento": comportamiento,
+              "Examen Supletorio": examenSupletorio,
+              "Promedio Final": pFinal,
+              "Nivel": abreviarNivel(est.nivel),
+              "Estado": estado,
+            };
+          });
+
+          setDatos(nuevosDatos);
+          setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
+        })
+        .catch((err) => {
+          ErrorMessage(err);
+        });
+    }
   }, [datosModulo, quim1Data, quim2Data]);
 
   useEffect(() => {
@@ -180,12 +246,12 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
     titulo: "CONSERVATORIO NACIONAL DE MUSICA",
     subtitulo: "ACTA DE RESUMEN FINAL",
     info: {
-      "Profesor": datosModulo.docente,
-      "Asignatura": datosModulo.materia,
-      "Curso": datosModulo.año,
-      "Paralelo": datosModulo.paralelo,
-      "Año Lectivo": datosModulo.periodo,
-      "Jornada": determinarJornada(datosModulo.horario)
+      "Profesor": datosModulo.docente || (datosModulo.asignaciones?.[0]?.docente),
+      "Asignatura": datosModulo.materia || datosModulo.nombreMateria,
+      "Curso": datosModulo.asignaciones ? `Niveles ${datosModulo.tipoNivel}` : datosModulo.año,
+      "Paralelo": datosModulo.asignaciones ? "Múltiples" : datosModulo.paralelo,
+      "Año Lectivo": datosModulo.periodo || (datosModulo.asignaciones?.[0]?.periodo),
+      "Jornada": datosModulo.horario ? determinarJornada(datosModulo.horario) : (datosModulo.asignaciones?.[0]?.horario ? determinarJornada(datosModulo.asignaciones[0].horario) : "")
     }
   };
 

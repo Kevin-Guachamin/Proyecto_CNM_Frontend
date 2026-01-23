@@ -80,13 +80,56 @@ function PanelCursos() {
 
                 // ✅ Caso: sí hay asignaciones
                 if (Array.isArray(data)) {
-                  const cursosData = data.map((curso) => ({
-                    id: curso.ID,
-                    titulo: `Curso: ${curso.materia}`,
-                    descripcion: `Paralelo: ${curso.paralelo}\nHorario: ${formatearHorario(curso.horario)}\nNivel: ${curso.nivel}`,
+                  // Función para determinar si un nivel es BE o Superior
+                  const esNivelBE = (nivel) => {
+                    return nivel && nivel.includes("BE");
+                  };
+
+                  // Agrupar materias individuales por nombre y tipo de nivel
+                  const materiasAgrupadas = data.reduce((acc, curso) => {
+                    if (curso.tipo === "individual") {
+                      const nombreMateria = curso.materia;
+                      const tipoNivel = esNivelBE(curso.nivel) ? "BE" : "Superior";
+                      const key = `${nombreMateria}_${tipoNivel}`;
+
+                      if (!acc[key]) {
+                        acc[key] = {
+                          nombreMateria,
+                          tipoNivel,
+                          asignaciones: []
+                        };
+                      }
+
+                      acc[key].asignaciones.push(curso);
+                    }
+                    return acc;
+                  }, {});
+
+                  // Crear tarjetas agrupadas para materias individuales
+                  const cursosAgrupados = Object.values(materiasAgrupadas).map(grupo => ({
+                    id: `grupo_${grupo.nombreMateria}_${grupo.tipoNivel}`,
+                    titulo: `Curso: ${grupo.nombreMateria}`,
+                    descripcion: `Nivel: ${grupo.tipoNivel}\n${grupo.asignaciones.length} asignación(es)`,
                     link: "/profesor/panelcursos/calificaciones",
-                    nivel: curso.nivel,
+                    nivel: grupo.tipoNivel,
+                    tipo: "individual",
+                    asignaciones: grupo.asignaciones
                   }));
+
+                  // Mantener materias grupales sin cambios
+                  const cursosGrupales = data
+                    .filter(curso => curso.tipo !== "individual")
+                    .map((curso) => ({
+                      id: curso.ID,
+                      titulo: `Curso: ${curso.materia}`,
+                      descripcion: `Paralelo: ${curso.paralelo}\nHorario: ${formatearHorario(curso.horario)}\nNivel: ${curso.nivel}`,
+                      link: "/profesor/panelcursos/calificaciones",
+                      nivel: curso.nivel,
+                      tipo: curso.tipo
+                    }));
+
+                  // Combinar ambos tipos
+                  const cursosData = [...cursosAgrupados, ...cursosGrupales];
 
                   setCursos(cursosData);
                 }
@@ -130,6 +173,21 @@ function PanelCursos() {
   const handleModuloClick = (modulo) => {
     setLoading(true);
 
+    // Si es una materia agrupada, manejar todas las asignaciones
+    if (modulo.asignaciones && modulo.asignaciones.length > 0) {
+      // Navegar con todas las asignaciones del grupo
+      navigate("/profesor/panelcursos/calificaciones", { 
+        state: {
+          tipo: "individual",
+          nombreMateria: modulo.titulo.replace("Curso: ", ""),
+          tipoNivel: modulo.nivel,
+          asignaciones: modulo.asignaciones
+        }
+      });
+      return;
+    }
+
+    // Para materias grupales, funcionar como antes
     axios.get(`${import.meta.env.VITE_URL_DEL_BACKEND}/asignacion/obtener/${modulo.id}`, config)
       .then((response) => {
         const moduloCompleto = {

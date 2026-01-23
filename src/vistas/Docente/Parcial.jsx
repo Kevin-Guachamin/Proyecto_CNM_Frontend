@@ -34,12 +34,12 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
     titulo: "CONSERVATORIO NACIONAL DE MUSICA",
     subtitulo: subtitulo,
     info: {
-      "Profesor": datosModulo.docente,
-      "Asignatura": datosModulo.materia,
-      "Curso": datosModulo.año,
-      "Paralelo": datosModulo.paralelo,
-      "Año Lectivo": datosModulo.periodo,
-      "Jornada": determinarJornada(datosModulo.horario)
+      "Profesor": datosModulo.docente || (datosModulo.asignaciones?.[0]?.docente),
+      "Asignatura": datosModulo.materia || datosModulo.nombreMateria,
+      "Curso": datosModulo.asignaciones ? `Niveles ${datosModulo.tipoNivel}` : datosModulo.año,
+      "Paralelo": datosModulo.asignaciones ? "Múltiples" : datosModulo.paralelo,
+      "Año Lectivo": datosModulo.periodo || (datosModulo.asignaciones?.[0]?.periodo),
+      "Jornada": datosModulo.horario ? determinarJornada(datosModulo.horario) : (datosModulo.asignaciones?.[0]?.horario ? determinarJornada(datosModulo.asignaciones[0].horario) : "")
     }
   };
 
@@ -220,61 +220,127 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
   };
 
   useEffect(() => {
-    if (!datosModulo?.ID) return;
-
-    // ✅ Aquí agregamos el token antes de hacer cualquier request
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
     }
-    const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${datosModulo.ID}`;
-    const urlParciales = `${import.meta.env.VITE_URL_DEL_BACKEND}/parciales/asignacion/${datosModulo.ID}`;
 
-    Promise.all([axios.get(urlInscripciones), axios.get(urlParciales)])
-      .then(([respEstudiantes, respParciales]) => {
-        const estudiantes = respEstudiantes.data;
-        const parciales = respParciales.data;
-        
-        const nuevosDatos = estudiantes.map(est => {
-          const parcialGuardado = parciales.find(p =>
-            p.idInscripcion === est.idInscripcion &&
-            p.parcial === obtenerEtiquetaParcial() &&
-            p.quimestre === obtenerEtiquetaQuimestre()
-          ) || {};
-
-          const fila = {
-            idInscripcion: est.idInscripcion,
-            idParcial: parcialGuardado?.idParcial,
-            "Nro": est.nro,
-            "Nómina de Estudiantes": est.nombre,
-            "INSUMO 1": safe(parcialGuardado?.insumo1),
-            "INSUMO 2": safe(parcialGuardado?.insumo2),
-            "EVALUACIÓN SUMATIVA": safe(parcialGuardado?.evaluacion),
-            "RESPETO Y CONSIDERACION": safe(parcialGuardado?.comportamiento?.[0]),
-            "VALORACION DE LA DIVERSIDAD": safe(parcialGuardado?.comportamiento?.[1]),
-            "CUMPLIMIENTO DE LAS NORMA DE CONVIVENCIA": safe(parcialGuardado?.comportamiento?.[2]),
-            "CUIDADO  DEL PATRIMONIO INSTITUCIONAL": safe(parcialGuardado?.comportamiento?.[3]),
-            "RESPETO A LA PROPIEDAD AJENA": safe(parcialGuardado?.comportamiento?.[4]),
-            "PUNTUALIDAD Y ASISTENCIA": safe(parcialGuardado?.comportamiento?.[5]),
-            "HONESTIDAD ": safe(parcialGuardado?.comportamiento?.[6]),
-            "PRESENTACION PERSONAL (LIMPIEZA Y UNIFORME)": safe(parcialGuardado?.comportamiento?.[7]),
-            "PARTICIPACION COMUNITARIA": safe(parcialGuardado?.comportamiento?.[8]),
-            "RESPONSABILIDAD ": safe(parcialGuardado?.comportamiento?.[9]),
-            "PONDERACIÓN 70%": "",
-            "PONDERACIÓN 30%": "",
-            "PROMEDIO PARCIAL": "",
-            "PROMEDIO COMPORTAMIENTO": "",
-            "NIVEL": abreviarNivel(est.nivel),
-            "VALORACION": ""
-          };
-          return calcularDatosFila(fila);
-        });
-        setDatos(nuevosDatos);
-        setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
-      })
-      .catch((error) => {
-        ErrorMessage(error);
+    // ✅ Soporte para materias agrupadas (múltiples asignaciones)
+    const esGrupoIndividual = datosModulo?.asignaciones && datosModulo.asignaciones.length > 0;
+    
+    if (esGrupoIndividual) {
+      // Cargar datos de todas las asignaciones del grupo
+      const promesasAsignaciones = datosModulo.asignaciones.map(asignacion => {
+        const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${asignacion.ID}`;
+        const urlParciales = `${import.meta.env.VITE_URL_DEL_BACKEND}/parciales/asignacion/${asignacion.ID}`;
+        return Promise.all([axios.get(urlInscripciones), axios.get(urlParciales)])
+          .then(([respEstudiantes, respParciales]) => ({
+            asignacion,
+            estudiantes: respEstudiantes.data,
+            parciales: respParciales.data
+          }));
       });
+
+      Promise.all(promesasAsignaciones)
+        .then(resultados => {
+          let nroGlobal = 1;
+          const todosLosDatos = [];
+
+          resultados.forEach(({ asignacion, estudiantes, parciales }) => {
+            estudiantes.forEach(est => {
+              const parcialGuardado = parciales.find(p =>
+                p.idInscripcion === est.idInscripcion &&
+                p.parcial === obtenerEtiquetaParcial() &&
+                p.quimestre === obtenerEtiquetaQuimestre()
+              ) || {};
+
+              const fila = {
+                idInscripcion: est.idInscripcion,
+                idParcial: parcialGuardado?.idParcial,
+                idAsignacion: asignacion.ID,
+                "Nro": nroGlobal++,
+                "Nómina de Estudiantes": est.nombre,
+                "INSUMO 1": safe(parcialGuardado?.insumo1),
+                "INSUMO 2": safe(parcialGuardado?.insumo2),
+                "EVALUACIÓN SUMATIVA": safe(parcialGuardado?.evaluacion),
+                "RESPETO Y CONSIDERACION": safe(parcialGuardado?.comportamiento?.[0]),
+                "VALORACION DE LA DIVERSIDAD": safe(parcialGuardado?.comportamiento?.[1]),
+                "CUMPLIMIENTO DE LAS NORMA DE CONVIVENCIA": safe(parcialGuardado?.comportamiento?.[2]),
+                "CUIDADO  DEL PATRIMONIO INSTITUCIONAL": safe(parcialGuardado?.comportamiento?.[3]),
+                "RESPETO A LA PROPIEDAD AJENA": safe(parcialGuardado?.comportamiento?.[4]),
+                "PUNTUALIDAD Y ASISTENCIA": safe(parcialGuardado?.comportamiento?.[5]),
+                "HONESTIDAD ": safe(parcialGuardado?.comportamiento?.[6]),
+                "PRESENTACION PERSONAL (LIMPIEZA Y UNIFORME)": safe(parcialGuardado?.comportamiento?.[7]),
+                "PARTICIPACION COMUNITARIA": safe(parcialGuardado?.comportamiento?.[8]),
+                "RESPONSABILIDAD ": safe(parcialGuardado?.comportamiento?.[9]),
+                "PONDERACIÓN 70%": "",
+                "PONDERACIÓN 30%": "",
+                "PROMEDIO PARCIAL": "",
+                "PROMEDIO COMPORTAMIENTO": "",
+                "NIVEL": abreviarNivel(est.nivel),
+                "VALORACION": ""
+              };
+              todosLosDatos.push(calcularDatosFila(fila));
+            });
+          });
+
+          setDatos(todosLosDatos);
+          setDatosOriginales(JSON.parse(JSON.stringify(todosLosDatos)));
+        })
+        .catch((error) => {
+          ErrorMessage(error);
+        });
+    } else if (datosModulo?.ID) {
+      // Lógica original para materias grupales (una sola asignación)
+      const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${datosModulo.ID}`;
+      const urlParciales = `${import.meta.env.VITE_URL_DEL_BACKEND}/parciales/asignacion/${datosModulo.ID}`;
+
+      Promise.all([axios.get(urlInscripciones), axios.get(urlParciales)])
+        .then(([respEstudiantes, respParciales]) => {
+          const estudiantes = respEstudiantes.data;
+          const parciales = respParciales.data;
+          
+          const nuevosDatos = estudiantes.map(est => {
+            const parcialGuardado = parciales.find(p =>
+              p.idInscripcion === est.idInscripcion &&
+              p.parcial === obtenerEtiquetaParcial() &&
+              p.quimestre === obtenerEtiquetaQuimestre()
+            ) || {};
+
+            const fila = {
+              idInscripcion: est.idInscripcion,
+              idParcial: parcialGuardado?.idParcial,
+              "Nro": est.nro,
+              "Nómina de Estudiantes": est.nombre,
+              "INSUMO 1": safe(parcialGuardado?.insumo1),
+              "INSUMO 2": safe(parcialGuardado?.insumo2),
+              "EVALUACIÓN SUMATIVA": safe(parcialGuardado?.evaluacion),
+              "RESPETO Y CONSIDERACION": safe(parcialGuardado?.comportamiento?.[0]),
+              "VALORACION DE LA DIVERSIDAD": safe(parcialGuardado?.comportamiento?.[1]),
+              "CUMPLIMIENTO DE LAS NORMA DE CONVIVENCIA": safe(parcialGuardado?.comportamiento?.[2]),
+              "CUIDADO  DEL PATRIMONIO INSTITUCIONAL": safe(parcialGuardado?.comportamiento?.[3]),
+              "RESPETO A LA PROPIEDAD AJENA": safe(parcialGuardado?.comportamiento?.[4]),
+              "PUNTUALIDAD Y ASISTENCIA": safe(parcialGuardado?.comportamiento?.[5]),
+              "HONESTIDAD ": safe(parcialGuardado?.comportamiento?.[6]),
+              "PRESENTACION PERSONAL (LIMPIEZA Y UNIFORME)": safe(parcialGuardado?.comportamiento?.[7]),
+              "PARTICIPACION COMUNITARIA": safe(parcialGuardado?.comportamiento?.[8]),
+              "RESPONSABILIDAD ": safe(parcialGuardado?.comportamiento?.[9]),
+              "PONDERACIÓN 70%": "",
+              "PONDERACIÓN 30%": "",
+              "PROMEDIO PARCIAL": "",
+              "PROMEDIO COMPORTAMIENTO": "",
+              "NIVEL": abreviarNivel(est.nivel),
+              "VALORACION": ""
+            };
+            return calcularDatosFila(fila);
+          });
+          setDatos(nuevosDatos);
+          setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
+        })
+        .catch((error) => {
+          ErrorMessage(error);
+        });
+    }
   }, [datosModulo, quimestreSeleccionado, parcialSeleccionado]);
 
   const handleGuardar = (rowIndex, rowData) => {
