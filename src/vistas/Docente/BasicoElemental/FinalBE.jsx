@@ -77,12 +77,12 @@ const FinalBE = ({ quim1Data, quim2Data, datosModulo, escala }) => {
     titulo: "CONSERVATORIO NACIONAL DE MUSICA",
     subtitulo: "ACTA DE CALIFICACIONES - FINAL BE",
     info: {
-      Profesor: datosModulo.docente,
-      Asignatura: datosModulo.materia,
-      Curso: datosModulo.año,
-      Paralelo: datosModulo.paralelo,
-      "Año Lectivo": datosModulo.periodo,
-      Jornada: determinarJornada(datosModulo.horario)
+      Profesor: datosModulo.docente || (datosModulo.asignaciones?.[0]?.docente),
+      Asignatura: datosModulo.materia || datosModulo.nombreMateria,
+      Curso: datosModulo.asignaciones ? `Niveles ${datosModulo.tipoNivel}` : datosModulo.año,
+      Paralelo: datosModulo.asignaciones ? "Múltiples" : datosModulo.paralelo,
+      "Año Lectivo": datosModulo.periodo || (datosModulo.asignaciones?.[0]?.periodo),
+      Jornada: datosModulo.horario ? determinarJornada(datosModulo.horario) : (datosModulo.asignaciones?.[0]?.horario ? determinarJornada(datosModulo.asignaciones[0].horario) : "")
     }
   };
 

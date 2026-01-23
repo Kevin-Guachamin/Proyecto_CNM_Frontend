@@ -43,62 +43,129 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
 
   // Cada vez que lleguen datos de ambos parciales, se combinan
   useEffect(() => {
-    if (!datosModulo?.ID) return;
-
-    // ✅ Aquí agregamos el token antes de hacer cualquier request
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
     }
-    const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${datosModulo.ID}`;
-    const urlQuimestrales = `${import.meta.env.VITE_URL_DEL_BACKEND}/quimestrales/asignacion/${datosModulo.ID}`;
 
-    Promise.all([axios.get(urlInscripciones), axios.get(urlQuimestrales)])
-      .then(([respEstudiantes, respQuimestrales]) => {
-        const estudiantes = respEstudiantes.data;
-        const quimestrales = respQuimestrales.data;
-        const nuevosDatos = estudiantes.map(est => {
-          const p1 = parcial1Data.find(p => p.id_inscripcion === est.idInscripcion) || {};
-          const p2 = parcial2Data.find(p => p.id_inscripcion === est.idInscripcion) || {};
-          const saved = quimestrales.find(q =>
-            q.idInscripcion === est.idInscripcion &&
-            q.quimestre === obtenerEtiquetaQuimestre()
-          ) || {};
+    const esGrupoIndividual = datosModulo?.asignaciones && datosModulo.asignaciones.length > 0;
 
-          const parcial1 = parseFloat(p1["Promedio Final"] || 0);
-          const parcial2 = parseFloat(p2["Promedio Final"] || 0);
-          const notaExamen = saved.examen ?? "";
-
-          const { ponderacion70, ponderacion30, promedioFinal } = calcularPromedioQuimestral(parcial1, parcial2, notaExamen);
-
-          const comportamientoP1 = p1["Promedio Comportamiento"];
-          const comportamientoP2 = p2["Promedio Comportamiento"];
-          const comportamientoTotal = calcularPromedioComportamiento(comportamientoP1, comportamientoP2);
-          const comportamientoFinal = calcularValoracionComportamiento(comportamientoTotal);
-
-          return {
-            idInscripcion: est.idInscripcion,
-            idQuimestral: saved.id,
-            "Nro": est.nro,
-            "Nómina de Estudiantes": est.nombre,
-            "Primer Parcial": parcial1.toFixed(2),
-            "Segundo Parcial": parcial2.toFixed(2),
-            "Ponderación 70%": ponderacion70.toFixed(2),
-            "Examen": notaExamen,
-            "Ponderación 30%": ponderacion30.toFixed(2),
-            "Promedio Final": promedioFinal.toFixed(2),
-            "Promedio Comportamiento": comportamientoTotal.toFixed(2),
-            "Nivel": abreviarNivel(est.nivel),
-            "Comportamiento Final": comportamientoFinal,
-          };
-        });
-        setDatos(nuevosDatos);
-        setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
-        actualizarDatosQuim(nuevosDatos);
-      })
-      .catch(err => {
-        ErrorMessage(err);
+    if (esGrupoIndividual) {
+      // Cargar datos de todas las asignaciones del grupo
+      const promesasAsignaciones = datosModulo.asignaciones.map(asignacion => {
+        const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${asignacion.ID}`;
+        const urlQuimestrales = `${import.meta.env.VITE_URL_DEL_BACKEND}/quimestrales/asignacion/${asignacion.ID}`;
+        return Promise.all([axios.get(urlInscripciones), axios.get(urlQuimestrales)])
+          .then(([respEstudiantes, respQuimestrales]) => ({
+            asignacion,
+            estudiantes: respEstudiantes.data,
+            quimestrales: respQuimestrales.data
+          }));
       });
+
+      Promise.all(promesasAsignaciones)
+        .then(resultados => {
+          let nroGlobal = 1;
+          const todosLosDatos = [];
+
+          resultados.forEach(({ asignacion, estudiantes, quimestrales }) => {
+            estudiantes.forEach(est => {
+              const p1 = parcial1Data.find(p => p.id_inscripcion === est.idInscripcion) || {};
+              const p2 = parcial2Data.find(p => p.id_inscripcion === est.idInscripcion) || {};
+              const saved = quimestrales.find(q =>
+                q.idInscripcion === est.idInscripcion &&
+                q.quimestre === obtenerEtiquetaQuimestre()
+              ) || {};
+
+              const parcial1 = parseFloat(p1["Promedio Final"] || 0);
+              const parcial2 = parseFloat(p2["Promedio Final"] || 0);
+              const notaExamen = saved.examen ?? "";
+
+              const { ponderacion70, ponderacion30, promedioFinal } = calcularPromedioQuimestral(parcial1, parcial2, notaExamen);
+
+              const comportamientoP1 = p1["Promedio Comportamiento"];
+              const comportamientoP2 = p2["Promedio Comportamiento"];
+              const comportamientoTotal = calcularPromedioComportamiento(comportamientoP1, comportamientoP2);
+              const comportamientoFinal = calcularValoracionComportamiento(comportamientoTotal);
+
+              todosLosDatos.push({
+                idInscripcion: est.idInscripcion,
+                idQuimestral: saved.id,
+                idAsignacion: asignacion.ID,
+                "Nro": nroGlobal++,
+                "Nómina de Estudiantes": est.nombre,
+                "Primer Parcial": parcial1.toFixed(2),
+                "Segundo Parcial": parcial2.toFixed(2),
+                "Ponderación 70%": ponderacion70.toFixed(2),
+                "Examen": notaExamen,
+                "Ponderación 30%": ponderacion30.toFixed(2),
+                "Promedio Final": promedioFinal.toFixed(2),
+                "Promedio Comportamiento": comportamientoTotal.toFixed(2),
+                "Nivel": abreviarNivel(est.nivel),
+                "Comportamiento Final": comportamientoFinal,
+              });
+            });
+          });
+
+          setDatos(todosLosDatos);
+          setDatosOriginales(JSON.parse(JSON.stringify(todosLosDatos)));
+          actualizarDatosQuim(todosLosDatos);
+        })
+        .catch(err => {
+          ErrorMessage(err);
+        });
+    } else if (datosModulo?.ID) {
+      // Lógica original para materias grupales
+      const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${datosModulo.ID}`;
+      const urlQuimestrales = `${import.meta.env.VITE_URL_DEL_BACKEND}/quimestrales/asignacion/${datosModulo.ID}`;
+
+      Promise.all([axios.get(urlInscripciones), axios.get(urlQuimestrales)])
+        .then(([respEstudiantes, respQuimestrales]) => {
+          const estudiantes = respEstudiantes.data;
+          const quimestrales = respQuimestrales.data;
+          const nuevosDatos = estudiantes.map(est => {
+            const p1 = parcial1Data.find(p => p.id_inscripcion === est.idInscripcion) || {};
+            const p2 = parcial2Data.find(p => p.id_inscripcion === est.idInscripcion) || {};
+            const saved = quimestrales.find(q =>
+              q.idInscripcion === est.idInscripcion &&
+              q.quimestre === obtenerEtiquetaQuimestre()
+            ) || {};
+
+            const parcial1 = parseFloat(p1["Promedio Final"] || 0);
+            const parcial2 = parseFloat(p2["Promedio Final"] || 0);
+            const notaExamen = saved.examen ?? "";
+
+            const { ponderacion70, ponderacion30, promedioFinal } = calcularPromedioQuimestral(parcial1, parcial2, notaExamen);
+
+            const comportamientoP1 = p1["Promedio Comportamiento"];
+            const comportamientoP2 = p2["Promedio Comportamiento"];
+            const comportamientoTotal = calcularPromedioComportamiento(comportamientoP1, comportamientoP2);
+            const comportamientoFinal = calcularValoracionComportamiento(comportamientoTotal);
+
+            return {
+              idInscripcion: est.idInscripcion,
+              idQuimestral: saved.id,
+              "Nro": est.nro,
+              "Nómina de Estudiantes": est.nombre,
+              "Primer Parcial": parcial1.toFixed(2),
+              "Segundo Parcial": parcial2.toFixed(2),
+              "Ponderación 70%": ponderacion70.toFixed(2),
+              "Examen": notaExamen,
+              "Ponderación 30%": ponderacion30.toFixed(2),
+              "Promedio Final": promedioFinal.toFixed(2),
+              "Promedio Comportamiento": comportamientoTotal.toFixed(2),
+              "Nivel": abreviarNivel(est.nivel),
+              "Comportamiento Final": comportamientoFinal,
+            };
+          });
+          setDatos(nuevosDatos);
+          setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
+          actualizarDatosQuim(nuevosDatos);
+        })
+        .catch(err => {
+          ErrorMessage(err);
+        });
+    }
   }, [datosModulo, parcial1Data, parcial2Data, quimestreSeleccionado]);
 
   useEffect(() => {
@@ -181,12 +248,12 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
     titulo: "CONSERVATORIO NACIONAL DE MUSICA",
     subtitulo: subtitulo,
     info: {
-      "Profesor": datosModulo.docente,
-      "Asignatura": datosModulo.materia,
-      "Curso": datosModulo.año,
-      "Paralelo": datosModulo.paralelo,
-      "Año Lectivo": datosModulo.periodo,
-      "Jornada": determinarJornada(datosModulo.horario)
+      "Profesor": datosModulo.docente || (datosModulo.asignaciones?.[0]?.docente),
+      "Asignatura": datosModulo.materia || datosModulo.nombreMateria,
+      "Curso": datosModulo.asignaciones ? `Niveles ${datosModulo.tipoNivel}` : datosModulo.año,
+      "Paralelo": datosModulo.asignaciones ? "Múltiples" : datosModulo.paralelo,
+      "Año Lectivo": datosModulo.periodo || (datosModulo.asignaciones?.[0]?.periodo),
+      "Jornada": datosModulo.horario ? determinarJornada(datosModulo.horario) : (datosModulo.asignaciones?.[0]?.horario ? determinarJornada(datosModulo.asignaciones[0].horario) : "")
     }
   };
 
