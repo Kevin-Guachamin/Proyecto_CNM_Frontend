@@ -6,7 +6,7 @@ import axios from "axios";
 import { ErrorMessage } from "../../../Utils/ErrorMesaje";
 import "../Parcial.css";
 
-const QuimestralBE = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actualizarDatosQuim, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, escala }) => {
+const QuimestralBE = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actualizarDatosQuim, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, escala, esPorSolicitud }) => {
 
   const idContenedor = `pdf-quimestral-quim${quimestreSeleccionado}`;
 
@@ -172,7 +172,6 @@ const QuimestralBE = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actua
 
     // Filtra filas válidas (aquí todas tienen “Promedio Final” calculado)
     const datosCompletos = datos.filter(fila => fila["Promedio Quimestral"] !== undefined );
-
 
     if (typeof actualizarDatosQuim === "function" && datosCompletos.length > 0) {
       const datosTransformados = transformarDatosQuimestralParaGuardar(datosCompletos);
@@ -405,6 +404,7 @@ const QuimestralBE = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actua
         isWithinRange={isWithinRange}
         globalEdit={forceEdit}
         soloLectura={soloLectura}
+        esPorSolicitud={esPorSolicitud}
       />
     </div>
   );

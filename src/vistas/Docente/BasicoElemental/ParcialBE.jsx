@@ -6,7 +6,7 @@ import { ErrorMessage } from "../../../Utils/ErrorMesaje";
 import Swal from 'sweetalert2';
 import "../Parcial.css";
 
-function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, escala }) {
+function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, escala, esPorSolicitud }) {
   // ID dinámico: pdf-parcial1-quim1, pdf-parcial2-quim1, pdf-parcial1-quim2, etc.
   const idContenedor = `pdf-parcial-be${parcialSeleccionado}-quim${quimestreSeleccionado}`;
 
@@ -390,6 +390,7 @@ function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatos
         isWithinRange={isWithinRange}
         globalEdit={forceEdit}
         soloLectura={soloLectura}
+        esPorSolicitud={esPorSolicitud}
       />
     </div>
   );

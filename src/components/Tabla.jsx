@@ -8,7 +8,7 @@ import "./Tabla.css";
 const Tabla = ({
   columnas, columnasAgrupadas, datos, onChange, columnasEditables = [],
   mostrarEditar = true, mostrarGuardar = true, onEditar, onGuardar, inputsDisabled,
-  isWithinRange, rangoTexto, globalEdit, forceEdit, clasePersonalizada = "", soloLectura }) => {
+  isWithinRange, rangoTexto, globalEdit, forceEdit, clasePersonalizada = "", soloLectura, esPorSolicitud = false }) => {
   
   const [editingRow, setEditingRow] = useState(null);
   const columnasRepetidas = ["Nro", "Nómina de Estudiantes"];
@@ -74,6 +74,7 @@ const Tabla = ({
                             <button
                               className="btn btn-sm btn-primary text-white"
                               onClick={() => {
+                                // Permitir edición si está dentro del rango O si forceEdit está activo (solicitud aprobada)
                                 if (!isWithinRange && !forceEdit) {
                                   Swal.fire({
                                     icon: rangoTexto ? "warning" : "info",
@@ -86,6 +87,16 @@ const Tabla = ({
                                 }
                                 setEditingRow(i); // Habilita la edición para esta fila.
                                 if (onEditar) onEditar(i, fila);
+                                
+                                // Mostrar alerta de confirmación diferenciando si es por solicitud o por fechas normales
+                                Swal.fire({
+                                  icon: "success",
+                                  title: esPorSolicitud ? "Edición por solicitud aprobada" : "Edición habilitada",
+                                  text: esPorSolicitud 
+                                    ? "Los campos están habilitados gracias a tu solicitud de permiso aprobada. Recuerda guardar los cambios con el botón 💾" 
+                                    : "Los campos de esta fila están habilitados para edición. Recuerda guardar los cambios con el botón 💾",
+                                  confirmButtonText: "OK"
+                                });
                               }}>
                               <i className="bi bi-pencil-fill" ></i>
                             </button>

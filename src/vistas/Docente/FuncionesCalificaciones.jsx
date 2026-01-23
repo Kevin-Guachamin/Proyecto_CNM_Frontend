@@ -244,10 +244,12 @@ export const handleEditar = ({
   }
 
   if (tieneDatosGuardados()) {
+    // Si hay datos guardados, NO permitir edición global
+    // Solo se permite edición individual por filas
     Swal.fire({
       icon: "warning",
-      title: "Edición no permitida",
-      text: "Las calificaciones ya fueron guardadas. Usa el ✏️ de cada fila si necesitas editar.",
+      title: "Edición global no permitida",
+      text: "Las calificaciones ya fueron guardadas. Debes usar el botón ✏️ de cada fila para editar individualmente.",
     });
     return;
   }
