@@ -74,96 +74,179 @@ const QuimestralBE = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actua
 
   // Cada vez que lleguen datos de ambos parciales, se combinan
   useEffect(() => {
-    if (!datosModulo?.ID) return;
-
-    // ✅ Aquí agregamos el token antes de hacer cualquier request
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
     }
-    const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${datosModulo.ID}`;
-    const urlQuimestrales = `${import.meta.env.VITE_URL_DEL_BACKEND}/quimestralesbe/asignacion/${datosModulo.ID}`;
 
-    Promise.all([axios.get(urlInscripciones), axios.get(urlQuimestrales)])
-      .then(([respEstudiantes, respQuimestrales]) => {
-        const estudiantes = respEstudiantes.data;
-        const quimestrales = respQuimestrales.data;
+    const esGrupoIndividual = datosModulo?.asignaciones && datosModulo.asignaciones.length > 0;
 
-        const nuevosDatos = estudiantes.map(est => {
-          const p1 = parcial1Data.find(p => p.id_inscripcion === est.idInscripcion) || {};
-          const p2 = parcial2Data.find(p => p.id_inscripcion === est.idInscripcion) || {};
-          const saved = quimestrales.find(q =>
-            q.idInscripcion === est.idInscripcion &&
-            q.quimestre === obtenerEtiquetaQuimestre()
-          ) || {};
-        
-          const parcial1 = parseFloat(p1["Promedio Final"]);
-          const parcial2 = parseFloat(p2["Promedio Final"]);
-        
-          const parcial1Valido = !isNaN(parcial1);
-          const parcial2Valido = !isNaN(parcial2);
-          const promedioAcademico = (parcial1Valido && parcial2Valido)
-            ? (parcial1 + parcial2) / 2
-            : null;
-        
-          const ponderacion70 = promedioAcademico !== null ? promedioAcademico * 0.7 : 0;
-        
-          const notaExamen = saved.examen ?? "";
-          const examenValido = !isNaN(parseFloat(notaExamen));
-          const ponderacion30 = examenValido ? parseFloat(notaExamen) * 0.3 : 0;
-          const promedioFinal = ponderacion70 + ponderacion30;
-        
-          return {
-            idInscripcion: est.idInscripcion,
-            idQuimestral: saved.id,
-            "Nro": est.nro,
-            "Nómina de Estudiantes": est.nombre,
-            "Primer Parcial": parcial1Valido ? parcial1.toFixed(2) : "",
-            [nombreColumnaExtra]: parcial1Valido ? convertirNota(parcial1.toFixed(2)) : "-",
-            "Segundo Parcial": parcial2Valido ? parcial2.toFixed(2) : "",
-            [nombreColumnaExtra1]: parcial2Valido ? convertirNota(parcial2.toFixed(2)) : "-",
-            "Promedio": promedioAcademico !== null ? promedioAcademico.toFixed(2) : "",
-            [nombreColumnaExtra2]: promedioAcademico !== null ? convertirNota(promedioAcademico.toFixed(2)) : "-",
-            "Ponderación 70%": promedioAcademico !== null ? ponderacion70.toFixed(2) : "",
-            "Examen": notaExamen,
-            "Ponderación 30%": examenValido ? ponderacion30.toFixed(2) : "",
-            "Promedio Quimestral": examenValido ? promedioFinal.toFixed(2) : "",
-            [nombreColumnaExtra3]: examenValido ? convertirNota(promedioFinal.toFixed(2)) : "-"
-          };
-        }); 
-        
-        const hayParcial1 = estudiantes.some(est => {
-          const p1 = parcial1Data.find(p => p.id_inscripcion === est.idInscripcion);
-          return p1 && !isNaN(parseFloat(p1["Promedio Final"]));
-        });
-        
-        const hayParcial2 = estudiantes.some(est => {
-          const p2 = parcial2Data.find(p => p.id_inscripcion === est.idInscripcion);
-          return p2 && !isNaN(parseFloat(p2["Promedio Final"]));
-        });
-        
-        const hayAmbosPromedios = estudiantes.some(est => {
-          const p1 = parcial1Data.find(p => p.id_inscripcion === est.idInscripcion);
-          const p2 = parcial2Data.find(p => p.id_inscripcion === est.idInscripcion);
-          return p1 && p2 && !isNaN(parseFloat(p1["Promedio Final"])) && !isNaN(parseFloat(p2["Promedio Final"]));
-        });
-        
-        const hayExamen = quimestrales.some(q => !isNaN(parseFloat(q.examen)));
-        
-        setMostrarExtras({
-          extra1: hayParcial1,
-          extra2: hayParcial2,
-          extra3: hayAmbosPromedios,
-          extra4: hayExamen,
-        });       
-        setDatos(nuevosDatos);
-
-        setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
-        actualizarDatosQuim(nuevosDatos);        
-      })
-      .catch(err => {
-        ErrorMessage(err);
+    if (esGrupoIndividual) {
+      const promesasAsignaciones = datosModulo.asignaciones.map(asignacion => {
+        const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${asignacion.ID}`;
+        const urlQuimestrales = `${import.meta.env.VITE_URL_DEL_BACKEND}/quimestralesbe/asignacion/${asignacion.ID}`;
+        return Promise.all([axios.get(urlInscripciones), axios.get(urlQuimestrales)])
+          .then(([respEstudiantes, respQuimestrales]) => ({
+            asignacion,
+            estudiantes: respEstudiantes.data,
+            quimestrales: respQuimestrales.data
+          }));
       });
+
+      Promise.all(promesasAsignaciones)
+        .then(resultados => {
+          let nroGlobal = 1;
+          const todosLosDatos = [];
+          let hayP1 = false, hayP2 = false, hayAmbos = false, hayExam = false;
+
+          resultados.forEach(({ asignacion, estudiantes, quimestrales }) => {
+            estudiantes.forEach(est => {
+              const p1 = parcial1Data.find(p => p.id_inscripcion === est.idInscripcion) || {};
+              const p2 = parcial2Data.find(p => p.id_inscripcion === est.idInscripcion) || {};
+              const saved = quimestrales.find(q =>
+                q.idInscripcion === est.idInscripcion &&
+                q.quimestre === obtenerEtiquetaQuimestre()
+              ) || {};
+            
+              const parcial1 = parseFloat(p1["Promedio Final"]);
+              const parcial2 = parseFloat(p2["Promedio Final"]);
+            
+              const parcial1Valido = !isNaN(parcial1);
+              const parcial2Valido = !isNaN(parcial2);
+              const promedioAcademico = (parcial1Valido && parcial2Valido)
+                ? (parcial1 + parcial2) / 2
+                : null;
+            
+              const ponderacion70 = promedioAcademico !== null ? promedioAcademico * 0.7 : 0;
+            
+              const notaExamen = saved.examen ?? "";
+              const examenValido = !isNaN(parseFloat(notaExamen));
+              const ponderacion30 = examenValido ? parseFloat(notaExamen) * 0.3 : 0;
+              const promedioFinal = ponderacion70 + ponderacion30;
+
+              if (parcial1Valido) hayP1 = true;
+              if (parcial2Valido) hayP2 = true;
+              if (parcial1Valido && parcial2Valido) hayAmbos = true;
+              if (examenValido) hayExam = true;
+            
+              todosLosDatos.push({
+                idInscripcion: est.idInscripcion,
+                idQuimestral: saved.id,
+                idAsignacion: asignacion.ID,
+                "Nro": nroGlobal++,
+                "Nómina de Estudiantes": est.nombre,
+                "Primer Parcial": parcial1Valido ? parcial1.toFixed(2) : "",
+                [nombreColumnaExtra]: parcial1Valido ? convertirNota(parcial1.toFixed(2)) : "-",
+                "Segundo Parcial": parcial2Valido ? parcial2.toFixed(2) : "",
+                [nombreColumnaExtra1]: parcial2Valido ? convertirNota(parcial2.toFixed(2)) : "-",
+                "Promedio": promedioAcademico !== null ? promedioAcademico.toFixed(2) : "",
+                [nombreColumnaExtra2]: promedioAcademico !== null ? convertirNota(promedioAcademico.toFixed(2)) : "-",
+                "Ponderación 70%": promedioAcademico !== null ? ponderacion70.toFixed(2) : "",
+                "Examen": notaExamen,
+                "Ponderación 30%": examenValido ? ponderacion30.toFixed(2) : "",
+                "Promedio Quimestral": examenValido ? promedioFinal.toFixed(2) : "",
+                [nombreColumnaExtra3]: examenValido ? convertirNota(promedioFinal.toFixed(2)) : "-"
+              });
+            });
+          });
+
+          setMostrarExtras({
+            extra1: hayP1,
+            extra2: hayP2,
+            extra3: hayAmbos,
+            extra4: hayExam,
+          });
+          setDatos(todosLosDatos);
+          setDatosOriginales(JSON.parse(JSON.stringify(todosLosDatos)));
+          actualizarDatosQuim(todosLosDatos);
+        })
+        .catch(err => {
+          ErrorMessage(err);
+        });
+    } else if (datosModulo?.ID) {
+      const urlInscripciones = `${import.meta.env.VITE_URL_DEL_BACKEND}/inscripcion/asignacion/${datosModulo.ID}`;
+      const urlQuimestrales = `${import.meta.env.VITE_URL_DEL_BACKEND}/quimestralesbe/asignacion/${datosModulo.ID}`;
+
+      Promise.all([axios.get(urlInscripciones), axios.get(urlQuimestrales)])
+        .then(([respEstudiantes, respQuimestrales]) => {
+          const estudiantes = respEstudiantes.data;
+          const quimestrales = respQuimestrales.data;
+
+          const nuevosDatos = estudiantes.map(est => {
+            const p1 = parcial1Data.find(p => p.id_inscripcion === est.idInscripcion) || {};
+            const p2 = parcial2Data.find(p => p.id_inscripcion === est.idInscripcion) || {};
+            const saved = quimestrales.find(q =>
+              q.idInscripcion === est.idInscripcion &&
+              q.quimestre === obtenerEtiquetaQuimestre()
+            ) || {};
+          
+            const parcial1 = parseFloat(p1["Promedio Final"]);
+            const parcial2 = parseFloat(p2["Promedio Final"]);
+          
+            const parcial1Valido = !isNaN(parcial1);
+            const parcial2Valido = !isNaN(parcial2);
+            const promedioAcademico = (parcial1Valido && parcial2Valido)
+              ? (parcial1 + parcial2) / 2
+              : null;
+          
+            const ponderacion70 = promedioAcademico !== null ? promedioAcademico * 0.7 : 0;
+          
+            const notaExamen = saved.examen ?? "";
+            const examenValido = !isNaN(parseFloat(notaExamen));
+            const ponderacion30 = examenValido ? parseFloat(notaExamen) * 0.3 : 0;
+            const promedioFinal = ponderacion70 + ponderacion30;
+          
+            return {
+              idInscripcion: est.idInscripcion,
+              idQuimestral: saved.id,
+              "Nro": est.nro,
+              "Nómina de Estudiantes": est.nombre,
+              "Primer Parcial": parcial1Valido ? parcial1.toFixed(2) : "",
+              [nombreColumnaExtra]: parcial1Valido ? convertirNota(parcial1.toFixed(2)) : "-",
+              "Segundo Parcial": parcial2Valido ? parcial2.toFixed(2) : "",
+              [nombreColumnaExtra1]: parcial2Valido ? convertirNota(parcial2.toFixed(2)) : "-",
+              "Promedio": promedioAcademico !== null ? promedioAcademico.toFixed(2) : "",
+              [nombreColumnaExtra2]: promedioAcademico !== null ? convertirNota(promedioAcademico.toFixed(2)) : "-",
+              "Ponderación 70%": promedioAcademico !== null ? ponderacion70.toFixed(2) : "",
+              "Examen": notaExamen,
+              "Ponderación 30%": examenValido ? ponderacion30.toFixed(2) : "",
+              "Promedio Quimestral": examenValido ? promedioFinal.toFixed(2) : "",
+              [nombreColumnaExtra3]: examenValido ? convertirNota(promedioFinal.toFixed(2)) : "-"
+            };
+          }); 
+          
+          const hayParcial1 = estudiantes.some(est => {
+            const p1 = parcial1Data.find(p => p.id_inscripcion === est.idInscripcion);
+            return p1 && !isNaN(parseFloat(p1["Promedio Final"]));
+          });
+          
+          const hayParcial2 = estudiantes.some(est => {
+            const p2 = parcial2Data.find(p => p.id_inscripcion === est.idInscripcion);
+            return p2 && !isNaN(parseFloat(p2["Promedio Final"]));
+          });
+          
+          const hayAmbosPromedios = estudiantes.some(est => {
+            const p1 = parcial1Data.find(p => p.id_inscripcion === est.idInscripcion);
+            const p2 = parcial2Data.find(p => p.id_inscripcion === est.idInscripcion);
+            return p1 && p2 && !isNaN(parseFloat(p1["Promedio Final"])) && !isNaN(parseFloat(p2["Promedio Final"]));
+          });
+          
+          const hayExamen = quimestrales.some(q => !isNaN(parseFloat(q.examen)));
+          
+          setMostrarExtras({
+            extra1: hayParcial1,
+            extra2: hayParcial2,
+            extra3: hayAmbosPromedios,
+            extra4: hayExamen,
+          });       
+          setDatos(nuevosDatos);
+          setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
+          actualizarDatosQuim(nuevosDatos);        
+        })
+        .catch(err => {
+          ErrorMessage(err);
+        });
+    }
   }, [datosModulo, parcial1Data, parcial2Data, quimestreSeleccionado]);
 
   useEffect(() => {
@@ -284,12 +367,12 @@ const QuimestralBE = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actua
     titulo: "CONSERVATORIO NACIONAL DE MUSICA",
     subtitulo: subtitulo,
     info: {
-      "Profesor": datosModulo.docente,
-      "Asignatura": datosModulo.materia,
-      "Curso": datosModulo.año,
-      "Paralelo": datosModulo.paralelo,
-      "Año Lectivo": datosModulo.periodo,
-      "Jornada": determinarJornada(datosModulo.horario)
+      "Profesor": datosModulo.docente || (datosModulo.asignaciones?.[0]?.docente),
+      "Asignatura": datosModulo.materia || datosModulo.nombreMateria,
+      "Curso": datosModulo.asignaciones ? `Niveles ${datosModulo.tipoNivel}` : datosModulo.año,
+      "Paralelo": datosModulo.asignaciones ? "Múltiples" : datosModulo.paralelo,
+      "Año Lectivo": datosModulo.periodo || (datosModulo.asignaciones?.[0]?.periodo),
+      "Jornada": datosModulo.horario ? determinarJornada(datosModulo.horario) : (datosModulo.asignaciones?.[0]?.horario ? determinarJornada(datosModulo.asignaciones[0].horario) : "")
     }
   };
 

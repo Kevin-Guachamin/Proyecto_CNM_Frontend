@@ -7,6 +7,7 @@ import Loading from "../../../components/Loading";
 import { Table, Button } from "react-bootstrap";
 import Swal from "sweetalert2";
 import { ErrorMessage } from "../../../Utils/ErrorMesaje";
+import { InfoMessage } from "../../../Utils/InfoMessage";
 import { getModulos, transformModulesForLayout } from "../../getModulos";
 import "./ListadoEstudiantes.css";
 
@@ -77,10 +78,19 @@ function ListadoEstudiantes() {
                 setEstudiantes(estudiantesOrdenados);
             })
             .catch((err) => {
+                const status = err?.response?.status;
+
+                if (status === 404) {
+                    setEstudiantes([]);
+                    InfoMessage({
+                    title: "Sin estudiantes",
+                    text: "No hay estudiantes registrados para este nivel.",
+                    });
+                    return;
+                }
+
                 ErrorMessage(err);
-                Swal.fire("Error", "No se pudieron obtener los estudiantes del nivel.", "error");
-            })
-            .finally(() => setLoading(false));
+            }).finally(() => setLoading(false));
     }, [nivel, idPeriodo, navigate]);
 
     const handleSidebarNavigation = (path) => {
