@@ -12,23 +12,21 @@ function Index() {
     // Protección de ruta
     const auth = useAuth("Profesor");
     
-    // Si no está autenticado, no renderizar nada
-    if (!auth.isAuthenticated) {
-        return null;
-    }
+    
 
     const [usuario, setUsuario] = useState(null);
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
-    const navigate = useNavigate()
     const [periodo,setPeriodo]=useState("")
     const token = localStorage.getItem("token")
     const [inscripciones, setInscripciones] = useState([])
     const [limit, setLimit] = useState("")
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1);
+    const navigate = useNavigate()
     
     const [width, setWidth] = useState(window.innerWidth);
     // ✅ Detectar cambio de tamaño de pantalla
+   
     useEffect(() => {
         const handleResize = () => setWidth(window.innerWidth);
         window.addEventListener('resize', handleResize);
@@ -73,6 +71,7 @@ function Index() {
             headers: { Authorization: `Bearer ${token}` },
           })
           .then(res => {
+            console.log("estas son las inscripciones de un docente", res);
             setInscripciones(res.data.data);
           })
           .catch(err => {
@@ -80,7 +79,10 @@ function Index() {
           });
         }
       }, [usuario,periodo]); 
-
+ // Si no está autenticado, no renderizar nada
+    if (!auth.isAuthenticated) {
+        return null;
+    }
 
 
     return (

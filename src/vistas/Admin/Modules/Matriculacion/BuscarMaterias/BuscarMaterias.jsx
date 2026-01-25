@@ -5,6 +5,7 @@ import { ErrorMessage } from '../../../../../Utils/ErrorMesaje';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Card, Row, Col } from "react-bootstrap";
 import Horario from '../Horario';
+import '../../../../components/BuscarEstudiante.css';
 
 function BuscarMaterias() {
   const [asignatura, setAsignatura] = useState('');
@@ -166,6 +167,7 @@ function BuscarMaterias() {
   return (
     <div ref={wrapRef} className="matric-wrapper">
       <div className="matric-content">
+        <h1 className="periodo-title">Matricula de {estudiante.primer_nombre} {estudiante.primer_apellido}</h1>
         {/* Filtros */}
         <div className="matric-filtros">
           <div className='search-input-container'>

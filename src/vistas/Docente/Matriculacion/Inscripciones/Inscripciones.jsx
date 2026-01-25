@@ -7,6 +7,7 @@ import { Card, Row, Col } from "react-bootstrap";
 import Horario from './Horario';
 import { useNavigate } from 'react-router-dom';
 import CrearCursoIndividual from '../CrearCursoIndividual';
+import '../../../components/BuscarEstudiante.css';
 
 function Inscripciones({asignaciones,docente, periodo,setAsignaciones}) {
     
@@ -190,6 +191,7 @@ function Inscripciones({asignaciones,docente, periodo,setAsignaciones}) {
     }
     return (
         <div ref={wrapRef} className="matric-wrapper">
+            <h1 className="periodo-title">Matricula de {estudiante.primer_nombre} {estudiante.primer_apellido}</h1>
             <div className="matric-content">
                 {/* Botones de control */}
                 <div className="matric-filtros">
