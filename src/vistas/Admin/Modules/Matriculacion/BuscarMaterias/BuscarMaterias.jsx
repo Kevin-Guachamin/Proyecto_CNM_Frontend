@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Card, Row, Col } from "react-bootstrap";
 import Horario from '../Horario';
 import '../../../../components/BuscarEstudiante.css';
+import '../../../Styles/Matricula.css';
 
 function BuscarMaterias() {
   const [asignatura, setAsignatura] = useState('');
@@ -232,14 +233,15 @@ function BuscarMaterias() {
             />
           )}
         </div>
-      </div>
-
-      {/* Botón final - ahora sticky */}
+        {/* Botón final - ahora sticky */}
       {inscripciones.length > 0 && (
         <div ref={footerRef} className='matric-footer'>
           <button className="btn-finalizar" onClick={FinalizarMatriculas}>Finalizar</button>
         </div>
       )}
+      </div>
+
+      
     </div>
   );
 }

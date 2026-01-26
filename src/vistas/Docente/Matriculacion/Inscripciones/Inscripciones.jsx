@@ -8,11 +8,12 @@ import Horario from './Horario';
 import { useNavigate } from 'react-router-dom';
 import CrearCursoIndividual from '../CrearCursoIndividual';
 import '../../../components/BuscarEstudiante.css';
+import '../../../Admin/Styles/Matricula.css';
 
-function Inscripciones({asignaciones,docente, periodo,setAsignaciones}) {
-    
+function Inscripciones({ asignaciones, docente, periodo, setAsignaciones }) {
+
     const [inscripciones, setInscripciones] = useState([])
-    const [isModalOpen,setIsModalOpen]=useState(false)
+    const [isModalOpen, setIsModalOpen] = useState(false)
     const location = useLocation();
     const navigate = useNavigate();
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
@@ -35,7 +36,7 @@ function Inscripciones({asignaciones,docente, periodo,setAsignaciones}) {
             const availableHeight = viewportHeight - rect.top;
             const minHeight = window.innerWidth <= 768 ? 200 : 300;
             const finalHeight = Math.max(availableHeight - 20, minHeight);
-            
+
             document.documentElement.style.setProperty('--matric-h', `${finalHeight}px`);
         };
 
@@ -68,14 +69,14 @@ function Inscripciones({asignaciones,docente, periodo,setAsignaciones}) {
             const paddedHeight = h > 0 ? h + 16 : 0;
             document.documentElement.style.setProperty('--footer-h', `${paddedHeight}px`);
         };
-        
+
         const timeout = setTimeout(setFooterHeight, 50);
 
         const ro = new ResizeObserver(() => {
             clearTimeout(window.footerResizeTimeout);
             window.footerResizeTimeout = setTimeout(setFooterHeight, 100);
         });
-        
+
         if (footerRef.current) ro.observe(footerRef.current);
 
         return () => {
@@ -130,7 +131,7 @@ function Inscripciones({asignaciones,docente, periodo,setAsignaciones}) {
     }, [])
 
 
-    
+
 
     const Inscribir = async (asignacion) => {
         try {
@@ -151,42 +152,42 @@ function Inscripciones({asignaciones,docente, periodo,setAsignaciones}) {
                 confirmButtonColor: "#003F89",
             });
             obtenerInscripciones()
-           
+
         } catch (error) {
             ErrorMessage(error);
         }
     }
     const FinalizarMatriculas = () => {
         Swal.fire({
+            icon: "success",
+            title: `Matricula con exitosa`,
+            iconColor: "#218838",
+            confirmButtonText: "Entendido",
+            confirmButtonColor: "#003F89",
+        });
+        navigate("/profesor/matricula")
+    }
+    const handleCrearAsignacion = (asignacion) => {
+        console.log("esta es la asignacion a crear", asignacion)
+        axios.post(`${API_URL}/asignacion/crear`, asignacion, {
+            headers: { Authorization: `Bearer ${token}` },
+        })
+            .then(res => {
+                setAsignaciones((prevData) => [...prevData, res.data]);
+                Swal.fire({
                     icon: "success",
-                    title: `Matricula con exitosa`,
+                    title: "Datos creados con éxito",
                     iconColor: "#218838",
                     confirmButtonText: "Entendido",
                     confirmButtonColor: "#003F89",
                 });
-        navigate("/profesor/matricula")
+                setIsModalOpen(false);
+            })
+            .catch(error => {
+                ErrorMessage(error)
+            })
     }
-    const handleCrearAsignacion =(asignacion)=>{
-        console.log("esta es la asignacion a crear",asignacion)
-        axios.post(`${API_URL}/asignacion/crear`,asignacion,{
-            headers: { Authorization: `Bearer ${token}` },
-        })
-        .then(res=>{
-            setAsignaciones((prevData) => [...prevData, res.data]);
-                        Swal.fire({
-                          icon: "success",
-                          title: "Datos creados con éxito",
-                          iconColor: "#218838",
-                          confirmButtonText: "Entendido",
-                          confirmButtonColor: "#003F89",
-                        });
-                        setIsModalOpen(false);
-        })
-        .catch(error=>{
-            ErrorMessage(error)
-        })
-    }
-    const toggleModal=()=>{
+    const toggleModal = () => {
         setIsModalOpen((prev) => !prev);
     }
     return (
@@ -200,8 +201,8 @@ function Inscripciones({asignaciones,docente, periodo,setAsignaciones}) {
                     </div>
                 </div>
 
-                {isModalOpen && <CrearCursoIndividual onCancel={toggleModal} onSave={handleCrearAsignacion} docente={docente} periodo={periodo.ID}/>}
-                
+                {isModalOpen && <CrearCursoIndividual onCancel={toggleModal} onSave={handleCrearAsignacion} docente={docente} periodo={periodo.ID} />}
+
                 {/* Resultados (cards) */}
                 <div className="matric-cards">
                     {asignaciones.length === 0 ? (
@@ -238,22 +239,23 @@ function Inscripciones({asignaciones,docente, periodo,setAsignaciones}) {
                 {/* Horario (con scroll horizontal cuando haga falta) */}
                 <div className="matric-horario">
                     {inscripciones.length > 0 && (
-                        <Horario 
-                            materiasSeleccionadas={inscripciones} 
-                            setMateriasSeleccionadas={setInscripciones} 
+                        <Horario
+                            materiasSeleccionadas={inscripciones}
+                            setMateriasSeleccionadas={setInscripciones}
                             jornada={estudiante.jornada}
                             nivel={estudiante.nivel}
                         />
                     )}
                 </div>
+                {/* Botón final - ahora sticky */}
+                {inscripciones.length > 0 && (
+                    <div ref={footerRef} className='matric-footer'>
+                        <button className="btn-finalizar" onClick={FinalizarMatriculas}>Finalizar</button>
+                    </div>
+                )}
             </div>
 
-            {/* Botón final - ahora sticky */}
-            {inscripciones.length > 0 && (
-                <div ref={footerRef} className='matric-footer'>
-                    <button className="btn-finalizar" onClick={FinalizarMatriculas}>Finalizar</button>
-                </div>
-            )}
+
         </div>
     )
 }

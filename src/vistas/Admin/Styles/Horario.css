@@ -9,16 +9,6 @@
 
 }
 
-.matric-content{
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding-bottom: var(--footer-h, 80px); /* reserva espacio para footer sticky */
-  margin-bottom: 30px;
-  flex: 1;
-  min-height: 0; /* permite que el contenido se comprima */
-}
-
 .horario-table-responsive{
   margin: 8px 0 0 0;    /* eliminar margin inferior completamente */
   padding: 0;           /* eliminar cualquier padding */
@@ -138,118 +128,6 @@
   }
 }
 
-
-/*******************  MATRÍCULA (contenedor con scroll interno)  *******************/
-
-/* Alto controlado por --matric-h (se define en el componente) */
-.matric-wrapper{
-position: relative;
-width: 100%;
-flex: 1; /* ← ocupa el espacio disponible */
-min-height: 0; /* ← CLAVE para que exista overflow */
-overflow-y: auto;
-overflow-x: hidden;
--webkit-overflow-scrolling: touch;
-display: flex;
-flex-direction: column;
-background-color: #f4f4f4;
-}
-
-/* Pila vertical */
-.matric-content{
-  display: flex;
-  flex-direction: column;
-  gap: 8px;  /* reducir gap para menos espacio entre elementos */
-  padding-bottom: 8px;
-  margin-bottom: 30px;
-}
-
-/* Filtros */
-.matric-filtros{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.search-input-container{
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.label-search{ font-weight: 600; }
-.malla-link{ white-space: nowrap; }
-
-/* Bloques */
-.matric-cards,
-.matric-horario{ min-height: 0; }
-.matric-horario{ margin-bottom: 2px; } /* reducir margen inferior del horario */
-
-/* Evitar overflow horizontal por márgenes negativos del grid */
-.matric-cards>.row{
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-}
-
-/* Footer sticky al final del contenedor */
-.matric-footer{
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 16px 12px;
-  background-color: #f4f4f4;
-}
-
-/* Botón finalizar */
-.btn-finalizar{
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 10px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  padding: 12px 20px;
-  max-width: 200px;
-  width: 100%;
-  min-height: 48px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-.btn-finalizar:hover{ background-color: #00408A; }
-
-/* En pantallas pequeñas: apilar controles y dejar aire
-   a la barra horizontal del horario si aparece. */
-@media (max-width: 768px){
-  .matric-wrapper {
-    min-height: 350px; /* altura mínima menor en móviles */
-  }
-  
-  .matric-filtros{
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .search-input-container{ width: 100%; }
-  .search-input-container .input-cedula{ flex: 1; }
-
-  .horario-table-responsive{ 
-    padding: 0;           /* eliminar padding en móviles */
-    margin: 0;            /* eliminar margin en móviles */
-  }
-  
-  .matric-footer {
-    padding: 20px 16px; /* más padding en móviles */
-  }
-  
-  .btn-finalizar {
-    font-size: 16px;
-    padding: 14px 20px;
-    max-width: none; /* ancho completo en móviles */
-  }
-}
 
 /* La tabla sí puede hacer scroll horizontal si lo necesita */
 .horario-table-responsive{
