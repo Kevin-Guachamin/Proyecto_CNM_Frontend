@@ -2,19 +2,13 @@
 
 /* Config: 1 columna de hora + 5 días */
 :root{
-  --hora-col-min: /* Alto controlado por --matric-h (se define en el componente) */
-.matric-wrapper{
-  position: relative;
-  width: 100%;
-  overflow-y: auto;          /* scroll vertical interno SIEMPRE */
-  overflow-x: hidden;        /* nunca scroll horizontal global */
-  display: flex;
-  flex-direction: column;
-  background-color: #f4f4f4;
-  min-height: 400px;         /* altura mínima garantizada */
+ --hora-col-min: 120px; /* ancho columna Hora */
+--dia-col-min: 160px; /* ancho mínimo cada día */
+--dias: 5;
+/* Pila vertical */
+
 }
 
-/* Pila vertical */
 .matric-content{
   display: flex;
   flex-direction: column;
@@ -23,9 +17,6 @@
   margin-bottom: 30px;
   flex: 1;
   min-height: 0; /* permite que el contenido se comprima */
-}mo columna “Hora” */
-  --dia-col-min: 160px;  /* ancho mínimo cada día */
-  --dias: 5;             /* L-V */
 }
 
 .horario-table-responsive{
@@ -152,15 +143,16 @@
 
 /* Alto controlado por --matric-h (se define en el componente) */
 .matric-wrapper{
-  position: relative;
-  width: 100%;
-  height: var(--matric-h);   /* sin fallback 100vh para no “cortar” */
-  overflow-y: auto;          /* scroll vertical interno SIEMPRE */
-  overflow-x: hidden;        /* nunca scroll horizontal global */
-  -webkit-overflow-scrolling: touch;
-  display: flex;
-  flex-direction: column;
-  background-color: #f4f4f4;
+position: relative;
+width: 100%;
+flex: 1; /* ← ocupa el espacio disponible */
+min-height: 0; /* ← CLAVE para que exista overflow */
+overflow-y: auto;
+overflow-x: hidden;
+-webkit-overflow-scrolling: touch;
+display: flex;
+flex-direction: column;
+background-color: #f4f4f4;
 }
 
 /* Pila vertical */
