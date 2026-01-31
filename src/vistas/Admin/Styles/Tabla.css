@@ -46,6 +46,9 @@
   height: 100%;
   min-width: 0; /* permite scroll-x en ancestros/hijos */
     background-color: #f4f4f4 !important;
+    max-height: 70vh; 
+    overflow-x: auto;
+    overflow-y: auto;
 }
 
 /* Wrapper para scroll horizontal */
