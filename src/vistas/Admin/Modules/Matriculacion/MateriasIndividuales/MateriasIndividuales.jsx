@@ -61,7 +61,7 @@ function MateriasIndividuales() {
                 })
         }
 
-    }, [periodo, nivel])
+    }, [periodo, nivel, page, limit])
 
     const filteredData = Array.isArray(inscripciones)
 
