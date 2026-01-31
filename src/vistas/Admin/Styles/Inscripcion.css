@@ -64,7 +64,7 @@
 
 /* ===== TABLAS (scroll horizontal se mantiene) ===== */
 .Contenedor-tabla {
-  width: 100%; overflow-x: auto; overflow-y: hidden;
+  width: 100%; overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   margin-top: 10px;
   border: 1px solid #e7f1ff; border-radius: 10px; background: #fff;

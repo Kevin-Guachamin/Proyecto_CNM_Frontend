@@ -22,7 +22,7 @@ function TablaInscripciones({inscripciones,OnDelete}) {
                             <tbody>
                                 {inscripciones.map((item, index) => (
                                     <tr key={index}>
-                                        {console.log("este es el item en tabla",item)}
+                                        
                                         <td className='tabla-celda'>{`${item.Matricula.Estudiante.primer_nombre} ${item.Matricula.Estudiante.primer_apellido}`}</td>
                                         <td className='tabla-celda'>{item.Matricula.Estudiante.nivel}</td>
                                         <td className='tabla-celda'>{item.Asignacion.Materia.nombre}</td>
