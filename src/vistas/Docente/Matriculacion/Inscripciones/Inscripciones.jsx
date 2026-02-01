@@ -8,7 +8,7 @@ import Horario from './Horario';
 import { useNavigate } from 'react-router-dom';
 import CrearCursoIndividual from '../CrearCursoIndividual';
 import '../../../components/BuscarEstudiante.css';
-import '../../../Admin/Styles/Matricula.css';
+import './Inscripciones.css';
 
 function Inscripciones({ asignaciones, docente, periodo, setAsignaciones }) {
 
@@ -191,71 +191,107 @@ function Inscripciones({ asignaciones, docente, periodo, setAsignaciones }) {
         setIsModalOpen((prev) => !prev);
     }
     return (
-        <div ref={wrapRef} className="matric-wrapper">
-            <h1 className="periodo-title">Matricula de {estudiante.primer_nombre} {estudiante.primer_apellido}</h1>
-            <div className="matric-content">
-                {/* Botones de control */}
-                <div className="matric-filtros">
-                    <div className='container_btn-finalizar'>
-                        <button className='boton-add' onClick={toggleModal}>Crear Curso</button>
-                    </div>
-                </div>
+        <div ref={wrapRef} className="gcd-wrapper">
 
-                {isModalOpen && <CrearCursoIndividual onCancel={toggleModal} onSave={handleCrearAsignacion} docente={docente} periodo={periodo.ID} />}
+            <h1 className="gcd-title">
+                Matricula de {estudiante.primer_nombre} {estudiante.primer_apellido}
+            </h1>
 
-                {/* Resultados (cards) */}
-                <div className="matric-cards">
-                    {asignaciones.length === 0 ? (
-                        <p className="no-registros">No existen cursos libres para este docente</p>
-                    ) : (
-                        <Row xs={1} md={2} lg={5} className="g-2">
-                            {asignaciones.map((asig) => {
-                                console.log("esta es la asignacion", asig)
-                                const nombreCompletoDocente = `${asig.Docente?.primer_nombre}  ${asig.Docente?.primer_apellido} `.trim();
-                                return (
-                                    <Col key={asig.ID} className="d-flex justify-content-center p-1">
-                                        <Card style={{ maxWidth: 300, cursor: "pointer", backgroundColor: "#CFD8DC" }} onClick={() => Inscribir(asig)}>
-                                            <Card.Body>
-                                                <Card.Title>{asig.Materia?.nombre}</Card.Title>
-                                                <Card.Subtitle className="mb-2 text-muted">
-                                                    Paralelo:  {asig.paralelo} || Cupos: {asig.cupos}
-                                                </Card.Subtitle>
-                                                <Card.Text>
-                                                    <strong>Nivel:</strong> {asig.Materia.nivel} <br />
-                                                    <strong>Horario día 1:</strong> {asig.horaInicio} - {asig.horaFin} <br />
-                                                    <strong>Horario día 2:</strong> {asig.hora1} - {asig.hora2} <br />
-                                                    <strong>Días:</strong> {asig.dias.join(", ")} <br />
-                                                    <strong>Docente:</strong> {nombreCompletoDocente}
-                                                </Card.Text>
-                                            </Card.Body>
-                                        </Card>
-                                    </Col>
-                                );
-                            })}
-                        </Row>
-                    )}
-                </div>
+            {/* Botón Crear Curso */}
+            <div className="gcd-actions-bar">
+                <button className='gcd-btn-add' onClick={toggleModal}>
+                    Crear Curso
+                </button>
+            </div>
 
-                {/* Horario (con scroll horizontal cuando haga falta) */}
-                <div className="matric-horario">
-                    {inscripciones.length > 0 && (
+            {isModalOpen && (
+                <CrearCursoIndividual
+                    onCancel={toggleModal}
+                    onSave={handleCrearAsignacion}
+                    docente={docente}
+                    periodo={periodo.ID}
+                />
+            )}
+
+            {/* Área de Cards (Flujo natural) */}
+            <div className="gcd-cards-area">
+                {asignaciones.length === 0 ? (
+                    <p className="text-muted fst-italic">No existen cursos libres para este docente</p>
+                ) : (
+                    <Row xs={1} md={2} lg={3} className="g-3">
+                        {asignaciones.map((asig) => {
+                            const nombreCompletoDocente = `${asig.Docente?.primer_nombre} ${asig.Docente?.primer_apellido}`.trim();
+                            return (
+                                <Col key={asig.ID}>
+                                    <Card
+                                        className="gcd-card-item"
+                                        style={{ cursor: "pointer" }}
+                                        onClick={() => Inscribir(asig)}
+                                    >
+                                        <Card.Body className="p-3">
+                                            <div className="d-flex justify-content-between align-items-start mb-2">
+                                                <div className="gcd-card-title me-2">
+                                                    {asig.Materia?.nombre}
+                                                </div>
+                                                <span className="badge bg-light text-primary border flex-shrink-0">
+                                                    Cupos: {asig.cupos}
+                                                </span>
+                                            </div>
+
+                                            <Row style={{ fontSize: '0.85rem' }}>
+                                                <Col xs={6}>
+                                                    <strong className="d-block text-dark">Horario:</strong>
+                                                    <span className="text-muted">
+                                                        {asig.dias?.join(", ")} <br />
+                                                        {asig.horaInicio} - {asig.horaFin}
+                                                    </span>
+                                                </Col>
+                                                <Col xs={6}>
+                                                    <strong className="d-block text-dark">Detalles:</strong>
+                                                    <span className="text-muted">
+                                                        Paralelo: {asig.paralelo} <br />
+                                                        Nivel: {asig.Materia?.nivel}
+                                                    </span>
+                                                </Col>
+                                                <Col xs={12} className="mt-2 pt-2 border-top">
+                                                    <small className="text-secondary fst-italic">
+                                                        <i className="bi bi-person-fill me-1"></i>
+                                                        {nombreCompletoDocente}
+                                                    </small>
+                                                </Col>
+                                            </Row>
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
+                            );
+                        })}
+                    </Row>
+                )}
+            </div>
+
+            {/* Horario (Scroll Horizontal) */}
+            <div className="gcd-horario-panel">
+                {inscripciones.length > 0 && (
+                    // Div interno para forzar el ancho y activar scroll horizontal
+                    <div className="gcd-horario-wrapper-inner">
                         <Horario
                             materiasSeleccionadas={inscripciones}
                             setMateriasSeleccionadas={setInscripciones}
                             jornada={estudiante.jornada}
                             nivel={estudiante.nivel}
                         />
-                    )}
-                </div>
-                {/* Botón final - ahora sticky */}
-                {inscripciones.length > 0 && (
-                    <div ref={footerRef} className='matric-footer'>
-                        <button className="btn-finalizar" onClick={FinalizarMatriculas}>Finalizar</button>
                     </div>
                 )}
             </div>
 
-
+            {/* Botón Finalizar (Al final de la página, sin tapar nada) */}
+            {inscripciones.length > 0 && (
+                <div ref={footerRef} className='gcd-footer-static'>
+                    <button className="gcd-btn-finish" onClick={FinalizarMatriculas}>
+                        Finalizar Matrícula
+                    </button>
+                </div>
+            )}
         </div>
     )
 }

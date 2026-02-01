@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Card, Row, Col } from "react-bootstrap";
 import Horario from '../Horario';
 import '../../../../components/BuscarEstudiante.css';
-import '../../../Styles/Matricula.css';
+import '../../../Styles/Inscripcion.css';
 
 function BuscarMaterias() {
   const [asignatura, setAsignatura] = useState('');
@@ -32,11 +32,11 @@ function BuscarMaterias() {
       const top = wrapRef.current.getBoundingClientRect().top;
       // alto visible disponible desde ese punto
       const availableHeight = window.innerHeight - top - 8; // 8px de respiro
-      
+
       // Asegurar una altura mínima razonable en pantallas pequeñas
       const minHeight = window.innerWidth <= 768 ? 400 : 360;
       const h = Math.max(minHeight, availableHeight);
-      
+
       document.documentElement.style.setProperty('--matric-h', `${h}px`);
     };
 
@@ -72,14 +72,14 @@ function BuscarMaterias() {
       const paddedHeight = h > 0 ? h + 16 : 0;
       document.documentElement.style.setProperty('--footer-h', `${paddedHeight}px`);
     };
-    
+
     const timeout = setTimeout(setFooterHeight, 50);
 
     const ro = new ResizeObserver(() => {
       clearTimeout(window.footerResizeTimeout);
       window.footerResizeTimeout = setTimeout(setFooterHeight, 100);
     });
-    
+
     if (footerRef.current) ro.observe(footerRef.current);
 
     return () => {
@@ -166,82 +166,150 @@ function BuscarMaterias() {
   };
 
   return (
-    <div ref={wrapRef} className="matric-wrapper">
-      <div className="matric-content">
-        <h1 className="periodo-title">Matricula de {estudiante.primer_nombre} {estudiante.primer_apellido}</h1>
-        {/* Filtros */}
-        <div className="matric-filtros">
-          <div className='search-input-container'>
-            <label className='label-search'>Materia:</label>
-            <input
-              className="input-cedula"
-              type="text"
-              value={asignatura ?? 'vacio'}
-              onChange={(e) => setAsignatura(e.target.value)}
-            />
-            <button className="btn-buscar" onClick={HandleBuscarAsignaturas}>Buscar</button>
-          </div>
-          <a className="malla-link" href="/public/Malla.pdf" download>
-            Descargar MALLA AQUÍ
-          </a>
-        </div>
+    <div ref={wrapRef} className="gcd-wrapper"> {/* Reutilizamos Wrapper con scroll */}
 
-        {/* Resultados (cards) */}
-        <div className="matric-cards">
-          {buscarAsignacion && (
-            asignaciones.length === 0 ? (
-              <p className="no-registros">No se encontraron coincidencias</p>
-            ) : (
-              <Row xs={1} md={2} lg={5} className="g-2">
-                {asignaciones.map((asig) => {
-                  const nombreDoc = `${asig.Docente?.primer_nombre || ''} ${asig.Docente?.primer_apellido || ''}`.trim();
-                  return (
-                    <Col key={asig.ID} className="d-flex justify-content-center p-1">
-                      <Card
-                        style={{ maxWidth: 300, cursor: "pointer", backgroundColor: "#CFD8DC" }}
-                        onClick={() => Inscribir(asig)}
-                      >
-                        <Card.Body>
-                          <Card.Title>{asig.Materia?.nombre}</Card.Title>
-                          <Card.Subtitle className="mb-2 text-muted">
-                            Paralelo: {asig.paralelo} || Cupos: {asig.cupos}
-                          </Card.Subtitle>
-                          <Card.Text>
-                            <strong>Nivel:</strong> {asig.Materia?.nivel} <br />
-                            <strong>Horario:</strong> {asig.horaInicio} - {asig.horaFin} <br />
-                            <strong>Días:</strong> {asig.dias?.join(", ")} <br />
-                            <strong>Docente:</strong> {nombreDoc}
-                          </Card.Text>
-                        </Card.Body>
-                      </Card>
-                    </Col>
-                  );
-                })}
-              </Row>
-            )
-          )}
-        </div>
+      <h1 className="gcd-title"> {/* Reutilizamos estilo de título */}
+        Matricula de {estudiante.primer_nombre} {estudiante.primer_apellido}
+      </h1>
 
-        {/* Horario (con scroll horizontal cuando haga falta) */}
-        <div className="matric-horario">
-          {inscripciones.length > 0 && (
+      {/* --- BARRA DE BÚSQUEDA FORZADA EN UNA SOLA LÍNEA --- */}
+      <div style={{
+        display: 'flex',           // Activa la fila
+        alignItems: 'center',      // Centra verticalmente
+        gap: '10px',               // Espacio entre elementos
+        flexWrap: 'nowrap',        // PROHIBIDO bajar de línea
+        width: '100%',
+        padding: '15px',
+        backgroundColor: 'white',
+        borderRadius: '8px',
+        marginBottom: '20px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+      }}>
+
+        {/* 1. Label */}
+        <label style={{
+          margin: 0,
+          fontWeight: 'bold',
+          whiteSpace: 'nowrap' // Que no se rompa el texto
+        }}>
+          Materia:
+        </label>
+
+        {/* 2. Input */}
+        <input
+          type="text"
+          placeholder="Escribe el nombre..."
+          value={asignatura ?? ''}
+          onChange={(e) => setAsignatura(e.target.value)}
+          style={{
+            flexGrow: 1,       // Ocupa todo el espacio libre
+            margin: 0,
+            padding: '8px 12px',
+            border: '1px solid #ced4da',
+            borderRadius: '4px'
+          }}
+        />
+
+        {/* 3. Botón */}
+        <button
+          onClick={HandleBuscarAsignaturas}
+          style={{
+            width: 'auto',     // El ancho justo del texto
+            margin: 0,
+            padding: '8px 20px',
+            backgroundColor: '#0d6efd',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            whiteSpace: 'nowrap'
+          }}
+        >
+          Buscar
+        </button>
+
+        {/* 4. Link Malla */}
+        <a
+          href="/public/Malla.pdf"
+          download
+          style={{
+            marginLeft: 'auto', // Se empuja a la derecha si sobra espacio
+            color: '#d32f2f',
+            textDecoration: 'none',
+            fontWeight: 'bold',
+            whiteSpace: 'nowrap',
+            fontSize: '0.9rem',
+            border: '1px solid #d32f2f',
+            padding: '5px 10px',
+            borderRadius: '4px'
+          }}
+        >
+          <i className="bi bi-download"></i> Descargar MALLA
+        </a>
+
+      </div>
+
+      {/* --- REUTILIZAMOS LA ZONA DE CARDS (Ya tiene el max-height: 220px) --- */}
+      <div className="gcd-cards-area">
+        {buscarAsignacion && (
+          asignaciones.length === 0 ? (
+            <p className="text-center text-muted mt-3">No se encontraron coincidencias</p>
+          ) : (
+            /* Mantenemos lg={3} o lg={4} para que sean bajitas y anchas */
+            <Row xs={1} md={2} lg={4} className="g-2">
+              {asignaciones.map((asig) => {
+                const nombreDoc = `${asig.Docente?.primer_nombre || ''} ${asig.Docente?.primer_apellido || ''}`.trim();
+                return (
+                  <Col key={asig.ID} className="d-flex justify-content-center">
+                    <Card
+                      className="gcd-card-item" /* Reutilizamos estilo de card */
+                      style={{ width: '100%', cursor: "pointer" }}
+                      onClick={() => Inscribir(asig)}
+                    >
+                      <Card.Body className="p-2"> {/* Padding pequeño */}
+                        <div className="gcd-card-title">{asig.Materia?.nombre}</div>
+
+                        <div className="d-flex justify-content-between mb-1">
+                          <small className="text-muted">Paralelo: {asig.paralelo}</small>
+                          <span className="badge bg-light text-dark border">Cupos: {asig.cupos}</span>
+                        </div>
+
+                        <div style={{ fontSize: '0.8rem' }} className="text-secondary">
+                          <strong>Nivel:</strong> {asig.Materia?.nivel} <br />
+                          <strong>Horario:</strong> {asig.horaInicio} - {asig.horaFin} <br />
+                          <span className="fst-italic">{nombreDoc}</span>
+                        </div>
+                      </Card.Body>
+                    </Card>
+                  </Col>
+                );
+              })}
+            </Row>
+          )
+        )}
+      </div>
+
+      {/* --- REUTILIZAMOS EL CONTENEDOR DE HORARIO --- */}
+      <div className="gcd-horario-panel">
+        {inscripciones.length > 0 && (
+          <div style={{ minWidth: '800px' }}> {/* El fix del scroll horizontal */}
             <Horario
               materiasSeleccionadas={inscripciones}
               setMateriasSeleccionadas={setInscripciones}
               jornada={estudiante.jornada}
               nivel={estudiante.nivel}
             />
-          )}
-        </div>
-        {/* Botón final - ahora sticky */}
-      {inscripciones.length > 0 && (
-        <div ref={footerRef} className='matric-footer'>
-          <button className="btn-finalizar" onClick={FinalizarMatriculas}>Finalizar</button>
-        </div>
-      )}
+          </div>
+        )}
       </div>
 
-      
+      {/* --- REUTILIZAMOS EL FOOTER ESTÁTICO --- */}
+      {inscripciones.length > 0 && (
+        <div ref={footerRef} className='gcd-footer-static'>
+          <button className="gcd-btn-finish" onClick={FinalizarMatriculas}>Finalizar</button>
+        </div>
+      )}
+
     </div>
   );
 }

@@ -43,16 +43,16 @@ function MateriasIndividuales() {
             .catch(err => {
                 ErrorMessage(err)
             })
-    },[])
+    }, [])
     useEffect(() => {
         if (periodo && nivel) {
-            
+
             axios.get(`${API_URL}/inscripcion/obtener/nivel/${periodo}/${nivel}?page=${page}&limit=${limit}`, {
                 headers: { Authorization: `Bearer ${token}` },
             })
                 .then(res => {
                     setInscripciones(res.data.data);
-                    console.log("esto llego de base",res)
+                    console.log("esto llego de base", res)
                     setTotalPages(res.data.totalPages);
                     setLoading(false)
                 })
@@ -87,12 +87,12 @@ function MateriasIndividuales() {
             if (result.isConfirmed) {
                 axios.delete(`${API_URL}/inscripcion/eliminar/${inscripcion.ID}`, {
                     headers: { Authorization: `Bearer ${token}` },
-                }).then(()=>{
-                    console.log("este no tiene ID",inscripcion.Asignacion)
-                    
-                    setInscripciones((prevData) => 
+                }).then(() => {
+                    console.log("este no tiene ID", inscripcion.Asignacion)
+
+                    setInscripciones((prevData) =>
                         prevData.filter((d) => d.Inscripcion && d.Inscripcion.ID !== inscripcion.ID)
-                      );
+                    );
                 })
                 // Eliminar usuario por PK
                 axios.delete(`${API_URL}/asignacion/eliminar/${inscripcion.Asignacion.ID}`, {
@@ -100,7 +100,7 @@ function MateriasIndividuales() {
                 })
                     .then(() => {
 
-                        
+
 
                         Swal.fire({
                             icon: "success",
@@ -161,6 +161,10 @@ function MateriasIndividuales() {
                         <option value="1ro BCH">1ro BCH</option>
                         <option value="2do BCH">2do BCH</option>
                         <option value="3ro BCH">3ro BCH</option>
+                        <option value="BCH">BCH</option>
+                        <option value="BM">BM</option>
+                        <option value="BS">BS</option>
+                        <option value="BS BCH">BS BCH</option>
                     </select>
                 </div>
                 <div className="form-group">
