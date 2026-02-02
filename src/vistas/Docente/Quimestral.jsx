@@ -7,7 +7,7 @@ import { ErrorMessage } from "../../Utils/ErrorMesaje";
 import { calcularPromedioQuimestral, calcularPromedioComportamiento, calcularValoracionComportamiento, abreviarNivel } from "./Promedios";
 import "./Parcial.css";
 
-const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actualizarDatosQuim, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, esPorSolicitud }) => {
+const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actualizarDatosQuim, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, esPorSolicitud, savedKeysQuim, makeKeyQuim }) => {
 
   const idContenedor = `pdf-quimestral-quim${quimestreSeleccionado}`;
 
@@ -65,7 +65,6 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
 
       Promise.all(promesasAsignaciones)
         .then(resultados => {
-          let nroGlobal = 1;
           const todosLosDatos = [];
 
           resultados.forEach(({ asignacion, estudiantes, quimestrales }) => {
@@ -92,7 +91,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
                 idInscripcion: est.idInscripcion,
                 idQuimestral: saved.id,
                 idAsignacion: asignacion.ID,
-                "Nro": nroGlobal++,
+                "Nro": 0, // Se asignará después de ordenar
                 "Nómina de Estudiantes": est.nombre,
                 "Primer Parcial": parcial1.toFixed(2),
                 "Segundo Parcial": parcial2.toFixed(2),
@@ -105,6 +104,18 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
                 "Comportamiento Final": comportamientoFinal,
               });
             });
+          });
+
+          // Ordenar alfabéticamente por nombre completo
+          todosLosDatos.sort((a, b) => {
+            const nombreA = a["Nómina de Estudiantes"].toLowerCase();
+            const nombreB = b["Nómina de Estudiantes"].toLowerCase();
+            return nombreA.localeCompare(nombreB);
+          });
+
+          // Asignar números secuenciales después de ordenar
+          todosLosDatos.forEach((fila, index) => {
+            fila["Nro"] = index + 1;
           });
 
           setDatos(todosLosDatos);
@@ -270,7 +281,30 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
   // Indicamos que la columna "Examen" es editable, similar a como se hace en el componente de Parcial
   const columnasEditables = ["Examen"];
 
-  const realmenteDeshabilitado = soloLectura || inputsDisabled || (!isWithinRange && !forceEdit);
+  // Función que determina si una fila específica está deshabilitada
+  const esFilaDeshabilitada = (row) => {
+    // Si es soloLectura, siempre deshabilitado
+    if (soloLectura) return true;
+    
+    // Si la fila está guardada (tiene idQuimestral), está deshabilitada
+    // INCLUSO si forceEdit está activo (botón amarillo presionado)
+    if (savedKeysQuim && row.idInscripcion) {
+      const quim = quimestreSeleccionado; // "1" o "2"
+      const rowKey = `${row.idInscripcion}-${quim}`;
+      if (savedKeysQuim.has(rowKey)) {
+        return true;
+      }
+    }
+    
+    // Si forceEdit está activo, las NO guardadas están habilitadas
+    if (forceEdit) return false;
+    
+    // Si estamos fuera de rango, deshabilitado
+    if (!isWithinRange) return true;
+    
+    // Si inputsDisabled es true, deshabilitado
+    return inputsDisabled;
+  };
 
   const handleGuardar = (rowIndex, rowData) => {
     if (!rowData.idQuimestral) {
@@ -350,7 +384,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
         datos={datos}
         onChange={handleInputChange}
         columnasEditables={columnasEditables}
-        inputsDisabled={realmenteDeshabilitado}
+        inputsDisabled={inputsDisabled}
         onEditar={onEditar}
         onGuardar={handleGuardar}
         rangoTexto={rangoTexto}
@@ -358,6 +392,7 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
         globalEdit={forceEdit}
         soloLectura={soloLectura}
         esPorSolicitud={esPorSolicitud}
+        esFilaDeshabilitada={esFilaDeshabilitada}
       />
     </div>
   );

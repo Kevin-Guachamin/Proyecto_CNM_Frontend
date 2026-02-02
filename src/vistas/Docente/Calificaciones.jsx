@@ -298,25 +298,41 @@ function Calificaciones() {
           requiredFields.push("comportamiento"); // Solo si NO es BE
         }
       }
-      // 2) Verificar que ninguno de los campos requeridos esté vacío o nulo
-      const camposVacios = newRows.some(row =>
-        requiredFields.some(field => {
+      
+      // 2) GUARDADO PARCIAL: Filtrar solo las filas que estén 100% completas
+      const rowsCompletas = newRows.filter(row => {
+        // Verificar que TODOS los campos requeridos estén completos
+        return requiredFields.every(field => {
           if (field === "comportamiento") {
             // Validamos cada elemento dentro del array de comportamiento
-            return !Array.isArray(row[field]) || row[field].some(v => v == null || v === "");
+            return Array.isArray(row[field]) && row[field].every(v => v != null && v !== "");
           } else {
-            return row[field] == null || row[field] === "";
+            return row[field] != null && row[field] !== "";
           }
-        })
-      );
-      if (camposVacios) {
+        });
+      });
+
+      // Si no hay filas completas para guardar
+      if (rowsCompletas.length === 0) {
         return Swal.fire({
           icon: "warning",
-          title: "Campos vacíos",
-          text: "Por favor completa todos los campos obligatorios antes de guardar (Debe ingresar las notas de todos los alumnos)."
+          title: "Sin datos completos",
+          text: "No hay estudiantes con todas sus calificaciones completas para guardar."
         });
       }
-      // 3) Realizar el POST
+
+      // Mostrar advertencia si hay filas incompletas
+      const rowsIncompletas = newRows.length - rowsCompletas.length;
+      if (rowsIncompletas > 0) {
+        Swal.fire({
+          icon: "info",
+          title: "Guardado parcial",
+          html: `Se guardarán <b>${rowsCompletas.length}</b> estudiante(s).<br>Quedan <b>${rowsIncompletas}</b> estudiante(s) con datos incompletos.`,
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+      // 3) Realizar el POST con las filas completas
       const endpoint = esBe
         ? isQuimestral
           ? `${import.meta.env.VITE_URL_DEL_BACKEND}/quimestralesbe/bulk`
@@ -325,15 +341,19 @@ function Calificaciones() {
           ? `${import.meta.env.VITE_URL_DEL_BACKEND}/quimestrales/bulk`
           : `${import.meta.env.VITE_URL_DEL_BACKEND}/parciales/bulk`;
 
-      axios.post(endpoint, newRows)
+      axios.post(endpoint, rowsCompletas)
         .then((response) => {
           // Verificas el status o el contenido del response
           if (response.status === 201) {
             // Significa que sí se insertaron registros
+            const mensaje = rowsIncompletas > 0 
+              ? `Se guardaron ${rowsCompletas.length} estudiante(s) correctamente. Quedan ${rowsIncompletas} pendiente(s).`
+              : "Calificaciones guardadas correctamente.";
+              
             Swal.fire({
               icon: "success",
               title: "Guardado",
-              text: "Calificaciones guardadas correctamente."
+              text: mensaje
             }).then(() => { 
               setInputsDisabled(true); 
               localStorage.setItem("inputsLocked", "true");
@@ -345,13 +365,13 @@ function Calificaciones() {
             if (isQuimestral) {
               setSavedKeysQuim(prev => {
                 const copy = new Set(prev);
-                newRows.forEach(r => copy.add(makeKeyQuim(r)));
+                rowsCompletas.forEach(r => copy.add(makeKeyQuim(r)));
                 return copy;
               });
             } else {
               setSavedKeys(prev => {
                 const copy = new Set(prev);
-                newRows.forEach(r => copy.add(makeKey(r)));
+                rowsCompletas.forEach(r => copy.add(makeKey(r)));
                 return copy;
               });
             }
@@ -634,6 +654,12 @@ function Calificaciones() {
       soloLectura={soloLectura}
       getRangoValido={getRangoValido}
       esPorSolicitud={esPorSolicitud}
+      savedKeys={savedKeys}
+      savedKeysQuim={savedKeysQuim}
+      savedKeysFinal={savedKeysFinal}
+      makeKey={makeKey}
+      makeKeyQuim={makeKeyQuim}
+      makeKeyFinal={makeKeyFinal}
     />
   );
 }

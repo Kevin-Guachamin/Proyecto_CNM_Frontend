@@ -5,7 +5,7 @@ import axios from "axios";
 import { ErrorMessage } from "../../../Utils/ErrorMesaje";
 import "../Parcial.css";
 
-const FinalBE = ({ quim1Data, quim2Data, datosModulo, escala }) => {
+const FinalBE = ({ quim1Data, quim2Data, datosModulo, escala, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, esPorSolicitud, actualizarDatosFinal, savedKeysFinal, makeKeyFinal }) => {
   const [datos, setDatos] = useState([]);
   const idContenedor = `pdf-final`;
 

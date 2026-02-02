@@ -7,7 +7,7 @@ import Swal from 'sweetalert2';
 import "./Parcial.css";
 import { calcularPromedioParcial, calcularSumaComportamiento, calcularValoracionComportamiento, abreviarNivel } from "./Promedios"
 
-function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, esPorSolicitud }) {
+function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, esPorSolicitud, savedKeys, makeKey }) {
   // ID dinámico: pdf-parcial1-quim1, pdf-parcial2-quim1, pdf-parcial1-quim2, etc.
   const idContenedor = `pdf-parcial${parcialSeleccionado}-quim${quimestreSeleccionado}`;
 
@@ -102,8 +102,31 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
     });
   };
 
-  // Combina la lógica de "deshabilitado por fuera de fecha" y "deshabilitado por prop"
-  const realmenteDeshabilitado = soloLectura || inputsDisabled || (!isWithinRange && !forceEdit);
+  const esFilaDeshabilitada = (row) => {
+    // Si es soloLectura, siempre deshabilitado
+    if (soloLectura) return true;
+    
+    // Si la fila está guardada (tiene idParcial), está deshabilitada
+    // INCLUSO si forceEdit está activo (botón amarillo presionado)
+    if (savedKeys && row.idInscripcion) {
+      // Construir la clave manualmente usando los valores correctos
+      const quim = quimestreSeleccionado; // "1" o "2"
+      const parc = parcialSeleccionado; // "1" o "2"
+      const rowKey = `${row.idInscripcion}-${quim}-${parc}`;
+      if (savedKeys.has(rowKey)) {
+        return true; // Bloqueada incluso con forceEdit
+      }
+    }
+    
+    // Si forceEdit está activo y la fila NO está guardada, la desbloqueamos
+    if (forceEdit) return false;
+    
+    // Si estamos fuera de rango, deshabilitado
+    if (!isWithinRange) return true;
+    
+    // Si inputsDisabled es true, deshabilitado
+    return inputsDisabled;
+  };
 
   // ✅ Nuevo useEffect que envía datos transformados al padre
   useEffect(() => {
@@ -243,7 +266,6 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
 
       Promise.all(promesasAsignaciones)
         .then(resultados => {
-          let nroGlobal = 1;
           const todosLosDatos = [];
 
           resultados.forEach(({ asignacion, estudiantes, parciales }) => {
@@ -258,7 +280,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
                 idInscripcion: est.idInscripcion,
                 idParcial: parcialGuardado?.idParcial,
                 idAsignacion: asignacion.ID,
-                "Nro": nroGlobal++,
+                "Nro": 0, // Se asignará después de ordenar
                 "Nómina de Estudiantes": est.nombre,
                 "INSUMO 1": safe(parcialGuardado?.insumo1),
                 "INSUMO 2": safe(parcialGuardado?.insumo2),
@@ -282,6 +304,18 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
               };
               todosLosDatos.push(calcularDatosFila(fila));
             });
+          });
+
+          // Ordenar alfabéticamente por nombre completo
+          todosLosDatos.sort((a, b) => {
+            const nombreA = a["Nómina de Estudiantes"].toLowerCase();
+            const nombreB = b["Nómina de Estudiantes"].toLowerCase();
+            return nombreA.localeCompare(nombreB);
+          });
+
+          // Asignar números secuenciales después de ordenar
+          todosLosDatos.forEach((fila, index) => {
+            fila["Nro"] = index + 1;
           });
 
           setDatos(todosLosDatos);
@@ -415,7 +449,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
         datos={datos}
         onChange={handleInputChange}
         columnasEditables={columnasEditables}
-        inputsDisabled={realmenteDeshabilitado}
+        inputsDisabled={inputsDisabled}
         onEditar={onEditar}
         onGuardar={handleGuardar}
         rangoTexto={rangoTexto}
@@ -423,6 +457,7 @@ function Parcial({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosPa
         globalEdit={forceEdit}
         soloLectura={soloLectura}
         esPorSolicitud={esPorSolicitud}
+        esFilaDeshabilitada={esFilaDeshabilitada}
       />
     </div>
   );

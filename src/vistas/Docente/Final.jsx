@@ -7,7 +7,7 @@ import { ErrorMessage } from "../../Utils/ErrorMesaje";
 import { calcularPromedioAnual, calcularPromedioComportamientoFinal, calcularPromedioFinalConSupletorio, determinarEstado, calcularValoracionComportamiento, abreviarNivel } from "./Promedios";
 import "./Parcial.css";
 
-const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, esPorSolicitud }) => {
+const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, esPorSolicitud, savedKeysFinal, makeKeyFinal }) => {
   const [datos, setDatos] = useState([]);
 
   const idContenedor = `pdf-final`;
@@ -310,7 +310,29 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
     });
   }, [datos]);
 
-  const realmenteDeshabilitado = soloLectura || inputsDisabled || (!isWithinRange && !forceEdit);
+  // Función que determina si una fila específica está deshabilitada
+  const esFilaDeshabilitada = (row) => {
+    // Si es soloLectura, siempre deshabilitado
+    if (soloLectura) return true;
+    
+    // Si la fila está guardada (tiene idFinal), está deshabilitada
+    // INCLUSO si forceEdit está activo (botón amarillo presionado)
+    if (savedKeysFinal && row.idInscripcion) {
+      const rowKey = `${row.idInscripcion}`;
+      if (savedKeysFinal.has(rowKey)) {
+        return true;
+      }
+    }
+    
+    // Si forceEdit está activo, las NO guardadas están habilitadas
+    if (forceEdit) return false;
+    
+    // Si estamos fuera de rango, deshabilitado
+    if (!isWithinRange) return true;
+    
+    // Si inputsDisabled es true, deshabilitado
+    return inputsDisabled;
+  };
 
   const handleGuardar = (rowIndex, rowData) => {
     const original = datosOriginales[rowIndex];
@@ -404,7 +426,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
         onChange={handleInputChange}
         // Sólo la columna "Examen Supletorio" es editable
         columnasEditables={["Examen Supletorio"]}
-        inputsDisabled={realmenteDeshabilitado}
+        inputsDisabled={inputsDisabled}
         onEditar={onEditar}
         onGuardar={handleGuardar}
         rangoTexto={rangoTexto}
@@ -412,6 +434,7 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
         globalEdit={forceEdit}
         soloLectura={soloLectura}
         esPorSolicitud={esPorSolicitud}
+        esFilaDeshabilitada={esFilaDeshabilitada}
       />
     </div>
   );
