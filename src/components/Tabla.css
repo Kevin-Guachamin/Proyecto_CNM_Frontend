@@ -1,9 +1,22 @@
 /* =========================================
+   CONTENEDOR DE TABLA CON SCROLL MEJORADO
+   ========================================= */
+.table-responsive {
+  max-height: 600px; /* Altura fija para mostrar aprox 8-10 filas */
+  overflow-y: auto; /* Scroll vertical */
+  overflow-x: auto; /* Scroll horizontal */
+  position: relative;
+  border: 1px solid #dee2e6;
+  display: block; /* Asegurar que funcione como contenedor con scroll */
+}
+
+/* =========================================
    1) Ancho fijo para columnas "Nro" y "Nómina de Estudiantes"
    ========================================= */
    .custom-table th:nth-child(1),
    .custom-table td:nth-child(1) {
-     width: 25px;
+     width: 50px;
+     min-width: 50px;
      overflow: hidden;
      text-overflow: ellipsis;
      white-space: nowrap;
@@ -12,6 +25,7 @@
    .custom-table th:nth-child(2),
    .custom-table td:nth-child(2) {
      width: 200px;
+     min-width: 200px;
      overflow: hidden;
      text-overflow: ellipsis;
      white-space: nowrap;

@@ -10,7 +10,8 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
   forceEdit, inputsDisabled, estadoFechas, textoRangoFechas, activeMainTab, activeSubTabQuim1, activeSubTabQuim2, setActiveMainTab,
   setActiveSubTabQuim1, setActiveSubTabQuim2, parcial1Quim1Data, parcial2Quim1Data, parcial1Quim2Data, parcial2Quim2Data, quim1Data,
   quim2Data, finalData, handleActualizarParcial1Quim1, handleActualizarParcial2Quim1, handleActualizarParcial1Quim2, handleActualizarParcial2Quim2,
-  handleActualizarQuim1, handleActualizarQuim2, handleActualizarFinal, handleEditarFila, soloLectura, getRangoValido, esPorSolicitud}) {
+  handleActualizarQuim1, handleActualizarQuim2, handleActualizarFinal, handleEditarFila, soloLectura, getRangoValido, esPorSolicitud,
+  savedKeys, savedKeysQuim, savedKeysFinal, makeKey, makeKeyQuim, makeKeyFinal}) {
   
   // Determinar el activeModule según el rol del usuario
   const getActiveModule = () => {
@@ -77,6 +78,8 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                       forceEdit={forceEdit}
                       soloLectura={soloLectura}
                       esPorSolicitud={esPorSolicitud("parcial1-quim1")}
+                      savedKeys={savedKeys}
+                      makeKey={makeKey}
                     />
                   </Tab>
 
@@ -94,6 +97,8 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                       forceEdit={forceEdit}
                       soloLectura={soloLectura}
                       esPorSolicitud={esPorSolicitud("parcial2-quim1")}
+                      savedKeys={savedKeys}
+                      makeKey={makeKey}
                     />
                   </Tab>
 
@@ -111,6 +116,8 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                       forceEdit={forceEdit}
                       soloLectura={soloLectura}
                       esPorSolicitud={esPorSolicitud("quimestral-quim1")}
+                      savedKeysQuim={savedKeysQuim}
+                      makeKeyQuim={makeKeyQuim}
                     />
                   </Tab>
                 </Tabs>
@@ -133,6 +140,8 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                       forceEdit={forceEdit}
                       soloLectura={soloLectura}
                       esPorSolicitud={esPorSolicitud("parcial1-quim2")}
+                      savedKeys={savedKeys}
+                      makeKey={makeKey}
                     />
                   </Tab>
 
@@ -150,6 +159,8 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                       forceEdit={forceEdit}
                       soloLectura={soloLectura}
                       esPorSolicitud={esPorSolicitud("parcial2-quim2")}
+                      savedKeys={savedKeys}
+                      makeKey={makeKey}
                     />
                   </Tab>
 
@@ -167,6 +178,8 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                       forceEdit={forceEdit}
                       soloLectura={soloLectura}
                       esPorSolicitud={esPorSolicitud("quimestral-quim2")}
+                      savedKeysQuim={savedKeysQuim}
+                      makeKeyQuim={makeKeyQuim}
                     />
                   </Tab>
                 </Tabs>
@@ -187,6 +200,8 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                     forceEdit={forceEdit}
                     soloLectura={soloLectura}
                     esPorSolicitud={esPorSolicitud("notaFinal")}
+                    savedKeysFinal={savedKeysFinal}
+                    makeKeyFinal={makeKeyFinal}
                   />
                 </div>
               </Tab>

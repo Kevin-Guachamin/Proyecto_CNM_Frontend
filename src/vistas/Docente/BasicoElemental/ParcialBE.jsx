@@ -6,7 +6,7 @@ import { ErrorMessage } from "../../../Utils/ErrorMesaje";
 import Swal from 'sweetalert2';
 import "../Parcial.css";
 
-function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, escala, esPorSolicitud }) {
+function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, escala, esPorSolicitud, savedKeys, makeKey }) {
   // ID dinámico: pdf-parcial1-quim1, pdf-parcial2-quim1, pdf-parcial1-quim2, etc.
   const idContenedor = `pdf-parcial-be${parcialSeleccionado}-quim${quimestreSeleccionado}`;
 
@@ -117,7 +117,31 @@ function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatos
   };
 
   // Combina la lógica de "deshabilitado por fuera de fecha" y "deshabilitado por prop"
-  const realmenteDeshabilitado = soloLectura || inputsDisabled || (!isWithinRange && !forceEdit);
+  // Función que determina si una fila específica está deshabilitada
+  const esFilaDeshabilitada = (row) => {
+    // Si es soloLectura, siempre deshabilitado
+    if (soloLectura) return true;
+    
+    // Si la fila está guardada (tiene idParcial), está deshabilitada
+    // INCLUSO si forceEdit está activo (botón amarillo presionado)
+    if (savedKeys && row.idInscripcion) {
+      const quim = quimestreSeleccionado; // "1" o "2"
+      const parc = parcialSeleccionado; // "1" o "2"
+      const rowKey = `${row.idInscripcion}-${quim}-${parc}`;
+      if (savedKeys.has(rowKey)) {
+        return true;
+      }
+    }
+    
+    // Si forceEdit está activo, las NO guardadas están habilitadas
+    if (forceEdit) return false;
+    
+    // Si estamos fuera de rango, deshabilitado
+    if (!isWithinRange) return true;
+    
+    // Si inputsDisabled es true, deshabilitado
+    return inputsDisabled;
+  };
 
   // ✅ Nuevo useEffect que envía datos transformados al padre
   useEffect(() => {
@@ -290,7 +314,6 @@ function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatos
 
       Promise.all(promesasAsignaciones)
         .then(resultados => {
-          let nroGlobal = 1;
           const todosLosDatos = [];
 
           resultados.forEach(({ asignacion, estudiantes, parciales }) => {
@@ -305,7 +328,7 @@ function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatos
                 idInscripcion: est.idInscripcion,
                 idParcial: parcialGuardado?.idParcial,
                 idAsignacion: asignacion.ID,
-                "Nro": nroGlobal++,
+                "Nro": 0, // Se asignará después de ordenar
                 "Nómina de Estudiantes": est.nombre,
                 "INSUMO 1": safe(parcialGuardado?.insumo1),
                 "INSUMO 2": safe(parcialGuardado?.insumo2),
@@ -317,6 +340,18 @@ function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatos
               };
               todosLosDatos.push(calcularDatosFila(fila));
             });
+          });
+
+          // Ordenar alfabéticamente por nombre completo
+          todosLosDatos.sort((a, b) => {
+            const nombreA = a["Nómina de Estudiantes"].toLowerCase();
+            const nombreB = b["Nómina de Estudiantes"].toLowerCase();
+            return nombreA.localeCompare(nombreB);
+          });
+
+          // Asignar números secuenciales después de ordenar
+          todosLosDatos.forEach((fila, index) => {
+            fila["Nro"] = index + 1;
           });
 
           setDatos(todosLosDatos);
@@ -433,7 +468,7 @@ function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatos
         datos={datos}
         onChange={handleInputChange}
         columnasEditables={columnasEditables}
-        inputsDisabled={realmenteDeshabilitado}
+        inputsDisabled={inputsDisabled}
         onEditar={onEditar}
         onGuardar={handleGuardar}
         rangoTexto={rangoTexto}
@@ -441,6 +476,7 @@ function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatos
         globalEdit={forceEdit}
         soloLectura={soloLectura}
         esPorSolicitud={esPorSolicitud}
+        esFilaDeshabilitada={esFilaDeshabilitada}
       />
     </div>
   );

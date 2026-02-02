@@ -8,7 +8,7 @@ import "./Tabla.css";
 const Tabla = ({
   columnas, columnasAgrupadas, datos, onChange, columnasEditables = [],
   mostrarEditar = true, mostrarGuardar = true, onEditar, onGuardar, inputsDisabled,
-  isWithinRange, rangoTexto, globalEdit, forceEdit, clasePersonalizada = "", soloLectura, esPorSolicitud = false }) => {
+  isWithinRange, rangoTexto, globalEdit, forceEdit, clasePersonalizada = "", soloLectura, esPorSolicitud = false, esFilaDeshabilitada }) => {
   
   const [editingRow, setEditingRow] = useState(null);
   const columnasRepetidas = ["Nro", "Nómina de Estudiantes"];
@@ -153,7 +153,11 @@ const Tabla = ({
                                     }}
                                     className="form-control text-center screen-only"
                                     data-columna={col}
-                                    disabled={inputsDisabled || editingRow !== i || (promedio < 4)}
+                                    disabled={
+                                      esFilaDeshabilitada 
+                                        ? esFilaDeshabilitada(fila) || (promedio < 4)
+                                        : inputsDisabled || editingRow !== i || (promedio < 4)
+                                    }
                                   />
                                 );
                               }
@@ -174,7 +178,11 @@ const Tabla = ({
                               }}
                               className="form-control text-center screen-only"
                               data-columna={col}
-                              disabled={inputsDisabled || (globalEdit ? false : editingRow !== i)}
+                              disabled={
+                                esFilaDeshabilitada
+                                  ? esFilaDeshabilitada(fila)
+                                  : inputsDisabled || (globalEdit ? false : editingRow !== i)
+                              }
                             />
                           )
                         ) : (
