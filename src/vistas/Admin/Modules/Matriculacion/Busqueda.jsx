@@ -13,7 +13,7 @@ function Busqueda({ subRol }) {
   const [buscado, setBuscado] = useState(false);
   const [matricula, setMatricula] = useState('');
   const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
@@ -86,6 +86,27 @@ function Busqueda({ subRol }) {
       .then((response) => setPeriodo(response.data))
       .catch(ErrorMessage);
   }, [API_URL, token]);
+  useEffect(() => {
+    const fetchEstudiantes = async () => {
+      try {
+        const response = await axios.get(
+          `${API_URL}/estudiante/obtenerPorApellido?search=${apellido}&page=${page}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        console.log(response.data.estudiantes);
+        setEstudiantes(response.data.estudiantes);
+        setTotalPages(response.data.totalPages);
+      } catch (error) {
+        ErrorMessage(error);
+      }
+    };
+
+    fetchEstudiantes();
+  }, [page]);
+
 
   // Navegar / crear matrícula
   const HandleMatricular = async (estudiante) => {
@@ -188,17 +209,17 @@ function Busqueda({ subRol }) {
 
             )}
           </div>
-           {/* Paginación fija en la parte inferior */}
-              <div style={{ 
-                flexShrink: 0,
-                padding: '15px',
-                borderTop: '1px solid #e5e7eb',
-                backgroundColor: '#f9fafb'
-              }} >
-                {totalPages > 1 && (
-                  <Paginación totalPages={totalPages} page={page} setPage={setPage} />
-                )}
-              </div>
+          {/* Paginación fija en la parte inferior */}
+          <div style={{
+            flexShrink: 0,
+            padding: '15px',
+            borderTop: '1px solid #e5e7eb',
+            backgroundColor: '#f9fafb'
+          }} >
+            {totalPages > 1 && (
+              <Paginación totalPages={totalPages} page={page} setPage={setPage} />
+            )}
+          </div>
         </div>
       </div>
     </div>
