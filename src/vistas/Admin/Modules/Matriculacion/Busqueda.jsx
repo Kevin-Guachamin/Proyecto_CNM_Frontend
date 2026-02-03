@@ -4,6 +4,7 @@ import { ErrorMessage } from '../../../../Utils/ErrorMesaje';
 import { useNavigate } from 'react-router-dom';
 import '../../../components/BuscarEstudiante.css';
 import BuscarEstudianteByApellido from '../../../components/BuscarEstudianteByApellido';
+import Paginación from '../../../Components/Paginación';
 
 function Busqueda({ subRol }) {
   const [periodo, setPeriodo] = useState('');
@@ -11,6 +12,8 @@ function Busqueda({ subRol }) {
   const [estudiantes, setEstudiantes] = useState([]);
   const [buscado, setBuscado] = useState(false);
   const [matricula, setMatricula] = useState('');
+  const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
@@ -137,6 +140,8 @@ function Busqueda({ subRol }) {
             setBuscado={setBuscado}
             apellido={apellido}
             setApellido={setApellido}
+            page={page}
+            setTotalPages={setTotalPages}
           />
 
           <div className="Contenedor-estudiante">
@@ -183,6 +188,17 @@ function Busqueda({ subRol }) {
 
             )}
           </div>
+           {/* Paginación fija en la parte inferior */}
+              <div style={{ 
+                flexShrink: 0,
+                padding: '15px',
+                borderTop: '1px solid #e5e7eb',
+                backgroundColor: '#f9fafb'
+              }} >
+                {totalPages > 1 && (
+                  <Paginación totalPages={totalPages} page={page} setPage={setPage} />
+                )}
+              </div>
         </div>
       </div>
     </div>

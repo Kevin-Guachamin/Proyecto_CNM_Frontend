@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { ErrorMessage } from '../../Utils/ErrorMesaje';
-function BuscarEstudianteByApellido({apellido,setApellido,setEstudiantes,setBuscado}) {
+function BuscarEstudianteByApellido({apellido,setApellido,setEstudiantes,setBuscado,setTotalPages,page}) {
     const API_URL = import.meta.env.VITE_URL_DEL_BACKEND;
     const token=localStorage.getItem("token")
     const handleApellidoChange = (e) => {
@@ -13,11 +13,12 @@ function BuscarEstudianteByApellido({apellido,setApellido,setEstudiantes,setBusc
             if (!apellido) {
                 return
             }
-            const response = await axios.get(`${API_URL}/estudiante/obtenerPorApellido?search=${apellido}`,{
+            const response = await axios.get(`${API_URL}/estudiante/obtenerPorApellido?search=${apellido}&page=${page}`,{
                 headers: { Authorization: `Bearer ${token}` },
               });
               console.log(response.data.estudiantes)
             setEstudiantes(response.data.estudiantes)
+            setTotalPages(response.data.totalPages)
         } catch (error) {
             ErrorMessage(error);
         }

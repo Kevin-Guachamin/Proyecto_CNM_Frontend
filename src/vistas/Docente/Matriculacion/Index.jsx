@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Header from "../../../components/Header";
 import Layout from "../../../layout/Layout";
-import Busqueda from "./Busqueda";
+import Busqueda from "../../Admin/Modules/Matriculacion/Busqueda";
 import { useNavigate } from "react-router-dom";
 import { getModulos,transformModulesForLayout} from "../../getModulos";
 

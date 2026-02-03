@@ -87,7 +87,9 @@ function CrearAsignatura({ onCancel, entityToUpdate, onSave }) {
                                 <option value="BCH">BCH</option>
                                 <option value="BM">BM</option>
                                 <option value="BS">BS</option>
+                                <option value="BE">BE</option>
                                 <option value="BS BCH">BS BCH</option>
+                                <option value="BM BS">BM BS</option>
                             </select>
                         </div>
                         <div className="form-group">
