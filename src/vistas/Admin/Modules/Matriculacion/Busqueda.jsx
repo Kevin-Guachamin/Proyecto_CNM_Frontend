@@ -4,7 +4,7 @@ import { ErrorMessage } from '../../../../Utils/ErrorMesaje';
 import { useNavigate } from 'react-router-dom';
 import '../../../components/BuscarEstudiante.css';
 import BuscarEstudianteByApellido from '../../../components/BuscarEstudianteByApellido';
-import Paginación from '../../../Components/Paginación';
+import Paginación from '../../Components/Paginación';
 
 function Busqueda({ subRol }) {
   const [periodo, setPeriodo] = useState('');
