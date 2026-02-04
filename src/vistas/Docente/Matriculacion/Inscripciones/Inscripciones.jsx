@@ -242,8 +242,18 @@ function Inscripciones({ asignaciones, docente, periodo, setAsignaciones }) {
                                                 <Col xs={6}>
                                                     <strong className="d-block text-dark">Horario:</strong>
                                                     <span className="text-muted">
-                                                        {asig.dias?.join(", ")} <br />
-                                                        {asig.horaInicio} - {asig.horaFin}
+                                                        {asig.dias?.[0] && (
+                                                            <>
+                                                                {asig.dias[0]} {asig.horaInicio} - {asig.horaFin}
+                                                            </>
+                                                        )}
+
+                                                        {asig.dias?.[1] && (
+                                                            <>
+                                                                <br />
+                                                                {asig.dias[1]} {asig.hora1} - {asig.hora2}
+                                                            </>
+                                                        )}
                                                     </span>
                                                 </Col>
                                                 <Col xs={6}>
@@ -258,6 +268,7 @@ function Inscripciones({ asignaciones, docente, periodo, setAsignaciones }) {
                                                         <i className="bi bi-person-fill me-1"></i>
                                                         {nombreCompletoDocente}
                                                     </small>
+
                                                 </Col>
                                             </Row>
                                         </Card.Body>

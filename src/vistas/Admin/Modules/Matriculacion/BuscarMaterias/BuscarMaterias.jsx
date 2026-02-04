@@ -249,44 +249,61 @@ function BuscarMaterias() {
 
       </div>
 
-      {/* --- REUTILIZAMOS LA ZONA DE CARDS (Ya tiene el max-height: 220px) --- */}
-      <div className="gcd-cards-area">
-        {buscarAsignacion && (
-          asignaciones.length === 0 ? (
-            <p className="text-center text-muted mt-3">No se encontraron coincidencias</p>
-          ) : (
-            /* Mantenemos lg={3} o lg={4} para que sean bajitas y anchas */
-            <Row xs={1} md={2} lg={4} className="g-2">
-              {asignaciones.map((asig) => {
-                const nombreDoc = `${asig.Docente?.primer_nombre || ''} ${asig.Docente?.primer_apellido || ''}`.trim();
-                return (
-                  <Col key={asig.ID} className="d-flex justify-content-center">
-                    <Card
-                      className="gcd-card-item" /* Reutilizamos estilo de card */
-                      style={{ width: '100%', cursor: "pointer" }}
-                      onClick={() => Inscribir(asig)}
-                    >
-                      <Card.Body className="p-2"> {/* Padding pequeño */}
-                        <div className="gcd-card-title">{asig.Materia?.nombre}</div>
-
-                        <div className="d-flex justify-content-between mb-1">
-                          <small className="text-muted">Paralelo: {asig.paralelo}</small>
-                          <span className="badge bg-light text-dark border">Cupos: {asig.cupos}</span>
-                        </div>
-
-                        <div style={{ fontSize: '0.8rem' }} className="text-secondary">
-                          <strong>Nivel:</strong> {asig.Materia?.nivel} <br />
-                          <strong>Horario:</strong> {asig.horaInicio} - {asig.horaFin} <br />
-                          <span className="fst-italic">{nombreDoc}</span>
-                        </div>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                );
-              })}
-            </Row>
-          )
-        )}
+       {/* Área de Cards (Flujo natural) */}
+                  <div className="gcd-cards-area">
+                      {asignaciones.length === 0 ? (
+                          <p className="text-muted fst-italic">No existen cursos libres para este docente</p>
+                      ) : (
+                          <Row xs={1} md={2} lg={3} className="g-3">
+                              {asignaciones.map((asig) => {
+                                  const nombreCompletoDocente = `${asig.Docente?.primer_nombre} ${asig.Docente?.primer_apellido}`.trim();
+                                  return (
+                                      <Col key={asig.ID}>
+                                          <Card
+                                              className="gcd-card-item"
+                                              style={{ cursor: "pointer" }}
+                                              onClick={() => Inscribir(asig)}
+                                          >
+                                              <Card.Body className="p-3">
+                                                  <div className="d-flex justify-content-between align-items-start mb-2">
+                                                      <div className="gcd-card-title me-2">
+                                                          {asig.Materia?.nombre}
+                                                      </div>
+                                                      <span className="badge bg-light text-primary border flex-shrink-0">
+                                                          Cupos: {asig.cupos}
+                                                      </span>
+                                                  </div>
+      
+                                                  <Row style={{ fontSize: '0.85rem' }}>
+                                                      <Col xs={6}>
+                                                          <strong className="d-block text-dark">Horario:</strong>
+                                                          <span className="text-muted">
+                                                              {asig.dias?.join(", ")} <br />
+                                                              {asig.horaInicio} - {asig.horaFin}
+                                                          </span>
+                                                      </Col>
+                                                      <Col xs={6}>
+                                                          <strong className="d-block text-dark">Detalles:</strong>
+                                                          <span className="text-muted">
+                                                              Paralelo: {asig.paralelo} <br />
+                                                              Nivel: {asig.Materia?.nivel}
+                                                          </span>
+                                                      </Col>
+                                                      <Col xs={12} className="mt-2 pt-2 border-top">
+                                                          <small className="text-secondary fst-italic">
+                                                              <i className="bi bi-person-fill me-1"></i>
+                                                              {nombreCompletoDocente}
+                                                          </small>
+                                                          
+                                                      </Col>
+                                                  </Row>
+                                              </Card.Body>
+                                          </Card>
+                                      </Col>
+                                  );
+                              })}
+                          </Row>
+                      )}
       </div>
 
       {/* --- REUTILIZAMOS EL CONTENEDOR DE HORARIO --- */}
