@@ -82,7 +82,7 @@ function Index() {
             "BM": ["1ro BM", "2do BM", "3ro BM"],
             "BS": ["1ro BS", "2do BS", "3ro BS"],
             "BCH": ["1ro BCH", "2do BCH", "3ro BCH"],
-            "Agr": ["BM", "BS", "BCH", "BS BCH"],
+            "Agr": ["BM", "BS", "BCH", "BS BCH","BE","BM BS","BM BS BCH"], // Agrupaciones
           };
 
           const niveles = grupos[grupo] ?? [];
