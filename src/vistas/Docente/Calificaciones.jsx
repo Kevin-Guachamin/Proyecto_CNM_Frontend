@@ -41,9 +41,22 @@ function Calificaciones() {
   const [quim1Data, setQuim1Data] = useState([]);
   const [quim2Data, setQuim2Data] = useState([]);
   const [finalData, setFinalData] = useState([]);
-  const [activeMainTab, setActiveMainTab] = useState("quimestre1");
-  const [activeSubTabQuim1, setActiveSubTabQuim1] = useState("parcial1-quim1");
-  const [activeSubTabQuim2, setActiveSubTabQuim2] = useState("parcial1-quim2");
+  // Restaurar pestañas activas desde localStorage si existen
+  const [activeMainTab, setActiveMainTab] = useState(() => {
+    const saved = localStorage.getItem("activeMainTab");
+    console.log("🔍 Al cargar - activeMainTab desde localStorage:", saved);
+    return saved || "quimestre1";
+  });
+  const [activeSubTabQuim1, setActiveSubTabQuim1] = useState(() => {
+    const saved = localStorage.getItem("activeSubTabQuim1");
+    console.log("🔍 Al cargar - activeSubTabQuim1 desde localStorage:", saved);
+    return saved || "parcial1-quim1";
+  });
+  const [activeSubTabQuim2, setActiveSubTabQuim2] = useState(() => {
+    const saved = localStorage.getItem("activeSubTabQuim2");
+    console.log("🔍 Al cargar - activeSubTabQuim2 desde localStorage:", saved);
+    return saved || "parcial1-quim2";
+  });
   const [datosModulo, setDatosModulo] = useState(moduloSeleccionado || {});
   const [estadoFechas, setEstadoFechas] = useState({});
   const [textoRangoFechas, setTextoRangoFechas] = useState({});
@@ -101,6 +114,31 @@ function Calificaciones() {
   const [savedKeys, setSavedKeys] = useState(new Set());
   const [savedKeysQuim, setSavedKeysQuim] = useState(new Set());
   const [savedKeysFinal, setSavedKeysFinal] = useState(new Set());
+
+  // Funciones para agregar a savedKeys sin recargar
+  const agregarSavedKey = React.useCallback((key) => {
+    setSavedKeys(prev => {
+      const newSet = new Set(prev);
+      newSet.add(key);
+      return newSet;
+    });
+  }, []);
+
+  const agregarSavedKeyQuim = React.useCallback((key) => {
+    setSavedKeysQuim(prev => {
+      const newSet = new Set(prev);
+      newSet.add(key);
+      return newSet;
+    });
+  }, []);
+
+  const agregarSavedKeyFinal = React.useCallback((key) => {
+    setSavedKeysFinal(prev => {
+      const newSet = new Set(prev);
+      newSet.add(key);
+      return newSet;
+    });
+  }, []);
 
   const handleActualizarParcial1Quim1 = React.useCallback((datos) => {
     setParcial1Quim1Data(datos);
@@ -223,6 +261,14 @@ function Calificaciones() {
     obtenerSolicitud();
   }, []);
   
+  // Guardar pestañas activas en localStorage cada vez que cambien
+  useEffect(() => {
+    console.log("📌 Guardando en localStorage:", { activeMainTab, activeSubTabQuim1, activeSubTabQuim2 });
+    localStorage.setItem("activeMainTab", activeMainTab);
+    localStorage.setItem("activeSubTabQuim1", activeSubTabQuim1);
+    localStorage.setItem("activeSubTabQuim2", activeSubTabQuim2);
+  }, [activeMainTab, activeSubTabQuim1, activeSubTabQuim2]);
+  
   useEffect(() => {
     const storedUser = localStorage.getItem("usuario");
     const storedToken = localStorage.getItem("token");
@@ -299,12 +345,26 @@ function Calificaciones() {
         }
       }
       
-      // 2) GUARDADO PARCIAL: Filtrar solo las filas que estén 100% completas
-      const rowsCompletas = newRows.filter(row => {
-        // Verificar que TODOS los campos requeridos estén completos
+      // 2) GUARDADO PARCIAL: Filtrar filas que tienen al menos un campo con dato
+      const rowsConDatos = newRows.filter(row => {
+        // Verificar si tiene al menos un campo obligatorio con dato
+        if (isQuimestral) {
+          return row.examen != null && row.examen !== "";
+        } else {
+          // Para parciales: insumo1, insumo2, evaluacion
+          const tieneInsumo1 = row.insumo1 != null && row.insumo1 !== "";
+          const tieneInsumo2 = row.insumo2 != null && row.insumo2 !== "";
+          const tieneEval = row.evaluacion != null && row.evaluacion !== "";
+          const tieneComport = !esBe && Array.isArray(row.comportamiento) && row.comportamiento.some(v => v != null && v !== "");
+          
+          return tieneInsumo1 || tieneInsumo2 || tieneEval || tieneComport;
+        }
+      });
+
+      // 3) De las que tienen datos, verificar cuáles están COMPLETAS
+      const rowsCompletas = rowsConDatos.filter(row => {
         return requiredFields.every(field => {
           if (field === "comportamiento") {
-            // Validamos cada elemento dentro del array de comportamiento
             return Array.isArray(row[field]) && row[field].every(v => v != null && v !== "");
           } else {
             return row[field] != null && row[field] !== "";
@@ -312,24 +372,58 @@ function Calificaciones() {
         });
       });
 
+      // 4) Identificar filas INCOMPLETAS (tienen datos pero les falta algo)
+      const rowsIncompletas = rowsConDatos.filter(row => {
+        return !requiredFields.every(field => {
+          if (field === "comportamiento") {
+            return Array.isArray(row[field]) && row[field].every(v => v != null && v !== "");
+          } else {
+            return row[field] != null && row[field] !== "";
+          }
+        });
+      });
+
+      // Si hay filas incompletas, mostrar detalle específico
+      if (rowsIncompletas.length > 0) {
+        const detalles = rowsIncompletas.map(row => {
+          const camposFaltantes = [];
+          requiredFields.forEach(field => {
+            if (field === "comportamiento") {
+              if (!Array.isArray(row[field]) || !row[field].every(v => v != null && v !== "")) {
+                camposFaltantes.push("Comportamiento");
+              }
+            } else {
+              if (row[field] == null || row[field] === "") {
+                const nombreCampo = field === "insumo1" ? "Insumo 1" : 
+                                   field === "insumo2" ? "Insumo 2" : 
+                                   field === "evaluacion" ? "Evaluación Sumativa" :
+                                   field === "examen" ? "Examen" : field;
+                camposFaltantes.push(nombreCampo);
+              }
+            }
+          });
+          
+          // Obtener el índice real en activeData para mostrar el número de fila correcto
+          const indiceReal = activeData.findIndex(r => r.id_inscripcion === row.id_inscripcion);
+          const numeroFila = indiceReal !== -1 ? indiceReal + 1 : "?";
+          const nombreEstudiante = row.nombre ? `${row.nombre}` : `Fila ${numeroFila}`;
+          return `• Fila ${numeroFila} - ${nombreEstudiante}: Falta ${camposFaltantes.join(', ')}`;
+        }).join('\n');
+
+        return Swal.fire({
+          icon: "warning",
+          title: "No se puede guardar",
+          html: `<div style="text-align: left;">Faltan datos en:<br><br>${detalles.split('\n').join('<br>')}</div>`,
+          confirmButtonText: "OK"
+        });
+      }
+
       // Si no hay filas completas para guardar
       if (rowsCompletas.length === 0) {
         return Swal.fire({
           icon: "warning",
           title: "Sin datos completos",
           text: "No hay estudiantes con todas sus calificaciones completas para guardar."
-        });
-      }
-
-      // Mostrar advertencia si hay filas incompletas
-      const rowsIncompletas = newRows.length - rowsCompletas.length;
-      if (rowsIncompletas > 0) {
-        Swal.fire({
-          icon: "info",
-          title: "Guardado parcial",
-          html: `Se guardarán <b>${rowsCompletas.length}</b> estudiante(s).<br>Quedan <b>${rowsIncompletas}</b> estudiante(s) con datos incompletos.`,
-          timer: 2000,
-          showConfirmButton: false
         });
       }
       // 3) Realizar el POST con las filas completas
@@ -345,23 +439,20 @@ function Calificaciones() {
         .then((response) => {
           // Verificas el status o el contenido del response
           if (response.status === 201) {
-            // Significa que sí se insertaron registros
-            const mensaje = rowsIncompletas > 0 
-              ? `Se guardaron ${rowsCompletas.length} estudiante(s) correctamente. Quedan ${rowsIncompletas} pendiente(s).`
-              : "Calificaciones guardadas correctamente.";
-              
-            Swal.fire({
-              icon: "success",
-              title: "Guardado",
-              text: mensaje
-            }).then(() => { 
-              setInputsDisabled(true); 
-              localStorage.setItem("inputsLocked", "true");
-              setForceEdit(false); // Resetear para que la próxima vez detecte datos guardados
-              // Recargar la página para actualizar los datos con los IDs del backend
-              window.location.reload();
-            });
-            // Aquí actualizas tus savedKeys como venías haciendo
+            // Calcular totales para mensaje
+            const totalNuevos = newRows.length;
+            const guardados = rowsCompletas.length;
+            const faltantes = totalNuevos - guardados;
+            
+            // Mensaje según si guardó todo o parcial
+            let mensaje;
+            if (faltantes === 0) {
+              mensaje = "Calificaciones guardadas correctamente.";
+            } else {
+              mensaje = `Guardado(s) ${guardados} de ${totalNuevos} estudiante(s), faltan ${faltantes}.`;
+            }
+            
+            // Actualizar savedKeys ANTES de mostrar el mensaje
             if (isQuimestral) {
               setSavedKeysQuim(prev => {
                 const copy = new Set(prev);
@@ -375,6 +466,24 @@ function Calificaciones() {
                 return copy;
               });
             }
+              
+            Swal.fire({
+              icon: "success",
+              title: "Guardado",
+              text: mensaje
+            }).then(() => { 
+              setInputsDisabled(true); 
+              localStorage.setItem("inputsLocked", "true");
+              setForceEdit(false);
+              // Guardar las pestañas activas ANTES de recargar para mantener la posición
+              console.log("💾 ANTES de reload - Guardando:", { activeMainTab, activeSubTabQuim1, activeSubTabQuim2 });
+              localStorage.setItem("activeMainTab", activeMainTab);
+              localStorage.setItem("activeSubTabQuim1", activeSubTabQuim1);
+              localStorage.setItem("activeSubTabQuim2", activeSubTabQuim2);
+              console.log("✅ Valores guardados en localStorage");
+              // Recargar para obtener los IDs del backend
+              window.location.reload();
+            });
           }
           else if (
             response.status === 200 &&
@@ -400,41 +509,68 @@ function Calificaciones() {
     }
     // B) Lógica para Nota Final (Examen Supletorio)
     if (isFinal) {
-      // 1) Verificar que quienes estén entre 4 y 6.99 no dejen el supletorio vacío
-      const rowsNeedingSupleButEmpty = activeData.filter(row => {
+      // 1) Filtrar solo las filas que NO están guardadas todavía (registros nuevos)
+      // Nota: en Nota Final, `activeData` viene transformado desde `Final.jsx` y no incluye `idFinal`.
+      const newRows = activeData.filter(row => !savedKeysFinal.has(makeKeyFinal(row)));
+      
+      if (newRows.length === 0) {
+        return Swal.fire({
+          icon: "info",
+          title: "Sin cambios",
+          text: "Para editar una calificación ya guardada usa el botón ✏️ y guarda con el botón 💾 en Acciones."
+        });
+      }
+      
+      // 2) Verificar que quienes estén entre 4 y 6.99 no dejen el supletorio vacío
+      const rowsNeedingSupleButEmpty = newRows.filter(row => {
         const promedioAnual = parseFloat(row._promedioAnual) || 0;
-        const supleVal = row.examen_recuperacion ?? ""; // Usamos la clave que viene del hijo
-        return (promedioAnual >= 4 && promedioAnual < 7 && !supleVal);
+        const supleVal = row.examen_recuperacion;
+        const supleValNorm = typeof supleVal === "string" ? supleVal.trim() : supleVal;
+        const estaVacio = supleValNorm === "" || supleValNorm == null;
+        return (promedioAnual >= 4 && promedioAnual < 7 && estaVacio);
       });
 
       if (rowsNeedingSupleButEmpty.length > 0) {
+        const detalles = rowsNeedingSupleButEmpty.map(row => {
+          const indiceReal = activeData.findIndex(r => r.id_inscripcion === row.id_inscripcion);
+          const numeroFila = indiceReal !== -1 ? indiceReal + 1 : "?";
+          const nombreEstudiante = row.nombre ? String(row.nombre) : "";
+          const encabezado = nombreEstudiante ? `Fila ${numeroFila} - ${nombreEstudiante}` : `Fila ${numeroFila}`;
+          return `• ${encabezado}: Falta Examen Supletorio`;
+        }).join('\n');
+        
         return Swal.fire({
           icon: "warning",
-          title: "Campos vacíos",
-          text: "Los estudiantes con promedio anual entre 4 y 6.99 deben rendir supletorio."
+          title: "No se puede guardar",
+          html: `<div style="text-align: left;">Faltan datos en:<br><br>${detalles.split('\n').join('<br>')}</div>`,
+          confirmButtonText: "OK"
         });
       }
-      // 2) Excluir a los que tengan promedio <4 (pierden el año) o ≥7 (no necesitan supletorio)
-      const rowsToSave = activeData.filter(row => {
+      
+      // 3) Excluir a los que tengan promedio <4 (pierden el año) o ≥7 (no necesitan supletorio)
+      const rowsToSave = newRows.filter(row => {
         const promedioAnual = parseFloat(row._promedioAnual) || 0;
         if (promedioAnual < 4 || promedioAnual >= 7) {
           return false;
         }
         return true;
       });
-      // 3) Si no hay nada que guardar, salimos con un mensaje
+      
+      // 4) Si no hay nada que guardar, salimos con un mensaje
       if (rowsToSave.length === 0) {
         return Swal.fire({
           icon: "info",
           title: "Sin cambios",
-          text: "No hay supletorios para guardar."
+          text: "No hay supletorios nuevos para guardar."
         });
       }
       // 4) Transformar los datos (ej. fila["Examen Supletorio"] => examen_recuperacion)
-      const datosFiltrados = rowsToSave.map((row) => ({
-        id_inscripcion: row.id_inscripcion,
-        examen_recuperacion: row.examen_recuperacion,
-      }));
+      const datosFiltrados = rowsToSave
+        .filter(row => row.id_inscripcion) // Asegurar que tiene id_inscripcion válido
+        .map((row) => ({
+          id_inscripcion: row.id_inscripcion,
+          examen_recuperacion: parseFloat(row.examen_recuperacion),
+        }));
       // 5) Guardar en /finales/bulk
       axios.post(`${import.meta.env.VITE_URL_DEL_BACKEND}/finales/bulk`, datosFiltrados)
         .then((response) => {
@@ -448,6 +584,10 @@ function Calificaciones() {
             }).then(() => {
               setInputsDisabled(true);
               setForceEdit(false); // Resetear para que la próxima vez detecte datos guardados
+              // Guardar las pestañas activas antes de recargar
+              localStorage.setItem("activeMainTab", activeMainTab);
+              localStorage.setItem("activeSubTabQuim1", activeSubTabQuim1);
+              localStorage.setItem("activeSubTabQuim2", activeSubTabQuim2);
               // Recargar la página para actualizar los datos con los IDs del backend
               window.location.reload();
             });
@@ -499,10 +639,13 @@ function Calificaciones() {
   }
 
   const [forceEdit, setForceEdit] = useState(false);
+  const [editingRow, setEditingRow] = useState(null);
+  
   // Al cambiar de pestaña o subpestaña, volvemos a bloquear los inputs globalmente:
   useEffect(() => {
     setForceEdit(false);
     setInputsDisabled(true);
+    setEditingRow(null); // Resetear edición individual al cambiar de pestaña
   }, [activeMainTab, activeSubTabQuim1, activeSubTabQuim2]);
 
   const tieneDatosGuardados = () => {
@@ -527,7 +670,26 @@ function Calificaciones() {
         return tieneCamposLlenos(quim2Data, ["examen"]);
       }
     } else if (activeMainTab === "notaFinal") {
-      return tieneCamposLlenos(finalData, ["examen_recuperacion"]);
+      // Para Final, solo verificar estudiantes que REQUIEREN supletorio (4.00 ≤ promedio < 7.00)
+      // Los que tienen promedio >= 7 están aprobados sin supletorio
+      // Los que tienen promedio < 4 están reprobados sin opción a supletorio
+      const estudiantesConSupletorioRequerido = finalData.filter(row => {
+        const promedio = parseFloat(row._promedioAnual) || 0;
+        return promedio >= 4 && promedio < 7;
+      });
+      
+      // Si no hay estudiantes que requieran supletorio, no hay datos que guardar
+      if (estudiantesConSupletorioRequerido.length === 0) {
+        return false;
+      }
+      
+      // Verificar que todos los que requieren supletorio lo tengan guardado
+      // Un estudiante tiene supletorio guardado si:
+      // 1. Tiene idFinal (registro en BD) Y
+      // 2. El campo examen_recuperacion no está vacío
+      return estudiantesConSupletorioRequerido.every(row => 
+        row.idFinal && row.examen_recuperacion !== null && row.examen_recuperacion !== "" && row.examen_recuperacion !== undefined
+      );
     }
     return false;
   };
@@ -543,7 +705,9 @@ function Calificaciones() {
       setInputsDisabled,
       tieneDatosGuardados,
       solicitudAceptada,
-      solicitudEnRango
+      solicitudEnRango,
+      finalData,
+      datosModulo
     });
   };
 
@@ -608,8 +772,8 @@ function Calificaciones() {
   }, [activeMainTab, activeSubTabQuim1, activeSubTabQuim2]);
 
   const handleEditarFila = (rowIndex, rowData) => {
-    localStorage.removeItem("inputsLocked");
-    setInputsDisabled(false);
+    // No hacer nada aquí - la lógica de editingRow en Tabla.jsx ya maneja la habilitación de la fila individual
+    // Solo se usa para callbacks si es necesario en el futuro
   };
 
   // Determinar si es BE: puede ser por nivel directo o por tipoNivel en materias agrupadas
@@ -660,6 +824,11 @@ function Calificaciones() {
       makeKey={makeKey}
       makeKeyQuim={makeKeyQuim}
       makeKeyFinal={makeKeyFinal}
+      agregarSavedKey={agregarSavedKey}
+      agregarSavedKeyQuim={agregarSavedKeyQuim}
+      agregarSavedKeyFinal={agregarSavedKeyFinal}
+      editingRow={editingRow}
+      setEditingRow={setEditingRow}
     />
   );
 }

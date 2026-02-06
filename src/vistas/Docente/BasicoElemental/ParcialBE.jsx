@@ -6,7 +6,7 @@ import { ErrorMessage } from "../../../Utils/ErrorMesaje";
 import Swal from 'sweetalert2';
 import "../Parcial.css";
 
-function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, escala, esPorSolicitud, savedKeys, makeKey }) {
+function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatosParcial, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, escala, esPorSolicitud, savedKeys, makeKey, agregarSavedKey, editingRow, setEditingRow }) {
   // ID dinámico: pdf-parcial1-quim1, pdf-parcial2-quim1, pdf-parcial1-quim2, etc.
   const idContenedor = `pdf-parcial-be${parcialSeleccionado}-quim${quimestreSeleccionado}`;
 
@@ -158,23 +158,8 @@ function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatos
 
   // Manejar cambios en los inputs de la tabla
   const handleInputChange = (rowIndex, columnName, value) => {
-    if (!isWithinRange && !forceEdit) {
-      Swal.fire({
-        icon: 'info',
-        title: 'Fuera de fecha',
-        text: 'No se pueden editar notas fuera del rango de fechas establecido.',
-      });
-      return;
-    }
-
-    if (inputsDisabled) {
-      Swal.fire({
-        icon: 'info',
-        title: 'Edición bloqueada',
-        text: 'Este parcial ya se bloqueó o se guardó definitivamente.',
-      });
-      return;
-    }
+    // La validación de si está bloqueado ya se maneja en el atributo 'disabled' de los inputs
+    // que considera editingRow, savedKeys y rangos de fecha correctamente
 
     const nuevosDatos = datos.map((fila, i) => {
       if (i === rowIndex) {
@@ -400,12 +385,34 @@ function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatos
     }
   }, [datosModulo, quimestreSeleccionado, parcialSeleccionado]);
 
-  const handleGuardar = (rowIndex, rowData) => {
+  const handleGuardar = (rowIndex, rowData, onSuccessCallback) => {
     if (!rowData.idParcial) {
       Swal.fire({
         icon: "error",
         title: "Registro no encontrado",
         text: "No se puede actualizar porque aún no existe un registro para esta fila.",
+      });
+      return;
+    }
+
+    // Validar que todos los campos obligatorios estén completos (mejoramiento NO es obligatorio)
+    const camposVacios = [];
+    if (!rowData["INSUMO 1"] || rowData["INSUMO 1"] === "") camposVacios.push("Insumo 1");
+    if (!rowData["INSUMO 2"] || rowData["INSUMO 2"] === "") camposVacios.push("Insumo 2");
+    if (!rowData["EVALUACIÓN SUMATIVA"] || rowData["EVALUACIÓN SUMATIVA"] === "") camposVacios.push("Evaluación Sumativa");
+
+    if (camposVacios.length > 0) {
+      const listaCampos = camposVacios.length === 1 
+        ? camposVacios[0]
+        : camposVacios.length === 2
+        ? camposVacios.join(' y ')
+        : `${camposVacios.slice(0, -1).join(', ')} y ${camposVacios[camposVacios.length - 1]}`;
+      
+      Swal.fire({
+        icon: "warning",
+        title: "Faltan datos",
+        text: `Debes completar: ${listaCampos}`,
+        confirmButtonText: "OK"
       });
       return;
     }
@@ -443,6 +450,22 @@ function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatos
         const nuevaCopia = [...datosOriginales];
         nuevaCopia[rowIndex] = JSON.parse(JSON.stringify(rowData));
         setDatosOriginales(nuevaCopia);
+        
+        // Actualizar savedKeys para bloquear la fila inmediatamente sin recargar
+        if (agregarSavedKey && makeKey) {
+          const key = makeKey({
+            id_inscripcion: rowData.idInscripcion,
+            quimestre: obtenerEtiquetaQuimestre(),
+            parcial: obtenerEtiquetaParcial()
+          });
+          agregarSavedKey(key);
+          
+          // Forzar re-render
+          setDatos([...datos]);
+        }
+        
+        // Solo resetear editingRow si el guardado fue exitoso
+        if (onSuccessCallback) onSuccessCallback();
       })
       .catch((error) => {
         Swal.fire({
@@ -452,6 +475,85 @@ function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatos
         });
         ErrorMessage(error);
       });
+  };
+
+  const handleEliminar = (rowIndex, rowData) => {
+    if (!rowData.idParcial) {
+      Swal.fire({
+        icon: "warning",
+        title: "No hay registro",
+        text: "Esta fila aún no tiene calificaciones guardadas para eliminar.",
+      });
+      return;
+    }
+
+    Swal.fire({
+      icon: "warning",
+      title: "¿Eliminar calificaciones?",
+      text: `¿Estás seguro de eliminar las calificaciones de ${rowData["Nómina de Estudiantes"]}? Esta acción no se puede deshacer.`,
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .delete(`${import.meta.env.VITE_URL_DEL_BACKEND}/parcialesbe/${rowData.idParcial}`)
+          .then(() => {
+            Swal.fire({
+              icon: "success",
+              title: "Eliminado",
+              text: "Las calificaciones se eliminaron correctamente.",
+            }).then(() => {
+              // Actualizar el estado local sin recargar la página
+              const nuevosDatos = datos.map((fila, i) => {
+                if (i === rowIndex) {
+                  // Resetear valores a vacíos
+                  return {
+                    ...fila,
+                    idParcial: null,
+                    "INSUMO 1": "",
+                    "INSUMO 2": "",
+                    "EVALUACIÓN SUMATIVA": "",
+                    "EVALUACIÓN MEJORAMIENTO": "",
+                    "PROMEDIO": "",
+                    "PONDERACIÓN 70%": "",
+                    "PROMEDIO DE MEJORA": "",
+                    "PROMEDIO SUMATIVAS": "",
+                    "PONDERACIÓN 30%": "",
+                    "NOTA PARCIAL": "",
+                    [nombreColumnaExtra]: "-",
+                    [nombreColumnaExtra1]: "-"
+                  };
+                }
+                return fila;
+              });
+              
+              setDatos(nuevosDatos);
+              setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
+              
+              // Remover de savedKeys
+              if (savedKeys && makeKey) {
+                const key = makeKey({
+                  id_inscripcion: rowData.idInscripcion,
+                  quimestre: obtenerEtiquetaQuimestre(),
+                  parcial: obtenerEtiquetaParcial()
+                });
+                savedKeys.delete(key);
+              }
+            });
+          })
+          .catch((error) => {
+            Swal.fire({
+              icon: "error",
+              title: "Error al eliminar",
+              text: "No se pudo eliminar la calificación.",
+            });
+            ErrorMessage(error);
+          });
+      }
+    });
   };
 
   return (
@@ -471,12 +573,15 @@ function ParcialBE({ quimestreSeleccionado, parcialSeleccionado, actualizarDatos
         inputsDisabled={inputsDisabled}
         onEditar={onEditar}
         onGuardar={handleGuardar}
+        onEliminar={handleEliminar}
         rangoTexto={rangoTexto}
         isWithinRange={isWithinRange}
         globalEdit={forceEdit}
         soloLectura={soloLectura}
         esPorSolicitud={esPorSolicitud}
         esFilaDeshabilitada={esFilaDeshabilitada}
+        editingRow={editingRow}
+        setEditingRow={setEditingRow}
       />
     </div>
   );
