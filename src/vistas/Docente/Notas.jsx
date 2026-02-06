@@ -11,7 +11,8 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
   setActiveSubTabQuim1, setActiveSubTabQuim2, parcial1Quim1Data, parcial2Quim1Data, parcial1Quim2Data, parcial2Quim2Data, quim1Data,
   quim2Data, finalData, handleActualizarParcial1Quim1, handleActualizarParcial2Quim1, handleActualizarParcial1Quim2, handleActualizarParcial2Quim2,
   handleActualizarQuim1, handleActualizarQuim2, handleActualizarFinal, handleEditarFila, soloLectura, getRangoValido, esPorSolicitud,
-  savedKeys, savedKeysQuim, savedKeysFinal, makeKey, makeKeyQuim, makeKeyFinal}) {
+  savedKeys, savedKeysQuim, savedKeysFinal, makeKey, makeKeyQuim, makeKeyFinal, agregarSavedKey, agregarSavedKeyQuim, agregarSavedKeyFinal,
+  editingRow, setEditingRow}) {
   
   // Determinar el activeModule según el rol del usuario
   const getActiveModule = () => {
@@ -60,12 +61,13 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
               </div>
             </div>
             {/* TABS PRINCIPALES */}
-            <Tabs defaultActiveKey="quimestre1" id="calificaciones-tabs" className="mb-3" fill onSelect={(k) => setActiveMainTab(k)}>
+            <Tabs activeKey={activeMainTab} id="calificaciones-tabs" className="mb-3" fill onSelect={(k) => setActiveMainTab(k)}>
               {/* QUIMESTRE 1 */}
               <Tab eventKey="quimestre1" title="Quimestre 1">
-                <Tabs defaultActiveKey="parcial1-quim1" className="mb-3" fill onSelect={(k) => setActiveSubTabQuim1(k)}>
+                <Tabs activeKey={activeSubTabQuim1} className="mb-3" fill onSelect={(k) => setActiveSubTabQuim1(k)}>
                   <Tab eventKey="parcial1-quim1" title="Parcial 1 - Quim 1">
                     <Parcial
+                      key="parcial1-quim1"
                       quimestreSeleccionado="1"
                       parcialSeleccionado="1"
                       actualizarDatosParcial={handleActualizarParcial1Quim1}
@@ -80,11 +82,15 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                       esPorSolicitud={esPorSolicitud("parcial1-quim1")}
                       savedKeys={savedKeys}
                       makeKey={makeKey}
+                      agregarSavedKey={agregarSavedKey}
+                      editingRow={editingRow}
+                      setEditingRow={setEditingRow}
                     />
                   </Tab>
 
                   <Tab eventKey="parcial2-quim1" title="Parcial 2 - Quim 1">
                     <Parcial
+                      key="parcial2-quim1"
                       quimestreSeleccionado="1"
                       parcialSeleccionado="2"
                       actualizarDatosParcial={handleActualizarParcial2Quim1}
@@ -99,11 +105,15 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                       esPorSolicitud={esPorSolicitud("parcial2-quim1")}
                       savedKeys={savedKeys}
                       makeKey={makeKey}
+                      agregarSavedKey={agregarSavedKey}
+                      editingRow={editingRow}
+                      setEditingRow={setEditingRow}
                     />
                   </Tab>
 
                   <Tab eventKey="quimestral-quim1" title="Quimestre 1">
                     <Quimestral
+                      key="quimestral-quim1"
                       quimestreSeleccionado="1"
                       parcial1Data={parcial1Quim1Data}
                       parcial2Data={parcial2Quim1Data}
@@ -118,6 +128,9 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                       esPorSolicitud={esPorSolicitud("quimestral-quim1")}
                       savedKeysQuim={savedKeysQuim}
                       makeKeyQuim={makeKeyQuim}
+                      agregarSavedKeyQuim={agregarSavedKeyQuim}
+                      editingRow={editingRow}
+                      setEditingRow={setEditingRow}
                     />
                   </Tab>
                 </Tabs>
@@ -125,9 +138,10 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
 
               {/* QUIMESTRE 2 */}
               <Tab eventKey="quimestre2" title="Quimestre 2">
-                <Tabs defaultActiveKey="parcial1-quim2" className="mb-3" fill onSelect={(k) => setActiveSubTabQuim2(k)}>
+                <Tabs activeKey={activeSubTabQuim2} className="mb-3" fill onSelect={(k) => setActiveSubTabQuim2(k)}>
                   <Tab eventKey="parcial1-quim2" title="Parcial 1 - Quim 2">
                     <Parcial
+                      key="parcial1-quim2"
                       quimestreSeleccionado="2"
                       parcialSeleccionado="1"
                       actualizarDatosParcial={handleActualizarParcial1Quim2}
@@ -142,11 +156,15 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                       esPorSolicitud={esPorSolicitud("parcial1-quim2")}
                       savedKeys={savedKeys}
                       makeKey={makeKey}
+                      agregarSavedKey={agregarSavedKey}
+                      editingRow={editingRow}
+                      setEditingRow={setEditingRow}
                     />
                   </Tab>
 
                   <Tab eventKey="parcial2-quim2" title="Parcial 2 - Quim 2">
                     <Parcial
+                      key="parcial2-quim2"
                       quimestreSeleccionado="2"
                       parcialSeleccionado="2"
                       actualizarDatosParcial={handleActualizarParcial2Quim2}
@@ -161,11 +179,15 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                       esPorSolicitud={esPorSolicitud("parcial2-quim2")}
                       savedKeys={savedKeys}
                       makeKey={makeKey}
+                      agregarSavedKey={agregarSavedKey}
+                      editingRow={editingRow}
+                      setEditingRow={setEditingRow}
                     />
                   </Tab>
 
                   <Tab eventKey="quimestral-quim2" title="Quimestre 2">
                     <Quimestral
+                      key="quimestral-quim2"
                       quimestreSeleccionado="2"
                       parcial1Data={parcial1Quim2Data}
                       parcial2Data={parcial2Quim2Data}
@@ -180,6 +202,9 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                       esPorSolicitud={esPorSolicitud("quimestral-quim2")}
                       savedKeysQuim={savedKeysQuim}
                       makeKeyQuim={makeKeyQuim}
+                      agregarSavedKeyQuim={agregarSavedKeyQuim}
+                      editingRow={editingRow}
+                      setEditingRow={setEditingRow}
                     />
                   </Tab>
                 </Tabs>
@@ -189,6 +214,7 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
               <Tab eventKey="notaFinal" title="Nota Final">
                 <div className="tab-pane active">
                   <Final
+                    key="notaFinal"
                     quim1Data={quim1Data}
                     quim2Data={quim2Data}
                     datosModulo={datosModulo}
@@ -202,6 +228,9 @@ function Notas({ usuario, modules, datosModulo, handleSidebarNavigation, handleE
                     esPorSolicitud={esPorSolicitud("notaFinal")}
                     savedKeysFinal={savedKeysFinal}
                     makeKeyFinal={makeKeyFinal}
+                    agregarSavedKeyFinal={agregarSavedKeyFinal}
+                    editingRow={editingRow}
+                    setEditingRow={setEditingRow}
                   />
                 </div>
               </Tab>

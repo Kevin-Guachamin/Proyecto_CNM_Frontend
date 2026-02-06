@@ -5,7 +5,7 @@ import axios from "axios";
 import { ErrorMessage } from "../../../Utils/ErrorMesaje";
 import "../Parcial.css";
 
-const FinalBE = ({ quim1Data, quim2Data, datosModulo, escala, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, esPorSolicitud, actualizarDatosFinal, savedKeysFinal, makeKeyFinal }) => {
+const FinalBE = ({ quim1Data, quim2Data, datosModulo, escala, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, esPorSolicitud, actualizarDatosFinal, savedKeysFinal, makeKeyFinal, editingRow, setEditingRow }) => {
   const [datos, setDatos] = useState([]);
   const idContenedor = `pdf-final`;
 
@@ -120,6 +120,8 @@ const FinalBE = ({ quim1Data, quim2Data, datosModulo, escala, inputsDisabled, on
         columnasEditables={[]}
         inputsDisabled={true}
         soloLectura={true}
+        editingRow={editingRow}
+        setEditingRow={setEditingRow}
       />
     </div>
   );

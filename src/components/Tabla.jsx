@@ -7,10 +7,14 @@ import "./Tabla.css";
 
 const Tabla = ({
   columnas, columnasAgrupadas, datos, onChange, columnasEditables = [],
-  mostrarEditar = true, mostrarGuardar = true, onEditar, onGuardar, inputsDisabled,
-  isWithinRange, rangoTexto, globalEdit, forceEdit, clasePersonalizada = "", soloLectura, esPorSolicitud = false, esFilaDeshabilitada }) => {
+  mostrarEditar = true, mostrarGuardar = true, onEditar, onGuardar, onEliminar, inputsDisabled,
+  isWithinRange, rangoTexto, globalEdit, forceEdit, clasePersonalizada = "", soloLectura, esPorSolicitud = false, esFilaDeshabilitada,
+  editingRow: externalEditingRow, setEditingRow: externalSetEditingRow }) => {
   
-  const [editingRow, setEditingRow] = useState(null);
+  // Usar estado externo si existe, sino usar estado local
+  const [localEditingRow, setLocalEditingRow] = useState(null);
+  const editingRow = externalEditingRow !== undefined ? externalEditingRow : localEditingRow;
+  const setEditingRow = externalSetEditingRow || setLocalEditingRow;
   const columnasRepetidas = ["Nro", "Nómina de Estudiantes"];
   const columnaFinal = "Acciones";
   
@@ -74,6 +78,19 @@ const Tabla = ({
                             <button
                               className="btn btn-sm btn-primary text-white"
                               onClick={() => {
+                                // Verificar si la fila tiene un registro guardado en la base de datos
+                                const tieneRegistroGuardado = fila.idParcial || fila.idQuimestral || fila.idFinal;
+                                
+                                if (!tieneRegistroGuardado) {
+                                  Swal.fire({
+                                    icon: "info",
+                                    title: "Sin registro guardado",
+                                    text: "Esta fila aún no tiene calificaciones guardadas. Usa el botón amarillo de edición global para ingresar nuevas calificaciones.",
+                                    confirmButtonText: "Entendido"
+                                  });
+                                  return;
+                                }
+                                
                                 // Permitir edición si está dentro del rango O si forceEdit está activo (solicitud aprobada)
                                 if (!isWithinRange && !forceEdit) {
                                   Swal.fire({
@@ -105,10 +122,21 @@ const Tabla = ({
                             <button
                               className="btn btn-success-light btn-sm text-white"
                               onClick={() => {
-                                if (onGuardar) onGuardar(i, fila);
-                                setEditingRow(null); // Sale del modo edición.
+                                if (onGuardar) {
+                                  // Llamar a onGuardar y pasarle un callback para resetear editingRow solo si es exitoso
+                                  onGuardar(i, fila, () => setEditingRow(null));
+                                }
                               }}>
                               <i className="bi bi-floppy2-fill" ></i>
+                            </button>
+                          )}
+                          {onEliminar && (
+                            <button
+                              className="btn btn-danger btn-sm text-white"
+                              onClick={() => {
+                                if (onEliminar) onEliminar(i, fila);
+                              }}>
+                              <i className="bi bi-trash-fill" ></i>
                             </button>
                           )}
                         </div>
@@ -133,8 +161,8 @@ const Tabla = ({
                                 typeof valor === "string"
                                   ? parseFloat(valor)
                                   : parseFloat(valor?.props?.children) || 0;
-                              // Si el promedio anual es mayor o igual a 7, mostramos solo "-" y no input
-                              if (promedio >= 7) {
+                              // Si el promedio anual es >= 7 (aprobado) o < 4 (reprobado sin opción), mostramos solo "-"
+                              if (promedio >= 7 || promedio < 4) {
                                 return <span className="screen-only">-</span>;
                               } else {
                                 return (
@@ -155,7 +183,7 @@ const Tabla = ({
                                     data-columna={col}
                                     disabled={
                                       esFilaDeshabilitada 
-                                        ? esFilaDeshabilitada(fila) || (promedio < 4)
+                                        ? (esFilaDeshabilitada(fila) && editingRow !== i) || (promedio < 4)
                                         : inputsDisabled || editingRow !== i || (promedio < 4)
                                     }
                                   />
@@ -180,8 +208,8 @@ const Tabla = ({
                               data-columna={col}
                               disabled={
                                 esFilaDeshabilitada
-                                  ? esFilaDeshabilitada(fila)
-                                  : inputsDisabled || (globalEdit ? false : editingRow !== i)
+                                  ? (esFilaDeshabilitada(fila) && editingRow !== i)
+                                  : inputsDisabled || editingRow !== i
                               }
                             />
                           )

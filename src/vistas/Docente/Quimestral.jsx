@@ -7,7 +7,7 @@ import { ErrorMessage } from "../../Utils/ErrorMesaje";
 import { calcularPromedioQuimestral, calcularPromedioComportamiento, calcularValoracionComportamiento, abreviarNivel } from "./Promedios";
 import "./Parcial.css";
 
-const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actualizarDatosQuim, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, esPorSolicitud, savedKeysQuim, makeKeyQuim }) => {
+const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actualizarDatosQuim, datosModulo, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, esPorSolicitud, savedKeysQuim, makeKeyQuim, agregarSavedKeyQuim, editingRow, setEditingRow }) => {
 
   const idContenedor = `pdf-quimestral-quim${quimestreSeleccionado}`;
 
@@ -194,23 +194,8 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
 
   // Función para manejar cambios en los inputs de la tabla (en este caso, solo para la columna "Examen")
   const handleInputChange = (rowIndex, columnName, value) => {
-    if (!isWithinRange && !forceEdit) {
-      Swal.fire({
-        icon: 'info',
-        title: 'Fuera de fecha',
-        text: 'No se pueden editar notas fuera del rango de fechas establecido.',
-      });
-      return;
-    }
-
-    if (inputsDisabled) {
-      Swal.fire({
-        icon: 'info',
-        title: 'Edición bloqueada',
-        text: 'Este quimestre ya fue guardado o bloqueado.',
-      });
-      return;
-    }
+    // La validación de si está bloqueado ya se maneja en el atributo 'disabled' de los inputs
+    // que considera editingRow, savedKeys y rangos de fecha correctamente
 
     const nuevosDatos = datos.map((fila, i) => {
       if (i === rowIndex) {
@@ -306,12 +291,23 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
     return inputsDisabled;
   };
 
-  const handleGuardar = (rowIndex, rowData) => {
+  const handleGuardar = (rowIndex, rowData, onSuccessCallback) => {
     if (!rowData.idQuimestral) {
       Swal.fire({
         icon: "error",
         title: "Registro no encontrado",
         text: "No se puede actualizar porque aún no existe un registro para este estudiante.",
+      });
+      return;
+    }
+
+    // Validar que el examen esté completo
+    if (!rowData["Examen"] || rowData["Examen"] === "") {
+      Swal.fire({
+        icon: "warning",
+        title: "Faltan datos",
+        text: "Debes ingresar la nota del examen antes de guardar.",
+        confirmButtonText: "OK"
       });
       return;
     }
@@ -355,6 +351,21 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
         const copia = [...datosOriginales];
         copia[rowIndex] = JSON.parse(JSON.stringify(rowData));
         setDatosOriginales(copia);
+        
+        // Actualizar savedKeysQuim para bloquear la fila inmediatamente sin recargar
+        if (agregarSavedKeyQuim && makeKeyQuim) {
+          const key = makeKeyQuim({
+            id_inscripcion: rowData.idInscripcion,
+            quimestre: quimestreSeleccionado === "1" ? "Q1" : "Q2"
+          });
+          agregarSavedKeyQuim(key);
+          
+          // Forzar re-render
+          setDatos([...datos]);
+        }
+        
+        // Solo resetear editingRow si el guardado fue exitoso
+        if (onSuccessCallback) onSuccessCallback();
       })
       .catch((error) => {
         Swal.fire({
@@ -364,6 +375,74 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
         });
         ErrorMessage(error);
       });
+  };
+
+  const handleEliminar = (rowIndex, rowData) => {
+    if (!rowData.idQuimestral) {
+      Swal.fire({
+        icon: "warning",
+        title: "No hay registro",
+        text: "Esta fila aún no tiene calificaciones guardadas para eliminar.",
+      });
+      return;
+    }
+
+    Swal.fire({
+      icon: "warning",
+      title: "¿Eliminar calificaciones?",
+      text: `¿Estás seguro de eliminar las calificaciones quimestrales de ${rowData["Nómina de Estudiantes"]}? Esta acción no se puede deshacer.`,
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .delete(`${import.meta.env.VITE_URL_DEL_BACKEND}/quimestrales/${rowData.idQuimestral}`)
+          .then(() => {
+            Swal.fire({
+              icon: "success",
+              title: "Eliminado",
+              text: "Las calificaciones quimestrales se eliminaron correctamente.",
+            }).then(() => {
+              // Actualizar el estado local sin recargar
+              const nuevosDatos = datos.map((fila, i) => {
+                if (i === rowIndex) {
+                  return {
+                    ...fila,
+                    idQuimestral: null,
+                    "Examen": "",
+                    "Promedio Quimestral": "",
+                    "Examen Supletorio": ""
+                  };
+                }
+                return fila;
+              });
+              
+              setDatos(nuevosDatos);
+              setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
+              
+              // Remover de savedKeys
+              if (savedKeysQuim && makeKeyQuim) {
+                const key = makeKeyQuim({
+                  id_inscripcion: rowData.idInscripcion,
+                  quimestre: obtenerEtiquetaQuimestre()
+                });
+                savedKeysQuim.delete(key);
+              }
+            });
+          })
+          .catch((error) => {
+            Swal.fire({
+              icon: "error",
+              title: "Error al eliminar",
+              text: "No se pudo eliminar la calificación.",
+            });
+            ErrorMessage(error);
+          });
+      }
+    });
   };
 
   return (
@@ -387,12 +466,15 @@ const Quimestral = ({ quimestreSeleccionado, parcial1Data, parcial2Data, actuali
         inputsDisabled={inputsDisabled}
         onEditar={onEditar}
         onGuardar={handleGuardar}
+        onEliminar={handleEliminar}
         rangoTexto={rangoTexto}
         isWithinRange={isWithinRange}
         globalEdit={forceEdit}
         soloLectura={soloLectura}
         esPorSolicitud={esPorSolicitud}
         esFilaDeshabilitada={esFilaDeshabilitada}
+        editingRow={editingRow}
+        setEditingRow={setEditingRow}
       />
     </div>
   );

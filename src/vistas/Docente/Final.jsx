@@ -7,17 +7,21 @@ import { ErrorMessage } from "../../Utils/ErrorMesaje";
 import { calcularPromedioAnual, calcularPromedioComportamientoFinal, calcularPromedioFinalConSupletorio, determinarEstado, calcularValoracionComportamiento, abreviarNivel } from "./Promedios";
 import "./Parcial.css";
 
-const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, esPorSolicitud, savedKeysFinal, makeKeyFinal }) => {
+const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputsDisabled, onEditar, isWithinRange, rangoTexto, forceEdit, soloLectura, esPorSolicitud, savedKeysFinal, makeKeyFinal, agregarSavedKeyFinal, editingRow, setEditingRow }) => {
   const [datos, setDatos] = useState([]);
 
   const idContenedor = `pdf-final`;
 
   const transformarDatosFinalParaGuardar = (datos) => {
     return datos.map((fila) => {
+      const supleRaw = fila["Examen Supletorio"];
+      const supleNorm = typeof supleRaw === "string" ? supleRaw.trim() : supleRaw;
       return {
         id_inscripcion: fila.idInscripcion, // 👈 cambia la clave a minúscula y con guión bajo      
-        examen_recuperacion: parseFloat(fila["Examen Supletorio"]) || 0,
+        // Importante: conservar vacío para poder validar correctamente en el guardado global
+        examen_recuperacion: supleNorm === "" || supleNorm == null ? "" : parseFloat(supleNorm),
         _promedioAnual: fila._promedioAnual,
+        nombre: fila["Nómina de Estudiantes"],
       };
     });
   };
@@ -334,7 +338,28 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
     return inputsDisabled;
   };
 
-  const handleGuardar = (rowIndex, rowData) => {
+  const handleGuardar = (rowIndex, rowData, onSuccessCallback) => {
+    if (!rowData.idFinal) {
+      Swal.fire({
+        icon: "error",
+        title: "Registro no encontrado",
+        text: "No se puede actualizar porque aún no existe un registro para este estudiante.",
+      });
+      return;
+    }
+    
+    // Validar que el examen supletorio tenga valor si es necesario
+    const promedioAnual = parseFloat(rowData._promedioAnual);
+    if (promedioAnual < 7 && (!rowData["Examen Supletorio"] || rowData["Examen Supletorio"] === "")) {
+      Swal.fire({
+        icon: "warning",
+        title: "Faltan datos",
+        text: "Este estudiante requiere examen supletorio. Debes ingresar la nota antes de guardar.",
+        confirmButtonText: "OK"
+      });
+      return;
+    }
+
     const original = datosOriginales[rowIndex];
     const haCambiado =
       parseFloat(rowData["Examen Supletorio"] || 0).toFixed(2) !==
@@ -396,15 +421,109 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
           "Estado": estadoFinal,
         };
         setDatosOriginales(nuevosOriginales);
+        
+        // Actualizar savedKeysFinal para bloquear la fila inmediatamente sin recargar
+        if (agregarSavedKeyFinal && makeKeyFinal) {
+          const key = makeKeyFinal({ id_inscripcion: rowData.idInscripcion });
+          agregarSavedKeyFinal(key);
+          
+          // Forzar re-render
+          setDatos([...nuevaCopia]);
+        }
+        
+        // Solo resetear editingRow si el guardado fue exitoso
+        if (onSuccessCallback) onSuccessCallback();
       })
       .catch((error) => {
+        let mensajeError = "No se pudo actualizar el examen supletorio.";
+        
+        if (error.response) {
+          // El servidor respondió con un código de error
+          if (error.response.status === 404) {
+            mensajeError = "Registro no encontrado en el servidor.";
+          } else if (error.response.status === 400) {
+            mensajeError = error.response.data?.message || "Datos inválidos enviados al servidor.";
+          } else if (error.response.status === 500) {
+            mensajeError = "Error interno del servidor. Intenta nuevamente.";
+          } else {
+            mensajeError = error.response.data?.message || `Error ${error.response.status}: No se pudo actualizar.`;
+          }
+        } else if (error.request) {
+          mensajeError = "No se recibió respuesta del servidor. Verifica tu conexión.";
+        }
+        
         Swal.fire({
           icon: "error",
           title: "Error al actualizar ❌",
-          text: "No se pudo actualizar el examen supletorio.",
+          text: mensajeError,
         });
         ErrorMessage(error);
       });
+  };
+
+  const handleEliminar = (rowIndex, rowData) => {
+    if (!rowData.idFinal) {
+      Swal.fire({
+        icon: "warning",
+        title: "No hay registro",
+        text: "Esta fila aún no tiene calificaciones guardadas para eliminar.",
+      });
+      return;
+    }
+
+    Swal.fire({
+      icon: "warning",
+      title: "¿Eliminar calificaciones?",
+      text: `¿Estás seguro de eliminar las calificaciones finales de ${rowData["Nómina de Estudiantes"]}? Esta acción no se puede deshacer.`,
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .delete(`${import.meta.env.VITE_URL_DEL_BACKEND}/finales/${rowData.idFinal}`)
+          .then(() => {
+            Swal.fire({
+              icon: "success",
+              title: "Eliminado",
+              text: "Las calificaciones finales se eliminaron correctamente.",
+            }).then(() => {
+              // Actualizar el estado local sin recargar
+              const nuevosDatos = datos.map((fila, i) => {
+                if (i === rowIndex) {
+                  return {
+                    ...fila,
+                    idFinal: null,
+                    "Examen Supletorio": ""
+                  };
+                }
+                return fila;
+              });
+              
+              setDatos(nuevosDatos);
+              setDatosOriginales(JSON.parse(JSON.stringify(nuevosDatos)));
+              
+              // Remover de savedKeys
+              if (savedKeysFinal && makeKeyFinal) {
+                const key = makeKeyFinal({
+                  id_inscripcion: rowData.idInscripcion
+                });
+                savedKeysFinal.delete(key);
+              }
+            });
+          })
+          .catch((error) => {
+            Swal.fire({
+              icon: "error",
+              title: "Error al eliminar",
+              text: "No se pudo eliminar la calificación.",
+            });
+            ErrorMessage(error);
+          });
+      }
+    });
   };
 
   return (
@@ -429,12 +548,15 @@ const Final = ({ quim1Data, quim2Data, datosModulo, actualizarDatosFinal, inputs
         inputsDisabled={inputsDisabled}
         onEditar={onEditar}
         onGuardar={handleGuardar}
+        onEliminar={handleEliminar}
         rangoTexto={rangoTexto}
         isWithinRange={isWithinRange}
         globalEdit={forceEdit}
         soloLectura={soloLectura}
         esPorSolicitud={esPorSolicitud}
         esFilaDeshabilitada={esFilaDeshabilitada}
+        editingRow={editingRow}
+        setEditingRow={setEditingRow}
       />
     </div>
   );

@@ -204,7 +204,9 @@ export const handleEditar = ({
   setInputsDisabled,
   tieneDatosGuardados,
   solicitudAceptada,
-  solicitudEnRango
+  solicitudEnRango,
+  finalData = [],
+  datosModulo = {}
 }) => {
   let currentSubTab = "";
   if (activeMainTab === "quimestre1") {
@@ -241,6 +243,36 @@ export const handleEditar = ({
       text: "Los campos ya se encuentran disponibles para edición.",
     });
     return;
+  }
+
+  // Validación especial para Nota Final
+  if (activeMainTab === "notaFinal") {
+    const esBE = datosModulo?.nivel?.toLowerCase().includes("be") || datosModulo?.tipoNivel === "BE";
+    
+    if (esBE) {
+      // En BE no hay examen supletorio, solo es resumen
+      Swal.fire({
+        icon: "info",
+        title: "Sin campos editables",
+        text: "En Básico Elemental, la Nota Final es solo un resumen de quimestrales. No hay calificaciones para registrar.",
+      });
+      return;
+    }
+    
+    // Para Superior, verificar si hay estudiantes que requieran supletorio
+    const estudiantesConSupletorioRequerido = finalData.filter(row => {
+      const promedio = parseFloat(row._promedioAnual) || 0;
+      return promedio >= 4 && promedio < 7;
+    });
+    
+    if (estudiantesConSupletorioRequerido.length === 0) {
+      Swal.fire({
+        icon: "info",
+        title: "Sin estudiantes para supletorio",
+        text: "No hay estudiantes que requieran examen supletorio. Todos tienen promedios aprobados (≥7.00) o están directamente reprobados (<4.00).",
+      });
+      return;
+    }
   }
 
   if (tieneDatosGuardados()) {
