@@ -171,7 +171,11 @@
 }
 
 .pdf-export .table-responsive {
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
   overflow-x: visible !important;
+  overflow-y: visible !important;
 }
 
 /* Manejo de inputs vs texto */

@@ -28,14 +28,16 @@ function dataUrlBytes(dataUrl) {
 /* Genera dataURL intentando WEBP y luego JPEG con calidades/DPI decrecientes hasta quedar bajo maxKB */
 function compressCanvasAdaptive(sourceCanvas, targetWidthPt, maxKB = 120) {
   // 72 pt = 1 inch → px deseados = (pt/72)*DPI
-  const dpiSteps = [160, 140, 120, 100, 90];            // baja si aún queda pesado
-  const qualStepsWebP = [0.75, 0.65, 0.55, 0.45];
-  const qualStepsJpeg = [0.72, 0.65, 0.6, 0.5, 0.45];
+  // DPI más alto = más nitidez (especialmente texto/lineas). Luego baja si queda muy pesado.
+  const dpiSteps = [300, 260, 220, 200, 180, 160];
+  const qualStepsWebP = [0.9, 0.85, 0.8, 0.75, 0.7];
+  const qualStepsJpeg = [0.92, 0.88, 0.84, 0.8, 0.75, 0.7];
 
   const maxBytes = maxKB * 1024;
 
   for (const dpi of dpiSteps) {
-    const targetWidthPx = Math.max(600, Math.round((targetWidthPt / 72) * dpi));
+    // Mantén un piso mayor para evitar que el texto se vea borroso.
+    const targetWidthPx = Math.max(1400, Math.round((targetWidthPt / 72) * dpi));
     const scaled = resampleCanvas(sourceCanvas, targetWidthPx);
 
     // 1) WEBP (mucho más eficiente si jsPDF soporta)
@@ -56,7 +58,7 @@ function compressCanvasAdaptive(sourceCanvas, targetWidthPt, maxKB = 120) {
   }
 
   // si nada cumple el límite, devuelve lo “menos pesado” probado (último intento)
-  const lastTargetWidthPx = Math.round((targetWidthPt / 72) * dpiSteps.at(-1));
+  const lastTargetWidthPx = Math.max(1400, Math.round((targetWidthPt / 72) * dpiSteps.at(-1)));
   const lastScaled = resampleCanvas(sourceCanvas, lastTargetWidthPx);
   const url = lastScaled.toDataURL("image/jpeg", 0.45);
   return { url, fmt: "JPEG", dpi: dpiSteps.at(-1), q: 0.45 };
@@ -148,13 +150,54 @@ export const handleExportPDF = async () => {
     const xOffset = isParcial ? 30 : 40;
     const yOffset = isParcial ? (pageHeight - imgHeight) / 10 : (pageHeight - imgHeight) / 8;
 
-    // Genera imagen optimizada <= 120 KB (ajusta si quieres 80/100/150)
-    const { url, fmt } = compressCanvasAdaptive(canvas, imgWidth, /*maxKB*/ 120);
+    // Genera imagen optimizada (subimos el límite para mejorar nitidez)
+    const { url, fmt } = compressCanvasAdaptive(canvas, imgWidth, /*maxKB*/ 400);
 
     // addImage soporta 'WEBP' en jsPDF recientes; si no, cae a JPEG sin romper formato
     const formatForJsPDF = fmt === "WEBP" ? "WEBP" : "JPEG";
 
-    pdf.addImage(url, formatForJsPDF, xOffset, yOffset, imgWidth, imgHeight);
+    // Si el contenido excede el alto de una hoja, jsPDF recorta.
+    // 1) Intentar encajar en 1 hoja reduciendo escala (solo si no queda demasiado pequeño).
+    // 2) Si aún no alcanza, dibujar la MISMA imagen en páginas sucesivas desplazando el eje Y.
+    const topMargin = 10;
+    const bottomMargin = 10;
+    const maxHeightOnePage = pageHeight - topMargin - bottomMargin;
+
+    let drawX = xOffset;
+    let drawY = yOffset;
+    let drawWidth = imgWidth;
+    let drawHeight = imgHeight;
+    let needsMultiPage = imgHeight > pageHeight;
+
+    if (needsMultiPage) {
+      const scaleToFit = maxHeightOnePage / imgHeight;
+      const minReadableScale = 0.75; // si hay que encoger más que esto, mejor paginar
+
+      if (scaleToFit >= minReadableScale) {
+        drawWidth = imgWidth * scaleToFit;
+        drawHeight = imgHeight * scaleToFit;
+        drawY = topMargin;
+        needsMultiPage = false;
+      } else {
+        drawY = topMargin;
+      }
+    }
+
+    const imageAlias = "calif-export";
+    pdf.addImage(url, formatForJsPDF, drawX, drawY, drawWidth, drawHeight, imageAlias);
+
+    if (needsMultiPage) {
+      let heightLeft = drawHeight + drawY - pageHeight;
+      let pageIndex = 1;
+
+      while (heightLeft > 1) {
+        pdf.addPage();
+        const nextY = drawY - pageHeight * pageIndex;
+        pdf.addImage(url, formatForJsPDF, drawX, nextY, drawWidth, drawHeight, imageAlias);
+        heightLeft -= pageHeight;
+        pageIndex += 1;
+      }
+    }
 
     // ==============================
     //    Nombre de archivo (igual)
