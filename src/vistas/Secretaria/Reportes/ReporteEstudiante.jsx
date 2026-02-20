@@ -19,9 +19,11 @@ function ReporteEstudiante() {
   const { estudiante, esBE } = useLocation().state || {};
   const navigate = useNavigate();
   const [materias, setMaterias] = useState([]);
+  const [materiasQuim, setMateriasQuim] = useState([]);
   const [loading, setLoading] = useState(true);
   const [usuario, setUsuario] = useState(null);
   const [modules, setModules] = useState([]);
+  const [tabActiva, setTabActiva] = useState("q1");
 
   // ---- ref para el certificado completo ----
   const certificadoRef = useRef(null);
@@ -54,6 +56,7 @@ function ReporteEstudiante() {
         );
 
         const resultados = [];
+        const resultadosQuim = [];
         for (const insc of inscData) {
           if (esBE) {
             const { data: parciales } = await axios.get(
@@ -63,7 +66,7 @@ function ReporteEstudiante() {
               `${import.meta.env.VITE_URL_DEL_BACKEND}/quimestralesbe/asignacion/${insc.ID_asignacion}`
             );
 
-            const { promedioFinal } = calcularPromedioFinalBE(
+            const { promedioFinal, detalle } = calcularPromedioFinalBE(
               parciales,
               quimestrales,
               insc.ID
@@ -76,6 +79,14 @@ function ReporteEstudiante() {
                 ? obtenerCualitativa(promedioFinal)
                 : "—",
             });
+
+            resultadosQuim.push({
+              Asignatura: insc.Asignacion?.Materia?.nombre || "—",
+              "Prom. Q1": detalle?.q1Final?.toFixed(2) ?? "—",
+              "Cuali. Q1": detalle?.q1Final ? obtenerCualitativa(detalle.q1Final) : "—",
+              "Prom. Q2": detalle?.q2Final?.toFixed(2) ?? "—",
+              "Cuali. Q2": detalle?.q2Final ? obtenerCualitativa(detalle.q2Final) : "—",
+            });
           } else {
             const { data: parciales } = await axios.get(
               `${import.meta.env.VITE_URL_DEL_BACKEND}/parciales/asignacion/${insc.ID_asignacion}`
@@ -87,7 +98,7 @@ function ReporteEstudiante() {
               `${import.meta.env.VITE_URL_DEL_BACKEND}/finales/asignacion/${insc.ID_asignacion}`
             );
 
-            const { promedioFinal } = calcularPromedioFinalNormal(
+            const { promedioFinal, detalle } = calcularPromedioFinalNormal(
               parciales,
               quimestrales,
               finales,
@@ -107,10 +118,19 @@ function ReporteEstudiante() {
                 ? obtenerEstado(promedioFinal)
                 : "—",
             });
+
+            resultadosQuim.push({
+              Asignatura: insc.Asignacion?.Materia?.nombre || "—",
+              "Prom. Q1": detalle?.finalQ1?.toFixed(2) ?? "—",
+              "Cuali. Q1": detalle?.finalQ1 ? obtenerCualitativa(detalle.finalQ1) : "—",
+              "Prom. Q2": detalle?.finalQ2?.toFixed(2) ?? "—",
+              "Cuali. Q2": detalle?.finalQ2 ? obtenerCualitativa(detalle.finalQ2) : "—",
+            });
           }
         }
 
         setMaterias(resultados);
+        setMateriasQuim(resultadosQuim);
       } catch (err) {
         ErrorMessage(err);
         Swal.fire("Error", "No se pudo calcular la nota final.", "error");
@@ -249,21 +269,95 @@ function ReporteEstudiante() {
               imagenIzquierda="/ConservatorioNacional.png"
               imagenDerecha="/Ministerio.png"
             />
-            <div className="tabla-certificado mt-4">
-              <table className="table table-bordered text-center">
-                <thead className="table-primary">
-                  <tr>{columnas.map((c, i) => <th key={i}>{c}</th>)}</tr>
-                </thead>
-                <tbody>
-                  {materias.map((m, i) => (
-                    <tr key={i}>
-                      <td>{m.Asignatura}</td>
-                      <td>{m["Promedio Final"]}</td>
-                      <td>{m["Calificación Cualitativa"]}</td>
+
+            {/* Pestañas Q1 / Q2 / Final */}
+            <ul className="nav nav-tabs mt-3 mb-0">
+              <li className="nav-item">
+                <button
+                  className={`nav-link ${tabActiva === "q1" ? "active" : ""}`}
+                  onClick={() => setTabActiva("q1")}
+                  type="button"
+                >
+                  Quimestre 1
+                </button>
+              </li>
+              <li className="nav-item">
+                <button
+                  className={`nav-link ${tabActiva === "q2" ? "active" : ""}`}
+                  onClick={() => setTabActiva("q2")}
+                  type="button"
+                >
+                  Quimestre 2
+                </button>
+              </li>
+              <li className="nav-item">
+                <button
+                  className={`nav-link ${tabActiva === "final" ? "active" : ""}`}
+                  onClick={() => setTabActiva("final")}
+                  type="button"
+                >
+                  Reporte Final
+                </button>
+              </li>
+            </ul>
+
+            <div className="tabla-certificado">
+              {tabActiva === "final" && (
+                <table className="table table-bordered text-center">
+                  <thead className="table-primary">
+                    <tr>{columnas.map((c, i) => <th key={i}>{c}</th>)}</tr>
+                  </thead>
+                  <tbody>
+                    {materias.map((m, i) => (
+                      <tr key={i}>
+                        <td>{m.Asignatura}</td>
+                        <td>{m["Promedio Final"]}</td>
+                        <td>{m["Calificación Cualitativa"]}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+              {tabActiva === "q1" && (
+                <table className="table table-bordered text-center">
+                  <thead className="table-primary">
+                    <tr>
+                      <th>Asignatura</th>
+                      <th>Promedio Q1</th>
+                      <th>Calificación Cualitativa</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {materiasQuim.map((m, i) => (
+                      <tr key={i}>
+                        <td>{m.Asignatura}</td>
+                        <td>{m["Prom. Q1"]}</td>
+                        <td>{m["Cuali. Q1"]}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+              {tabActiva === "q2" && (
+                <table className="table table-bordered text-center">
+                  <thead className="table-primary">
+                    <tr>
+                      <th>Asignatura</th>
+                      <th>Promedio Q2</th>
+                      <th>Calificación Cualitativa</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {materiasQuim.map((m, i) => (
+                      <tr key={i}>
+                        <td>{m.Asignatura}</td>
+                        <td>{m["Prom. Q2"]}</td>
+                        <td>{m["Cuali. Q2"]}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
         </div>

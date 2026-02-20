@@ -1,4 +1,25 @@
 
+/* ==== BOTÓN ESCOBA BUSCADOR ==== */
+.broom-btn {
+  border: none;
+  background: transparent;
+  padding: 0;
+  line-height: 1;
+  cursor: pointer;
+  color: #adb5bd;
+  font-size: 18px;
+  transition: color 0.2s ease;
+}
+
+.broom-btn:not(:disabled):hover {
+  color: #000;
+}
+
+.broom-btn:disabled {
+  cursor: default;
+  color: #ced4da;
+}
+
 /* ==== CONTENEDOR GENERAL ==== */
 .content-container {
   background-color: #f9f9f9;
